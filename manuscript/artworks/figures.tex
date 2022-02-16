@@ -1,0 +1,210 @@
+\documentclass[8pt]{beamer}
+
+\usepackage{amssymb,amsfonts,amsmath,amsthm,mathtools}
+\usepackage{lmodern}
+\usepackage{xfrac, nicefrac}
+\usepackage{pgfplots, pgf,tikz}
+\usepackage{enumitem}
+\usepgfplotslibrary{fillbetween}
+\usebackgroundtemplate{\tikz\node[opacity=0]{};}
+\setbeamertemplate{footline}[frame number]{}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{}
+\usefonttheme{serif}
+\pgfplotsset{compat=1.16}
+
+\definecolor{RED}{HTML}{EB6231}
+\definecolor{YELLOW}{HTML}{E29D26}
+\definecolor{BLUE}{HTML}{5D80B4}
+\definecolor{LIGHTGREEN}{HTML}{6ABD9B}
+\definecolor{GREEN}{HTML}{8FB03E}
+\definecolor{PURPLE}{HTML}{BE1E2D}
+\definecolor{BROWN}{HTML}{A97C50}
+\definecolor{PINK}{HTML}{DA1C5C}
+
+\pgfplotsset{every axis/.append style={line width=1pt}}
+\pgfplotscreateplotcyclelist{colors}{LIGHTGREEN\\YELLOW\\RED\\GREEN\\BLUE\\}
+
+
+\newcommand{\der}{\mathrm{d}}
+\newcommand{\e}{\text{e}}
+\newcommand{\Ne}{N_{\text{e}}}
+\newcommand{\pnps}{\pn / \ps}
+\newcommand{\proba}{\mathbb{P}}
+\newcommand{\pfix}{\proba_{\text{fix}}}
+
+\newcommand{\ci}{{\color{BLUE}{\textbf{ATT}}}}
+\newcommand{\cj}{{\color{YELLOW}\textbf{ATG}}}
+\newcommand{\nuci}{{\color{BLUE}\textbf{T}}}
+\newcommand{\nucj}{{\color{YELLOW}\textbf{G}}}
+\newcommand{\aai}{{\color{BLUE}\textbf{Ile}}}
+\newcommand{\aaj}{{\color{YELLOW}\textbf{Met}}}
+\newcommand{\Fi}{{F_{\aai}}}
+\newcommand{\Fj}{{F_{\aaj}}}
+\newcommand{\aaitoj}{{\aai \rightarrow \aaj}}
+\newcommand{\nucitoj}{\nuci \rightarrow \nucj}
+\newcommand{\citoj}{\ci \rightarrow \cj}
+\newcommand{\AtoB}{A \rightarrow B}
+\newcommand{\itoj}{ i \rightarrow j }
+
+\begin{document}
+	\begin{frame}
+		\begin{itemize}[label=$\bullet$]
+			\item $s_{\AtoB}$ is the selection coefficient of allele $B$ in a population of $A$.
+			\item $w_A$ is the Wrightian fitness (survival $\times$ fecundity) of allele $A$.
+			\item $f_A = \ln (w_A) $ is the Malthusian fitness of allele $A$.
+		\end{itemize}
+		\begin{align*}
+			s_{\AtoB} &  = \frac{w_B - w_A}{w_A} \\
+							     &  = \frac{w_B}{w_A} - 1 \\
+								 &  \simeq \ln \left( \frac{w_B}{w_A} \right) \\
+								 &  = \ln (w_B) - \ln (w_A) \\
+								 &  = f_B - f_A. \\
+		\end{align*}
+		$s_{\AtoB}$ = 0.01 means that B is favored with a increased chance of survival or fecundity by 1\%.
+	\end{frame}
+	\begin{frame}
+		For a diploid population of size $\Ne$ the initial frequency of a mutation with selection coefficient $s$ is $p = 1/2\Ne$. Its probability of fixation
+denoted $\pfix(s)$ is given by:
+		\begin{align*}
+		\pfix(s) &  = \frac{1 - \e^{ -2s}}{1 - \e^{ -4 \Ne s}}  \\
+		 	     & \simeq \frac{2s}{1 - \e^{ -4 \Ne s}}.
+		\end{align*}
+		The special case of a neutral allele can be obtained by taking the limit $s \rightarrow 0$:
+		\begin{align*}
+			\pfix(0) &  = \lim_{s \rightarrow 0} \pfix(s), \\
+					 &  = \lim_{s \rightarrow 0} \frac{2s}{1 - \e^{ -4 \Ne s}} \\
+					 &  = \lim_{s \rightarrow 0} \frac{2s}{1 - (1 - 4 \Ne s)} \\
+					 &  = \lim_{s \rightarrow 0} \frac{2s}{4 \Ne s} \\
+					 & = \frac{1}{2 \Ne}.
+		\end{align*}
+	\end{frame}
+	\begin{frame}
+		\begin{itemize}[label=$\bullet$]
+			\item $\Ne$ is the number of diploid individuals. 
+			\item $q$ is the substitution rate of new alleles.
+			\item $\mu$ is the mutation rate of new alleles.
+			\item $\pfix(s)$ is the probability of fixation of new allele, with selection coefficient $s$.
+		\end{itemize}
+		\begin{align*}
+			q &  = 2 \Ne \times \mu \times \pfix(s), \\
+			&  = 2 \Ne \times \mu \times \frac{2s}{1 - \e^{ -4 \Ne s}}, \\
+			&  =   \mu \times \frac{S}{1 - \e^{ - S}} \text{ with } S=4 \Ne s.
+		\end{align*}
+	\end{frame}
+	\begin{frame}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=\textwidth,
+				height=0.5\textwidth,
+				ylabel={Relative fixation probability},
+				xlabel={Scaled selection coefficient ($S=4 \Ne s$)},
+				cycle list name=colors,
+				domain=-5:5,
+				ymin=0.0, ymax=5.0,
+				samples=200,
+				legend entries={$\frac{S}{1 - \e^{-S}}$},
+				legend cell align=left,
+				minor tick num=2,
+				axis x line=bottom,
+				axis y line=left,
+				legend style={at={(0.02,0.9)},anchor=north west}
+				]
+				\addplot[line width=2.0pt, BLUE]{ x / (1 - exp(- x))};
+				\addplot[name path=B, dashed, YELLOW, line width=0.5pt] coordinates {(-1, 0) (-1, 5)};
+				\addplot[name path=A, line width=0pt] coordinates {(-5, 0) (-5, 5)};
+				\addplot[black, dashed, line width=1.0pt]{1.0};
+				\addplot[black, dashed, line width=1.0pt] coordinates {(0, 0) (0, 5)};
+				\addplot[name path=C, dashed, YELLOW, line width=0.5pt] coordinates {(1, 0) (1, 5)};
+				\addplot[name path=D, line width=0pt] coordinates {(5, 0) (5, 5)};
+				\addplot[fill=RED, opacity=0.2] fill between[ of = A and B];
+				\addplot[fill=YELLOW, opacity=0.2] fill between[ of = B and C];
+				\addplot[fill=GREEN, opacity=0.2] fill between[ of = C and D];
+			\end{axis}
+		\end{tikzpicture}
+	\end{frame}
+	\begin{frame}
+		\begin{itemize}[label=$\bullet$]
+			\item $q_{\citoj}$ is the substitution rate from codon $\ci$ to $\cj$.
+			\item $\mu_{\nucitoj}$ is the mutation rate from nucleotide $\nuci$ to $\nucj$.
+			\item $S_{\aaitoj}=4\Ne s_{\aaitoj}$ is the scaled selection coefficient from $\aai$ to $\aaj$.
+			\item $\Fi=4\Ne f_{\aai} $ is the scaled fitness of Isoleucine.
+			\item $\Fj=4\Ne f_{\aaj} $ is the scaled fitness of Methionine.
+		\end{itemize}
+		\begin{align*}
+				q_{\citoj}  &  = \mu_{\nucitoj}   \dfrac{S_{\aaitoj}}{1 - \e^{-S_{\aaitoj}} } \\
+				&  = \mu_{\nucitoj}   \dfrac{\Fj - \Fi}{1 - \e^{\Fi - \Fj} } \\
+		\end{align*}
+	\end{frame}
+	\begin{frame}
+	\begin{itemize}[label=$\bullet$]
+		\item $q_{\itoj}$ is the substitution rate from codon $i$ to $j$.
+		\item $\mu_{\itoj}$ is the mutation rate from codon $i$ to $j$.
+		\item $ F_i $ is the scaled fitness of codon $i$ ($F_j$ for codon $j$).
+	\end{itemize}
+	\begin{equation*}
+		\begin{dcases}
+			q_{\itoj} = \mu_{\itoj} & \text{for synonymous substitutions} \\
+			q_{\itoj} = \mu_{\itoj} \frac{F_j - F_i}{1 - \e^{ F_i - F_j}} & \text{for non-synonymous substitutions}\\
+		\end{dcases}
+	\end{equation*}
+	\end{frame}
+	\begin{frame}
+		Before fixation or extinction, the probability of an allele to be at a certain frequency can be related to its selection coefficient ($s$) and to the effective population size ($\Ne$).
+		\begin{itemize}[label=$\bullet$]
+			\item $g(x) \der x $ is the expected time for which the population frequency of derived allele is in the range $(x, x+\der x)$ before eventual absorption
+		\end{itemize}
+		\begin{align*}
+			g(x, S) & = \dfrac{\left( 1 - \e^{- 2 s }\right) \left( 1 - \e^{-4 \Ne s(1-x)}\right)}{ s (1 - \e^{-4 \Ne s})x(1-x)} \\
+			        & \approx \dfrac{2 \left( 1 - \e^{-S(1-x)}\right)}{(1 - \e^{-S})x(1-x)}
+		\end{align*}
+	\end{frame}
+	\begin{frame}
+		\centering
+		\begin{tikzpicture}[
+		declare function={
+			f(\x,\k)= 2 * (1 - exp(-\k * (1-\x))) / ((1 - exp(- \k))*\x*(1-\x));
+		},]
+		\begin{axis}[
+		width=\textwidth,
+		height=0.6\textwidth,
+		ylabel={$g(x, S)$},
+		xlabel={frequency of the derived allele ($x$)},
+		domain=0.05:0.95,
+		cycle list name=colors,
+		samples=200,
+		legend entries={$S=12$, $ S=4$, $S=0$, $S=-4$, $S=-12$},
+		legend cell align=left,
+		minor tick num=2,
+		axis x line=bottom,
+		axis y line=left,
+		legend style={at={(0.3,0.7)},anchor=north west}
+		]
+		\addplot{f(\x, 12)};
+		\addplot{f(\x, 4)};
+		\addplot{2 / x};
+		\addplot{f(\x, -4)};
+		\addplot{f(\x, -12)};
+		\end{axis}
+		\end{tikzpicture}
+	\end{frame}
+	\begin{frame}
+		\begin{itemize}[label=$\bullet$]
+			\item $n$ is the number of sampled chromosomes (twice the number of individuals).
+			\item $1 \leq i \leq n - 1 $ is number of chromosomes with the derived allele.
+			\item $\beta_i$ is the number of SNPs with derived allele carried by $i$ chromosomes.
+			\item $\beta_i' = \beta_i \times i $ is the scaled $\beta_i$.
+		\end{itemize}
+	\end{frame}
+\begin{frame}
+	\begin{align*}
+		H & = \frac{2}{n(n-1)} \left( \sum_{i=1}^{n-1} \beta_i \times (n-i) \times i   - \sum_{i=1}^{n-1} \beta_i \times i^2 \right)
+	\end{align*}
+	\begin{itemize}[label=$\bullet$]
+		\item $H = 0$:  no evidence of deviation from neutrality. 
+		\item $H > 0$: deficit of SNPs at high frequency (negative selection).
+		\item $H < 0$: excess of SNPs at high frequency (positive selection).
+	\end{itemize}
+\end{frame}
+\end{document}

@@ -1,0 +1,14 @@
+SAMPLE_LIST: "sample_test.tsv"
+subsample: 50
+nbr_replicates: 1
+METHOD_LIST: [ "MutSel" ]
+# METHOD_LIST: [ "MutSel", "Omega", "SW", "WS", "SIFT" ]
+MODEL_LIST: [ "polyDFE_D"]
+# MODEL_LIST: [ "grapes", "polyDFE_D", "polyDFE_C" ]
+SIFT:
+  Bos_taurus.SIFT.vcf.gz: "ftp.ensembl.org/pub/release-91/variation/vcf/bos_taurus/bos_taurus_incl_consequences.vcf.gz"
+  Ovis_aries.SIFT.vcf.gz: "ftp.ensembl.org/pub/release-91/variation/vcf/ovis_aries/ovis_aries_incl_consequences.vcf.gz"
+  Capra_hircus.SIFT.vcf.gz: "ftp.ensembl.org/pub/release-92/variation/vcf/capra_hircus/capra_hircus_incl_consequences.vcf.gz"
+  Canis_familiaris.SIFT.vcf.gz: "ftp.ensembl.org/pub/release-91/variation/vcf/canis_familiaris/canis_familiaris_incl_consequences.vcf.gz"
+  # Equus_caballus.SIFT.vcf.gz: "ftp.ensembl.org/pub/release-91/variation/vcf/equus_caballus/equus_caballus_incl_consequences.vcf.gz"
+  # Homo_sapiens.SIFT.vcf.gz: "ftp.ensembl.org/pub/release-91/variation/vcf/homo_sapiens/homo_sapiens_incl_consequences.vcf.gz"

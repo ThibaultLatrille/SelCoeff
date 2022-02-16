@@ -1,0 +1,112 @@
+import os
+import sys
+import pandas as pd
+
+
+configfile: 'config/config.yaml'
+
+FOLDER = os.path.abspath('.')
+sys.path.append('.')
+from scripts.libraries_plot import CategorySNP
+
+cat_snps = CategorySNP().non_syn() + ["all"]
+sample_list = f"{FOLDER}/config/{config['SAMPLE_LIST']}"
+SFS_LIST = []
+
+for id, row in list(pd.read_csv(sample_list,sep='\t').iterrows()):
+    for method in config['METHOD_LIST']:
+        if method == 'SIFT' and row['Species'] not in config['SIFT']:
+            continue
+        SFS_LIST.append(FOLDER + f"/analysis/{row['Species']}.{row['SampleName']}.{method}")
+
+
+rule all:
+    input:
+        f'{FOLDER}/manuscript/main.pdf',
+        expand("{path}.{model}.pdf",path=SFS_LIST,model=config['MODEL_LIST'])
+
+rule download:
+    priority: 50
+    output: FOLDER + '/data/dl.{filename}'
+    params: lambda wildcards: f'{FOLDER}/{config["SIFT"][wildcards.filename]}'
+    shell:
+        "wget -c {params} -O {output}"
+
+rule SIFT_intersect:
+    input:
+        vcf=FOLDER + '/data/{species}.{popu}.vcf.gz',
+        vcf_sift=lambda wildcards: FOLDER + f"/data/dl.{wildcards.species}.SIFT.vcf.gz"
+    output:
+        vcf=FOLDER + '/data/{species}.{popu}.SIFT.vcf.gz'
+    shell:
+        'bedtools intersect -a {input.vcf_sift} -b {input.vcf} -wb -wa -header | gzip > {output.vcf}'
+
+rule sfs:
+    input:
+        vcf=lambda wildcards: rules.SIFT_intersect.output.vcf if wildcards.method == 'SIFT' else FOLDER + '/data/{species}.{popu}.vcf.gz',
+        script=f'{FOLDER}/scripts/plot_sfs.py',
+        genome_results=f'{FOLDER}/data/genome_results.tsv'
+    output:
+        pdf=FOLDER + '/analysis/{species}.{popu}.{method}.pdf',
+        tsv=FOLDER + '/analysis/{species}.{popu}.{method}.tsv',
+        sfs=expand(FOLDER + '/analysis/{{species}}.{{popu}}.{{method}}.{cat}.sfs',cat=cat_snps),
+        dofe=expand(FOLDER + '/analysis/{{species}}.{{popu}}.{{method}}.{cat}.dofe',cat=cat_snps)
+    params:
+        f'--nbr_replicates {config["nbr_replicates"]} --subsample {config["subsample"]}'
+    shell:
+        'python3 {input.script} --vcf {input.vcf} --pop {wildcards.popu} {params} --method {wildcards.method} --genome_results {input.genome_results} --output {output.pdf}'
+
+rule polyDFE:
+    input:
+        sfs=FOLDER + '/analysis/{species}.{popu}.{method}.{cat}.sfs',
+        polyDFE=f'{FOLDER}/utils/polyDFE/polyDFE-2.0-linux-64-bit',
+        init_file=FOLDER + '/config/{model}_init.txt',
+        range_file=FOLDER + '/config/{model}_range.txt'
+    output:
+        out=FOLDER + '/analysis/{species}.{popu}.{method}.{cat}.{model}.out',
+        stderr=FOLDER + '/analysis/{species}.{popu}.{method}.{cat}.{model}.stderr'
+    params:
+        lambda wildcards: "-m D 5" if wildcards.model == "polyDFE_D" else "-m C"
+    shell:
+        '{input.polyDFE} -d {input.sfs} -i {input.init_file} 1 -r {input.range_file} 1 -w {params} 1> {output.out} 2> {output.stderr}'
+
+rule grapes:
+    input:
+        dofe=FOLDER + '/analysis/{species}.{popu}.{method}.{cat}.dofe',
+        grapes=f'{FOLDER}/utils/grapes/grapes/grapes',
+    output:
+        out=FOLDER + '/analysis/{species}.{popu}.{method}.{cat}.grapes.out',
+        stdout=FOLDER + '/analysis/{species}.{popu}.{method}.{cat}.grapes.stdout',
+        stderr=FOLDER + '/analysis/{species}.{popu}.{method}.{cat}.grapes.stderr'
+    shell:
+        "{input.grapes} -in {input.dofe} -out {output.out} -model GammaExpo -no_div_data 1> {output.stdout} 2> {output.stderr}"
+
+rule merge_models:
+    input:
+        modelfile=expand(FOLDER + '/analysis/{{species}}.{{popu}}.{{method}}.{cat}.{{model}}.out',cat=cat_snps),
+        script=f'{FOLDER}/scripts/gather_polyDFE.py'
+    output:
+        pdf=FOLDER + '/analysis/{species}.{popu}.{method}.{model}.pdf'
+    shell:
+        'python3 {input.script} --input {input.modelfile} --output {output.pdf}'
+
+rule gather_sfs_theta:
+    input:
+        sfs=map(lambda p: f"{p}.pdf",SFS_LIST),
+        sample_list=sample_list,
+        script=f'{FOLDER}/scripts/gather_sfs_theta.py'
+    output:
+        tsv=f'{FOLDER}/results.tsv'
+    shell:
+        'python3 {input.script} --sfs {input.sfs} --sample_list {input.sample_list} --output {output.tsv}'
+
+rule latex:
+    input:
+        sfs=map(lambda p: f"{p}.pdf",SFS_LIST),
+        tex=f'{FOLDER}/manuscript/main.tex',
+        tsv=f'{FOLDER}/results/results.tsv',
+        script=f'{FOLDER}/scripts/tex_sfs.py'
+    output:
+        tex=FOLDER + '/manuscript/include-figures.tex',
+        pdf=FOLDER + '/manuscript/main.pdf'
+    shell: 'python3 {input.script} --sfs {input.sfs} --tex_doc {input.tex} --results {input.tsv} --tex_include {output.tex}'
