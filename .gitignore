@@ -9,7 +9,8 @@
 __pycache__
 .snakemake/
 /analysis/
-/data/
+/data_poly/
+/data_div/
 /results/
 /utils/
 .idea/

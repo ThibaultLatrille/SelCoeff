@@ -10,9 +10,12 @@ sys.path.append('.')
 from scripts.libraries import CategorySNP
 
 sample_list = f"{FOLDER}/config/{config['SAMPLE_LIST']}"
+bins = config["bins"]
+pop2sp = {}
 SFS_LIST = []
 
 for id, row in list(pd.read_csv(sample_list,sep='\t').iterrows()):
+    pop2sp[row['SampleName']] = row['Species']
     for method in config['METHOD_LIST']:
         if method == 'SIFT' and row['Species'] not in config['SIFT']:
             continue
@@ -26,32 +29,45 @@ rule all:
         expand("{path}.{model}.pdf",path=SFS_LIST,model=config['MODEL_LIST'])
 
 rule download:
-    output: FOLDER + '/data/dl.{species}.SIFT.vcf.gz'
+    output: FOLDER + '/data_poly/dl.{species}.SIFT.vcf.gz'
     params: lambda wildcards: config["SIFT"][wildcards.species]
     shell:
         "wget -c {params} -O {output}"
 
+rule opportunities:
+    input:
+        script=f'{FOLDER}/scripts/genome_opportunities.py',
+        exp_folder=f'{FOLDER}/data_div/Experiments',
+        fasta_folder=f'{FOLDER}/data_div/omm_NT_fasta.v10c_116'
+    output:
+        opportunities=FOLDER + '/data_div/opportunities.{method}.tsv'
+    params:
+        species=" ".join(set(pop2sp.values()))
+    shell:
+        'python3 {input.script} --species {params.species} --method {wildcards.method} --exp_folder {input.exp_folder} --fasta_folder {input.fasta_folder} --output {output.opportunities}'
+
 rule SIFT_intersect:
     input:
-        vcf=FOLDER + '/data/{species}.{popu}.vcf.gz',
+        vcf=FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
         vcf_sift=rules.download.output
     output:
-        vcf=FOLDER + '/data/{species}.{popu}.SIFT.vcf.gz'
+        vcf=FOLDER + '/data_poly/{species}.{popu}.SIFT.vcf.gz'
     shell:
         'bedtools intersect -a {input.vcf_sift} -b {input.vcf} -wb -wa -header | gzip > {output.vcf}'
 
 rule sfs:
     input:
-        vcf=lambda wildcards: rules.SIFT_intersect.output.vcf if wildcards.method == 'SIFT' else FOLDER + '/data/{species}.{popu}.vcf.gz',
+        vcf=lambda wildcards: rules.SIFT_intersect.output.vcf if wildcards.method == 'SIFT' else FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
         script=f'{FOLDER}/scripts/plot_sfs.py',
-        genome_results=f'{FOLDER}/data/genome_results.tsv'
+        genome_results=f'{FOLDER}/data_div/genome_results.tsv',
+        opportunities=FOLDER + '/data_div/opportunities.{method}.tsv'
     output:
         pdf=FOLDER + '/analysis/{species}.{popu}.{method}.pdf',
         tsv=FOLDER + '/analysis/{species}.{popu}.{method}.tsv'
     params:
-        f'--nbr_replicates {config["nbr_replicates"]} --subsample {config["subsample"]}'
+        lambda wildcards: f'--nbr_replicates {config["nbr_replicates"]} --subsample {config["subsample"]} --species {pop2sp[wildcards.popu]}'
     shell:
-        'python3 {input.script} --vcf {input.vcf} --pop {wildcards.popu} {params} --method {wildcards.method} --genome_results {input.genome_results} --output {output.pdf}'
+        'python3 {input.script} {params} --vcf {input.vcf} --pop {wildcards.popu} --method {wildcards.method} --bins {bins} --genome_results {input.genome_results} --opportunities {input.opportunities} --output {output.pdf}'
 
 rule polyDFE:
     input:
@@ -83,13 +99,13 @@ rule grapes:
 
 rule parse_results_DFE:
     input:
-        modelfile=lambda wildcards: expand(FOLDER + '/analysis/{{species}}.{{popu}}.{{method}}.{cat}.{{model}}.out',cat=CategorySNP(wildcards.method).all()),
+        modelfile=lambda wildcards: expand(FOLDER + '/analysis/{{species}}.{{popu}}.{{method}}.{cat}.{{model}}.out',cat=CategorySNP(wildcards.method,bins).all()),
         script=f'{FOLDER}/scripts/parse_results_DFE.py'
     output:
         pdf=FOLDER + '/analysis/{species}.{popu}.{method}.{model}.pdf',
         tsv=FOLDER + '/analysis/{species}.{popu}.{method}.{model}.tsv'
     shell:
-        'python3 {input.script} --input {input.modelfile} --method {wildcards.method} --output {output.pdf}'
+        'python3 {input.script} --input {input.modelfile} --method {wildcards.method} --bins {bins} --output {output.pdf}'
 
 rule plot_theta_heatmap:
     input:
@@ -99,7 +115,7 @@ rule plot_theta_heatmap:
     output:
         tsv=f'{FOLDER}/results/Theta.results.tsv'
     shell:
-        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --output {output.tsv}'
+        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --bins {bins} --output {output.tsv}'
 
 rule plot_dfe_heatmap:
     input:
@@ -109,7 +125,7 @@ rule plot_dfe_heatmap:
     output:
         tsv=f'{FOLDER}/results/DFE.results.tsv'
     shell:
-        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --output {output.tsv}'
+        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --bins {bins} --output {output.tsv}'
 
 
 rule latex:

@@ -7,8 +7,8 @@ from scipy.stats import expon, gamma
 from libraries import plt, CategorySNP, my_dpi
 
 
-def read_polyDFE(path):
-    out_polyDFE = {}
+def read_poly_dfe(path):
+    out_poly_dfe = {}
     with open(path, 'r') as f:
         for line in f:
             if "Model: C" in line or "Model: D" in line:
@@ -18,16 +18,16 @@ def read_polyDFE(path):
                 values = re.sub(' +', ' ', f.readline().replace("--", "").strip()).split(" ")
                 if "Model: C" in line:
                     for h_i, h in enumerate(header):
-                        out_polyDFE[h] = float(values[h_i])
-                    out_polyDFE["S_d"] = -out_polyDFE["S_d"]
+                        out_poly_dfe[h] = float(values[h_i])
+                    out_poly_dfe["S_d"] = -out_poly_dfe["S_d"]
                 elif "Model: D" in line:
                     for v_i, v in enumerate(values):
-                        out_polyDFE[f"S_{v_i + 1}"] = float(header[v_i * 2 + 1])
-                        out_polyDFE[f"p(S={header[v_i * 2 + 1]})"] = float(v)
+                        out_poly_dfe[f"S_{v_i + 1}"] = float(header[v_i * 2 + 1])
+                        out_poly_dfe[f"p(S={header[v_i * 2 + 1]})"] = float(v)
             if "alpha_dfe" in line:
                 k, v = line.strip().split("=")
-                out_polyDFE["$\\alpha$"] = float(v)
-    return out_polyDFE
+                out_poly_dfe["$\\alpha$"] = float(v)
+    return out_poly_dfe
 
 
 def read_grapes(path):
@@ -39,12 +39,12 @@ def read_grapes(path):
 
 
 def main(args):
-    cat_snps = CategorySNP(args.method)
-    list_cat = cat_snps.non_syn() + ["all"]
+    cat_snps = CategorySNP(args.method, args.bins)
+    list_cat = cat_snps.all()
     s_dico = dict()
     for file in args.input:
         cat = os.path.basename(file).replace(".out", "").split(".")[-2]
-        out = read_polyDFE(file) if "polyDFE" in file else read_grapes(file)
+        out = read_poly_dfe(file) if "polyDFE" in file else read_grapes(file)
         if "polyDFE_D" in file:
             p_list = np.array([v for k, v in out.items() if "p(S=" in k])
             s_list = np.array([v for k, v in out.items() if "S_" in k])
@@ -94,7 +94,7 @@ def main(args):
             scale_pos = s_dico[cat]["S_b"]
             d_pos = expon(scale=scale_pos)
             x = np.linspace(0, 5, 100)
-            y = [p_pos * expon.pdf(s) for s in x]
+            y = [p_pos * d_pos.pdf(s) for s in x]
             axs[cat_i].plot(x, y, color=cat_snps.color(cat))
             axs[cat_i].axvline(-1, color="grey", lw=1, ls='--')
             axs[cat_i].axvline(1, color="grey", lw=1, ls='--')
@@ -119,4 +119,5 @@ if __name__ == '__main__':
     parser.add_argument('--output', required=False, type=str, dest="output", help="Output tex file")
     parser.add_argument('--sample_list', required=False, type=str, dest="sample_list", help="Sample list file")
     parser.add_argument('--method', required=False, type=str, dest="method", help="Sel coeff parameter")
+    parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
     main(parser.parse_args())

@@ -53,7 +53,7 @@ def main(args):
     pop2sp = {pop: sp for (pop, sp), d in df_merge.groupby(["pop", "species"])}
 
     for method, df in df_merge.groupby(["method"]):
-        cat_snps = CategorySNP(method)
+        cat_snps = CategorySNP(method, args.bins)
         for d, d_label in d_dict.items():
             # scatter_plot(cat_snps, df, d, d_dict, f"{args.output.replace('.tsv', '')}/{method}.{d}.scatter.pdf")
 
@@ -66,12 +66,12 @@ def main(args):
             _, ax = plt.subplots(figsize=(1920 / my_dpi, 880 / my_dpi), dpi=my_dpi)
             cat_labels = [cat_snps.label(cat) for cat in cat_snps.non_syn()]
             start, end = np.nanmin(matrix), np.nanmax(matrix)
-            RdBu = cm.get_cmap('RdBu_r')
+            rd_bu = cm.get_cmap('RdBu_r')
             if np.sign(start) != np.sign(end):
                 midpoint = - start / (np.nanmax(matrix) - start)
-                RdBu = shiftedColorMap(RdBu, midpoint=midpoint, name='shifted')
+                rd_bu = shiftedColorMap(rd_bu, midpoint=midpoint, name='shifted')
 
-            im, _ = heatmap(matrix.T, cat_labels, matrix.index, ax=ax, cmap=RdBu, cbarlabel=d_label)
+            im, _ = heatmap(matrix.T, cat_labels, matrix.index, ax=ax, cmap=rd_bu, cbarlabel=d_label)
             annotate_heatmap(im, valfmt=lambda p: "{0:.2f}".format(p), div=True, fontsize=5)
             plt.tight_layout()
             plt.savefig(args.output.replace('results.tsv', f'{method}.{d}.heatmap.pdf'), format="pdf")
@@ -84,4 +84,5 @@ if __name__ == '__main__':
     parser.add_argument('--tsv', required=False, type=str, nargs="+", dest="tsv", help="Input tsv file")
     parser.add_argument('--output', required=False, type=str, dest="output", help="Output tsv file")
     parser.add_argument('--sample_list', required=False, type=str, dest="sample_list", help="Sample list file")
+    parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
     main(parser.parse_args())

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 import numpy as np
 from math import floor
 import matplotlib
@@ -9,6 +9,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import to_rgb
+from matplotlib.cm import get_cmap
 
 fontsize = 16
 fontsize_legend = 14
@@ -24,6 +25,26 @@ GREEN_RGB = to_rgb(GREEN)
 GREY_RGB = to_rgb("grey")
 BLACK_RGB = to_rgb("black")
 
+complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
+nucleotides = list(sorted(complement.keys()))
+codontable = defaultdict(lambda: "-")
+codontable.update({
+    'ATA': 'I', 'ATC': 'I', 'ATT': 'I', 'ATG': 'M',
+    'ACA': 'T', 'ACC': 'T', 'ACG': 'T', 'ACT': 'T',
+    'AAC': 'N', 'AAT': 'N', 'AAA': 'K', 'AAG': 'K',
+    'AGC': 'S', 'AGT': 'S', 'AGA': 'R', 'AGG': 'R',
+    'CTA': 'L', 'CTC': 'L', 'CTG': 'L', 'CTT': 'L',
+    'CCA': 'P', 'CCC': 'P', 'CCG': 'P', 'CCT': 'P',
+    'CAC': 'H', 'CAT': 'H', 'CAA': 'Q', 'CAG': 'Q',
+    'CGA': 'R', 'CGC': 'R', 'CGG': 'R', 'CGT': 'R',
+    'GTA': 'V', 'GTC': 'V', 'GTG': 'V', 'GTT': 'V',
+    'GCA': 'A', 'GCC': 'A', 'GCG': 'A', 'GCT': 'A',
+    'GAC': 'D', 'GAT': 'D', 'GAA': 'E', 'GAG': 'E',
+    'GGA': 'G', 'GGC': 'G', 'GGG': 'G', 'GGT': 'G',
+    'TCA': 'S', 'TCC': 'S', 'TCG': 'S', 'TCT': 'S',
+    'TTC': 'F', 'TTT': 'F', 'TTA': 'L', 'TTG': 'L',
+    'TAC': 'Y', 'TAT': 'Y', 'TAA': 'X', 'TAG': 'X',
+    'TGC': 'C', 'TGT': 'C', 'TGA': 'X', 'TGG': 'W', '---': '-'})
 confidence_interval = namedtuple('confidence_interval', ['low', 'mean', 'up'])
 sfs_weight = {"watterson": lambda i, n: 1.0 / i, "tajima": lambda i, n: n - i, "fay_wu": lambda i, n: i}
 
@@ -120,7 +141,9 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
     return newcmap
 
 
-def heatmap(data, row_labels, col_labels, ax=None, cbar_kw={}, cbarlabel="", **kwargs):
+def heatmap(data, row_labels, col_labels, ax=None, cbar_kw=None, cbarlabel="", **kwargs):
+    if cbar_kw is None:
+        cbar_kw = {}
     im = ax.imshow(data, **kwargs)
     cbar = ax.figure.colorbar(im, ax=ax, **cbar_kw, orientation='horizontal')
     cbar.ax.set_xlabel(cbarlabel)
@@ -221,26 +244,70 @@ def multiline(xs, ys, c, ax, **kwargs):
     return lc
 
 
+def append_int(num):
+    if num > 9:
+        second_to_last_digit = str(num)[-2]
+        if second_to_last_digit == '1':
+            return 'th'
+    last_digit = num % 10
+    if last_digit == 1:
+        return 'st'
+    elif last_digit == 2:
+        return 'nd'
+    elif last_digit == 3:
+        return 'rd'
+    else:
+        return 'th'
+
+
+def quantile(b, num):
+    if num == 100:
+        return f"{b}{append_int(b)} percentiles"
+    if num == 10:
+        return f"{b}{append_int(b)} deciles"
+    if num == 5:
+        return f"{b}{append_int(b)} quintiles"
+    elif num == 4:
+        return f"{b}{append_int(b)} quarters"
+    else:
+        return f"{b}/{num} quantile"
+
+
 class CategorySNP(list):
-    def __init__(self, method=""):
+    def __init__(self, method="", bins=0, transform_bound=lambda s: s):
         P = namedtuple('P', ['label', 'color', 'interval'])
-        if method == "SIFT":
-            self.dico = {"syn": P("Synonymous", 'black', lambda x: False),
-                         "pos": P("$0.8<SIFT$", RED, lambda s: 1 >= s > 0.8),
-                         "weak": P("$0.3<SIFT<0.8$", YELLOW, lambda s: 0.8 >= s > 0.3),
-                         "neg": P("$0.1<SIFT<0.3$", LIGHTGREEN, lambda s: 0.3 >= s > 0.1),
-                         "neg-strong": P("$SIFT<0.1$", BLUE, lambda s: 0.1 >= s >= 0)}
+        self.bins = bins
+        if bins > 0:
+            self.inner_bound = []
+            cmap = get_cmap('viridis_r')
+            assert bins > 1
+            self.dico = {"syn": P("Synonymous", 'black', lambda s: False)}
+            for b in range(1, bins + 1):
+                color = cmap((b - 1) / (bins - 1))
+                self.dico[f"bin{b}"] = P(f"{quantile(b, bins)}", color, lambda s: False)
+        elif method == "SIFT":
+            self.inner_bound = [0.1, 0.3, 0.8]
+            self.dico = {
+                "neg-strong": P("$SIFT<0.1$", BLUE, lambda s: 0.1 >= s >= 0),
+                "neg": P("$0.1<SIFT<0.3$", LIGHTGREEN, lambda s: 0.3 >= s > 0.1),
+                "weak": P("$0.3<SIFT<0.8$", YELLOW, lambda s: 0.8 >= s > 0.3),
+                "pos": P("$0.8<SIFT$", RED, lambda s: 1 >= s > 0.8),
+                "syn": P("$Synonymous$", 'black', lambda x: False),
+            }
         else:
-            self.dico = {"pos": P("$1<S$", RED, lambda s: s > 1),
-                         "pos-weak": P("$0<S<1$", YELLOW, lambda s: 1 >= s >= 0),
-                         "syn": P("Synonymous", 'black', lambda s: False),
-                         "neg-weak": P("$-1<S<0$", LIGHTGREEN, lambda s: 0 >= s > -1),
-                         "neg": P("$-3<S<-1$", GREEN, lambda s: -1 >= s > -3),
-                         "neg-strong": P("$S<-3$", BLUE, lambda s: -3 >= s)}
+            self.inner_bound = [-3, -1, 0, 1]
+            self.dico = {
+                "neg-strong": P("$S<-3$", BLUE, lambda s: transform_bound(-3) >= s),
+                "neg": P("$-3<S<-1$", GREEN, lambda s: transform_bound(-1) >= s > transform_bound(-3)),
+                "neg-weak": P("$-1<S<0$", LIGHTGREEN, lambda s: transform_bound(0) >= s > transform_bound(-1)),
+                "syn": P("$Synonymous$", 'black', lambda s: False),
+                "pos-weak": P("$0<S<1$", YELLOW, lambda s: transform_bound(1) >= s >= transform_bound(0)),
+                "pos": P("$1<S$", RED, lambda s: s > transform_bound(1))
+            }
         super().__init__(self.dico.keys())
 
     def color(self, cat):
-        return self.dico[cat].color if cat != "all" else "black"
+        return self.dico[cat].color if cat != "all" else "grey"
 
     def label(self, cat):
         return self.dico[cat].label if cat != "all" else "All"
@@ -249,6 +316,9 @@ class CategorySNP(list):
         for cat in self:
             if self.dico[cat].interval(s):
                 return cat
+
+    def nbr_non_syn(self):
+        return len(self) - 1
 
     def non_syn(self):
         return [i for i in self if i != "syn"]
