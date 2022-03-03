@@ -80,6 +80,18 @@ def read_vcf(vcf, method, subsample, nbr_replicates):
     return list_non_syn, list_syn, max_daf
 
 
+def classify_snps(list_non_syn, s_method, cat_snps):
+    snp_dico = defaultdict(list)
+    if cat_snps.bins:
+        sorted_non_syn = sorted(list_non_syn, key=lambda x: getattr(x, s_method))
+        for i, snp in enumerate(sorted_non_syn):
+            snp_dico[f"bin{1 + int((i * cat_snps.nbr_non_syn()) / len(sorted_non_syn))}"].append(snp)
+    else:
+        for snp in list_non_syn:
+            snp_dico[cat_snps.selcoeff2cat(getattr(snp, s_method))].append(snp)
+    return snp_dico
+
+
 def plot_sift(list_non_syn, file):
     plt.figure(figsize=(1920 / my_dpi, 1080 / my_dpi), dpi=my_dpi)
     x = [snp.s_sift for snp in list_non_syn if snp.s_mutsel < 20]
@@ -99,7 +111,7 @@ def plot_density(list_non_syn, s_method, file):
     assert f_min != 0
     n_lines = min(int(1 / f_min), 500)
     s_list = [getattr(snp, s_method) for snp in list_non_syn if np.isfinite(getattr(snp, s_method))]
-    xmin, xmax = max(min(s_list), -10), min(max(s_list), 5)
+    xmin, xmax = (-10, 5) if min(s_list) < 0.0 else (0, 1)
     x = np.linspace(xmin, xmax, 101)
     ys = list()
     f_cutoff_list = np.linspace(f_min, 1.0, n_lines)[::-1]
@@ -114,6 +126,7 @@ def plot_density(list_non_syn, s_method, file):
     plt.xlabel("Scaled selection coefficient (S)")
     plt.ylabel("Density")
     if xmin < -1.0 and xmax > 1.0:
+        ax.xaxis.set_major_locator(plt.MultipleLocator(1))
         plt.axvline(-1, color="grey", lw=1, ls='--')
         plt.axvline(1, color="grey", lw=1, ls='--')
         plt.axvline(0, color="black", lw=2, ls='--')
@@ -125,9 +138,9 @@ def plot_density(list_non_syn, s_method, file):
 
 
 def plot_histogram(list_non_syn, cat_snps, s_method, file):
-    plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
+    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
     s_list = [getattr(snp, s_method) for snp in list_non_syn if np.isfinite(getattr(snp, s_method))]
-    xmin, xmax = max(min(s_list), -10), min(max(s_list), 5)
+    xmin, xmax = (-10, 5) if min(s_list) < 0.0 else (0, 1)
     n, bins, patches = plt.hist(s_list, bins=np.linspace(xmin, xmax, 61), range=(xmin, xmax))
     n_cat = defaultdict(int)
     for i, b in enumerate(bins[1:]):
@@ -135,12 +148,14 @@ def plot_histogram(list_non_syn, cat_snps, s_method, file):
         patches[i].set_facecolor(cat_snps.color(cat))
         n_cat[cat] += n[i]
     handles = [Rectangle((0, 0), 1, 1, color=c) for c in [cat_snps.color(cat) for cat in cat_snps.non_syn()]]
-    labels = [cat_snps.label(cat) + f" $({int(n_cat[cat])}~SNPs)$" for cat in cat_snps.non_syn()]
+    labels = [cat_snps.label(cat) + f" $({int(n_cat[cat])}~mutations)$" for cat in cat_snps.non_syn()]
     plt.legend(handles, labels, loc="upper left")
     plt.xlabel("Scaled selection coefficient (S)")
     plt.ylabel("Density")
     for x in cat_snps.inner_bound:
         plt.axvline(x, color="grey", lw=1, ls='--')
+    if xmin < -1.0 and xmax > 1.0:
+        ax.xaxis.set_major_locator(plt.MultipleLocator(1))
     plt.axvline(0, color="black", lw=2)
     plt.xlim((xmin, xmax))
     plt.tight_layout()
@@ -150,16 +165,32 @@ def plot_histogram(list_non_syn, cat_snps, s_method, file):
     return n_cat
 
 
-def classify_snps(list_non_syn, s_method, cat_snps):
-    snp_dico = defaultdict(list)
-    if cat_snps.bins:
-        sorted_non_syn = sorted(list_non_syn, key=lambda x: getattr(x, s_method))
-        for i, snp in enumerate(sorted_non_syn):
-            snp_dico[f"bin{1 + int((i * cat_snps.nbr_non_syn()) / len(sorted_non_syn))}"].append(snp)
+def plot_sfs(cat_snps, snp_sfs, max_daf, daf_axis, cat_dico_count, output, scaled):
+    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 1080 / my_dpi), dpi=my_dpi)
+    for cat in cat_snps:
+        if scaled:
+            snp_sfs[cat] *= np.array([i for i in range(max_daf)])
+
+        mean_sfs = np.mean(snp_sfs[cat], axis=0)[1:]
+        std_sfs = np.std(snp_sfs[cat], axis=0)[1:]
+        label = cat_snps.label(cat) + f" $({int(cat_dico_count[cat])}~mutations)$"
+        plt.scatter(daf_axis, mean_sfs, color=cat_snps.color(cat))
+        plt.plot(daf_axis, mean_sfs, label=label, color=cat_snps.color(cat), linewidth=1.0)
+        plt.fill_between(daf_axis, mean_sfs - std_sfs, mean_sfs + std_sfs, linewidth=1.0,
+                         color=cat_snps.color(cat), alpha=0.2)
+    if max_daf < 32:
+        ax.xaxis.set_major_locator(plt.MultipleLocator(1))
+    plt.xlabel("Derived allele count")
+    if scaled:
+        plt.ylabel('Proportion of mutations (scaled)')
     else:
-        for snp in list_non_syn:
-            snp_dico[cat_snps.selcoeff2cat(getattr(snp, s_method))].append(snp)
-    return snp_dico
+        plt.ylabel("Proportion of mutations")
+        plt.yscale("log")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(output, format="pdf")
+    plt.clf()
+    plt.close("all")
 
 
 def plot_venn(list_non_syn, method, cat_snps, snps_classified, file):
@@ -239,33 +270,9 @@ def main(args):
     df = pd.DataFrame(theta_dict)
     df.to_csv(args.output.replace('.pdf', '.tsv'), sep="\t", index=False)
 
-    scale = np.array([i for i in range(max_daf)])
     for scaled in [False, True]:
-        plt.figure(figsize=(1920 / my_dpi, 1080 / my_dpi), dpi=my_dpi)
-        for cat in cat_snps:
-            if scaled:
-                snp_sfs[cat] *= scale
-
-            mean_sfs = np.mean(snp_sfs[cat], axis=0)[1:]
-            std_sfs = np.std(snp_sfs[cat], axis=0)[1:]
-            label = cat_snps.label(cat) + f" $({int(cat_dico_count[cat])}~SNPs)$"
-            plt.scatter(daf_axis, mean_sfs, color=cat_snps.color(cat))
-            plt.plot(daf_axis, mean_sfs, label=label, color=cat_snps.color(cat), linewidth=1.0)
-            plt.fill_between(daf_axis, mean_sfs - std_sfs, mean_sfs + std_sfs, linewidth=1.0,
-                             color=cat_snps.color(cat), alpha=0.2)
-
-        plt.legend()
-        plt.xlabel("Derived allele count")
-        if scaled:
-            plt.ylabel('Frequency of SNPs (scaled)')
-        else:
-            plt.ylabel("Frequency of SNPs")
-            plt.yscale("log")
-        plt.tight_layout()
         output = args.output.replace('.pdf', '.normalize.pdf') if scaled else args.output
-        plt.savefig(output, format="pdf")
-        plt.clf()
-        plt.close("all")
+        plot_sfs(cat_snps, snp_sfs, max_daf, daf_axis, cat_dico_count, output, scaled)
 
 
 if __name__ == '__main__':

@@ -51,7 +51,7 @@ def main(args):
                 o.write("\\subsubsection*{" + dict_method[method] + '} \n')
                 o.write(minipage(0.49, sfs))
                 o.write(minipage(0.49, sfs.replace(".pdf", ".normalize.pdf")))
-                o.write(minipage(0.49, sfs.replace(".pdf", ".polyDFE_D.pdf")))
+                o.write(minipage(0.49, sfs.replace(".pdf", ".polyDFE_C.pdf")))
                 if "SIFT" in method:
                     o.write(minipage(0.49, sfs.replace("SIFT", "SIFT_vs_MutSel")))
                 else:

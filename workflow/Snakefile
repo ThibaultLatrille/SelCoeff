@@ -10,6 +10,7 @@ sys.path.append('.')
 from scripts.libraries import CategorySNP
 
 sample_list = f"{FOLDER}/config/{config['SAMPLE_LIST']}"
+model = config["MODEL"]
 bins = config["bins"]
 pop2sp = {}
 SFS_LIST = []
@@ -26,7 +27,7 @@ ruleorder: parse_results_DFE > sfs
 rule all:
     input:
         f'{FOLDER}/manuscript/main.pdf',
-        expand("{path}.{model}.pdf",path=SFS_LIST,model=config['MODEL_LIST'])
+        expand("{path}.{model}.pdf",path=SFS_LIST,model=[model])
 
 rule download:
     output: FOLDER + '/data_poly/dl.{species}.SIFT.vcf.gz'
@@ -119,7 +120,7 @@ rule plot_theta_heatmap:
 
 rule plot_dfe_heatmap:
     input:
-        tsv=map(lambda p: f"{p}.polyDFE_D.tsv",SFS_LIST),
+        tsv=map(lambda p: f"{p}.{model}.tsv", SFS_LIST),
         sample_list=sample_list,
         script=f'{FOLDER}/scripts/plot_heatmap.py'
     output:

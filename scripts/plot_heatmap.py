@@ -1,10 +1,9 @@
 import os
 import argparse
-import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from matplotlib import cm
-from libraries import plt, my_dpi, format_pop, sp_sorted, CategorySNP, annotate_heatmap, heatmap, shiftedColorMap
+from libraries import *
 
 theta_dict = {"watterson": "Watterson $\\theta_W$", "tajima": "Tajima $\\theta_{\\pi}$ ",
               "fay_wu": "Fay and Wu $\\theta_{H}$"}
@@ -18,10 +17,10 @@ def open_tsv(filepath):
 
 
 def scatter_plot(cat_snps, df, d, d_dict, file):
-    theta = "tajima"
+    theta_param = "tajima"
     _, _ = plt.subplots(figsize=(1920 / my_dpi, 880 / my_dpi), dpi=my_dpi)
     for cat in cat_snps.non_syn():
-        x = df[df["category"] == "syn"][theta].values
+        x = df[df["category"] == "syn"][theta_param].values
         y = df[df["category"] == cat][d].values
         plt.scatter(x, y, color=cat_snps.color(cat))
         model = sm.OLS(y, sm.add_constant(x))
@@ -31,7 +30,7 @@ def scatter_plot(cat_snps, df, d, d_dict, file):
         sign = '+' if float(b) > 0 else '-'
         label = f"{cat_snps.label(cat)}: $y={a:.2g}x {sign} {abs(b):.2g}$ ($r^2={r.rsquared:.2g})$"
         plt.plot(idf, a * idf + b, '-', color=cat_snps.color(cat), label=label)
-    plt.xlabel(theta_dict[theta])
+    plt.xlabel(theta_dict[theta_param])
     plt.ylabel(f"{d_dict[d]}")
     plt.legend()
     plt.tight_layout()
@@ -48,7 +47,7 @@ def main(args):
         d_dict = {"D_tajima": "Tajima's $D$", "H_fay_wu": "Fay and Wu's $H$"}
         d_dict.update(theta_dict)
     else:
-        d_dict = {"P(S<0)": "P(S<0)", "P(S=0)": "P(S=0)", "P(S>0)": "P(S>0)"}
+        d_dict = polydfe_cat_dico
     df_merge.to_csv(args.output, sep="\t", index=False)
     pop2sp = {pop: sp for (pop, sp), d in df_merge.groupby(["pop", "species"])}
 
@@ -56,7 +55,6 @@ def main(args):
         cat_snps = CategorySNP(method, args.bins)
         for d, d_label in d_dict.items():
             # scatter_plot(cat_snps, df, d, d_dict, f"{args.output.replace('.tsv', '')}/{method}.{d}.scatter.pdf")
-
             matrix = df[df["category"] != "syn"].pivot(index="pop", columns="category", values=d)
             matrix = matrix.iloc[matrix.apply(lambda row: sp_sorted(row.name, pop2sp[row.name]), axis=1).argsort()]
             matrix = matrix.reindex(cat_snps.non_syn(), axis=1)

@@ -47,6 +47,8 @@ codontable.update({
     'TGC': 'C', 'TGT': 'C', 'TGA': 'X', 'TGG': 'W', '---': '-'})
 confidence_interval = namedtuple('confidence_interval', ['low', 'mean', 'up'])
 sfs_weight = {"watterson": lambda i, n: 1.0 / i, "tajima": lambda i, n: n - i, "fay_wu": lambda i, n: i}
+polydfe_cat_dico = {"S": "$S^{pop}$", "P-Sinf0": "$p_{-}$", "P-Seq0": "$p_{neutral}$", "P-Ssup0": "$p_{+}$"}
+polydfe_cat_list = list(polydfe_cat_dico.keys())
 
 
 def theta(sfs_epsilon, daf_n, weight_method):

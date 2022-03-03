@@ -54,7 +54,8 @@ def main(args):
     output_dict = defaultdict(list)
     for species in args.species:
         dico_opp_sp = defaultdict(int)
-        for ensg in sorted(os.listdir(args.exp_folder))[:500]:
+        files = sorted(os.listdir(args.exp_folder))
+        for ensg in np.random.choice(files, size=min(1000, len(files)), replace=False):
             seq = ali_seq(args.fasta_folder, ensg, species)
             if not seq:
                 continue
