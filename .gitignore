@@ -8,10 +8,9 @@
 /manuscript/papers
 __pycache__
 .snakemake/
-/analysis/
+/experiments/
 /data_poly/
 /data_div/
-/results/
 /utils/
 .idea/
 *.indd

@@ -247,7 +247,7 @@ def main(args):
     sfs_nonsyn_mean = np.mean(daf_to_sfs([snp.derived_count for snp in list_non_syn], max_daf), axis=0)
     out = args.output.replace('.pdf', '.all')
     write_sfs(snp_sfs_mean["syn"], sfs_nonsyn_mean, ldn, dn, lds, ds, max_daf, out, args.pop, "", div=False)
-    write_dofe(snp_sfs_mean["syn"], sfs_nonsyn_mean, ldn, dn, lds, ds, max_daf, out, args.pop, "", True, ldn + lds)
+    write_dofe(snp_sfs_mean["syn"], sfs_nonsyn_mean, ldn, dn, lds, ds, max_daf, out, args.pop, "", ldn + lds)
 
     daf_axis = range(1, max_daf)
     theta_dict = defaultdict(list)
@@ -260,7 +260,7 @@ def main(args):
             write_sfs(snp_sfs_mean["syn"], snp_sfs_mean[cat], ld_cat, dn * opp_dico[cat], lds, ds, max_daf,
                       out, args.pop, "", div=False)
             write_dofe(snp_sfs_mean["syn"], snp_sfs_mean[cat], ld_cat, dn * opp_dico[cat], lds, ds, max_daf,
-                       out, args.pop, "", True, ld_cat + lds)
+                       out, args.pop, "", ld_cat + lds)
 
         theta_dict["category"].append(cat)
         for theta_method in sfs_weight:

@@ -57,22 +57,15 @@ def theta(sfs_epsilon, daf_n, weight_method):
     return sum(sfs_theta * weights) / sum(weights)
 
 
-def write_dofe(sfs_syn, sfs_non_syn, l_non_syn, d_non_syn, l_syn, d_syn, k, filepath, sp_focal, sp_sister, is_unfolded,
-               L):
+def write_dofe(sfs_syn, sfs_non_syn, l_non_syn, d_non_syn, l_syn, d_syn, k, filepath, sp_focal, sp_sister, L):
     sfs_list = [k]
     for sfs, nbr_site in [(sfs_non_syn, l_non_syn), (sfs_syn, l_syn)]:
-        if is_unfolded:
-            sfs_list += [nbr_site] + [sfs[i] for i in range(1, k)]
-        else:
-            range_sfs = range(1, int(floor(k // 2)) + 1)
-            assert len(range_sfs) * 2 == k
-            sfs_list += [nbr_site] + [(sfs[i] + sfs[k - i]) if k - i != i else sfs[i] for i in range_sfs]
+        sfs_list += [nbr_site] + [sfs[i] for i in range(1, k)]
     sfs_list += [l_non_syn, d_non_syn, l_syn, d_syn]
 
     dofe_file = open(filepath + ".dofe", 'w')
     dofe_file.write(f"{sp_focal}+{sp_sister} ({int(L)} sites)\n")
-    if is_unfolded:
-        dofe_file.write("#unfolded\n")
+    dofe_file.write("#unfolded\n")
     dofe_file.write("Summed\t" + "\t".join(map(lambda i: str(int(i)), sfs_list)) + "\n")
     dofe_file.close()
 

@@ -51,18 +51,18 @@ def main(args):
                 o.write("\\subsubsection*{" + dict_method[method] + '} \n')
                 o.write(minipage(0.49, sfs))
                 o.write(minipage(0.49, sfs.replace(".pdf", ".normalize.pdf")))
-                o.write(minipage(0.49, sfs.replace(".pdf", ".polyDFE_C.pdf")))
+                o.write("\\\\ \n")
                 if "SIFT" in method:
                     o.write(minipage(0.49, sfs.replace("SIFT", "SIFT_vs_MutSel")))
                 else:
                     o.write(minipage(0.49, sfs.replace(".pdf", ".histogram.pdf")))
-
+                o.write(minipage(0.40, sfs.replace(".pdf", ".polyDFE_C.pdf")))
                 o.write("\\\\ \n")
-
     o.close()
 
-    tex_to_pdf = "pdflatex -synctex=1 -interaction=nonstopmode -output-directory={0} {1}".format(
-        os.path.dirname(args.tex_doc), args.tex_doc)
+    os.system(f"cp -f {args.tex_source} {args.tex_target}")
+    output_dir = os.path.dirname(args.tex_target)
+    tex_to_pdf = f"pdflatex -synctex=1 -interaction=nonstopmode -output-directory={output_dir} {args.tex_target}"
     os.system(tex_to_pdf)
     os.system(tex_to_pdf)
 
@@ -70,7 +70,8 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--sfs', required=False, type=str, nargs="+", dest="sfs", help="Input sfs file (pdf)")
-    parser.add_argument('--tex_doc', required=False, type=str, dest="tex_doc", help="Main document tex file")
+    parser.add_argument('--tex_source', required=False, type=str, dest="tex_source", help="Main document source file")
+    parser.add_argument('--tex_target', required=False, type=str, dest="tex_target", help="Main document target file")
     parser.add_argument('--results', required=False, type=str, dest="results", help="Results tsv file")
     parser.add_argument('--tex_include', required=False, type=str, dest="tex_include", help="Include tex file")
     main(parser.parse_args())

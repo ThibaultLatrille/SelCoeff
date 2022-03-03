@@ -1,3 +1,4 @@
+experiment: "5cat-polyDFE-mC"
 SAMPLE_LIST: "sample_all.tsv"
 subsample: 16
 nbr_replicates: 32
