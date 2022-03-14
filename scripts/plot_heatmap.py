@@ -1,6 +1,4 @@
-import os
 import argparse
-import pandas as pd
 import statsmodels.api as sm
 from matplotlib import cm
 from libraries import *

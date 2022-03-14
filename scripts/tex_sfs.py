@@ -52,11 +52,8 @@ def main(args):
                 o.write(minipage(0.49, sfs))
                 o.write(minipage(0.49, sfs.replace(".pdf", ".normalize.pdf")))
                 o.write("\\\\ \n")
-                if "SIFT" in method:
-                    o.write(minipage(0.49, sfs.replace("SIFT", "SIFT_vs_MutSel")))
-                else:
-                    o.write(minipage(0.49, sfs.replace(".pdf", ".histogram.pdf")))
-                o.write(minipage(0.40, sfs.replace(".pdf", ".polyDFE_C.pdf")))
+                o.write(minipage(0.49, sfs.replace(".pdf", ".histogram.pdf")))
+                o.write(minipage(0.35, sfs.replace(".pdf", ".polyDFE_C.pdf")))
                 o.write("\\\\ \n")
     o.close()
 

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-from collections import namedtuple, defaultdict
+import os
+import re
 import numpy as np
-from math import floor
+import pandas as pd
+from collections import namedtuple, defaultdict
 import matplotlib
 
 matplotlib.rcParams["font.family"] = ["Latin Modern Sans"]
@@ -49,6 +51,110 @@ confidence_interval = namedtuple('confidence_interval', ['low', 'mean', 'up'])
 sfs_weight = {"watterson": lambda i, n: 1.0 / i, "tajima": lambda i, n: n - i, "fay_wu": lambda i, n: i}
 polydfe_cat_dico = {"S": "$S^{pop}$", "P-Sinf0": "$p_{-}$", "P-Seq0": "$p_{neutral}$", "P-Ssup0": "$p_{+}$"}
 polydfe_cat_list = list(polydfe_cat_dico.keys())
+
+
+def translate_cds(seq):
+    return "".join([codontable[seq[codon_pos * 3:codon_pos * 3 + 3]] for codon_pos in range(len(seq) // 3)])
+
+
+def open_fasta(path):
+    if not os.path.isfile(path):
+        path = path.replace("_null_", "__")
+    assert os.path.isfile(path)
+
+    outfile = {}
+    ali_file = open(path, 'r')
+    for seq_id in ali_file:
+        outfile[seq_id.replace('>', '').strip()] = ali_file.readline().strip()
+    return outfile
+
+
+def write_fasta(dico_fasta, output):
+    outfile = open(output, "w")
+    outfile.write("\n".join([f">{seq_id}\n{seq}" for seq_id, seq in dico_fasta.items()]))
+    outfile.close()
+
+
+class CdsRates(dict):
+    def __init__(self, method, exp_folder):
+        self.method = method
+        assert self.method in ["Omega", "MutSel", "SIFT"], 'Method must be either "Omega", "MutSel" or "SIFT"'
+        self.exp_folder = exp_folder
+        super().__init__()
+
+    def add_sift(self, ensg, f_path):
+        mask_path = f"{f_path}.mask.tsv"
+        mask_file = open(mask_path, 'r')
+        mask_file.readline()
+        mask_convert = {}
+        for line in mask_file:
+            pos, mask_pos = line.strip().split("\t")
+            mask_convert[pos] = mask_pos
+        mask_file.close()
+
+        pred_path, header_line = f"{f_path}.SIFTprediction", []
+        sift_file = open(pred_path, 'r')
+        for line in sift_file:
+            header_line = re.sub(' +', ' ', line.strip()).split(" ")
+            if len(header_line) != 25:
+                continue
+            else:
+                break
+        self[ensg] = {k: [] for k in header_line}
+
+        for pos, mask_pos in mask_convert.items():
+            if mask_pos == "NaN":
+                for col in header_line:
+                    self[ensg][col].append(np.nan)
+            else:
+                strip_line = sift_file.readline().strip()
+                line_split = re.sub(' +', ' ', strip_line).split(" ")
+                for col, value in zip(header_line, line_split):
+                    self[ensg][col].append(float(value))
+
+        strip_line = sift_file.readline().strip()
+        assert strip_line == "//"
+        sift_file.close()
+
+    def add_ensg(self, ensg):
+        f_path = f"{self.exp_folder}/{ensg}"
+        if self.method == "MutSel":
+            path = f"{f_path}_NT/sitemutsel_1.run.siteprofiles"
+            if not os.path.isfile(path):
+                path = path.replace("_null_", "__")
+            if not os.path.isfile(path):
+                path = path.replace("__", "_null_")
+            assert os.path.isfile(path)
+            self[ensg] = pd.read_csv(path, sep="\t", skiprows=1, header=None,
+                                     names="site,A,C,D,E,F,G,H,I,K,L,M,N,P,Q,R,S,T,V,W,Y".split(","))
+        elif self.method == "Omega":
+            path = f"{f_path}_NT/siteomega_1.run.ci0.025.tsv"
+            if not os.path.isfile(path):
+                path = path.replace("_null_", "__")
+            if not os.path.isfile(path):
+                path = path.replace("__", "_null_")
+            assert os.path.isfile(path)
+            self[ensg] = pd.read_csv(path, sep="\t")["gene_omega"].values[1:]
+        elif self.method == "SIFT":
+            self.add_sift(ensg, f_path)
+
+    def rate(self, ensg, ref_aa, alt_aa, c_site):
+        if ensg not in self:
+            self.add_ensg(ensg)
+        if self.method == "MutSel":
+            return np.log(self[ensg][alt_aa][c_site] / self[ensg][ref_aa][c_site])
+        elif self.method == "Omega":
+            return self[ensg][c_site]
+        if self.method == "SIFT":
+            return self[ensg][alt_aa][c_site]
+
+    def seq_len(self, ensg):
+        if ensg not in self:
+            self.add_ensg(ensg)
+        if self.method == "MutSel" or self.method == "Omega":
+            return len(self[ensg])
+        if self.method == "SIFT":
+            return len(self[ensg]["A"])
 
 
 def theta(sfs_epsilon, daf_n, weight_method):
@@ -270,34 +376,35 @@ def quantile(b, num):
 
 class CategorySNP(list):
     def __init__(self, method="", bins=0, transform_bound=lambda s: s):
-        P = namedtuple('P', ['label', 'color', 'interval'])
+        P = namedtuple('P', ['label', 'color', 'interval', 'bounds'])
         self.bins = bins
         if bins > 0:
             self.inner_bound = []
             cmap = get_cmap('viridis_r')
             assert bins > 1
-            self.dico = {"syn": P("Synonymous", 'black', lambda s: False)}
+            self.dico = {"syn": P("Synonymous", 'black', lambda s: False, (0, 1))}
             for b in range(1, bins + 1):
                 color = cmap((b - 1) / (bins - 1))
-                self.dico[f"bin{b}"] = P(f"{quantile(b, bins)}", color, lambda s: False)
+                self.dico[f"bin{b}"] = P(f"{quantile(b, bins)}", color, lambda s: False, (0, 1))
         elif method == "SIFT":
-            self.inner_bound = [0.1, 0.3, 0.8]
+            self.inner_bound = [0.05, 0.1, 0.3, 0.8]
             self.dico = {
-                "neg-strong": P("$SIFT<0.1$", BLUE, lambda s: 0.1 >= s >= 0),
-                "neg": P("$0.1<SIFT<0.3$", LIGHTGREEN, lambda s: 0.3 >= s > 0.1),
-                "weak": P("$0.3<SIFT<0.8$", YELLOW, lambda s: 0.8 >= s > 0.3),
-                "pos": P("$0.8<SIFT$", RED, lambda s: 1 >= s > 0.8),
-                "syn": P("$Synonymous$", 'black', lambda x: False),
+                "neg-strong": P("$SIFT<0.05$", BLUE, lambda s: 0.05 >= s >= 0, (0, 0.05)),
+                "neg": P("$0.05<SIFT<0.1$", GREEN, lambda s: 0.1 >= s > 0.05, (0.05, 0.1)),
+                "neg-weak": P("$0.1<SIFT<0.3$", LIGHTGREEN, lambda s: 0.3 >= s > 0.1, (0.1, 0.3)),
+                "pos-weak": P("$0.3<SIFT<0.8$", YELLOW, lambda s: 0.8 >= s > 0.3, (.3, 0.8)),
+                "pos": P("$0.8<SIFT$", RED, lambda s: 1 >= s > 0.8, (.8, 1)),
+                "syn": P("$Synonymous$", 'black', lambda x: False, (0, 0)),
             }
         else:
             self.inner_bound = [-3, -1, 0, 1]
             self.dico = {
-                "neg-strong": P("$S<-3$", BLUE, lambda s: transform_bound(-3) >= s),
-                "neg": P("$-3<S<-1$", GREEN, lambda s: transform_bound(-1) >= s > transform_bound(-3)),
-                "neg-weak": P("$-1<S<0$", LIGHTGREEN, lambda s: transform_bound(0) >= s > transform_bound(-1)),
-                "syn": P("$Synonymous$", 'black', lambda s: False),
-                "pos-weak": P("$0<S<1$", YELLOW, lambda s: transform_bound(1) >= s >= transform_bound(0)),
-                "pos": P("$1<S$", RED, lambda s: s > transform_bound(1))
+                "neg-strong": P("$S<-3$", BLUE, lambda s: transform_bound(-3) >= s, (-np.float("infinity"), -3)),
+                "neg": P("$-3<S<-1$", GREEN, lambda s: transform_bound(-1) >= s > transform_bound(-3), (-3, -1)),
+                "neg-weak": P("$-1<S<0$", LIGHTGREEN, lambda s: transform_bound(0) >= s > transform_bound(-1), (-1, 0)),
+                "syn": P("$Synonymous$", 'black', lambda s: False, (0, 0)),
+                "pos-weak": P("$0<S<1$", YELLOW, lambda s: transform_bound(1) >= s >= transform_bound(0), (0, 1)),
+                "pos": P("$S>1$", RED, lambda s: s > transform_bound(1), (1, np.float("infinity")))
             }
         super().__init__(self.dico.keys())
 
@@ -307,7 +414,7 @@ class CategorySNP(list):
     def label(self, cat):
         return self.dico[cat].label if cat != "all" else "All"
 
-    def selcoeff2cat(self, s):
+    def rate2cat(self, s):
         for cat in self:
             if self.dico[cat].interval(s):
                 return cat

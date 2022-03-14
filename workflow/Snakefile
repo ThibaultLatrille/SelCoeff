@@ -9,18 +9,16 @@ configfile: 'config/config.yaml'
 
 FOLDER = os.path.abspath('.')
 EXP_FOLDER = f"{FOLDER}/experiments/{config['experiment']}"
-os.makedirs(EXP_FOLDER, exist_ok=True)
+os.makedirs(EXP_FOLDER,exist_ok=True)
 sample_list = f"{FOLDER}/config/{config['SAMPLE_LIST']}"
 model = config["MODEL"]
 bins = config["bins"]
 pop2sp = {}
 SFS_LIST = []
 
-for id, row in list(pd.read_csv(sample_list,sep='\t').iterrows()):
+for row_id, row in pd.read_csv(sample_list,sep='\t').iterrows():
     pop2sp[row['SampleName']] = row['Species']
     for method in config['METHOD_LIST']:
-        if method == 'SIFT' and row['Species'] not in config['SIFT']:
-            continue
         SFS_LIST.append(EXP_FOLDER + f"/analysis/{row['Species']}.{row['SampleName']}.{method}")
 
 ruleorder: parse_results_DFE > sfs
@@ -30,46 +28,64 @@ rule all:
         f'{EXP_FOLDER}/supp-mat.pdf',
         expand("{path}.{model}.pdf",path=SFS_LIST,model=[model])
 
-rule download:
-    output: FOLDER + '/data_poly/dl.{species}.SIFT.vcf.gz'
-    params: lambda wildcards: config["SIFT"][wildcards.species]
+rule fixed_snp_by_pop:
+    input:
+        script=f'{FOLDER}/scripts/fixed_snp_by_pop.py',
+        vcf=FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
+        fasta_folder=f'{FOLDER}/data_div/omm_NT_fasta.v10c_116'
+    output:
+        fasta=FOLDER + '/data_processed/{species}.{popu}.fasta'
     shell:
-        "wget -c {params} -O {output}"
+        'python3 {input.script} --species {wildcards.species} --vcf {input.vcf}  --fasta_folder {input.fasta_folder} --output {output.fasta}'
+
+rule SIFT_annotate:
+    input:
+        script=f'{FOLDER}/scripts/annotate_SIFT.py',
+        fasta_folder=f'{FOLDER}/data_div/omm_NT_fasta.v10c_116',
+        fasta_pop=rules.fixed_snp_by_pop.output.fasta,
+        sift_exec=f"{FOLDER}/utils/sift6.2.1/bin/info_on_seqs",
+        blimps_dir=f"{FOLDER}/utils/sift6.2.1/blimps"
+    output:
+        directory(FOLDER + '/data_processed/sift.{species}.{popu}')
+    shell:
+        'rm -rf {output}/* && mkdir -p {output} && python3 {input.script} --species {wildcards.species} --sift_exec {input.sift_exec} --blimps_dir {input.blimps_dir} --fasta_folder {input.fasta_folder} --fasta_pop {input.fasta_pop} --output {output}'
+
+rule merge_SIFT:
+    input:
+        script=f'{FOLDER}/scripts/merge_SIFT.py',
+        sift_folder=rules.SIFT_annotate.output,
+        vcf=FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
+    output:
+        FOLDER + '/data_processed/snps_sift.{species}.{popu}.tsv'
+    shell:
+        'python3 {input.script} --species {wildcards.species} --vcf {input.vcf} --sift_folder {input.sift_folder} --output {output}'
+
 
 rule opportunities:
     input:
         script=f'{FOLDER}/scripts/genome_opportunities.py',
-        exp_folder=f'{FOLDER}/data_div/Experiments',
-        fasta_folder=f'{FOLDER}/data_div/omm_NT_fasta.v10c_116'
+        exp_folder=lambda wildcards: f'{FOLDER}/data_div/Experiments' if wildcards.method != 'SIFT' else rules.SIFT_annotate.output,
+        fasta_pop=rules.fixed_snp_by_pop.output.fasta,
     output:
-        tsv=EXP_FOLDER + '/opportunities.{method}.tsv'
-    params:
-        species=" ".join(set(pop2sp.values()))
+        tsv=f"{FOLDER}/data_processed/opportunities.bins{bins}." + '{method}.{species}.{popu}.tsv'
     shell:
-        'python3 {input.script} --species {params.species} --method {wildcards.method} --exp_folder {input.exp_folder} --fasta_folder {input.fasta_folder} --output {output.tsv}'
-
-rule SIFT_intersect:
-    input:
-        vcf=FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
-        vcf_sift=rules.download.output
-    output:
-        vcf=FOLDER + '/data_poly/{species}.{popu}.SIFT.vcf.gz'
-    shell:
-        'bedtools intersect -a {input.vcf_sift} -b {input.vcf} -wb -wa -header | gzip > {output.vcf}'
+        'python3 {input.script} --method {wildcards.method} --exp_folder {input.exp_folder} --fasta_pop {input.fasta_pop} --output {output.tsv}'
 
 rule sfs:
     input:
-        vcf=lambda wildcards: rules.SIFT_intersect.output.vcf if wildcards.method == 'SIFT' else FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
+        vcf=FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
         script=f'{FOLDER}/scripts/plot_sfs.py',
         genome_results=f'{FOLDER}/data_div/genome_results.tsv',
-        opportunities=rules.opportunities.output.tsv
+        opportunities=rules.opportunities.output.tsv,
+        sift_file=lambda wildcards: rules.merge_SIFT.output if wildcards.method == 'SIFT' else []
     output:
         pdf=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.pdf',
         tsv=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.tsv'
     params:
-        lambda wildcards: f'--nbr_replicates {config["nbr_replicates"]} --subsample {config["subsample"]} --species {pop2sp[wildcards.popu]}'
+        opt_sift_file=lambda wildcards, input, output: f'--sift_file {input.sift_file}' if wildcards.method == 'SIFT' else "",
+        config=f'--nbr_replicates {config["nbr_replicates"]} --subsample {config["subsample"]}'
     shell:
-        'python3 {input.script} {params} --vcf {input.vcf} --pop {wildcards.popu} --method {wildcards.method} --bins {bins} --genome_results {input.genome_results} --opportunities {input.opportunities} --output {output.pdf}'
+        'python3 {input.script} {params.opt_sift_file} {params.config} --vcf {input.vcf} --pop {wildcards.popu} --species {wildcards.species} --method {wildcards.method} --bins {bins} --genome_results {input.genome_results} --opportunities {input.opportunities} --output {output.pdf}'
 
 rule polyDFE:
     input:
@@ -138,7 +154,7 @@ rule latex:
         tsv_dfe=f'{EXP_FOLDER}/results/DFE.results.tsv',
         script=f'{FOLDER}/scripts/tex_sfs.py'
     output:
-        tex_include= f'{EXP_FOLDER}/include-figures.tex',
-        tex_target= f'{EXP_FOLDER}/supp-mat.tex',
-        pdf= f'{EXP_FOLDER}/supp-mat.pdf'
+        tex_include=f'{EXP_FOLDER}/include-figures.tex',
+        tex_target=f'{EXP_FOLDER}/supp-mat.tex',
+        pdf=f'{EXP_FOLDER}/supp-mat.pdf'
     shell: 'python3 {input.script} --sfs {input.sfs} --results {input.tsv_theta} --tex_source {input.tex_source} --tex_target {output.tex_target} --tex_include {output.tex_include}'

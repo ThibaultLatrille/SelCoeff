@@ -1,14 +1,7 @@
-experiment: "5cat-polyDFE-mC"
+experiment: "5cat-polyDFE-mC-SIFT"
 SAMPLE_LIST: "sample_all.tsv"
 subsample: 16
-nbr_replicates: 32
+nbr_replicates: 12
 bins: 0 # bins: 0 to classify based on sel_coeff or sift_score
-METHOD_LIST: [ "MutSel", "Omega" ] # [ "MutSel", "Omega", "SW", "WS", "SIFT" ]
+METHOD_LIST: [ "MutSel", "SIFT", "Omega" ] # [ "MutSel", "Omega", "SW", "WS", "SIFT" ]
 MODEL: "polyDFE_C" # [ "grapes", "polyDFE_D", "polyDFE_C" ]
-SIFT:
-  Bos_taurus: "ftp.ensembl.org/pub/release-91/variation/vcf/bos_taurus/bos_taurus_incl_consequences.vcf.gz"
-  Ovis_aries: "ftp.ensembl.org/pub/release-91/variation/vcf/ovis_aries/ovis_aries_incl_consequences.vcf.gz"
-  Capra_hircus: "ftp.ensembl.org/pub/release-92/variation/vcf/capra_hircus/capra_hircus_incl_consequences.vcf.gz"
-  Canis_familiaris: "ftp.ensembl.org/pub/release-91/variation/vcf/canis_familiaris/canis_familiaris_incl_consequences.vcf.gz"
-  # Equus_caballus: "ftp.ensembl.org/pub/release-91/variation/vcf/equus_caballus/equus_caballus_incl_consequences.vcf.gz"
-  # Homo_sapiens: "ftp.ensembl.org/pub/release-91/variation/vcf/homo_sapiens/homo_sapiens_incl_consequences.vcf.gz"

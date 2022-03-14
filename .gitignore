@@ -11,6 +11,7 @@ __pycache__
 /experiments/
 /data_poly/
 /data_div/
+/data_processed/
 /utils/
 .idea/
 *.indd
