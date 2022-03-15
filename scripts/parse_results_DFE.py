@@ -106,7 +106,7 @@ def plot_dfe_stack_cat(list_cat, cat_snps, s_dico, output):
 def main(args):
     cat_snps = CategorySNP(args.method, args.bins)
     cat_poly_snps = CategorySNP("MutSel", args.bins)
-    list_cat = cat_snps.non_syn()
+    list_cat = cat_snps.all()
     s_dico = dict()
     for file in args.input:
         cat = os.path.basename(file).replace(".out", "").split(".")[-2]

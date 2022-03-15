@@ -138,6 +138,14 @@ class CdsRates(dict):
         elif self.method == "SIFT":
             self.add_sift(ensg, f_path)
 
+    def log_fitness(self, ensg, ref_aa, c_site):
+        if self.method == "MutSel":
+            if ensg not in self:
+                self.add_ensg(ensg)
+            return np.log(self[ensg][ref_aa][c_site])
+        else:
+            return np.float("infinity")
+
     def rate(self, ensg, ref_aa, alt_aa, c_site):
         if ensg not in self:
             self.add_ensg(ensg)

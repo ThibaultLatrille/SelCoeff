@@ -25,8 +25,8 @@ ruleorder: parse_results_DFE > sfs
 
 rule all:
     input:
-        f'{EXP_FOLDER}/supp-mat.pdf',
-        expand("{path}.{model}.pdf",path=SFS_LIST,model=[model])
+        f'{EXP_FOLDER}/results/scatter.tsv',
+        # f'{EXP_FOLDER}/supp-mat.pdf',
 
 rule fixed_snp_by_pop:
     input:
@@ -67,9 +67,21 @@ rule opportunities:
         exp_folder=lambda wildcards: f'{FOLDER}/data_div/Experiments' if wildcards.method != 'SIFT' else rules.SIFT_annotate.output,
         fasta_pop=rules.fixed_snp_by_pop.output.fasta,
     output:
-        tsv=f"{FOLDER}/data_processed/opportunities.bins{bins}." + '{method}.{species}.{popu}.tsv'
+        tsv=f"{FOLDER}/data_processed/DFE.bins{bins}." + '{species}.{popu}.{method}.tsv',
+        pdf=f"{FOLDER}/data_processed/DFE.bins{bins}." + '{species}.{popu}.{method}.pdf'
     shell:
-        'python3 {input.script} --method {wildcards.method} --exp_folder {input.exp_folder} --fasta_pop {input.fasta_pop} --output {output.tsv}'
+        'python3 {input.script} --method {wildcards.method} --exp_folder {input.exp_folder} --fasta_pop {input.fasta_pop} --output_tsv {output.tsv} --output_pdf {output.pdf}'
+
+rule gather_opportunities:
+    input:
+        tsv=[f"{FOLDER}/data_processed/DFE.bins{bins}.{species}.{popu}.MutSel.tsv" for popu, species in pop2sp.items()],
+        sample_list=sample_list,
+        script=f'{FOLDER}/scripts/gather_opportunities.py'
+    output:
+        tsv=f'{EXP_FOLDER}/results/scatter.tsv'
+    shell:
+        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --bins {bins} --output {output.tsv}'
+
 
 rule sfs:
     input:
