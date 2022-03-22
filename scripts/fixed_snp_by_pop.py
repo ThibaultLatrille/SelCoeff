@@ -37,6 +37,7 @@ def fixed_poly_from_vcf(vcf):
 
 
 def main(args):
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
     output_fasta = {}
     # Open vcf file: fixed poly dict by ensg : (pos, anc, der)
     fixed_poly = fixed_poly_from_vcf(args.vcf)

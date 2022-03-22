@@ -1,5 +1,6 @@
 import argparse
 from scipy.stats import expon, gamma
+import statsmodels.api as sm
 from libraries import *
 from matplotlib import cm
 
@@ -27,14 +28,6 @@ def read_poly_dfe(path):
     return out_poly_dfe
 
 
-def read_grapes(path):
-    dfem_df = pd.read_csv(path)
-    ge_df = dfem_df[dfem_df["model"] == "GammaExpo"]
-    return {"p_b": float(ge_df["GammaExpo:pos_prop"]), "S_b": float(ge_df["GammaExpo:posGmean"]),
-            "S_d": float(ge_df["GammaExpo:negGmean"]), "b": float(ge_df["GammaExpo:negGshape"]),
-            "$\\alpha$": float(ge_df["alpha"])}
-
-
 def plot_stack_param(list_cat, cat_snps, s_dico, output):
     n = len(polydfe_cat_dico)
     fig, axs = plt.subplots(n, 1, sharex='all', figsize=(1920 / my_dpi, 280 * (n + 1) / my_dpi), dpi=my_dpi)
@@ -51,11 +44,11 @@ def plot_stack_param(list_cat, cat_snps, s_dico, output):
 
 
 def plot_heatmap(cat_snps, cat_poly_snps, s_dico, output):
-    cat_labels_cols = [cat_snps.label(cat) for cat in cat_snps.non_syn()]
-    cat_labels_rows = [cat_poly_snps.label(cat) for cat in cat_poly_snps.non_syn()]
+    cat_labels_cols = [cat_snps.label(cat) for cat in cat_snps.non_syn_list]
+    cat_labels_rows = [cat_poly_snps.label(cat) for cat in cat_poly_snps.non_syn_list]
     matrix = np.zeros((len(cat_labels_cols), len(cat_labels_rows)))
-    for col, cat_col in enumerate(cat_snps.non_syn()):
-        for row, cat_row in enumerate(cat_poly_snps.non_syn()):
+    for col, cat_col in enumerate(cat_snps.non_syn_list):
+        for row, cat_row in enumerate(cat_poly_snps.non_syn_list):
             matrix[(row, col)] = s_dico[cat_col][cat_row]
     _, ax = plt.subplots(figsize=(1920 / my_dpi, 880 / my_dpi), dpi=my_dpi)
 
@@ -103,14 +96,32 @@ def plot_dfe_stack_cat(list_cat, cat_snps, s_dico, output):
     plt.close("all")
 
 
+def plot_scatter(x, y, method, file):
+    plt.figure(figsize=(1920 / my_dpi, 1080 / my_dpi), dpi=my_dpi)
+    plt.scatter(x, y, alpha=0.4, s=5.0)
+    idf = np.linspace(min(x), max(x), 30)
+    results = sm.OLS(y, sm.add_constant(x)).fit()
+    b, a = results.params[0:2]
+    linear = a * idf
+    reg = f'slope of {a:.2g} ($r^2$={results.rsquared:.2g})'
+    plt.plot(idf, linear, '-', linestyle="--", label=reg)
+    plt.xlabel(rate_dico[method])
+    plt.ylabel("S given by polyDFE")
+    plt.tight_layout()
+    plt.savefig(file, format="pdf")
+    plt.clf()
+    plt.close("all")
+
+
 def main(args):
-    cat_snps = CategorySNP(args.method, args.bins)
-    cat_poly_snps = CategorySNP("MutSel", args.bins)
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
+    cat_snps = CategorySNP(args.method, bound_file=args.bounds, bins=args.bins)
+    cat_poly_snps = CategorySNP("MutSel", bins=args.bins)
     list_cat = cat_snps.all()
     s_dico = dict()
     for file in args.input:
         cat = os.path.basename(file).replace(".out", "").split(".")[-2]
-        out = read_poly_dfe(file) if "polyDFE" in file else read_grapes(file)
+        out = read_poly_dfe(file)
         if "polyDFE_D" in file:
             p_list = np.array([v for k, v in out.items() if "p(s=" in k])
             s_list = np.array([v for k, v in out.items() if "S_" in k])
@@ -132,7 +143,7 @@ def main(args):
             out[polydfe_cat_list[2]] = (1 - p_pos) * d_neg.cdf(1.0) + p_pos * d_pos.cdf(1.0)
             out[polydfe_cat_list[3]] = p_pos * (1 - d_pos.cdf(1.0))
 
-            for cat_poly in cat_poly_snps.non_syn():
+            for cat_poly in cat_poly_snps.non_syn_list:
                 if cat_poly == "neg-strong":
                     out[cat_poly] = (1 - p_pos) * (1 - d_neg.cdf(3.0))
                 elif cat_poly == "neg":
@@ -145,13 +156,19 @@ def main(args):
                     out[cat_poly] = p_pos * (1 - d_pos.cdf(1.0))
         s_dico[cat] = out
 
+    list_cat = [cat for cat in list_cat if cat in s_dico]
     df_dico = {p: [s_dico[cat][p] for cat in list_cat] for p in polydfe_cat_list}
     df_dico["category"] = list_cat
     pd.DataFrame(df_dico).to_csv(args.output.replace(".pdf", ".tsv"), sep="\t", index=False)
-
     plot_stack_param(list_cat, cat_snps, s_dico, args.output)
-    plot_heatmap(cat_snps, cat_poly_snps, s_dico, args.output.replace(".pdf", ".heatmap.pdf"))
-    plot_dfe_stack_cat(list_cat, cat_snps, s_dico, args.output.replace(".pdf", ".predictedDFE.pdf"))
+
+    if args.bins == 0:
+        plot_heatmap(cat_snps, cat_poly_snps, s_dico, args.output.replace(".pdf", ".heatmap.pdf"))
+        plot_dfe_stack_cat(list_cat, cat_snps, s_dico, args.output.replace(".pdf", ".predictedDFE.pdf"))
+    else:
+        x = [cat_snps.mean[cat] for cat in list_cat if cat != 'all' and s_dico[cat]["S"] > -20]
+        y = [s_dico[cat]["S"] for cat in list_cat if cat != 'all' and s_dico[cat]["S"] > -20]
+        plot_scatter(x, y, args.method, args.output.replace(".pdf", ".scatter.pdf"))
 
 
 if __name__ == '__main__':
@@ -161,4 +178,5 @@ if __name__ == '__main__':
     parser.add_argument('--sample_list', required=False, type=str, dest="sample_list", help="Sample list file")
     parser.add_argument('--method', required=False, type=str, dest="method", help="Sel coeff parameter")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
+    parser.add_argument('--bounds', required=False, default="", type=str, dest="bounds", help="Input bound file path")
     main(parser.parse_args())

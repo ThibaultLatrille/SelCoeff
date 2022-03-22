@@ -3,7 +3,6 @@ import sys
 import pandas as pd
 
 sys.path.append('.')
-from scripts.libraries import CategorySNP
 
 configfile: 'config/config.yaml'
 
@@ -12,7 +11,9 @@ EXP_FOLDER = f"{FOLDER}/experiments/{config['experiment']}"
 os.makedirs(EXP_FOLDER,exist_ok=True)
 sample_list = f"{FOLDER}/config/{config['SAMPLE_LIST']}"
 model = config["MODEL"]
+assert model in ["grapes", "polyDFE_D", "polyDFE_C"]
 bins = config["bins"]
+assert bins >= 0
 pop2sp = {}
 SFS_LIST = []
 
@@ -25,8 +26,8 @@ ruleorder: parse_results_DFE > sfs
 
 rule all:
     input:
-        f'{EXP_FOLDER}/results/scatter.tsv',
-        # f'{EXP_FOLDER}/supp-mat.pdf',
+        f'{FOLDER}/data_processed/opportunities_bins{bins}.tsv',
+        f'{EXP_FOLDER}/supp-mat.pdf',
 
 rule fixed_snp_by_pop:
     input:
@@ -34,7 +35,7 @@ rule fixed_snp_by_pop:
         vcf=FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
         fasta_folder=f'{FOLDER}/data_div/omm_NT_fasta.v10c_116'
     output:
-        fasta=FOLDER + '/data_processed/{species}.{popu}.fasta'
+        fasta=FOLDER + '/data_processed/fasta/{species}.{popu}.fasta.gz'
     shell:
         'python3 {input.script} --species {wildcards.species} --vcf {input.vcf}  --fasta_folder {input.fasta_folder} --output {output.fasta}'
 
@@ -46,9 +47,9 @@ rule SIFT_annotate:
         sift_exec=f"{FOLDER}/utils/sift6.2.1/bin/info_on_seqs",
         blimps_dir=f"{FOLDER}/utils/sift6.2.1/blimps"
     output:
-        directory(FOLDER + '/data_processed/sift.{species}.{popu}')
+        directory(FOLDER + '/data_processed/sift/{species}.{popu}')
     shell:
-        'rm -rf {output}/* && mkdir -p {output} && python3 {input.script} --species {wildcards.species} --sift_exec {input.sift_exec} --blimps_dir {input.blimps_dir} --fasta_folder {input.fasta_folder} --fasta_pop {input.fasta_pop} --output {output}'
+        'python3 {input.script} --species {wildcards.species} --sift_exec {input.sift_exec} --blimps_dir {input.blimps_dir} --fasta_folder {input.fasta_folder} --fasta_pop {input.fasta_pop} --output {output}'
 
 rule merge_SIFT:
     input:
@@ -56,9 +57,20 @@ rule merge_SIFT:
         sift_folder=rules.SIFT_annotate.output,
         vcf=FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
     output:
-        FOLDER + '/data_processed/snps_sift.{species}.{popu}.tsv'
+        FOLDER + '/data_processed/sift_snps/{species}.{popu}.tsv'
     shell:
         'python3 {input.script} --species {wildcards.species} --vcf {input.vcf} --sift_folder {input.sift_folder} --output {output}'
+
+rule annotate_vcf:
+    input:
+        vcf=FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
+        script=f'{FOLDER}/scripts/annotate_vcf.py',
+        sift_file=rules.merge_SIFT.output
+    output:
+        tsv=f"{FOLDER}/data_processed/vcf_annotate_bins{bins}" + '/snps.{species}.{popu}.tsv.gz',
+        bounds=f"{FOLDER}/data_processed/vcf_annotate_bins{bins}" + '/bounds.{species}.{popu}.tsv'
+    shell:
+        'python3 {input.script} --sift_file {input.sift_file} --vcf {input.vcf} --bins {bins} --output_tsv {output.tsv} --output_bounds {output.bounds}'
 
 
 rule opportunities:
@@ -66,82 +78,85 @@ rule opportunities:
         script=f'{FOLDER}/scripts/genome_opportunities.py',
         exp_folder=lambda wildcards: f'{FOLDER}/data_div/Experiments' if wildcards.method != 'SIFT' else rules.SIFT_annotate.output,
         fasta_pop=rules.fixed_snp_by_pop.output.fasta,
+        bounds=lambda wildcards: rules.annotate_vcf.output.bounds if bins != 0 else []
     output:
-        tsv=f"{FOLDER}/data_processed/DFE.bins{bins}." + '{species}.{popu}.{method}.tsv',
-        pdf=f"{FOLDER}/data_processed/DFE.bins{bins}." + '{species}.{popu}.{method}.pdf'
+        tsv=f"{FOLDER}/data_processed/opportunities_bins{bins}/DFE." + '{species}.{popu}.{method}.tsv',
+    params:
+        opt_bounds_file=lambda wildcards, input, output: f'--bounds {input.bounds}' if bins != 0 else "",
+        k=lambda wildcards: f"--subsample_genes {config['subsample_genes']}"
     shell:
-        'python3 {input.script} --method {wildcards.method} --exp_folder {input.exp_folder} --fasta_pop {input.fasta_pop} --output_tsv {output.tsv} --output_pdf {output.pdf}'
+        'python3 {input.script} --bins {bins} {params.opt_bounds_file} {params.k} --method {wildcards.method} --exp_folder {input.exp_folder} --fasta_pop {input.fasta_pop} --output {output.tsv}'
 
 rule gather_opportunities:
     input:
-        tsv=[f"{FOLDER}/data_processed/DFE.bins{bins}.{species}.{popu}.MutSel.tsv" for popu, species in pop2sp.items()],
-        sample_list=sample_list,
-        script=f'{FOLDER}/scripts/gather_opportunities.py'
+        script=f'{FOLDER}/scripts/gather_opportunities.py',
+        tsv=[f"{FOLDER}/data_processed/opportunities_bins{bins}/DFE.{species}.{popu}.MutSel.tsv" for popu, species in
+             pop2sp.items()],
+        sample_list=sample_list
     output:
-        tsv=f'{EXP_FOLDER}/results/scatter.tsv'
+        tsv=f'{FOLDER}/data_processed/opportunities_bins{bins}.tsv'
     shell:
         'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --bins {bins} --output {output.tsv}'
 
-
-rule sfs:
+checkpoint sfs:
     input:
-        vcf=FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
         script=f'{FOLDER}/scripts/plot_sfs.py',
+        tsv=rules.annotate_vcf.output.tsv,
         genome_results=f'{FOLDER}/data_div/genome_results.tsv',
-        opportunities=rules.opportunities.output.tsv,
-        sift_file=lambda wildcards: rules.merge_SIFT.output if wildcards.method == 'SIFT' else []
+        opportunities=rules.opportunities.output.tsv
     output:
-        pdf=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.pdf',
-        tsv=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.tsv'
+        dir=directory(EXP_FOLDER + '/analysis/{species}.{popu}.{method}/'),
+        pdf=EXP_FOLDER + '/analysis/{species}.{popu}.{method}-sfs.pdf',
+        tsv=EXP_FOLDER + '/analysis/{species}.{popu}.{method}-sfs-summary-stats.tsv'
     params:
-        opt_sift_file=lambda wildcards, input, output: f'--sift_file {input.sift_file}' if wildcards.method == 'SIFT' else "",
         config=f'--nbr_replicates {config["nbr_replicates"]} --subsample {config["subsample"]}'
     shell:
-        'python3 {input.script} {params.opt_sift_file} {params.config} --vcf {input.vcf} --pop {wildcards.popu} --species {wildcards.species} --method {wildcards.method} --bins {bins} --genome_results {input.genome_results} --opportunities {input.opportunities} --output {output.pdf}'
+        'python3 {input.script} {params.config} --tsv {input.tsv} --pop {wildcards.popu} --method {wildcards.method} --bins {bins} --genome_results {input.genome_results} --opportunities {input.opportunities} --output_tsv {output.tsv} --output_pdf {output.pdf} --output_dir {output.dir}'
 
 rule polyDFE:
     input:
-        sfs=rules.sfs.output.pdf,
+        sfs=os.path.join(rules.sfs.output.dir,'{cat}.sfs'),
         polyDFE=f'{FOLDER}/utils/polyDFE/polyDFE-2.0-linux-64-bit',
         init_file=FOLDER + '/config/{model}_init.txt',
         range_file=FOLDER + '/config/{model}_range.txt'
     output:
-        out=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{cat}.{model}.out',
-        stderr=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{cat}.{model}.stderr'
+        out=EXP_FOLDER + '/analysis/{species}.{popu}.{method}/{cat}.{model}.out',
+        stderr=EXP_FOLDER + '/analysis/{species}.{popu}.{method}/{cat}.{model}.stderr'
     params:
-        sfs=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{cat}.sfs',
         model=lambda wildcards: "-m D 5" if wildcards.model == "polyDFE_D" else "-m C"
     shell:
-        '{input.polyDFE} -d {params.sfs} -i {input.init_file} 1 -r {input.range_file} 1 -w {params.model} 1> {output.out} 2> {output.stderr}'
+        '{input.polyDFE} -d {input.sfs} -i {input.init_file} 1 -r {input.range_file} 1 -w {params.model} 1> {output.out} 2> {output.stderr}'
 
-rule grapes:
-    input:
-        sfs=rules.sfs.output.pdf,
-        grapes=f'{FOLDER}/utils/grapes/grapes/grapes',
-    output:
-        out=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{cat}.grapes.out',
-        stdout=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{cat}.grapes.stdout',
-        stderr=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{cat}.grapes.stderr'
-    params:
-        dofe=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{cat}.dofe',
-    shell:
-        "{input.grapes} -in {params.dofe} -out {output.out} -model GammaExpo -no_div_data 1> {output.stdout} 2> {output.stderr}"
+
+def gather_model_results(wildcards):
+    dir = checkpoints.sfs.get(**wildcards).output.dir
+    out_list = expand(rules.polyDFE.output.out,
+        species=wildcards.species,
+        popu=wildcards.popu,
+        method=wildcards.method,
+        model=wildcards.model,
+        cat=glob_wildcards(os.path.join(dir,'{cat}.sfs')).cat)
+    return out_list
+
 
 rule parse_results_DFE:
     input:
-        modelfile=lambda wildcards: expand(EXP_FOLDER + '/analysis/{{species}}.{{popu}}.{{method}}.{cat}.{{model}}.out',cat=CategorySNP(wildcards.method,bins).all()),
-        script=f'{FOLDER}/scripts/parse_results_DFE.py'
+        script=f'{FOLDER}/scripts/parse_results_DFE.py',
+        modelfile=gather_model_results,
+        bounds=lambda wildcards: rules.annotate_vcf.output.bounds if bins != 0 else []
     output:
         pdf=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{model}.pdf',
         tsv=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{model}.tsv'
+    params:
+        opt_bounds_file=lambda wildcards, input, output: f'--bounds {input.bounds}' if bins != 0 else "",
     shell:
-        'python3 {input.script} --input {input.modelfile} --method {wildcards.method} --bins {bins} --output {output.pdf}'
+        'python3 {input.script} {params.opt_bounds_file} --input {input.modelfile} --method {wildcards.method} --bins {bins} --output {output.pdf}'
 
 rule plot_theta_heatmap:
     input:
-        tsv=map(lambda p: f"{p}.tsv",SFS_LIST),
-        sample_list=sample_list,
-        script=f'{FOLDER}/scripts/plot_heatmap.py'
+        script=f'{FOLDER}/scripts/plot_heatmap.py',
+        tsv=map(lambda p: f"{p}-sfs-summary-stats.tsv",SFS_LIST),
+        sample_list=sample_list
     output:
         tsv=f'{EXP_FOLDER}/results/Theta.results.tsv'
     shell:
@@ -149,9 +164,9 @@ rule plot_theta_heatmap:
 
 rule plot_dfe_heatmap:
     input:
+        script=f'{FOLDER}/scripts/plot_heatmap.py',
         tsv=map(lambda p: f"{p}.{model}.tsv",SFS_LIST),
-        sample_list=sample_list,
-        script=f'{FOLDER}/scripts/plot_heatmap.py'
+        sample_list=sample_list
     output:
         tsv=f'{EXP_FOLDER}/results/DFE.results.tsv'
     shell:
@@ -160,13 +175,15 @@ rule plot_dfe_heatmap:
 
 rule latex:
     input:
-        sfs=map(lambda p: f"{p}.pdf",SFS_LIST),
+        script=f'{FOLDER}/scripts/tex_sfs.py',
+        sfs=map(lambda p: f"{p}-sfs.pdf",SFS_LIST),
         tex_source=f'{FOLDER}/manuscript/supp-mat.tex',
         tsv_theta=f'{EXP_FOLDER}/results/Theta.results.tsv',
         tsv_dfe=f'{EXP_FOLDER}/results/DFE.results.tsv',
-        script=f'{FOLDER}/scripts/tex_sfs.py'
     output:
         tex_include=f'{EXP_FOLDER}/include-figures.tex',
         tex_target=f'{EXP_FOLDER}/supp-mat.tex',
         pdf=f'{EXP_FOLDER}/supp-mat.pdf'
-    shell: 'python3 {input.script} --sfs {input.sfs} --results {input.tsv_theta} --tex_source {input.tex_source} --tex_target {output.tex_target} --tex_include {output.tex_include}'
+    params:
+        hist_prefix=f'--hist_prefix {FOLDER}/data_processed/vcf_annotate_bins{bins}/snps.'
+    shell: 'python3 {input.script} {params.hist_prefix} --sfs {input.sfs} --results {input.tsv_theta} --tex_source {input.tex_source} --tex_target {output.tex_target} --tex_include {output.tex_include}'

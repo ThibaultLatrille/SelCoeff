@@ -12,6 +12,7 @@ def open_tsv(filepath):
 
 
 def main(args):
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
     df_merge = pd.concat([open_tsv(filepath) for filepath in sorted(args.tsv)])
     df_merge.to_csv(args.output, sep="\t", index=False)
 

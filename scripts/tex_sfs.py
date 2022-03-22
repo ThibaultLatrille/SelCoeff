@@ -6,10 +6,7 @@ from libraries import format_pop
 
 dict_method = {"MutSel": "Site-specific Mutation-Selection codon models.",
                "Omega": "Site-specific codon models.",
-               "Omega 0": "Site-specific Mutation-Selection codon models (average over all amino acids).",
-               "SIFT": "SIFT score",
-               "WS": "weak to strong mutations (AT$\\rightarrow$GC)",
-               "SW": "strong to weak mutations (GC$\\rightarrow$AT)"}
+               "SIFT": "SIFT score",}
 
 
 def minipage(size, file):
@@ -20,9 +17,11 @@ def minipage(size, file):
 
 
 def main(args):
+    os.makedirs(os.path.dirname(args.results), exist_ok=True)
     heatmap_dict = defaultdict(list)
     for result in sorted(glob(f"{os.path.dirname(args.results)}/*.pdf")):
-        _, method, theta, plot = os.path.basename(result).replace(".pdf", "").replace("_", " ").split(".")
+        _, method_lr, theta, plot, ext = os.path.basename(result).replace("_", " ").split(".")
+        method = method_lr.split("-")[0]
         heatmap_dict[method].append(result)
 
     o = open(args.tex_include, 'w')
@@ -36,7 +35,8 @@ def main(args):
 
     nested_dict = defaultdict(lambda: defaultdict(dict))
     for sfs in sorted(args.sfs):
-        sp, pop, method = os.path.basename(sfs).replace(".pdf", "").replace("_", " ").split(".")
+        sp, pop, method_lr, ext = os.path.basename(sfs).replace("_", " ").split(".")
+        method = method_lr.split("-")[0]
         nested_dict[sp][pop][method] = sfs
 
     for sp, nested_dict_1 in nested_dict.items():
@@ -52,8 +52,10 @@ def main(args):
                 o.write(minipage(0.49, sfs))
                 o.write(minipage(0.49, sfs.replace(".pdf", ".normalize.pdf")))
                 o.write("\\\\ \n")
-                o.write(minipage(0.49, sfs.replace(".pdf", ".histogram.pdf")))
-                o.write(minipage(0.35, sfs.replace(".pdf", ".polyDFE_C.pdf")))
+                suffix = f"{sp}.{pop}.{method}.histogram.pdf".replace(' ', '_')
+                hist_path = f"{args.hist_prefix}{suffix}"
+                o.write(minipage(0.49, hist_path))
+                o.write(minipage(0.35, sfs.replace("-sfs.pdf", ".polyDFE_C.pdf")))
                 o.write("\\\\ \n")
     o.close()
 
@@ -67,6 +69,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--sfs', required=False, type=str, nargs="+", dest="sfs", help="Input sfs file (pdf)")
+    parser.add_argument('--hist_prefix', required=False, type=str, dest="hist_prefix", help="Input histogram folder")
     parser.add_argument('--tex_source', required=False, type=str, dest="tex_source", help="Main document source file")
     parser.add_argument('--tex_target', required=False, type=str, dest="tex_target", help="Main document target file")
     parser.add_argument('--results', required=False, type=str, dest="results", help="Results tsv file")

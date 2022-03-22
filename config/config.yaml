@@ -1,7 +1,8 @@
-experiment: "5cat-polyDFE-mC-SIFT"
-SAMPLE_LIST: "sample_all.tsv"
+experiment: "5cat-polyDFE-mC"
+SAMPLE_LIST: "sample_test.tsv"
 subsample: 16
 nbr_replicates: 12
-bins: 0 # bins: 0 to classify based on sel_coeff or sift_score
-METHOD_LIST: [ "MutSel", "SIFT", "Omega" ] # [ "MutSel", "Omega", "SW", "WS", "SIFT" ]
-MODEL: "polyDFE_C" # [ "grapes", "polyDFE_D", "polyDFE_C" ]
+subsample_genes: 500
+bins: 30 # bins: 0 to classify based on predetermined bins
+METHOD_LIST: [ "MutSel", "SIFT", "Omega" ] # [ "MutSel", "Omega", "SIFT" ]
+MODEL: "polyDFE_C" # [ "polyDFE_D", "polyDFE_C" ]

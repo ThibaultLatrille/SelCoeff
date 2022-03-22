@@ -1,3 +1,4 @@
+import os
 import argparse
 import pandas as pd
 from libraries import open_fasta, write_fasta, translate_cds
@@ -9,6 +10,7 @@ def mask_seq(seq, mask):
 
 
 def main(args):
+    os.makedirs(args.output, exist_ok=True)
     # Open fasta file containing all CDS for the specific pop
     cds_dico = open_fasta(args.fasta_pop)
 
@@ -28,7 +30,7 @@ def main(args):
             else:
                 mask_pos.append("NaN")
 
-        convert_path = f"{args.output}/{ensg}.mask.tsv"
+        convert_path = f"{args.output}/{ensg}.mask.tsv.gz"
         df = pd.DataFrame({"pos": range(len(mask_pos)), "mask_pos": mask_pos})
         df.to_csv(convert_path, index=False, sep="\t")
 
@@ -42,11 +44,9 @@ def main(args):
         sift_path = f"{args.output}/{ensg}.SIFTprediction"
         # Run sift for each alignment.
         sift_cmd = f"export BLIMPS_DIR={args.blimps_dir} && {args.sift_exec} {ensg_path} - {sift_path}"
-        output = subprocess.check_output(sift_cmd, shell=True)
-        stdout = f"{args.output}/{ensg}.stdout"
-        f = open(stdout, 'wb')
-        f.write(output)
-        f.close()
+        subprocess.check_output(sift_cmd, shell=True)
+        subprocess.check_output(f"gzip {ensg_path}", shell=True)
+        subprocess.check_output(f"gzip {sift_path}", shell=True)
 
 
 if __name__ == '__main__':

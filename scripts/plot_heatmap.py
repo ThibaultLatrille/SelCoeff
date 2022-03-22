@@ -14,6 +14,7 @@ def open_tsv(filepath):
 
 
 def main(args):
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
     df_merge = pd.concat([open_tsv(filepath) for filepath in sorted(args.tsv)])
     if ("tajima" in df_merge) and ("watterson" in df_merge) and ("fay_wu" in df_merge):
         df_merge["D_tajima"] = df_merge["tajima"] - df_merge["watterson"]
@@ -26,16 +27,16 @@ def main(args):
     pop2sp = {pop: sp for (pop, sp), d in df_merge.groupby(["pop", "species"])}
 
     for method, df in df_merge.groupby(["method"]):
-        cat_snps = CategorySNP(method, args.bins)
+        cat_snps = CategorySNP(method, bins=args.bins)
         for d, d_label in d_dict.items():
             matrix = df[df["category"] != "syn"].pivot(index="pop", columns="category", values=d)
             matrix = matrix.iloc[matrix.apply(lambda row: sp_sorted(row.name, pop2sp[row.name]), axis=1).argsort()]
-            matrix = matrix.reindex(cat_snps.non_syn(), axis=1)
+            matrix = matrix.reindex(cat_snps.non_syn_list, axis=1)
             if abs(np.max(matrix.values)) < 1e-2:
                 matrix *= 1e4
                 d_label += ' ($\\times 10^4$)'
             _, ax = plt.subplots(figsize=(1920 / my_dpi, 880 / my_dpi), dpi=my_dpi)
-            cat_labels = [cat_snps.label(cat) for cat in cat_snps.non_syn()]
+            cat_labels = [cat_snps.label(cat) for cat in cat_snps.non_syn_list]
             start, end = np.nanmin(matrix), np.nanmax(matrix)
             rd_bu = cm.get_cmap('RdBu_r')
             if np.sign(start) != np.sign(end):

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import re
+import gzip
 import numpy as np
 import pandas as pd
 from collections import namedtuple, defaultdict
@@ -51,6 +52,10 @@ confidence_interval = namedtuple('confidence_interval', ['low', 'mean', 'up'])
 sfs_weight = {"watterson": lambda i, n: 1.0 / i, "tajima": lambda i, n: n - i, "fay_wu": lambda i, n: i}
 polydfe_cat_dico = {"S": "$S^{pop}$", "P-Sinf0": "$p_{-}$", "P-Seq0": "$p_{neutral}$", "P-Ssup0": "$p_{+}$"}
 polydfe_cat_list = list(polydfe_cat_dico.keys())
+xlim_dico = {"Omega": (0.0, 2.0), "MutSel": (-10, 10), "SIFT": (0.0, 1.0)}
+rate_dico = {"MutSel": "Scaled selection coefficient (S)",
+             "Omega": "Rate of evolution ($\\omega$)",
+             "SIFT": "SIFT score"}
 
 
 def translate_cds(seq):
@@ -63,14 +68,14 @@ def open_fasta(path):
     assert os.path.isfile(path)
 
     outfile = {}
-    ali_file = open(path, 'r')
+    ali_file = gzip.open(path, 'rt') if path.endswith(".gz") else open(path, 'r')
     for seq_id in ali_file:
         outfile[seq_id.replace('>', '').strip()] = ali_file.readline().strip()
     return outfile
 
 
 def write_fasta(dico_fasta, output):
-    outfile = open(output, "w")
+    outfile = gzip.open(output, 'wt') if output.endswith(".gz") else open(output, 'w')
     outfile.write("\n".join([f">{seq_id}\n{seq}" for seq_id, seq in dico_fasta.items()]))
     outfile.close()
 
@@ -83,8 +88,8 @@ class CdsRates(dict):
         super().__init__()
 
     def add_sift(self, ensg, f_path):
-        mask_path = f"{f_path}.mask.tsv"
-        mask_file = open(mask_path, 'r')
+        mask_path = f"{f_path}.mask.tsv.gz"
+        mask_file = gzip.open(mask_path, 'rt')
         mask_file.readline()
         mask_convert = {}
         for line in mask_file:
@@ -92,8 +97,8 @@ class CdsRates(dict):
             mask_convert[pos] = mask_pos
         mask_file.close()
 
-        pred_path, header_line = f"{f_path}.SIFTprediction", []
-        sift_file = open(pred_path, 'r')
+        pred_path, header_line = f"{f_path}.SIFTprediction.gz", []
+        sift_file = gzip.open(pred_path, 'rt')
         for line in sift_file:
             header_line = re.sub(' +', ' ', line.strip()).split(" ")
             if len(header_line) != 25:
@@ -379,42 +384,77 @@ def quantile(b, num):
     elif num == 4:
         return f"{b}{append_int(b)} quarters"
     else:
-        return f"{b}/{num} quantile"
+        return f"{b}/{num}"
+
+
+BOUND = namedtuple('BOUND', ['cat', 'lower', 'upper'])
+P = namedtuple('P', ['label', 'color', 'lower', 'upper'])
 
 
 class CategorySNP(list):
-    def __init__(self, method="", bins=0, transform_bound=lambda s: s):
-        P = namedtuple('P', ['label', 'color', 'interval', 'bounds'])
+    def __init__(self, method="", bound_file="", bins=0):
         self.bins = bins
+        self.non_syn_list, self.cat_bounds = [], []
+        self.mean = {}
         if bins > 0:
             self.inner_bound = []
             cmap = get_cmap('viridis_r')
             assert bins > 1
-            self.dico = {"syn": P("Synonymous", 'black', lambda s: False, (0, 1))}
-            for b in range(1, bins + 1):
-                color = cmap((b - 1) / (bins - 1))
-                self.dico[f"bin{b}"] = P(f"{quantile(b, bins)}", color, lambda s: False, (0, 1))
+            self.dico = {"syn": P("Synonymous", 'black', None, None)}
+            if bound_file != "":
+                df = pd.read_csv(bound_file, sep="\t")
+                df = df[df["method"] == method]
+                assert 1 <= len(df) <= bins
+                for row_id, row in df.iterrows():
+                    b = int(row["cat"].split("_")[-1])
+                    color = cmap((b - 1) / (len(df["cat"]) - 1))
+                    self.dico[row["cat"]] = P(f"{quantile(b, bins)}", color, row["lower"], row["upper"])
+                    self.mean[row["cat"]] = row["mean"]
+            else:
+                for b in range(1, bins + 1):
+                    color = cmap((b - 1) / (bins - 1))
+                    self.dico[f"bin_{b}"] = P(f"{quantile(b, bins)}", color, None, None)
         elif method == "SIFT":
             self.inner_bound = [0.05, 0.1, 0.3, 0.8]
             self.dico = {
-                "neg-strong": P("$SIFT<0.05$", BLUE, lambda s: 0.05 >= s >= 0, (0, 0.05)),
-                "neg": P("$0.05<SIFT<0.1$", GREEN, lambda s: 0.1 >= s > 0.05, (0.05, 0.1)),
-                "neg-weak": P("$0.1<SIFT<0.3$", LIGHTGREEN, lambda s: 0.3 >= s > 0.1, (0.1, 0.3)),
-                "pos-weak": P("$0.3<SIFT<0.8$", YELLOW, lambda s: 0.8 >= s > 0.3, (.3, 0.8)),
-                "pos": P("$0.8<SIFT$", RED, lambda s: 1 >= s > 0.8, (.8, 1)),
-                "syn": P("$Synonymous$", 'black', lambda x: False, (0, 0)),
+                "neg-strong": P("$SIFT<0.05$", BLUE, 0, 0.05),
+                "neg": P("$0.05<SIFT<0.1$", GREEN, 0.05, 0.1),
+                "neg-weak": P("$0.1<SIFT<0.3$", LIGHTGREEN, 0.1, 0.3),
+                "pos-weak": P("$0.3<SIFT<0.8$", YELLOW, 0.3, 0.8),
+                "pos": P("$0.8<SIFT$", RED, 0.8, 1.0),
+                "syn": P("$Synonymous$", 'black', None, None)
             }
         else:
             self.inner_bound = [-3, -1, 0, 1]
             self.dico = {
-                "neg-strong": P("$S<-3$", BLUE, lambda s: transform_bound(-3) >= s, (-np.float("infinity"), -3)),
-                "neg": P("$-3<S<-1$", GREEN, lambda s: transform_bound(-1) >= s > transform_bound(-3), (-3, -1)),
-                "neg-weak": P("$-1<S<0$", LIGHTGREEN, lambda s: transform_bound(0) >= s > transform_bound(-1), (-1, 0)),
-                "syn": P("$Synonymous$", 'black', lambda s: False, (0, 0)),
-                "pos-weak": P("$0<S<1$", YELLOW, lambda s: transform_bound(1) >= s >= transform_bound(0), (0, 1)),
-                "pos": P("$S>1$", RED, lambda s: s > transform_bound(1), (1, np.float("infinity")))
+                "neg-strong": P("$S<-3$", BLUE, -np.float("infinity"), -3),
+                "neg": P("$-3<S<-1$", GREEN, -3, -1),
+                "neg-weak": P("$-1<S<0$", LIGHTGREEN, -1, 0),
+                "syn": P("$Synonymous$", 'black', None, None),
+                "pos-weak": P("$0<S<1$", YELLOW, 0, 1),
+                "pos": P("$S>1$", RED, 1, np.float("infinity"))
             }
         super().__init__(self.dico.keys())
+        self.update()
+
+    def update(self):
+        super().__init__(self.dico.keys())
+        self.non_syn_list = [i for i in self if i != "syn"]
+        for i in range(self.nbr_non_syn() - 1):
+            assert self.dico[self.non_syn_list[i]].upper == self.dico[self.non_syn_list[i + 1]].lower
+
+        self.cat_bounds = [self.dico[cat].lower for cat in self.non_syn_list] + [self.dico[self.non_syn_list[-1]].upper]
+        self.inner_bound = [i for i in self.cat_bounds[1:-1] if i is not None]
+
+        if len(self.inner_bound) > 0:
+            assert np.all(np.diff(self.cat_bounds) >= 0)
+
+    def add_intervals(self, intervals):
+        self.dico = {"syn": P("Synonymous", 'black', None, None)}
+        for bound in intervals:
+            b = int(bound.cat.split("_")[-1])
+            self.dico[bound.cat] = P(f"{quantile(b, len(intervals))}", None, bound.lower, bound.upper)
+        self.update()
 
     def color(self, cat):
         return self.dico[cat].color if cat != "all" else "grey"
@@ -423,15 +463,20 @@ class CategorySNP(list):
         return self.dico[cat].label if cat != "all" else "All"
 
     def rate2cat(self, s):
-        for cat in self:
-            if self.dico[cat].interval(s):
-                return cat
+        i = np.searchsorted(self.cat_bounds, s, side='right') - 1
+        if i == -1:
+            assert s < self.cat_bounds[0] or s > self.cat_bounds[-1]
+            return "OutOfBounds"
+        if i == self.nbr_non_syn():
+            i -= 1
+        cat = self.non_syn_list[max(0, i)]
+        if self.dico[cat].upper < s or self.dico[cat].lower > s:
+            print(self.dico)
+            print(self.dico[cat].upper, s, self.dico[cat].lower)
+        return cat
 
     def nbr_non_syn(self):
-        return len(self) - 1
-
-    def non_syn(self):
-        return [i for i in self if i != "syn"]
+        return len(self.non_syn_list)
 
     def all(self):
-        return self.non_syn() + ["all"]
+        return self.non_syn_list + ["all"]
