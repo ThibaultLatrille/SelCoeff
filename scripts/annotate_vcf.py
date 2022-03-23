@@ -21,6 +21,7 @@ def read_vcf(vcf, sift_file, mask_grouped):
     dict_sift = open_sift(sift_file)
     vcf_file = gzip.open(vcf, 'rt')
     dico_snp = defaultdict(list)
+    discarded = 0
     header = {}
     for vcf_line in vcf_file:
         if vcf_line[0] == '#':
@@ -30,7 +31,6 @@ def read_vcf(vcf, sift_file, mask_grouped):
             continue
         assert len(header) > 0
 
-        discarded = 0
         split_line = vcf_line.strip().split("\t")
         snp_chr = str(split_line[header["#CHROM"]])
         snp_pos = int(split_line[header["POS"]])
@@ -64,7 +64,7 @@ def read_vcf(vcf, sift_file, mask_grouped):
         dico_snp["Omega"].append(omega)
     vcf_file.close()
 
-    return dico_snp
+    return dico_snp, discarded
 
 
 def classify_snps(s_list, type_list, cat_snps):
@@ -193,7 +193,8 @@ def main(args):
     os.makedirs(os.path.dirname(args.output_bounds), exist_ok=True)
 
     mask_grouped = open_mask(args.mask)
-    dico_snp = read_vcf(args.vcf, args.sift_file, mask_grouped)
+    dico_snp, discarded = read_vcf(args.vcf, args.sift_file, mask_grouped)
+    print(f'{discarded * 100 / len(dico_snp["snp_type"]):.2f}% of SNPs are discarded because their are adaptive.')
     dico_bounds = defaultdict(list)
 
     for method in ["MutSel", "Omega", "SIFT"]:

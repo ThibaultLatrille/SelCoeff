@@ -53,6 +53,7 @@ def main(args):
     log_fitness, sel_coeff, flow_pos, flow_neg = Stat(), Stat(), Stat(), Stat()
 
     mask_grouped = open_mask(args.mask)
+    unconserved_grouped = open_mask(args.unconserved)
 
     cds_rates = CdsRates(args.method, args.exp_folder)
     output_dict, dico_opp_sp = defaultdict(list), {cat: 0 for cat in cat_snps.non_syn_list}
@@ -78,7 +79,8 @@ def main(args):
                 continue
             lf = cds_rates.log_fitness(ensg, ref_aa, c_site)
             if args.method == "MutSel":
-                log_fitness.add(lf)
+                if (ensg not in unconserved_grouped) or (c_site not in unconserved_grouped[ensg]):
+                    log_fitness.add(lf)
 
             for frame, ref_nuc in enumerate(ref_codon):
                 for alt_nuc in [i for i in nucleotides if i != ref_nuc]:
@@ -86,6 +88,7 @@ def main(args):
                     alt_aa = codontable[alt_codon]
                     if alt_aa == 'X' or alt_aa == ref_aa:
                         continue
+
                     rate = cds_rates.rate(ensg, ref_aa, alt_aa, c_site)
                     if not np.isfinite(rate):
                         continue
@@ -142,6 +145,8 @@ if __name__ == '__main__':
     parser.add_argument('--fasta_pop', required=True, type=str, dest="fasta_pop", help="The fasta path")
     parser.add_argument('--bounds', required=False, default="", type=str, dest="bounds", help="Input bound file path")
     parser.add_argument('--mask', required=False, default="", type=str, dest="mask", help="Input mask file path")
+    parser.add_argument('--unconserved', required=False, default="", type=str, dest="unconserved",
+                        help="Input unconserved file path")
     parser.add_argument('--method', required=True, type=str, dest="method", help="The method (MutSel or Omega)")
     parser.add_argument('--output', required=True, type=str, dest="output", help="Output tsv path")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")

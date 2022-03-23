@@ -85,6 +85,16 @@ rule annotate_vcf:
     shell:
         'python3 {input.script} --mask {input.mask} --sift_file {input.sift_file} --vcf {input.vcf} --bins {bins} --windows {windows} --output_tsv {output.tsv} --output_bounds {output.bounds}'
 
+rule mask_unconserved:
+    input:
+        script=f'{FOLDER}/scripts/mask_unconserved.py',
+        fasta_folder=f'{FOLDER}/data_div/omm_NT_fasta.v10c_116'
+    output:
+        tsv=f"{FOLDER}/data_processed/mask_unconserved.tsv.gz",
+    params:
+        species=" ".join(sorted(set(pop2sp.values())))
+    shell:
+        'python3 {input.script} --species {params.species}  --fasta_folder {input.fasta_folder} --output {output.tsv}'
 
 rule opportunities:
     input:
@@ -92,13 +102,14 @@ rule opportunities:
         exp_folder=lambda wildcards: f'{FOLDER}/data_div/Experiments' if wildcards.method != 'SIFT' else rules.SIFT_annotate.output,
         fasta_pop=rules.fixed_snp_by_pop.output.fasta,
         bounds=rules.annotate_vcf.output.bounds,
+        unconserved=rules.mask_unconserved.output.tsv,
         mask=rules.mask_adaptation.output.tsv if config['mask_adaptation'] else []
     output:
         tsv=f"{FOLDER}/data_processed/opportunities_{binning}/DFE." + '{species}.{popu}.{method}.tsv',
     params:
         k=lambda wildcards: f"--subsample_genes {config['subsample_genes']}"
     shell:
-        'python3 {input.script} --mask {input.mask} --bins {bins} --windows {windows} --bounds {input.bounds} {params.k} --method {wildcards.method} --exp_folder {input.exp_folder} --fasta_pop {input.fasta_pop} --output {output.tsv}'
+        'python3 {input.script} --mask {input.mask} --unconserved {input.unconserved} --bins {bins} --windows {windows} --bounds {input.bounds} {params.k} --method {wildcards.method} --exp_folder {input.exp_folder} --fasta_pop {input.fasta_pop} --output {output.tsv}'
 
 rule gather_opportunities:
     input:
@@ -167,7 +178,7 @@ rule parse_results_DFE:
 rule plot_theta_heatmap:
     input:
         script=f'{FOLDER}/scripts/plot_heatmap.py',
-        tsv=map(lambda p: f"{p}-sfs-summary-stats.tsv", SFS_LIST),
+        tsv=map(lambda p: f"{p}-sfs-summary-stats.tsv",SFS_LIST),
         sample_list=sample_list
     output:
         tsv=f'{EXP_FOLDER}/results/Theta.results.tsv'

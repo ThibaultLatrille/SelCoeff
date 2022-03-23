@@ -92,7 +92,7 @@ def open_mask(file):
         df_mask = pd.read_csv(file, sep="\t", dtype={"ensg": 'string', "pos": int})
         mask_grouped = {ensg: df["pos"].values for ensg, df in df_mask.groupby("ensg")}
     else:
-        print("No mask found.")
+        print(f"No mask found: {file}.")
     return mask_grouped
 
 
