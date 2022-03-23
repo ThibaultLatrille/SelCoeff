@@ -62,12 +62,18 @@ def translate_cds(seq):
     return "".join([codontable[seq[codon_pos * 3:codon_pos * 3 + 3]] for codon_pos in range(len(seq) // 3)])
 
 
-def open_fasta(path):
+def clean_ensg_path(path):
     if not os.path.isfile(path):
         path = path.replace("_null_", "__")
-    assert os.path.isfile(path)
+        if not os.path.isfile(path):
+            path = path.replace("__", "_null_")
+            assert os.path.isfile(path)
+    return path
 
+
+def open_fasta(path):
     outfile = {}
+    path = clean_ensg_path(path)
     ali_file = gzip.open(path, 'rt') if path.endswith(".gz") else open(path, 'r')
     for seq_id in ali_file:
         outfile[seq_id.replace('>', '').strip()] = ali_file.readline().strip()
@@ -78,6 +84,16 @@ def write_fasta(dico_fasta, output):
     outfile = gzip.open(output, 'wt') if output.endswith(".gz") else open(output, 'w')
     outfile.write("\n".join([f">{seq_id}\n{seq}" for seq_id, seq in dico_fasta.items()]))
     outfile.close()
+
+
+def open_mask(file):
+    mask_grouped = {}
+    if file != "" and os.path.isfile(file):
+        df_mask = pd.read_csv(file, sep="\t", dtype={"ensg": 'string', "pos": int})
+        mask_grouped = {ensg: df["pos"].values for ensg, df in df_mask.groupby("ensg")}
+    else:
+        print("No mask found.")
+    return mask_grouped
 
 
 class CdsRates(dict):
@@ -124,21 +140,11 @@ class CdsRates(dict):
     def add_ensg(self, ensg):
         f_path = f"{self.exp_folder}/{ensg}"
         if self.method == "MutSel":
-            path = f"{f_path}_NT/sitemutsel_1.run.siteprofiles"
-            if not os.path.isfile(path):
-                path = path.replace("_null_", "__")
-            if not os.path.isfile(path):
-                path = path.replace("__", "_null_")
-            assert os.path.isfile(path)
+            path = clean_ensg_path(f"{f_path}_NT/sitemutsel_1.run.siteprofiles")
             self[ensg] = pd.read_csv(path, sep="\t", skiprows=1, header=None,
                                      names="site,A,C,D,E,F,G,H,I,K,L,M,N,P,Q,R,S,T,V,W,Y".split(","))
         elif self.method == "Omega":
-            path = f"{f_path}_NT/siteomega_1.run.ci0.025.tsv"
-            if not os.path.isfile(path):
-                path = path.replace("_null_", "__")
-            if not os.path.isfile(path):
-                path = path.replace("__", "_null_")
-            assert os.path.isfile(path)
+            path = clean_ensg_path(f"{f_path}_NT/siteomega_1.run.ci0.025.tsv")
             self[ensg] = pd.read_csv(path, sep="\t")["gene_omega"].values[1:]
         elif self.method == "SIFT":
             self.add_sift(ensg, f_path)
@@ -176,14 +182,14 @@ def theta(sfs_epsilon, daf_n, weight_method):
     return sum(sfs_theta * weights) / sum(weights)
 
 
-def write_dofe(sfs_syn, sfs_non_syn, l_non_syn, d_non_syn, l_syn, d_syn, k, filepath, sp_focal, sp_sister, L):
+def write_dofe(sfs_syn, sfs_non_syn, l_non_syn, d_non_syn, l_syn, d_syn, k, filepath, sp_focal, sp_sister, n_sites):
     sfs_list = [k]
     for sfs, nbr_site in [(sfs_non_syn, l_non_syn), (sfs_syn, l_syn)]:
         sfs_list += [nbr_site] + [sfs[i] for i in range(1, k)]
     sfs_list += [l_non_syn, d_non_syn, l_syn, d_syn]
 
     dofe_file = open(filepath + ".dofe", 'w')
-    dofe_file.write(f"{sp_focal}+{sp_sister} ({int(L)} sites)\n")
+    dofe_file.write(f"{sp_focal}+{sp_sister} ({int(n_sites)} sites)\n")
     dofe_file.write("#unfolded\n")
     dofe_file.write("Summed\t" + "\t".join(map(lambda i: str(int(i)), sfs_list)) + "\n")
     dofe_file.close()
@@ -204,27 +210,6 @@ def write_sfs(sfs_syn, sfs_non_syn, l_non_syn, d_non_syn, l_syn, d_syn, k, filep
 
 
 def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
-    '''
-    Function to offset the "center" of a colormap. Useful for
-    data with a negative min and positive max and you want the
-    middle of the colormap's dynamic range to be at zero.
-
-    Input
-    -----
-      cmap : The matplotlib colormap to be altered
-      start : Offset from lowest point in the colormap's range.
-          Defaults to 0.0 (no lower offset). Should be between
-          0.0 and `midpoint`.
-      midpoint : The new center of the colormap. Defaults to
-          0.5 (no shift). Should be between 0.0 and 1.0. In
-          general, this should be  1 - vmax / (vmax + abs(vmin))
-          For example if your data range from -15.0 to +5.0 and
-          you want the center of the colormap at 0.0, `midpoint`
-          should be set to  1 - 5/(5 + 15)) or 0.75
-      stop : Offset from highest point in the colormap's range.
-          Defaults to 1.0 (no upper offset). Should be between
-          `midpoint` and 1.0.
-    '''
     cdict = {
         'red': [],
         'green': [],

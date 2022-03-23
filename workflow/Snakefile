@@ -14,7 +14,9 @@ model = config["MODEL"]
 assert model in ["grapes", "polyDFE_D", "polyDFE_C"]
 bins = config["bins"]
 windows = config["windows"]
-binning = f'bins{bins}' if windows == 0 else f'windows{bins}x{windows}'
+binning = (f'bins{bins}' if windows == 0 else f'windows{bins}x{windows}')
+if config["mask_adaptation"]:
+    binning += "NonAdaptive"
 pop2sp = {}
 SFS_LIST = []
 
@@ -62,16 +64,26 @@ rule merge_SIFT:
     shell:
         'python3 {input.script} --species {wildcards.species} --vcf {input.vcf} --sift_folder {input.sift_folder} --output {output}'
 
+rule mask_adaptation:
+    input:
+        script=f'{FOLDER}/scripts/mask_adaptation.py',
+        exp_folder=f'{FOLDER}/data_div/Experiments'
+    output:
+        tsv=f"{FOLDER}/data_processed/mask_adaptation.tsv.gz",
+    shell:
+        'python3 {input.script} --exp_folder {input.exp_folder} --output {output.tsv}'
+
 rule annotate_vcf:
     input:
         vcf=FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
         script=f'{FOLDER}/scripts/annotate_vcf.py',
-        sift_file=rules.merge_SIFT.output
+        sift_file=rules.merge_SIFT.output,
+        mask=rules.mask_adaptation.output.tsv if config['mask_adaptation'] else []
     output:
         tsv=f"{FOLDER}/data_processed/vcf_annotate_{binning}" + '/snps.{species}.{popu}.tsv.gz',
         bounds=f"{FOLDER}/data_processed/vcf_annotate_{binning}" + '/bounds.{species}.{popu}.tsv'
     shell:
-        'python3 {input.script} --sift_file {input.sift_file} --vcf {input.vcf} --bins {bins} --windows {windows} --output_tsv {output.tsv} --output_bounds {output.bounds}'
+        'python3 {input.script} --mask {input.mask} --sift_file {input.sift_file} --vcf {input.vcf} --bins {bins} --windows {windows} --output_tsv {output.tsv} --output_bounds {output.bounds}'
 
 
 rule opportunities:
@@ -79,13 +91,14 @@ rule opportunities:
         script=f'{FOLDER}/scripts/genome_opportunities.py',
         exp_folder=lambda wildcards: f'{FOLDER}/data_div/Experiments' if wildcards.method != 'SIFT' else rules.SIFT_annotate.output,
         fasta_pop=rules.fixed_snp_by_pop.output.fasta,
-        bounds=rules.annotate_vcf.output.bounds
+        bounds=rules.annotate_vcf.output.bounds,
+        mask=rules.mask_adaptation.output.tsv if config['mask_adaptation'] else []
     output:
         tsv=f"{FOLDER}/data_processed/opportunities_{binning}/DFE." + '{species}.{popu}.{method}.tsv',
     params:
         k=lambda wildcards: f"--subsample_genes {config['subsample_genes']}"
     shell:
-        'python3 {input.script} --bins {bins} --windows {windows} --bounds {input.bounds} {params.k} --method {wildcards.method} --exp_folder {input.exp_folder} --fasta_pop {input.fasta_pop} --output {output.tsv}'
+        'python3 {input.script} --mask {input.mask} --bins {bins} --windows {windows} --bounds {input.bounds} {params.k} --method {wildcards.method} --exp_folder {input.exp_folder} --fasta_pop {input.fasta_pop} --output {output.tsv}'
 
 rule gather_opportunities:
     input:

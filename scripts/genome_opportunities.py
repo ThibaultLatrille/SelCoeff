@@ -3,7 +3,8 @@ import argparse
 import numpy as np
 import pandas as pd
 from collections import defaultdict
-from libraries import nucleotides, codontable, CdsRates, open_fasta, plt, CategorySNP, my_dpi, xlim_dico, rate_dico
+from libraries import nucleotides, codontable, CdsRates, open_mask, open_fasta, CategorySNP, xlim_dico, rate_dico, plt, \
+    my_dpi
 
 transitions = {('A', 'G'), ('G', 'A'), ('C', 'T'), ('T', 'C')}
 
@@ -22,7 +23,10 @@ class Stat:
 
 
 def pfix(s):
-    return s / (1 - np.exp(-s))
+    if s == 0.0:
+        return 1.0
+    else:
+        return s / (1 - np.exp(-s))
 
 
 def plot_histogram(counts, edges, method, file):
@@ -48,14 +52,17 @@ def main(args):
     counts_mu, counts_q = np.histogram([], bins=bins)[0], np.histogram([], bins=bins)[0]
     log_fitness, sel_coeff, flow_pos, flow_neg = Stat(), Stat(), Stat(), Stat()
 
+    mask_grouped = open_mask(args.mask)
+
     cds_rates = CdsRates(args.method, args.exp_folder)
     output_dict, dico_opp_sp = defaultdict(list), {cat: 0 for cat in cat_snps.non_syn_list}
-    dico_opp_sp["OutOfBounds"] = 0
+    dico_opp_sp["OutOfBounds"], dico_opp_sp["Adaptive"] = 0, 0
 
     tot_opp = 0
 
     seqs = open_fasta(args.fasta_pop)
     size = len(seqs) if args.subsample_genes < 1 else min(args.subsample_genes, len(seqs))
+    np.random.seed(seed=0)
     rd_ensg_list = np.random.choice(list(seqs.keys()), size=size, replace=False)
 
     for ensg in rd_ensg_list:
@@ -63,6 +70,8 @@ def main(args):
         list_rates, list_mu, list_q = [], [], []
 
         for c_site in range(len(seq) // 3):
+            adaptive = ensg in mask_grouped and c_site in mask_grouped[ensg]
+
             ref_codon = seq[c_site * 3:c_site * 3 + 3]
             ref_aa = codontable[ref_codon]
             if ref_aa == "X" or ref_aa == "-":
@@ -70,6 +79,7 @@ def main(args):
             lf = cds_rates.log_fitness(ensg, ref_aa, c_site)
             if args.method == "MutSel":
                 log_fitness.add(lf)
+
             for frame, ref_nuc in enumerate(ref_codon):
                 for alt_nuc in [i for i in nucleotides if i != ref_nuc]:
                     alt_codon = ref_codon[:frame] + alt_nuc + ref_codon[frame + 1:]
@@ -82,6 +92,11 @@ def main(args):
 
                     mutation_rate = 2.0 if (alt_nuc, ref_nuc) in transitions else 1.0
                     tot_opp += mutation_rate
+
+                    if adaptive:
+                        dico_opp_sp["Adaptive"] += mutation_rate
+                        continue
+
                     cats = cat_snps.rate2cats(rate)
                     if len(cats) == 0:
                         dico_opp_sp["OutOfBounds"] += mutation_rate
@@ -107,6 +122,7 @@ def main(args):
         output_dict[cat].append(dico_opp_sp[cat] / tot_opp)
 
     print(f'{output_dict["OutOfBounds"][0] * 100:.2f}% of opportunities out of bounds')
+    print(f'{output_dict["Adaptive"][0] * 100:.2f}% of opportunities are discarded because their are adaptive.')
 
     if args.method == "MutSel":
         output_dict["S_mean"].append(sel_coeff.mean())
@@ -125,6 +141,7 @@ if __name__ == '__main__':
     parser.add_argument('--exp_folder', required=True, type=str, dest="exp_folder", help="The experiment folder path")
     parser.add_argument('--fasta_pop', required=True, type=str, dest="fasta_pop", help="The fasta path")
     parser.add_argument('--bounds', required=False, default="", type=str, dest="bounds", help="Input bound file path")
+    parser.add_argument('--mask', required=False, default="", type=str, dest="mask", help="Input mask file path")
     parser.add_argument('--method', required=True, type=str, dest="method", help="The method (MutSel or Omega)")
     parser.add_argument('--output', required=True, type=str, dest="output", help="Output tsv path")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")

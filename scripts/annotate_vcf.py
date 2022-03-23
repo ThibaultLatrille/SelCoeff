@@ -6,7 +6,7 @@ import pandas as pd
 import scipy.stats as sps
 from collections import defaultdict
 from matplotlib.patches import Rectangle
-from libraries import plt, CategorySNP, my_dpi, multiline, xlim_dico, rate_dico, BOUND
+from libraries import open_mask, BOUND, CategorySNP, xlim_dico, rate_dico, plt, my_dpi, multiline
 
 
 def open_sift(sift_file):
@@ -17,7 +17,7 @@ def open_sift(sift_file):
     return output
 
 
-def read_vcf(vcf, sift_file):
+def read_vcf(vcf, sift_file, mask_grouped):
     dict_sift = open_sift(sift_file)
     vcf_file = gzip.open(vcf, 'rt')
     dico_snp = defaultdict(list)
@@ -30,11 +30,18 @@ def read_vcf(vcf, sift_file):
             continue
         assert len(header) > 0
 
+        discarded = 0
         split_line = vcf_line.strip().split("\t")
         snp_chr = str(split_line[header["#CHROM"]])
         snp_pos = int(split_line[header["POS"]])
         info = str(split_line[header["INFO"]])
         dico_info = {k: v for k, v in [s.split('=') for s in info.split(';') if '=' in s]}
+        ensg = dico_info["ENSG"]
+        c_site = int(dico_info["ENSG_POS"]) // 3
+        if ensg in mask_grouped and c_site in mask_grouped[ensg]:
+            assert float(dico_info["SITE_OMEGA"]) > float(dico_info["SITE_OMEGA_0"])
+            discarded += 1
+            continue
 
         sample_size = int(dico_info["SAMPLE_SIZE"])
         k = int(dico_info["COUNT_POLARIZED"])
@@ -184,7 +191,9 @@ def plot_histogram(score_list, cat_snps, method, file):
 def main(args):
     os.makedirs(os.path.dirname(args.output_tsv), exist_ok=True)
     os.makedirs(os.path.dirname(args.output_bounds), exist_ok=True)
-    dico_snp = read_vcf(args.vcf, args.sift_file)
+
+    mask_grouped = open_mask(args.mask)
+    dico_snp = read_vcf(args.vcf, args.sift_file, mask_grouped)
     dico_bounds = defaultdict(list)
 
     for method in ["MutSel", "Omega", "SIFT"]:
@@ -217,8 +226,8 @@ if __name__ == '__main__':
     parser.add_argument('--vcf', required=False, type=str, dest="vcf", help="Input vcf file")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
     parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
-    parser.add_argument('--sift_file', required=False, type=str, default="", dest="sift_file",
-                        help="The SIFT file path")
+    parser.add_argument('--sift_file', required=False, type=str, default="", dest="sift_file", help="The SIFT file")
+    parser.add_argument('--mask', required=False, default="", type=str, dest="mask", help="Input mask file path")
     parser.add_argument('--output_tsv', required=False, type=str, dest="output_tsv", help="Output tsv file")
     parser.add_argument('--output_bounds', required=False, type=str, dest="output_bounds", help="Output bounds file")
     main(parser.parse_args())
