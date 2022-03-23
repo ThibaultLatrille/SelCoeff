@@ -65,42 +65,45 @@ def classify_snps(s_list, type_list, cat_snps):
 
     if cat_snps.bins != 0:
         s_ns_list = [s for s, snp_type in zip(s_list, type_list) if snp_type == "NonSyn" and np.isfinite(s)]
-        array_split = np.array_split(sorted(s_ns_list), cat_snps.bins)
-        assert len(array_split) == cat_snps.bins
-        for i, current_bin in enumerate(array_split):
-            lower = current_bin[0]
-            upper = current_bin[-1] if i == (len(array_split) - 1) else array_split[i + 1][0]
-            if len(intervals) > 0:
-                prev = intervals[-1]
-                if (prev.upper == upper and prev.lower == lower) or (lower == 0.0 and upper == 0.0):
+        if cat_snps.windows == 0:
+            array_split = np.array_split(sorted(s_ns_list), cat_snps.bins)
+            assert len(array_split) == cat_snps.bins
+            for i, current_bin in enumerate(array_split):
+                lower = current_bin[0]
+                upper = current_bin[-1] if i == (len(array_split) - 1) else array_split[i + 1][0]
+                if lower == upper:
                     continue
-            intervals.append(BOUND(f"bin_{i + 1}", lower, upper))
-
-        cat_snps.add_intervals(intervals)
-
-        for s, snp_type in zip(s_list, type_list):
-            if snp_type == "Syn":
-                cat_list.append("syn")
-            elif np.isfinite(s):
-                cat = cat_snps.rate2cat(s)
-                cat_list.append(cat)
-                dico_cat[cat].append(s)
-            else:
-                cat_list.append("None")
+                intervals.append(BOUND(f"b_{i + 1}", lower, upper))
+        else:
+            sorted_list = sorted(s_ns_list)
+            assert cat_snps.windows < len(s_ns_list)
+            chunk = int((len(s_ns_list) - cat_snps.windows) / cat_snps.bins)
+            start = 0
+            for i in range(cat_snps.bins):
+                end = min(start + cat_snps.windows, len(s_ns_list) - 1)
+                assert start != end
+                intervals.append(BOUND(f"w_{i + 1}", sorted_list[start], sorted_list[end]))
+                start += chunk
     else:
-        for s, snp_type in zip(s_list, type_list):
-            if snp_type == "Syn":
-                cat_list.append("syn")
-            elif np.isfinite(s):
-                cat = cat_snps.rate2cat(s)
-                cat_list.append(cat)
-                dico_cat[cat].append(s)
-            else:
-                cat_list.append("None")
-
         for cat in range(cat_snps.non_syn_list):
             bounds = cat_snps.dico[cat].bounds
             intervals.append(BOUND(cat, bounds[0], bounds[1]))
+
+    cat_snps.add_intervals(intervals)
+    for s, snp_type in zip(s_list, type_list):
+        if snp_type == "Syn":
+            cat_list.append("-syn-")
+        elif np.isfinite(s):
+            cats = cat_snps.rate2cats(s)
+            if cat_snps.bins == 0 or (cat_snps.bins != 0 and cat_snps.windows == 0):
+                if len(cats) != 1:
+                    cats = [cats[0]]
+                assert len(cats) == 1
+            cat_list.append("-" + "-".join(cats) + "-")
+            for cat in cats:
+                dico_cat[cat].append(s)
+        else:
+            cat_list.append("None")
 
     return cat_list, intervals, [np.mean(dico_cat[b.cat]) for b in intervals], [len(dico_cat[b.cat]) for b in intervals]
 
@@ -156,7 +159,9 @@ def plot_histogram(score_list, cat_snps, method, file):
     if cat_snps.bins == 0:
         n_cat = defaultdict(int)
         for i, b in enumerate(bins[1:]):
-            cat = cat_snps.rate2cat(b)
+            cats = cat_snps.rate2cats(b)
+            assert len(cats) == 1
+            cat = cats[0]
             patches[i].set_facecolor(cat_snps.color(cat))
             n_cat[cat] += n[i]
         handles = [Rectangle((0, 0), 1, 1, color=c) for c in [cat_snps.color(cat) for cat in cat_snps.non_syn_list]]
@@ -183,7 +188,7 @@ def main(args):
     dico_bounds = defaultdict(list)
 
     for method in ["MutSel", "Omega", "SIFT"]:
-        cat_snps = CategorySNP(method, bins=args.bins)
+        cat_snps = CategorySNP(method, bins=args.bins, windows=args.windows)
         cat_list, bounds, mean_list, count_list = classify_snps(dico_snp[method], dico_snp["snp_type"], cat_snps)
         dico_snp["cat_" + method] = cat_list
         dico_bounds["method"].extend([method] * len(bounds))
@@ -211,6 +216,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--vcf', required=False, type=str, dest="vcf", help="Input vcf file")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
+    parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
     parser.add_argument('--sift_file', required=False, type=str, default="", dest="sift_file",
                         help="The SIFT file path")
     parser.add_argument('--output_tsv', required=False, type=str, dest="output_tsv", help="Output tsv file")

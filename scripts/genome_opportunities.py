@@ -42,16 +42,17 @@ def plot_histogram(counts, edges, method, file):
 
 def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
-    cat_snps = CategorySNP(args.method, args.bounds, bins=args.bins)
+    cat_snps = CategorySNP(args.method, args.bounds, bins=args.bins, windows=args.windows)
 
     bins = np.linspace(xlim_dico[args.method][0], xlim_dico[args.method][1], 61)
     counts_mu, counts_q = np.histogram([], bins=bins)[0], np.histogram([], bins=bins)[0]
     log_fitness, sel_coeff, flow_pos, flow_neg = Stat(), Stat(), Stat(), Stat()
 
     cds_rates = CdsRates(args.method, args.exp_folder)
-    output_dict, dico_opp_sp = defaultdict(list), defaultdict(int)
-    for cat in cat_snps:
-        dico_opp_sp[cat] = 0
+    output_dict, dico_opp_sp = defaultdict(list), {cat: 0 for cat in cat_snps.non_syn_list}
+    dico_opp_sp["OutOfBounds"] = 0
+
+    tot_opp = 0
 
     seqs = open_fasta(args.fasta_pop)
     size = len(seqs) if args.subsample_genes < 1 else min(args.subsample_genes, len(seqs))
@@ -80,10 +81,14 @@ def main(args):
                         continue
 
                     mutation_rate = 2.0 if (alt_nuc, ref_nuc) in transitions else 1.0
-                    cat = cat_snps.rate2cat(rate)
-                    dico_opp_sp[cat] += mutation_rate
-                    if cat == "OutOfBounds":
+                    tot_opp += mutation_rate
+                    cats = cat_snps.rate2cats(rate)
+                    if len(cats) == 0:
+                        dico_opp_sp["OutOfBounds"] += mutation_rate
                         continue
+
+                    for cat in cats:
+                        dico_opp_sp[cat] += mutation_rate
 
                     list_rates.append(rate)
                     list_mu.append(mutation_rate)
@@ -98,12 +103,10 @@ def main(args):
         if args.method == "MutSel":
             counts_q = counts_q + np.histogram(list_rates, bins=bins, weights=list_q)[0]
 
-    tot_opp = sum(dico_opp_sp.values())
     for cat in dico_opp_sp:
         output_dict[cat].append(dico_opp_sp[cat] / tot_opp)
 
-    if "OutOfBounds" in dico_opp_sp:
-        print(f'{output_dict["OutOfBounds"][0] * 100}% of opportunities out of bounds')
+    print(f'{output_dict["OutOfBounds"][0] * 100:.2f}% of opportunities out of bounds')
 
     if args.method == "MutSel":
         output_dict["S_mean"].append(sel_coeff.mean())
@@ -125,6 +128,7 @@ if __name__ == '__main__':
     parser.add_argument('--method', required=True, type=str, dest="method", help="The method (MutSel or Omega)")
     parser.add_argument('--output', required=True, type=str, dest="output", help="Output tsv path")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
+    parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
     parser.add_argument('--subsample_genes', required=False, default=-1, type=int, dest="subsample_genes",
                         help="Number of genes to subsample")
     main(parser.parse_args())

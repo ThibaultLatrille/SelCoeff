@@ -22,5 +22,4 @@ if __name__ == '__main__':
     parser.add_argument('--tsv', required=False, type=str, nargs="+", dest="tsv", help="Input tsv file")
     parser.add_argument('--output', required=False, type=str, dest="output", help="Output tsv file")
     parser.add_argument('--sample_list', required=False, type=str, dest="sample_list", help="Sample list file")
-    parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
     main(parser.parse_args())

@@ -115,8 +115,8 @@ def plot_scatter(x, y, method, file):
 
 def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
-    cat_snps = CategorySNP(args.method, bound_file=args.bounds, bins=args.bins)
-    cat_poly_snps = CategorySNP("MutSel", bins=args.bins)
+    cat_snps = CategorySNP(args.method, args.bounds, bins=args.bins, windows=args.windows)
+    cat_poly_snps = CategorySNP("MutSel", bins=0, windows=0)
     list_cat = cat_snps.all()
     s_dico = dict()
     for file in args.input:
@@ -178,5 +178,6 @@ if __name__ == '__main__':
     parser.add_argument('--sample_list', required=False, type=str, dest="sample_list", help="Sample list file")
     parser.add_argument('--method', required=False, type=str, dest="method", help="Sel coeff parameter")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
+    parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
     parser.add_argument('--bounds', required=False, default="", type=str, dest="bounds", help="Input bound file path")
     main(parser.parse_args())

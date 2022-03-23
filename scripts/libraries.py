@@ -392,28 +392,25 @@ P = namedtuple('P', ['label', 'color', 'lower', 'upper'])
 
 
 class CategorySNP(list):
-    def __init__(self, method="", bound_file="", bins=0):
-        self.bins = bins
-        self.non_syn_list, self.cat_bounds = [], []
-        self.mean = {}
+    def __init__(self, method="", bound_file="", bins=0, windows=0):
+        super().__init__()
+        self.bins, self.windows = bins, windows
+        self.non_syn_list, self.inner_bound = [], []
+        self.dico, self.mean = {}, {}
         if bins > 0:
-            self.inner_bound = []
-            cmap = get_cmap('viridis_r')
-            assert bins > 1
-            self.dico = {"syn": P("Synonymous", 'black', None, None)}
+            intervals = []
             if bound_file != "":
                 df = pd.read_csv(bound_file, sep="\t")
                 df = df[df["method"] == method]
-                assert 1 <= len(df) <= bins
+                assert 1 <= len(df) <= self.bins
                 for row_id, row in df.iterrows():
-                    b = int(row["cat"].split("_")[-1])
-                    color = cmap((b - 1) / (len(df["cat"]) - 1))
-                    self.dico[row["cat"]] = P(f"{quantile(b, bins)}", color, row["lower"], row["upper"])
+                    intervals.append(BOUND(row["cat"], row["lower"], row["upper"]))
                     self.mean[row["cat"]] = row["mean"]
             else:
-                for b in range(1, bins + 1):
-                    color = cmap((b - 1) / (bins - 1))
-                    self.dico[f"bin_{b}"] = P(f"{quantile(b, bins)}", color, None, None)
+                for b in range(bins):
+                    intervals.append(BOUND(f"{'b' if self.windows == 0 else 'w'}_{b + 1}", b, b + 1))
+            self.add_intervals(intervals)
+
         elif method == "SIFT":
             self.inner_bound = [0.05, 0.1, 0.3, 0.8]
             self.dico = {
@@ -424,6 +421,7 @@ class CategorySNP(list):
                 "pos": P("$0.8<SIFT$", RED, 0.8, 1.0),
                 "syn": P("$Synonymous$", 'black', None, None)
             }
+            self.update()
         else:
             self.inner_bound = [-3, -1, 0, 1]
             self.dico = {
@@ -434,26 +432,19 @@ class CategorySNP(list):
                 "pos-weak": P("$0<S<1$", YELLOW, 0, 1),
                 "pos": P("$S>1$", RED, 1, np.float("infinity"))
             }
-        super().__init__(self.dico.keys())
-        self.update()
+            self.update()
 
     def update(self):
         super().__init__(self.dico.keys())
         self.non_syn_list = [i for i in self if i != "syn"]
-        for i in range(self.nbr_non_syn() - 1):
-            assert self.dico[self.non_syn_list[i]].upper == self.dico[self.non_syn_list[i + 1]].lower
-
-        self.cat_bounds = [self.dico[cat].lower for cat in self.non_syn_list] + [self.dico[self.non_syn_list[-1]].upper]
-        self.inner_bound = [i for i in self.cat_bounds[1:-1] if i is not None]
-
-        if len(self.inner_bound) > 0:
-            assert np.all(np.diff(self.cat_bounds) >= 0)
 
     def add_intervals(self, intervals):
+        cmap = get_cmap('viridis_r')
         self.dico = {"syn": P("Synonymous", 'black', None, None)}
         for bound in intervals:
             b = int(bound.cat.split("_")[-1])
-            self.dico[bound.cat] = P(f"{quantile(b, len(intervals))}", None, bound.lower, bound.upper)
+            color = cmap((b - 1) / (len(intervals) - 1))
+            self.dico[bound.cat] = P(f"{quantile(b, len(intervals))}", color, bound.lower, bound.upper)
         self.update()
 
     def color(self, cat):
@@ -462,18 +453,12 @@ class CategorySNP(list):
     def label(self, cat):
         return self.dico[cat].label if cat != "all" else "All"
 
-    def rate2cat(self, s):
-        i = np.searchsorted(self.cat_bounds, s, side='right') - 1
-        if i == -1:
-            assert s < self.cat_bounds[0] or s > self.cat_bounds[-1]
-            return "OutOfBounds"
-        if i == self.nbr_non_syn():
-            i -= 1
-        cat = self.non_syn_list[max(0, i)]
-        if self.dico[cat].upper < s or self.dico[cat].lower > s:
-            print(self.dico)
-            print(self.dico[cat].upper, s, self.dico[cat].lower)
-        return cat
+    def rate2cats(self, s):
+        cats = []
+        for cat in self.non_syn_list:
+            if self.dico[cat].lower <= s <= self.dico[cat].upper:
+                cats.append(cat)
+        return cats
 
     def nbr_non_syn(self):
         return len(self.non_syn_list)

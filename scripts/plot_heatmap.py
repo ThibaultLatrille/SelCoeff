@@ -27,16 +27,17 @@ def main(args):
     pop2sp = {pop: sp for (pop, sp), d in df_merge.groupby(["pop", "species"])}
 
     for method, df in df_merge.groupby(["method"]):
-        cat_snps = CategorySNP(method, bins=args.bins)
+        cat_snps = CategorySNP(method, bins=args.bins, windows=args.windows)
         for d, d_label in d_dict.items():
+            cats = set(df["category"])
             matrix = df[df["category"] != "syn"].pivot(index="pop", columns="category", values=d)
             matrix = matrix.iloc[matrix.apply(lambda row: sp_sorted(row.name, pop2sp[row.name]), axis=1).argsort()]
-            matrix = matrix.reindex(cat_snps.non_syn_list, axis=1)
+            matrix = matrix.reindex(cats, axis=1)
             if abs(np.max(matrix.values)) < 1e-2:
                 matrix *= 1e4
                 d_label += ' ($\\times 10^4$)'
             _, ax = plt.subplots(figsize=(1920 / my_dpi, 880 / my_dpi), dpi=my_dpi)
-            cat_labels = [cat_snps.label(cat) for cat in cat_snps.non_syn_list]
+            cat_labels = [cat_snps.label(cat) for cat in cats]
             start, end = np.nanmin(matrix), np.nanmax(matrix)
             rd_bu = cm.get_cmap('RdBu_r')
             if np.sign(start) != np.sign(end):
@@ -57,4 +58,5 @@ if __name__ == '__main__':
     parser.add_argument('--output', required=False, type=str, dest="output", help="Output tsv file")
     parser.add_argument('--sample_list', required=False, type=str, dest="sample_list", help="Sample list file")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
+    parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
     main(parser.parse_args())

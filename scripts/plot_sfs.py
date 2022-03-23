@@ -56,7 +56,7 @@ def main(args):
     ldn, dn, lds, ds = row["Ldn"].values[0], row["dn"].values[0], row["Lds"].values[0], row["ds"].values[0]
     print(f'ratio Ldn/(Lds + Ldn)={ldn / (lds + ldn)}')
 
-    cat_snps = CategorySNP(args.method, bins=args.bins)
+    cat_snps = CategorySNP(args.method, args.bounds, bins=args.bins, windows=args.windows)
     opp_results = pd.read_csv(args.opportunities, sep='\t')
     opp_dico = {cat: opp_results[cat].values[0] for cat in opp_results}
 
@@ -65,15 +65,16 @@ def main(args):
     sample_size = max(df_snps["sample_size"])
     max_daf = min(sample_size, args.subsample)
     snps_daf = defaultdict(list)
-    for cat, df in df_snps.groupby([f"cat_{args.method}"]):
+
+    for cat in cat_snps:
+        df = df_snps[df_snps[f"cat_{args.method}"].str.contains(f"-{cat}-", regex=False)]
         for k in df["count"]:
             if max_daf < sample_size:
                 count = [np.random.hypergeometric(k, sample_size - k, max_daf) for _ in range(args.nbr_replicates)]
                 count = [i if i != max_daf else 0 for i in count]
             else:
                 count = [k]
-            if cat in opp_dico or cat == "syn":
-                snps_daf[cat].append(count)
+            snps_daf[cat].append(count)
 
     cat_dico_count = {cat: len(daf) for cat, daf in snps_daf.items()}
     snp_sfs = {cat: daf_to_sfs(daf, max_daf) for cat, daf in snps_daf.items()}
@@ -111,6 +112,8 @@ if __name__ == '__main__':
     parser.add_argument('--tsv', required=False, type=str, dest="tsv", help="Input tsv file")
     parser.add_argument('--method', required=False, type=str, dest="method", help="Sel coeff parameter")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
+    parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
+    parser.add_argument('--bounds', required=False, default="", type=str, dest="bounds", help="Input bound file path")
     parser.add_argument('--output_tsv', required=False, type=str, dest="output_tsv", help="Output tsv file")
     parser.add_argument('--output_pdf', required=False, type=str, dest="output_pdf", help="Output pdf file")
     parser.add_argument('--output_dir', required=False, type=str, dest="output_dir", help="Output directory for sfs")
