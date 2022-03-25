@@ -6,7 +6,7 @@ from libraries import format_pop
 
 dict_method = {"MutSel": "Site-specific Mutation-Selection codon models.",
                "Omega": "Site-specific codon models.",
-               "SIFT": "SIFT score",}
+               "SIFT": "SIFT score", }
 
 
 def minipage(size, file):
@@ -50,12 +50,16 @@ def main(args):
             for method, sfs in nested_dict_2.items():
                 o.write("\\subsubsection*{" + dict_method[method] + '} \n')
                 o.write(minipage(0.49, sfs))
-                o.write(minipage(0.49, sfs.replace(".pdf", ".normalize.pdf")))
+                scatter = sfs.replace("-sfs.pdf", ".polyDFE_C.scatter.pdf")
+                if os.path.isfile(scatter):
+                    o.write(minipage(0.49, scatter))
+                else:
+                    o.write(minipage(0.49, sfs.replace(".pdf", ".normalize.pdf")))
                 o.write("\\\\ \n")
                 suffix = f"{sp}.{pop}.{method}.histogram.pdf".replace(' ', '_')
                 hist_path = f"{args.hist_prefix}{suffix}"
                 o.write(minipage(0.49, hist_path))
-                o.write(minipage(0.35, sfs.replace("-sfs.pdf", ".polyDFE_C.pdf")))
+                o.write(minipage(0.49, sfs.replace("-sfs.pdf", ".polyDFE_C.pdf")))
                 o.write("\\\\ \n")
     o.close()
 

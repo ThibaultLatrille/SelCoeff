@@ -50,7 +50,7 @@ codontable.update({
     'TGC': 'C', 'TGT': 'C', 'TGA': 'X', 'TGG': 'W', '---': '-'})
 confidence_interval = namedtuple('confidence_interval', ['low', 'mean', 'up'])
 sfs_weight = {"watterson": lambda i, n: 1.0 / i, "tajima": lambda i, n: n - i, "fay_wu": lambda i, n: i}
-polydfe_cat_dico = {"S": "$S^{pop}$", "P-Sinf0": "$p_{-}$", "P-Seq0": "$p_{neutral}$", "P-Ssup0": "$p_{+}$"}
+polydfe_cat_dico = {"P-Sinf0": "$p_{-}$", "P-Seq0": "$p_{neutral}$", "P-Ssup0": "$p_{+}$"}
 polydfe_cat_list = list(polydfe_cat_dico.keys())
 xlim_dico = {"Omega": (0.0, 2.0), "MutSel": (-10, 10), "SIFT": (0.0, 1.0)}
 rate_dico = {"MutSel": "Scaled selection coefficient (S)",
@@ -210,12 +210,7 @@ def write_sfs(sfs_syn, sfs_non_syn, l_non_syn, d_non_syn, l_syn, d_syn, k, filep
 
 
 def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
-    cdict = {
-        'red': [],
-        'green': [],
-        'blue': [],
-        'alpha': []
-    }
+    cdict = {'red': [], 'green': [], 'blue': [], 'alpha': []}
 
     # regular index to compute the colors
     reg_index = np.linspace(start, stop, 257)
@@ -238,44 +233,6 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
     plt.register_cmap(cmap=newcmap)
 
     return newcmap
-
-
-def heatmap(data, row_labels, col_labels, ax=None, cbar_kw=None, cbarlabel="", **kwargs):
-    if cbar_kw is None:
-        cbar_kw = {}
-    im = ax.imshow(data, **kwargs)
-    cbar = ax.figure.colorbar(im, ax=ax, **cbar_kw, orientation='horizontal')
-    cbar.ax.set_xlabel(cbarlabel)
-    ax.set_xticks(np.arange(data.shape[1]))
-    ax.set_yticks(np.arange(data.shape[0]))
-    ax.set_xticklabels(col_labels)
-    ax.set_yticklabels(row_labels)
-    ax.tick_params(top=True, bottom=False,
-                   labeltop=True, labelbottom=False)
-    plt.setp(ax.get_xticklabels(), rotation=-45, ha="right",
-             rotation_mode="anchor")
-    ax.set_xticks(np.arange(data.shape[1] + 1) - .5, minor=True)
-    ax.set_yticks(np.arange(data.shape[0] + 1) - .5, minor=True)
-    ax.grid(which="minor", color="w", linestyle='-', linewidth=3)
-    ax.tick_params(which="minor", bottom=False, left=False)
-    return im, cbar
-
-
-def annotate_heatmap(im, data=None, div=False, valfmt="{x:.2f}", textcolors=("white", "black"), **textkw):
-    if not isinstance(data, (list, np.ndarray)):
-        data = im.get_array()
-    threshold_high = im.norm(data.max()) * (0.75 if div else 0.5)
-    threshold_low = (im.norm(data.max()) * 0.25) if div else 0.0
-    kw = dict(horizontalalignment="center",
-              verticalalignment="center")
-    kw.update(textkw)
-    texts = []
-    for i in range(data.shape[0]):
-        for j in range(data.shape[1]):
-            kw.update(color=textcolors[int(threshold_high >= im.norm(data[i, j]) >= threshold_low)])
-            text = im.axes.text(j, i, valfmt(data[i, j]), **kw)
-            texts.append(text)
-    return texts
 
 
 def format_pop(t):
@@ -310,25 +267,6 @@ def sp_sorted(pop, sp):
 
 
 def multiline(xs, ys, c, ax, **kwargs):
-    """Plot lines with different colorings
-
-    Parameters
-    ----------
-    xs : iterable container of x coordinates
-    ys : iterable container of y coordinates
-    c : iterable container of numbers mapped to colormap
-    ax: Axes to plot on.
-    kwargs (optional): passed to LineCollection
-
-    Notes:
-        len(xs) == len(ys) == len(c) is the number of line segments
-        len(xs[i]) == len(ys[i]) is the number of points for each line (indexed by i)
-
-    Returns
-    -------
-    lc : LineCollection instance.
-    """
-
     # create LineCollection
     segments = [np.column_stack([x, y]) for x, y in zip(xs, ys)]
     lc = LineCollection(segments, **kwargs)
@@ -395,7 +333,6 @@ class CategorySNP(list):
                 for b in range(bins):
                     intervals.append(BOUND(f"{'b' if self.windows == 0 else 'w'}_{b + 1}", b, b + 1))
             self.add_intervals(intervals)
-
         elif method == "SIFT":
             self.inner_bound = [0.05, 0.1, 0.3, 0.8]
             self.dico = {
@@ -407,7 +344,19 @@ class CategorySNP(list):
                 "syn": P("$Synonymous$", 'black', None, None)
             }
             self.update()
+        elif method == "Omega":
+            self.inner_bound = [0.05, 0.1, 0.3, 1.0]
+            self.dico = {
+                "neg-strong": P("$\\omega<0.05$", BLUE, 0, 0.05),
+                "neg": P("$0.05<\\omega<0.1$", GREEN, 0.05, 0.1),
+                "neg-weak": P("$0.1<\\omega<0.3$", LIGHTGREEN, 0.1, 0.3),
+                "pos-weak": P("$0.3<\\omega<1.0$", YELLOW, 0.3, 0.8),
+                "pos": P("$1.0<\\omega", RED, 1, np.float("infinity")),
+                "syn": P("$Synonymous$", 'black', None, None)
+            }
+            self.update()
         else:
+            assert method == "MutSel"
             self.inner_bound = [-3, -1, 0, 1]
             self.dico = {
                 "neg-strong": P("$S<-3$", BLUE, -np.float("infinity"), -3),
@@ -415,7 +364,7 @@ class CategorySNP(list):
                 "neg-weak": P("$-1<S<0$", LIGHTGREEN, -1, 0),
                 "syn": P("$Synonymous$", 'black', None, None),
                 "pos-weak": P("$0<S<1$", YELLOW, 0, 1),
-                "pos": P("$S>1$", RED, 1, np.float("infinity"))
+                "pos": P("$1<S$", RED, 1, np.float("infinity"))
             }
             self.update()
 

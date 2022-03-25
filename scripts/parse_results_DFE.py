@@ -1,6 +1,7 @@
 import argparse
 from scipy.stats import expon, gamma
 import statsmodels.api as sm
+import seaborn as sns
 from libraries import *
 from matplotlib import cm
 
@@ -53,9 +54,10 @@ def plot_heatmap(cat_snps, cat_poly_snps, s_dico, output):
     _, ax = plt.subplots(figsize=(1920 / my_dpi, 880 / my_dpi), dpi=my_dpi)
 
     rd_bu = cm.get_cmap('RdBu_r')
-    im, _ = heatmap(matrix, cat_labels_rows, cat_labels_cols, ax=ax, cmap=rd_bu, cbarlabel="$p$",
-                    cbar_kw={"fraction": 0.046}, origin="lower")
-    annotate_heatmap(im, valfmt=lambda p: "{0:.2f}".format(p), div=True, fontsize=5)
+    ax = sns.heatmap(matrix, xticklabels=cat_labels_cols, yticklabels=cat_labels_rows, linewidths=0.05,
+                     linecolor="black", ax=ax, cmap=rd_bu, cbar_kws={'label': "$p$"})
+    ax.set_xlabel("Phylogenetic scale")
+    ax.set_ylabel("Population scale")
     plt.tight_layout()
     plt.savefig(output, format="pdf")
     plt.clf()

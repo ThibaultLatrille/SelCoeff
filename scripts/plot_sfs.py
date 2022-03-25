@@ -67,7 +67,7 @@ def main(args):
     snps_daf = defaultdict(list)
 
     for cat in cat_snps:
-        df = df_snps[df_snps[f"cat_{args.method}"].str.contains(f"-{cat}-", regex=False)]
+        df = df_snps[df_snps[f"cat_{args.method}"].str.contains(f"|{cat}|", regex=False)]
         for k in df["count"]:
             if max_daf < sample_size:
                 count = [np.random.hypergeometric(k, sample_size - k, max_daf) for _ in range(args.nbr_replicates)]

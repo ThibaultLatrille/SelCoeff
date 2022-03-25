@@ -91,22 +91,21 @@ def classify_snps(s_list, type_list, cat_snps):
                 assert start != end
                 intervals.append(BOUND(f"w_{i + 1}", sorted_list[start], sorted_list[end]))
                 start += chunk
+        cat_snps.add_intervals(intervals)
     else:
-        for cat in range(cat_snps.non_syn_list):
-            bounds = cat_snps.dico[cat].bounds
-            intervals.append(BOUND(cat, bounds[0], bounds[1]))
+        for cat in cat_snps.non_syn_list:
+            intervals.append(BOUND(cat, cat_snps.dico[cat].lower, cat_snps.dico[cat].upper))
 
-    cat_snps.add_intervals(intervals)
     for s, snp_type in zip(s_list, type_list):
         if snp_type == "Syn":
-            cat_list.append("-syn-")
+            cat_list.append("|syn|")
         elif np.isfinite(s):
             cats = cat_snps.rate2cats(s)
             if cat_snps.bins == 0 or (cat_snps.bins != 0 and cat_snps.windows == 0):
                 if len(cats) != 1:
                     cats = [cats[0]]
                 assert len(cats) == 1
-            cat_list.append("-" + "-".join(cats) + "-")
+            cat_list.append("|" + "|".join(cats) + "|")
             for cat in cats:
                 dico_cat[cat].append(s)
         else:
@@ -167,7 +166,7 @@ def plot_histogram(score_list, cat_snps, method, file):
         n_cat = defaultdict(int)
         for i, b in enumerate(bins[1:]):
             cats = cat_snps.rate2cats(b)
-            assert len(cats) == 1
+            assert len(cats) >= 1
             cat = cats[0]
             patches[i].set_facecolor(cat_snps.color(cat))
             n_cat[cat] += n[i]
