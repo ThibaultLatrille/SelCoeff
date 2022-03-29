@@ -6,5 +6,5 @@ subsample_genes: -1
 bins: 0 # bins: 0 to classify based on predetermined bins
 windows: 0 # True for sliding windows, 0 for bins
 mask_adaptation: false
-METHOD_LIST: [ "MutSel", "SIFT" ]
+METHOD_LIST: [ "MutSel", "SIFT" , "Omega" ]
 MODEL: "polyDFE_C"

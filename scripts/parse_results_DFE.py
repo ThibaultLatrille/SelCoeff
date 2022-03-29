@@ -38,6 +38,7 @@ def plot_stack_param(list_cat, cat_snps, s_dico, output):
         axs[p_i].axhline(0, color="black", lw=1)
         axs[p_i].set_ylabel(param_label)
         axs[p_i].set_xticks(x_pos)
+        axs[p_i].set_ylim((0, 1))
     axs[len(polydfe_cat_dico) - 1].set_xticklabels([cat_snps.label(cat) for cat in list_cat])
     plt.tight_layout()
     plt.savefig(output)
@@ -104,11 +105,12 @@ def plot_scatter(x, y, method, file):
     idf = np.linspace(min(x), max(x), 30)
     results = sm.OLS(y, sm.add_constant(x)).fit()
     b, a = results.params[0:2]
-    linear = a * idf
+    linear = a * idf + b
     reg = f'slope of {a:.2g} ($r^2$={results.rsquared:.2g})'
     plt.plot(idf, linear, '-', linestyle="--", label=reg)
     plt.xlabel(rate_dico[method])
     plt.ylabel("S given by polyDFE")
+    plt.legend()
     plt.tight_layout()
     plt.savefig(file, format="pdf")
     plt.clf()
@@ -129,10 +131,10 @@ def main(args):
             s_list = np.array([v for k, v in out.items() if "S_" in k])
             out["S+"] = sum(p_list[3:] * s_list[3:])
             out["S-"] = sum(p_list[:3] * s_list[:3])
-            out[polydfe_cat_list[0]] = sum(p_list * s_list)
-            out[polydfe_cat_list[1]] = sum(p_list[:2])
-            out[polydfe_cat_list[2]] = p_list[2]
-            out[polydfe_cat_list[3]] = sum(p_list[3:])
+            out["S"] = sum(p_list * s_list)
+            out[polydfe_cat_list[0]] = sum(p_list[:2])
+            out[polydfe_cat_list[1]] = p_list[2]
+            out[polydfe_cat_list[2]] = sum(p_list[3:])
         else:
             p_pos = out["p_b"]
             shape_neg = out["b"]
@@ -140,10 +142,10 @@ def main(args):
             d_neg = gamma(shape_neg, scale=scale_neg)
             scale_pos = out["S_b"]
             d_pos = expon(scale=scale_pos)
-            out[polydfe_cat_list[0]] = d_pos.stats("m") * p_pos - d_neg.stats("m") * (1 - p_pos)
-            out[polydfe_cat_list[1]] = (1 - p_pos) * (1 - d_neg.cdf(1.0))
-            out[polydfe_cat_list[2]] = (1 - p_pos) * d_neg.cdf(1.0) + p_pos * d_pos.cdf(1.0)
-            out[polydfe_cat_list[3]] = p_pos * (1 - d_pos.cdf(1.0))
+            out["S"] = d_pos.stats("m") * p_pos - d_neg.stats("m") * (1 - p_pos)
+            out[polydfe_cat_list[0]] = (1 - p_pos) * (1 - d_neg.cdf(1.0))
+            out[polydfe_cat_list[1]] = (1 - p_pos) * d_neg.cdf(1.0) + p_pos * d_pos.cdf(1.0)
+            out[polydfe_cat_list[2]] = p_pos * (1 - d_pos.cdf(1.0))
 
             for cat_poly in cat_poly_snps.non_syn_list:
                 if cat_poly == "neg-strong":
@@ -164,12 +166,15 @@ def main(args):
     pd.DataFrame(df_dico).to_csv(args.output.replace(".pdf", ".tsv"), sep="\t", index=False)
     plot_stack_param(list_cat, cat_snps, s_dico, args.output)
 
-    if args.bins == 0:
+    if args.bins == 0 and args.windows == 0:
         plot_heatmap(cat_snps, cat_poly_snps, s_dico, args.output.replace(".pdf", ".heatmap.pdf"))
         plot_dfe_stack_cat(list_cat, cat_snps, s_dico, args.output.replace(".pdf", ".predictedDFE.pdf"))
     else:
-        x = [cat_snps.mean[cat] for cat in list_cat if cat != 'all' and s_dico[cat]["S"] > -20]
-        y = [s_dico[cat]["S"] for cat in list_cat if cat != 'all' and s_dico[cat]["S"] > -20]
+        s_pop_list = [s_dico[cat]["S"] for cat in list_cat if cat != 'all']
+        s_phy_list = [cat_snps.mean[cat] for cat in list_cat if cat != 'all']
+        x, y = zip(*[(s_phy, s_pop) for s_phy, s_pop in zip(s_phy_list, s_pop_list) if abs(s_phy) < 0.5])
+        scatter_dict = {"S_pop": s_pop_list, "S_phy": s_phy_list}
+        pd.DataFrame(scatter_dict).to_csv(args.output.replace(".pdf", ".scatter.tsv"), sep="\t", index=False)
         plot_scatter(x, y, args.method, args.output.replace(".pdf", ".scatter.pdf"))
 
 

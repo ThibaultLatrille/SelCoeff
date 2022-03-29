@@ -79,7 +79,7 @@ def main(args):
                 continue
             lf = cds_rates.log_fitness(ensg, ref_aa, c_site)
             if args.method == "MutSel":
-                if (ensg not in unconserved_grouped) or (c_site not in unconserved_grouped[ensg]):
+                if np.isfinite(lf) and ((ensg not in unconserved_grouped) or (c_site not in unconserved_grouped[ensg])):
                     log_fitness.add(lf)
 
             for frame, ref_nuc in enumerate(ref_codon):

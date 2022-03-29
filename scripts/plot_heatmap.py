@@ -4,13 +4,15 @@ import seaborn as sns
 from libraries import *
 
 theta_dict = {"watterson": "Watterson $\\theta_W$"}
+
+
 # theta_dict = {"watterson": "Watterson $\\theta_W$", "tajima": "Tajima $\\theta_{\\pi}$ ",
 #               "fay_wu": "Fay and Wu $\\theta_{H}$", "D_tajima": "Tajima's $D$", "H_fay_wu": "Fay and Wu's $H$"}
 
 
 def open_tsv(filepath):
     ddf = pd.read_csv(filepath, sep="\t")
-    ddf["species"], pop, ddf["method"] = os.path.basename(filepath).replace(".tsv", "").split(".")[:3]
+    ddf["species"], pop, ddf["method"] = os.path.basename(filepath).replace("-", ".").split(".")[:3]
     ddf["pop"] = format_pop(pop.replace("_", " "))
     return ddf
 
@@ -50,8 +52,11 @@ def main(args):
                 midpoint = - start / (np.nanmax(matrix) - start)
                 rd_bu = shiftedColorMap(rd_bu, midpoint=midpoint, name='shifted')
 
+            cbar_ws = {'label': d_label}
+            if args.bins < 10:
+                cbar_ws.update(dict(shrink=0.3, fraction=0.1))
             ax = sns.heatmap(matrix.T, linewidths=0.05, linecolor="black", ax=ax, cmap=rd_bu,
-                             cbar_kws={'label': d_label}, square=(args.bins < 10))
+                             cbar_kws=cbar_ws, square=(args.bins < 10))
             ax.set_xlabel("")
             ax.set_ylabel("")
             ax.vlines(vlist, color="black", linewidths=2.0, *ax.get_ylim())

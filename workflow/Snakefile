@@ -30,7 +30,7 @@ ruleorder: parse_results_DFE > sfs
 rule all:
     input:
         f'{FOLDER}/data_processed/opportunities_{binning}.tsv',
-        f'{EXP_FOLDER}/supp-mat.pdf',
+        f'{EXP_FOLDER}/supp-mat.pdf'
 
 rule fixed_snp_by_pop:
     input:
@@ -198,14 +198,35 @@ rule plot_dfe_heatmap:
     shell:
         'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --bins {bins} --windows {windows} --output {output.tsv}'
 
+rule plot_multiple_regression:
+    input:
+        script=f'{FOLDER}/scripts/plot_multiple_regression.py',
+        tsv=map(lambda p: f"{p}.{model}.tsv",SFS_LIST),
+        sample_list=sample_list
+    output:
+        tsv=f'{EXP_FOLDER}/results/regression.results.tsv'
+    shell:
+        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --output {output.tsv}'
+
+rule plot_regression:
+    input:
+        script=f'{FOLDER}/scripts/plot_regression.py',
+        tsv=([rules.plot_multiple_regression.output.tsv] if (bins != 0 and windows != 0) else []) +
+            [rules.plot_dfe_heatmap.output.tsv, rules.plot_theta_heatmap.output.tsv],
+        sample_list=sample_list
+    output:
+        tsv=f'{EXP_FOLDER}/regression/results.tsv'
+    shell:
+        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --output {output.tsv}'
+
 
 rule latex:
     input:
         script=f'{FOLDER}/scripts/tex_sfs.py',
         sfs=map(lambda p: f"{p}-sfs.pdf",SFS_LIST),
         tex_source=f'{FOLDER}/manuscript/supp-mat.tex',
-        tsv_theta=f'{EXP_FOLDER}/results/Theta.results.tsv',
-        tsv_dfe=f'{EXP_FOLDER}/results/DFE.results.tsv',
+        tsv_theta=rules.plot_theta_heatmap.output.tsv,
+        tsv_dfe=rules.plot_regression.output.tsv,
     output:
         tex_include=f'{EXP_FOLDER}/include-figures.tex',
         tex_target=f'{EXP_FOLDER}/supp-mat.tex',

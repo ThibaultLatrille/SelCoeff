@@ -30,7 +30,7 @@ def main(args):
         o.write("\\subsection{" + dict_method[method].capitalize() + '} \n')
         o.write("\\begin{center}\n")
         for plot in list_heatmap:
-            o.write("\\includegraphics[width=0.75\\linewidth, page=1]{" + plot + "} \\\\\n")
+            o.write("\\includegraphics[width=0.95\\linewidth, page=1]{" + plot + "} \\\\\n")
         o.write("\\end{center}\n")
 
     nested_dict = defaultdict(lambda: defaultdict(dict))

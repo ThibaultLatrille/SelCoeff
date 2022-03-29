@@ -316,6 +316,7 @@ P = namedtuple('P', ['label', 'color', 'lower', 'upper'])
 
 class CategorySNP(list):
     def __init__(self, method="", bound_file="", bins=0, windows=0):
+        assert method in ["MutSel", "Omega", "SIFT"]
         super().__init__()
         self.bins, self.windows = bins, windows
         self.non_syn_list, self.inner_bound = [], []
@@ -350,8 +351,8 @@ class CategorySNP(list):
                 "neg-strong": P("$\\omega<0.05$", BLUE, 0, 0.05),
                 "neg": P("$0.05<\\omega<0.1$", GREEN, 0.05, 0.1),
                 "neg-weak": P("$0.1<\\omega<0.3$", LIGHTGREEN, 0.1, 0.3),
-                "pos-weak": P("$0.3<\\omega<1.0$", YELLOW, 0.3, 0.8),
-                "pos": P("$1.0<\\omega", RED, 1, np.float("infinity")),
+                "pos-weak": P("$0.3<\\omega<1.0$", YELLOW, 0.3, 1.0),
+                "pos": P("$1.0<\\omega$", RED, 1.0, np.float("infinity")),
                 "syn": P("$Synonymous$", 'black', None, None)
             }
             self.update()
