@@ -15,14 +15,26 @@ def daf_to_sfs(daf_list, min_n):
     return np.array([np.bincount(d, minlength=min_n) for d in array_daf])
 
 
-def plot_sfs(cat_snps, snp_sfs, max_daf, daf_axis, cat_dico_count, output, scaled):
+def normalize_sfs(sfs):
+    return (sfs.T / np.sum(sfs, axis=1)).T
+
+
+def plot_sfs(cat_snps, snp_sfs, normed_sfs_syn_mean, max_daf, daf_axis, cat_dico_count, output, scaled):
     fig, ax = plt.subplots(figsize=(1920 / my_dpi, 1080 / my_dpi), dpi=my_dpi)
     for cat in snp_sfs:
-        if scaled:
-            snp_sfs[cat] *= np.array([i for i in range(max_daf)])
+        sfs = snp_sfs[cat][:, 1:].copy()
+        if scaled == "neutral":
+            sfs *= np.array([i for i in range(1, max_daf)])
+        elif scaled == "normalize":
+            sfs = normalize_sfs(sfs)
+        elif scaled == "synonymous":
+            if cat == "syn":
+                continue
+            sfs = normalize_sfs(sfs)
+            sfs /= normed_sfs_syn_mean
 
-        mean_sfs = np.mean(snp_sfs[cat], axis=0)[1:]
-        std_sfs = np.std(snp_sfs[cat], axis=0)[1:]
+        mean_sfs = np.mean(sfs, axis=0)
+        std_sfs = np.std(sfs, axis=0)
         label = cat_snps.label(cat) + f" $({int(cat_dico_count[cat])}~mutations)$"
         plt.scatter(daf_axis, mean_sfs, color=cat_snps.color(cat))
         plt.plot(daf_axis, mean_sfs, label=label, color=cat_snps.color(cat), linewidth=1.0)
@@ -31,10 +43,15 @@ def plot_sfs(cat_snps, snp_sfs, max_daf, daf_axis, cat_dico_count, output, scale
     if max_daf < 32:
         ax.xaxis.set_major_locator(plt.MultipleLocator(1))
     plt.xlabel("Derived allele count")
-    if scaled:
-        plt.ylabel('Proportion of mutations (scaled)')
+    if scaled == "neutral":
+        plt.ylabel('Proportion of mutations (scaled by neutral expectation)')
+    elif scaled == "normalize":
+        plt.ylabel('Proportion of mutations')
+    elif scaled == "synonymous":
+        plt.axhline(1.0, color="black")
+        plt.ylabel('Proportion of mutations (relative to synonymous)')
     else:
-        plt.ylabel("Proportion of mutations")
+        plt.ylabel("Proportion of mutations (scaled by opportunities)")
         plt.yscale("log")
     if len(snp_sfs) < 8:
         plt.legend()
@@ -102,9 +119,10 @@ def main(args):
     df = pd.DataFrame(theta_dict)
     df.to_csv(args.output_tsv, sep="\t", index=False)
 
-    for scaled in [False, True]:
-        output = args.output_pdf.replace('.pdf', '.normalize.pdf') if scaled else args.output_pdf
-        plot_sfs(cat_snps, snp_sfs, max_daf, daf_axis, cat_dico_count, output, scaled)
+    normed_sfs_syn_mean = snp_sfs_mean["syn"][1:] / np.sum(snp_sfs_mean["syn"][1:])
+    for scaled in ["", "neutral", "normalize", "synonymous"]:
+        output = args.output_pdf.replace('.pdf', f'.{scaled}.pdf') if scaled != "" else args.output_pdf
+        plot_sfs(cat_snps, snp_sfs, normed_sfs_syn_mean, max_daf, daf_axis, cat_dico_count, output, scaled)
 
 
 if __name__ == '__main__':

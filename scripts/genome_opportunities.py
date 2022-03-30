@@ -1,10 +1,6 @@
-import os
 import argparse
-import numpy as np
-import pandas as pd
-from collections import defaultdict
-from libraries import nucleotides, codontable, CdsRates, open_mask, open_fasta, CategorySNP, xlim_dico, rate_dico, plt, \
-    my_dpi
+from matplotlib.patches import Rectangle
+from libraries import *
 
 transitions = {('A', 'G'), ('G', 'A'), ('C', 'T'), ('T', 'C')}
 
@@ -15,8 +11,9 @@ class Stat:
         self.n = 0.0
 
     def add(self, x, w=1.0):
-        self.total += x * w
-        self.n += w
+        if np.isfinite(x) and np.isfinite(w):
+            self.total += x * w
+            self.n += w
 
     def mean(self):
         return self.total / self.n
@@ -29,9 +26,16 @@ def pfix(s):
         return s / (1 - np.exp(-s))
 
 
-def plot_histogram(counts, edges, method, file):
+def plot_histogram(counts, edges, cat_snps, dico_opp_sp, method, file):
     fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
-    plt.bar(edges[:-1], counts, width=np.diff(edges), edgecolor="black", align="edge")
+    cats_list_edges = [cat_snps.rate2cats(b) for b in edges[1:]]
+    colors = [cat_snps.color(cats[0]) if len(cats) > 0 else "black" for cats in cats_list_edges]
+    plt.bar(edges[:-1], height=counts, color=colors, width=np.diff(edges), edgecolor="black", align="edge")
+    if cat_snps.bins <= 10:
+        handles = [Rectangle((0, 0), 1, 1, color=c) for c in [cat_snps.color(cat) for cat in cat_snps.non_syn_list]]
+        labels = [cat_snps.label(cat) + f" ({dico_opp_sp[cat] * 100:.2f}% of total)" for cat in
+                  cat_snps.non_syn_list]
+        plt.legend(handles, labels)
     plt.xlabel(rate_dico[method])
     plt.ylabel("Density")
     if min(edges) < -1.0 and max(edges) > 1.0:
@@ -58,7 +62,7 @@ def main(args):
     cds_rates = CdsRates(args.method, args.exp_folder)
     output_dict, dico_opp_sp = defaultdict(list), {cat: 0 for cat in cat_snps.non_syn_list}
     dico_opp_sp["OutOfBounds"], dico_opp_sp["Adaptive"] = 0, 0
-
+    dico_flow_sp = dico_opp_sp.copy()
     tot_opp = 0
 
     seqs = open_fasta(args.fasta_pop)
@@ -79,11 +83,11 @@ def main(args):
                 continue
             lf = cds_rates.log_fitness(ensg, ref_aa, c_site)
             if args.method == "MutSel":
-                if np.isfinite(lf) and ((ensg not in unconserved_grouped) or (c_site not in unconserved_grouped[ensg])):
+                if (ensg not in unconserved_grouped) or (c_site not in unconserved_grouped[ensg]):
                     log_fitness.add(lf)
 
             for frame, ref_nuc in enumerate(ref_codon):
-                for alt_nuc in [i for i in nucleotides if i != ref_nuc]:
+                for alt_nuc in [nuc for nuc in nucleotides if nuc != ref_nuc]:
                     alt_codon = ref_codon[:frame] + alt_nuc + ref_codon[frame + 1:]
                     alt_aa = codontable[alt_codon]
                     if alt_aa == 'X' or alt_aa == ref_aa:
@@ -116,13 +120,20 @@ def main(args):
                     sel_coeff.add(rate, w=mutation_rate)
                     q = mutation_rate * pfix(rate)
                     list_q.append(q)
+                    if np.isfinite(q):
+                        for cat in cats:
+                            dico_flow_sp[cat] += q
+
                     (flow_pos if rate > 0 else flow_neg).add(q)
         counts_mu = counts_mu + np.histogram(list_rates, bins=bins, weights=list_mu)[0]
         if args.method == "MutSel":
             counts_q = counts_q + np.histogram(list_rates, bins=bins, weights=list_q)[0]
 
     for cat in dico_opp_sp:
-        output_dict[cat].append(dico_opp_sp[cat] / tot_opp)
+        dico_opp_sp[cat] = dico_opp_sp[cat] / tot_opp
+        output_dict[cat].append(dico_opp_sp[cat])
+        if args.method == "MutSel":
+            dico_flow_sp[cat] = dico_flow_sp[cat] / (flow_neg.total + flow_pos.total)
 
     print(f'{output_dict["OutOfBounds"][0] * 100:.2f}% of opportunities out of bounds')
     print(f'{output_dict["Adaptive"][0] * 100:.2f}% of opportunities are discarded because their are adaptive.')
@@ -131,10 +142,10 @@ def main(args):
         output_dict["S_mean"].append(sel_coeff.mean())
         output_dict["log_fitness"].append(log_fitness.mean())
         output_dict["flow_pos"].append(flow_pos.total)
-        output_dict["flow_neg"].append(flow_pos.total)
-        plot_histogram(counts_q, bins, args.method, args.output.replace(".tsv", ".Flow.pdf"))
+        output_dict["flow_neg"].append(flow_neg.total)
+        plot_histogram(counts_q, bins, cat_snps, dico_flow_sp, args.method, args.output.replace(".tsv", ".Flow.pdf"))
 
-    plot_histogram(counts_mu, bins, args.method, args.output.replace(".tsv", ".pdf"))
+    plot_histogram(counts_mu, bins, cat_snps, dico_opp_sp, args.method, args.output.replace(".tsv", ".pdf"))
     df = pd.DataFrame(output_dict)
     df.to_csv(args.output, index=False, sep="\t")
 

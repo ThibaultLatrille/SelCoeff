@@ -212,7 +212,7 @@ rule plot_regression:
     input:
         script=f'{FOLDER}/scripts/plot_regression.py',
         tsv=([rules.plot_multiple_regression.output.tsv] if (bins != 0 and windows != 0) else []) +
-            [rules.plot_dfe_heatmap.output.tsv, rules.plot_theta_heatmap.output.tsv],
+            [rules.gather_opportunities.output.tsv, rules.plot_theta_heatmap.output.tsv],
         sample_list=sample_list
     output:
         tsv=f'{EXP_FOLDER}/regression/results.tsv'
@@ -232,5 +232,6 @@ rule latex:
         tex_target=f'{EXP_FOLDER}/supp-mat.tex',
         pdf=f'{EXP_FOLDER}/supp-mat.pdf'
     params:
-        hist_prefix=f'--hist_prefix {FOLDER}/data_processed/vcf_annotate_{binning}/snps.'
-    shell: 'python3 {input.script} {params.hist_prefix} --sfs {input.sfs} --results {input.tsv_theta} --tex_source {input.tex_source} --tex_target {output.tex_target} --tex_include {output.tex_include}'
+        hist_prefix=f'--hist_prefix {FOLDER}/data_processed/vcf_annotate_{binning}/snps.',
+        dfe_prefix=f'--dfe_prefix {FOLDER}/data_processed/opportunities_{binning}/DFE.'
+    shell: 'python3 {input.script} {params.hist_prefix} {params.dfe_prefix} --sfs {input.sfs} --results {input.tsv_theta} --tex_source {input.tex_source} --tex_target {output.tex_target} --tex_include {output.tex_include}'

@@ -50,7 +50,7 @@ codontable.update({
     'TGC': 'C', 'TGT': 'C', 'TGA': 'X', 'TGG': 'W', '---': '-'})
 confidence_interval = namedtuple('confidence_interval', ['low', 'mean', 'up'])
 sfs_weight = {"watterson": lambda i, n: 1.0 / i, "tajima": lambda i, n: n - i, "fay_wu": lambda i, n: i}
-polydfe_cat_dico = {"P-Sinf0": "$p_{-}$", "P-Seq0": "$p_{neutral}$", "P-Ssup0": "$p_{+}$"}
+polydfe_cat_dico = {"P-Sinf0": "$p(S^{pop}<-1)$", "P-Seq0": "$p(-1<S^{pop}<1)$", "P-Ssup0": "$p(1<S^{pop})$"}
 polydfe_cat_list = list(polydfe_cat_dico.keys())
 xlim_dico = {"Omega": (0.0, 2.0), "MutSel": (-10, 10), "SIFT": (0.0, 1.0)}
 rate_dico = {"MutSel": "Scaled selection coefficient (S)",

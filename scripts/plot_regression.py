@@ -21,43 +21,47 @@ def discard_col(col, df):
     return (col not in df) or (df.dtypes[col] == np.object) or (not np.all(np.isfinite(df[col])))
 
 
+param_dict = {"watterson": "Watterson $\\theta_W$", "tajima": "Tajima $\\theta_{\\pi}$ ",
+              "flow_pos": "$\\Psi_{+}$", "flow_neg": "$\\Psi_{-}$", "flow_r": "$\\Psi_{+} / \\Psi_{-}$",
+              "log_fitness": "Mean log-fitness", "a": "Slope of $S^{pop}/S$", "S_mean": "$S$",
+              "fay_wu": "Fay and Wu $\\theta_{H}$", "D_tajima": "Tajima's $D$", "H_fay_wu": "Fay and Wu's $H$"}
+
+
 def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     df_list = [open_tsv(filepath) for filepath in sorted(args.tsv)]
-    df_merged = reduce(lambda left, right: pd.merge(left, right, how="inner", on=["pop"]), df_list)
-    df_merged = df_merged.iloc[
-        df_merged.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
+    df = reduce(lambda left, right: pd.merge(left, right, how="inner", on=["pop"]), df_list)
+    df = df.iloc[df.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
+    df["flow_r"] = df["flow_pos"] / df["flow_neg"]
 
-    species = {k: None for k in df_merged["species"]}
+    species = {k: None for k in df["species"]}
     cm = get_cmap('Set2')
-    color_dict = {sp: cm(i / len(species)) for i, sp in enumerate(species)}
-    color_list = [color_dict[sp] for sp in df_merged["species"]]
+    color_dict = {sp: cm((i + 1) / len(species)) for i, sp in enumerate(species)}
+    color_list = [color_dict[sp] for sp in df["species"]]
 
     out_dict = defaultdict(list)
-    for col_1 in ["watterson"]:
-        if discard_col(col_1, df_merged):
+    for col_1 in ["watterson", "tajima", "fay_wu"]:
+        if discard_col(col_1, df):
             continue
-        for col_2 in ["flow_pos", "flow_neg", "S_mean", "log_fitness", "a", "b"]:
-            if discard_col(col_2, df_merged):
+        for col_2 in ["flow_pos", "flow_neg", "flow_r", "S_mean", "log_fitness", "a", "D_tajima", "H_fay_wu"]:
+            if discard_col(col_2, df):
                 continue
             plt.figure(figsize=(1920 / my_dpi, 1080 / my_dpi), dpi=my_dpi)
-            x = df_merged[col_1]
-            idf = np.linspace(min(x), max(x), 30)
-            plt.xlim(min(x), max(x), 30)
-            y = df_merged[col_2]
-            plt.scatter(x, y, s=25.0, color=color_list)
+            x = df[col_1]
+            idf = np.linspace(0, max(x) * 1.05, 30)
+            plt.xlim((0, max(x) * 1.05))
+            y = df[col_2]
+
             results = sm.OLS(y, sm.add_constant(x)).fit()
             b, a = results.params[0:2]
-            out_dict['x'].append(col_1)
-            out_dict['y'].append(col_2)
-            out_dict['a'].append(a)
-            out_dict['b'].append(b)
-            out_dict['rsquared'].append(results.rsquared)
-            linear = a * idf + b
-            plt.plot(idf, linear, '-', linewidth=2)
-            plt.xlabel(col_1)
-            plt.ylabel(col_2)
-            legend_elements = [Line2D([0], [0], label=f'Slope of {a:.2g} ($r^2={results.rsquared:.2g}$)')]
+            pred = a * idf + b
+
+            plt.plot(idf, pred, '-', color='black', linewidth=2)
+            plt.scatter(x, y, s=80.0, edgecolors="black", linewidths=0.5, color=color_list, zorder=100)
+            plt.xlabel(param_dict[col_1] if col_1 in param_dict else col_1)
+            plt.ylabel(param_dict[col_2] if col_2 in param_dict else col_2)
+            legend_elements = [Line2D([0], [0], color='black',
+                                      label=f'Slope of ${a:.2f}$ ($r^2={results.rsquared:.2g}$)')]
             legend_elements += [Line2D([0], [0], marker='o', color='w', markerfacecolor=color_dict[sp],
                                        label=f'{sp.replace("_", " ")}') for sp in species]
             plt.legend(handles=legend_elements)
@@ -65,8 +69,13 @@ def main(args):
             plt.savefig(args.output.replace('.tsv', f'.{col_1}.{col_2}.scatter.pdf'), format="pdf")
             plt.clf()
             plt.close("all")
+            out_dict['x'].append(col_1)
+            out_dict['y'].append(col_2)
+            out_dict['a'].append(a)
+            out_dict['b'].append(b)
+            out_dict['rsquared'].append(results.rsquared)
 
-    df_out = pd.DataFrame()
+    df_out = pd.DataFrame(out_dict)
     df_out.to_csv(args.output, sep="\t", index=False)
 
 

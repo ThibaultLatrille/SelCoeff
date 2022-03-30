@@ -20,49 +20,55 @@ def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     df_merge = pd.concat([open_tsv(filepath.replace(".tsv", ".scatter.tsv")) for filepath in sorted(args.tsv)])
     df_merge = df_merge.iloc[df_merge.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
-
-    species = {k: None for k in df_merge["species"]}
+    sp2pop = {sp: list(set(df["pop"])) for sp, df in df_merge.groupby(["species"], sort=False)}
+    df_merge = df_merge.iloc[::-1]
+    merge_out = []
     cm = get_cmap('Set2')
-    colors = {sp: cm(i / len(species)) for i, sp in enumerate(species)}
-    for method, df_method in df_merge.groupby(["method"]):
+    colors = {sp: cm((i + 1) / len(sp2pop)) for i, sp in enumerate(sp2pop)}
+    for method, df_filter in df_merge.groupby(["method"]):
         plt.figure(figsize=(1920 / my_dpi, 1080 / my_dpi), dpi=my_dpi)
-        if method == "MutSel":
-            df_filter = df_method[np.abs(df_method["S_phy"]) < 0.5]
-        else:
-            df_filter = df_method[np.abs(df_method["S_pop"]) < 2.0]
+        plt.xlim((-0.5, 0.5))
         idf = np.linspace(min(df_filter["S_phy"]), max(df_filter["S_phy"]), 30)
-        plt.xlim((min(df_filter["S_phy"]), max(df_filter["S_phy"])))
         dico_out = defaultdict(list)
-        for (pop, sp), df in df_filter.groupby(["pop", "species"]):
-            dico_out["pop"].append(pop)
-            dico_out["species"].append(sp)
+        for (sp, pop), df in df_filter.groupby(["species", "pop"], sort=False):
+            zorder = 0
+            if len(sp2pop[sp]) <= 2:
+                zorder += 150
+            df = df.iloc[df.apply(lambda r: r["S_phy"], axis=1).argsort()]
             c = colors[sp]
             x = df["S_phy"]
             y = df["S_pop"]
-            plt.scatter(x, y, s=1.0, color=c)
-            results = sm.OLS(y, sm.add_constant(x)).fit()
-            b, a = results.params[0:2]
-            linear = a * idf + b
-            dico_out["a"].append(a)
-            dico_out["b"].append(b)
-            dico_out["rsquared"].append(results.rsquared)
-            plt.plot(idf, linear, '-', linewidth=0.5, color=c)
+
+            coeffs = np.polyfit(x, y, 2)
+            ffit = np.poly1d(coeffs)
+            pred = [ffit(i) for i in idf]
+            plt.plot(idf, pred, '-', linewidth=2.0, color="silver", zorder=zorder)
+            plt.plot(idf, pred, '-', linewidth=2.0, color=c, alpha=0.8, zorder=zorder)
+            plt.plot(x, y, '-', linewidth=0.25, color="dimgrey", alpha=0.1, zorder=zorder + 50)
+            plt.plot(x, y, '-', linewidth=0.25, color=c, alpha=0.3, zorder=zorder + 50)
+            plt.scatter(x, y, s=8.0, color=c, edgecolors="dimgrey", alpha=0.5, linewidths=0.05, zorder=zorder + 100)
+            dico_out["pop"].append(pop)
+            dico_out["species"].append(sp)
+            dico_out["a"].append(ffit.deriv()(0))
 
         df_out = pd.DataFrame(dico_out)
         df_out = df_out.iloc[df_out.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
-        df_out.to_csv(args.output, sep="\t", index=False)
+        df_out["method"] = method
+        merge_out.append(df_out)
+
         sp_slopes = {
-            sp: (f"a=[{min(df['a']):.2f}, {max(df['a']):.2f}]" if len(df) > 1 else f"a={df['a'].values[0]:.2f}") for
+            sp: (f"[{min(df['a']):.2f}, {max(df['a']):.2f}]" if len(df) > 1 else f"{df['a'].values[0]:.2f}") for
             sp, df in df_out.groupby(["species"])}
         legend_elements = [Line2D([0], [0], color=colors[sp],
-                                  label=f'{sp.replace("_", " ")}: {sp_slopes[sp]}') for sp in species]
+                                  label=f'{sp.replace("_", " ")}: f\'(0)={sp_slopes[sp]}') for sp in sp2pop]
         plt.legend(handles=legend_elements)
-        plt.xlabel("Phylogenetic scale")
-        plt.ylabel("Population scale")
+        plt.xlabel("$S$ at the phylogenetic scale (Mutation-selection)")
+        plt.ylabel("$S^{pop}$ at the population scale (polyDFE)")
         plt.tight_layout()
         plt.savefig(args.output.replace('results.tsv', f'{method}.SelCoeff.scatter.pdf'), format="pdf")
         plt.clf()
         plt.close("all")
+    pd.concat(merge_out).to_csv(args.output, sep="\t", index=False)
 
 
 if __name__ == '__main__':

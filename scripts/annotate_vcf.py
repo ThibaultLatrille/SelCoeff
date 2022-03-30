@@ -67,7 +67,7 @@ def read_vcf(vcf, sift_file, mask_grouped):
     return dico_snp, discarded
 
 
-def classify_snps(s_list, type_list, cat_snps):
+def classify_snps(s_list, type_list, method, cat_snps):
     cat_list, intervals, dico_cat = list(), list(), defaultdict(list)
 
     if cat_snps.bins != 0:
@@ -84,13 +84,17 @@ def classify_snps(s_list, type_list, cat_snps):
         else:
             sorted_list = sorted(s_ns_list)
             assert cat_snps.windows < len(s_ns_list)
-            chunk = int((len(s_ns_list) - cat_snps.windows) / cat_snps.bins)
-            start = 0
-            for i in range(cat_snps.bins):
-                end = min(start + cat_snps.windows, len(s_ns_list) - 1)
-                assert start != end
-                intervals.append(BOUND(f"w_{i + 1}", sorted_list[start], sorted_list[end]))
-                start += chunk
+            dico_bounds = {"MutSel": [-0.5, 0.5], "Omega": [0.2, 2.0], "SIFT": [0.2, 1.0]}
+            start, end = np.searchsorted(sorted_list, dico_bounds[method])
+            start = start - cat_snps.windows // 2
+            end = end - cat_snps.windows // 2
+            assert start < end
+            linspace = np.linspace(start, end, cat_snps.bins, dtype=int)
+
+            for i, start_chunk in enumerate(linspace):
+                end_chunk = min(start_chunk + cat_snps.windows, len(s_ns_list) - 1)
+                assert start_chunk != end_chunk
+                intervals.append(BOUND(f"w_{i + 1}", sorted_list[start_chunk], sorted_list[end_chunk]))
         cat_snps.add_intervals(intervals)
     else:
         for cat in cat_snps.non_syn_list:
@@ -172,7 +176,7 @@ def plot_histogram(score_list, cat_snps, method, file):
             n_cat[cat] += n[i]
         handles = [Rectangle((0, 0), 1, 1, color=c) for c in [cat_snps.color(cat) for cat in cat_snps.non_syn_list]]
         labels = [cat_snps.label(cat) + f" $({int(n_cat[cat])}~mutations)$" for cat in cat_snps.non_syn_list]
-        plt.legend(handles, labels, loc="upper left")
+        plt.legend(handles, labels)
     plt.xlabel(rate_dico[method])
     plt.ylabel("Density")
     for x in cat_snps.inner_bound:
@@ -198,7 +202,8 @@ def main(args):
 
     for method in ["MutSel", "Omega", "SIFT"]:
         cat_snps = CategorySNP(method, bins=args.bins, windows=args.windows)
-        cat_list, bounds, mean_list, count_list = classify_snps(dico_snp[method], dico_snp["snp_type"], cat_snps)
+        cat_list, bounds, mean_list, count_list = classify_snps(dico_snp[method], dico_snp["snp_type"], method,
+                                                                cat_snps)
         dico_snp["cat_" + method] = cat_list
         dico_bounds["method"].extend([method] * len(bounds))
         dico_bounds["cat"].extend([b.cat for b in bounds])

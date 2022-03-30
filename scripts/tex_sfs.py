@@ -49,16 +49,14 @@ def main(args):
 
             for method, sfs in nested_dict_2.items():
                 o.write("\\subsubsection*{" + dict_method[method] + '} \n')
-                o.write(minipage(0.49, sfs))
-                scatter = sfs.replace("-sfs.pdf", ".polyDFE_C.scatter.pdf")
-                if os.path.isfile(scatter):
-                    o.write(minipage(0.49, scatter))
-                else:
-                    o.write(minipage(0.49, sfs.replace(".pdf", ".normalize.pdf")))
-                o.write("\\\\ \n")
-                suffix = f"{sp}.{pop}.{method}.histogram.pdf".replace(' ', '_')
-                hist_path = f"{args.hist_prefix}{suffix}"
+                hist_suffix = f"{sp}.{pop}.{method}.histogram.pdf".replace(' ', '_')
+                hist_path = f"{args.hist_prefix}{hist_suffix}"
                 o.write(minipage(0.49, hist_path))
+                o.write(minipage(0.49, sfs.replace(".pdf", ".normalize.pdf")))
+                o.write("\\\\ \n")
+                dfe_suffix = f"{sp}.{pop}.{method}.pdf".replace(' ', '_')
+                dfe_path = f"{args.dfe_prefix}{dfe_suffix}"
+                o.write(minipage(0.49, dfe_path))
                 o.write(minipage(0.49, sfs.replace("-sfs.pdf", ".polyDFE_C.pdf")))
                 o.write("\\\\ \n")
     o.close()
@@ -74,6 +72,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--sfs', required=False, type=str, nargs="+", dest="sfs", help="Input sfs file (pdf)")
     parser.add_argument('--hist_prefix', required=False, type=str, dest="hist_prefix", help="Input histogram folder")
+    parser.add_argument('--dfe_prefix', required=False, type=str, dest="dfe_prefix", help="Input dfe folder")
     parser.add_argument('--tex_source', required=False, type=str, dest="tex_source", help="Main document source file")
     parser.add_argument('--tex_target', required=False, type=str, dest="tex_target", help="Main document target file")
     parser.add_argument('--results', required=False, type=str, dest="results", help="Results tsv file")
