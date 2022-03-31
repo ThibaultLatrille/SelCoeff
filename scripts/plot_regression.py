@@ -31,11 +31,13 @@ def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     df_list = [open_tsv(filepath) for filepath in sorted(args.tsv)]
     df = reduce(lambda left, right: pd.merge(left, right, how="inner", on=["pop"]), df_list)
+    if "species" not in df:
+        df["species"] = df["species_x"]
     df = df.iloc[df.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
     df["flow_r"] = df["flow_pos"] / df["flow_neg"]
 
     species = {k: None for k in df["species"]}
-    cm = get_cmap('Set2')
+    cm = get_cmap('tab10')
     color_dict = {sp: cm((i + 1) / len(species)) for i, sp in enumerate(species)}
     color_list = [color_dict[sp] for sp in df["species"]]
 

@@ -2,8 +2,6 @@ import argparse
 from matplotlib.patches import Rectangle
 from libraries import *
 
-transitions = {('A', 'G'), ('G', 'A'), ('C', 'T'), ('T', 'C')}
-
 
 class Stat:
     def __init__(self):
@@ -30,7 +28,8 @@ def plot_histogram(counts, edges, cat_snps, dico_opp_sp, method, file):
     fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
     cats_list_edges = [cat_snps.rate2cats(b) for b in edges[1:]]
     colors = [cat_snps.color(cats[0]) if len(cats) > 0 else "black" for cats in cats_list_edges]
-    plt.bar(edges[:-1], height=counts, color=colors, width=np.diff(edges), edgecolor="black", align="edge")
+    plt.bar(edges[:-1], height=counts, color=colors, width=np.diff(edges), linewidth=1.0, edgecolor="black",
+            align="edge")
     if cat_snps.bins <= 10:
         handles = [Rectangle((0, 0), 1, 1, color=c) for c in [cat_snps.color(cat) for cat in cat_snps.non_syn_list]]
         labels = [cat_snps.label(cat) + f" ({dico_opp_sp[cat] * 100:.2f}% of total)" for cat in
@@ -38,6 +37,8 @@ def plot_histogram(counts, edges, cat_snps, dico_opp_sp, method, file):
         plt.legend(handles, labels)
     plt.xlabel(rate_dico[method])
     plt.ylabel("Density")
+    for x in cat_snps.inner_bound:
+        plt.axvline(x, color="grey", lw=1, ls='--')
     if min(edges) < -1.0 and max(edges) > 1.0:
         ax.xaxis.set_major_locator(plt.MultipleLocator(1))
     plt.axvline(0, color="black", lw=2)
@@ -50,6 +51,7 @@ def plot_histogram(counts, edges, cat_snps, dico_opp_sp, method, file):
 
 def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
+    non_synonymous_codon_neighbors = build_non_synonymous_codon_neighbors()
     cat_snps = CategorySNP(args.method, args.bounds, bins=args.bins, windows=args.windows)
 
     bins = np.linspace(xlim_dico[args.method][0], xlim_dico[args.method][1], 61)
@@ -71,60 +73,60 @@ def main(args):
     rd_ensg_list = np.random.choice(list(seqs.keys()), size=size, replace=False)
 
     for ensg in rd_ensg_list:
+        cds_rates.add_ensg(ensg)
         seq = seqs[ensg]
         list_rates, list_mu, list_q = [], [], []
 
         for c_site in range(len(seq) // 3):
             adaptive = ensg in mask_grouped and c_site in mask_grouped[ensg]
-
             ref_codon = seq[c_site * 3:c_site * 3 + 3]
             ref_aa = codontable[ref_codon]
             if ref_aa == "X" or ref_aa == "-":
                 continue
-            lf = cds_rates.log_fitness(ensg, ref_aa, c_site)
+
             if args.method == "MutSel":
+                lf = cds_rates.log_fitness(ensg, ref_aa, c_site)
                 if (ensg not in unconserved_grouped) or (c_site not in unconserved_grouped[ensg]):
                     log_fitness.add(lf)
 
-            for frame, ref_nuc in enumerate(ref_codon):
-                for alt_nuc in [nuc for nuc in nucleotides if nuc != ref_nuc]:
-                    alt_codon = ref_codon[:frame] + alt_nuc + ref_codon[frame + 1:]
-                    alt_aa = codontable[alt_codon]
-                    if alt_aa == 'X' or alt_aa == ref_aa:
-                        continue
+            for (ref_nuc, alt_nuc, alt_codon, alt_aa) in non_synonymous_codon_neighbors[ref_codon]:
 
-                    rate = cds_rates.rate(ensg, ref_aa, alt_aa, c_site)
-                    if not np.isfinite(rate):
-                        continue
+                rate = cds_rates.rate(ensg, ref_aa, alt_aa, c_site)
+                if not np.isfinite(rate):
+                    continue
 
-                    mutation_rate = 2.0 if (alt_nuc, ref_nuc) in transitions else 1.0
-                    tot_opp += mutation_rate
+                mutation_rate = cds_rates.mutation_rate(ensg, ref_nuc, alt_nuc)
+                assert np.isfinite(mutation_rate)
+                tot_opp += mutation_rate
 
-                    if adaptive:
-                        dico_opp_sp["Adaptive"] += mutation_rate
-                        continue
+                if adaptive:
+                    dico_opp_sp["Adaptive"] += mutation_rate
+                    continue
 
-                    cats = cat_snps.rate2cats(rate)
-                    if len(cats) == 0:
-                        dico_opp_sp["OutOfBounds"] += mutation_rate
-                        continue
+                cats = cat_snps.rate2cats(rate)
+                if len(cats) == 0:
+                    dico_opp_sp["OutOfBounds"] += mutation_rate
+                    continue
 
+                for cat in cats:
+                    dico_opp_sp[cat] += mutation_rate
+
+                list_rates.append(rate)
+                list_mu.append(mutation_rate)
+                if args.method != "MutSel":
+                    continue
+
+                sel_coeff.add(rate, w=mutation_rate)
+                q = mutation_rate * pfix(rate)
+                list_q.append(q)
+                if np.isfinite(q):
                     for cat in cats:
-                        dico_opp_sp[cat] += mutation_rate
-
-                    list_rates.append(rate)
-                    list_mu.append(mutation_rate)
-                    if args.method != "MutSel":
-                        continue
-
-                    sel_coeff.add(rate, w=mutation_rate)
-                    q = mutation_rate * pfix(rate)
-                    list_q.append(q)
-                    if np.isfinite(q):
-                        for cat in cats:
-                            dico_flow_sp[cat] += q
+                        dico_flow_sp[cat] += q
 
                     (flow_pos if rate > 0 else flow_neg).add(q)
+
+        cds_rates.rm_ensg(ensg)
+
         counts_mu = counts_mu + np.histogram(list_rates, bins=bins, weights=list_mu)[0]
         if args.method == "MutSel":
             counts_q = counts_q + np.histogram(list_rates, bins=bins, weights=list_q)[0]

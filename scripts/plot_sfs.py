@@ -20,7 +20,7 @@ def normalize_sfs(sfs):
 
 
 def plot_sfs(cat_snps, snp_sfs, normed_sfs_syn_mean, max_daf, daf_axis, cat_dico_count, output, scaled):
-    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 1080 / my_dpi), dpi=my_dpi)
+    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
     for cat in snp_sfs:
         sfs = snp_sfs[cat][:, 1:].copy()
         if scaled == "neutral":
@@ -47,6 +47,7 @@ def plot_sfs(cat_snps, snp_sfs, normed_sfs_syn_mean, max_daf, daf_axis, cat_dico
         plt.ylabel('Proportion of mutations (scaled by neutral expectation)')
     elif scaled == "normalize":
         plt.ylabel('Proportion of mutations')
+        plt.yscale("log")
     elif scaled == "synonymous":
         plt.axhline(1.0, color="black")
         plt.ylabel('Proportion of mutations (relative to synonymous)')

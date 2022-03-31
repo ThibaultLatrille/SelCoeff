@@ -165,7 +165,7 @@ def plot_histogram(score_list, cat_snps, method, file):
     fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
     xmin, xmax = xlim_dico[method][0], xlim_dico[method][1]
     n, bins, patches = plt.hist([s for s in score_list if np.isfinite(s)], bins=np.linspace(xmin, xmax, 61),
-                                range=(xmin, xmax))
+                                range=(xmin, xmax), edgecolor="black", linewidth=1.0)
     if cat_snps.bins == 0:
         n_cat = defaultdict(int)
         for i, b in enumerate(bins[1:]):

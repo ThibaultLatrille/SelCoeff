@@ -47,7 +47,7 @@ def main(args):
                 d_label += ' ($\\times 10^4$)'
             _, ax = plt.subplots(figsize=(1920 / my_dpi, 880 / my_dpi), dpi=my_dpi)
             start, end = np.nanmin(matrix), np.nanmax(matrix)
-            rd_bu = cm.get_cmap('RdBu_r')
+            rd_bu = cm.get_cmap('viridis_r')
             if start != 0.0 and np.sign(start) != np.sign(end):
                 midpoint = - start / (np.nanmax(matrix) - start)
                 rd_bu = shiftedColorMap(rd_bu, midpoint=midpoint, name='shifted')

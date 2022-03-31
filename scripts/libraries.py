@@ -47,15 +47,29 @@ codontable.update({
     'TCA': 'S', 'TCC': 'S', 'TCG': 'S', 'TCT': 'S',
     'TTC': 'F', 'TTT': 'F', 'TTA': 'L', 'TTG': 'L',
     'TAC': 'Y', 'TAT': 'Y', 'TAA': 'X', 'TAG': 'X',
-    'TGC': 'C', 'TGT': 'C', 'TGA': 'X', 'TGG': 'W', '---': '-'})
+    'TGC': 'C', 'TGT': 'C', 'TGA': 'X', 'TGG': 'W'})
 confidence_interval = namedtuple('confidence_interval', ['low', 'mean', 'up'])
 sfs_weight = {"watterson": lambda i, n: 1.0 / i, "tajima": lambda i, n: n - i, "fay_wu": lambda i, n: i}
-polydfe_cat_dico = {"P-Sinf0": "$p(S^{pop}<-1)$", "P-Seq0": "$p(-1<S^{pop}<1)$", "P-Ssup0": "$p(1<S^{pop})$"}
+polydfe_cat_dico = {"P-Ssup0": "$p(1<S^{pop})$", "P-Seq0": "$p(-1<S^{pop}<1)$", "P-Sinf0": "$p(S^{pop}<-1)$"}
 polydfe_cat_list = list(polydfe_cat_dico.keys())
 xlim_dico = {"Omega": (0.0, 2.0), "MutSel": (-10, 10), "SIFT": (0.0, 1.0)}
 rate_dico = {"MutSel": "Scaled selection coefficient (S)",
              "Omega": "Rate of evolution ($\\omega$)",
              "SIFT": "SIFT score"}
+
+
+def build_non_synonymous_codon_neighbors():
+    codon_neighbors = defaultdict(list)
+    for ref_codon, ref_aa in codontable.items():
+        if ref_aa == "-" or ref_aa == "X":
+            continue
+        for frame, ref_nuc in enumerate(ref_codon):
+            for alt_nuc in [nuc for nuc in nucleotides if nuc != ref_nuc]:
+                alt_codon = ref_codon[:frame] + alt_nuc + ref_codon[frame + 1:]
+                alt_aa = codontable[alt_codon]
+                if alt_aa != 'X' and alt_aa != ref_aa:
+                    codon_neighbors[ref_codon].append((ref_nuc, alt_nuc, alt_codon, alt_aa))
+    return codon_neighbors
 
 
 def translate_cds(seq):
@@ -101,6 +115,7 @@ class CdsRates(dict):
         self.method = method
         assert self.method in ["Omega", "MutSel", "SIFT"], 'Method must be either "Omega", "MutSel" or "SIFT"'
         self.exp_folder = exp_folder
+        self.nuc_matrix = defaultdict(dict)
         super().__init__()
 
     def add_sift(self, ensg, f_path):
@@ -137,8 +152,13 @@ class CdsRates(dict):
         assert strip_line == "//"
         sift_file.close()
 
+    def add_nuc_matrix(self, ensg, nuc_path):
+        df = pd.read_csv(nuc_path, sep="\t")
+        self.nuc_matrix[ensg] = {name: q for name, q in zip(df["Name"], df["Rate"])}
+
     def add_ensg(self, ensg):
         f_path = f"{self.exp_folder}/{ensg}"
+        self.add_nuc_matrix(ensg, f"{f_path}_NT/sitemutsel_1.run.nucmatrix.tsv")
         if self.method == "MutSel":
             path = clean_ensg_path(f"{f_path}_NT/sitemutsel_1.run.siteprofiles")
             self[ensg] = pd.read_csv(path, sep="\t", skiprows=1, header=None,
@@ -148,6 +168,10 @@ class CdsRates(dict):
             self[ensg] = pd.read_csv(path, sep="\t")["gene_omega"].values[1:]
         elif self.method == "SIFT":
             self.add_sift(ensg, f_path)
+
+    def rm_ensg(self, ensg):
+        self.pop(ensg)
+        self.nuc_matrix.pop(ensg)
 
     def log_fitness(self, ensg, ref_aa, c_site):
         if self.method == "MutSel":
@@ -166,6 +190,11 @@ class CdsRates(dict):
             return self[ensg][c_site]
         if self.method == "SIFT":
             return self[ensg][alt_aa][c_site]
+
+    def mutation_rate(self, ensg, ref_nuc, alt_nuc):
+        if ensg not in self:
+            self.add_ensg(ensg)
+        return self.nuc_matrix[ensg][f"q_{ref_nuc}_{alt_nuc}"]
 
     def seq_len(self, ensg):
         if ensg not in self:

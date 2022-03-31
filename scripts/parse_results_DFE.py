@@ -30,16 +30,24 @@ def read_poly_dfe(path):
 
 
 def plot_stack_param(list_cat, cat_snps, s_dico, output):
-    n = len(polydfe_cat_dico)
-    fig, axs = plt.subplots(n, 1, sharex='all', figsize=(1920 / my_dpi, 280 * (n + 1) / my_dpi), dpi=my_dpi)
+    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
     x_pos = range(len(list_cat))
-    for p_i, (param, param_label) in enumerate(polydfe_cat_dico.items()):
-        axs[p_i].bar(x_pos, [s_dico[cat][param] for cat in list_cat], color=[cat_snps.color(cat) for cat in list_cat])
-        axs[p_i].axhline(0, color="black", lw=1)
-        axs[p_i].set_ylabel(param_label)
-        axs[p_i].set_xticks(x_pos)
-        axs[p_i].set_ylim((0, 1))
-    axs[len(polydfe_cat_dico) - 1].set_xticklabels([cat_snps.label(cat) for cat in list_cat])
+    hatches_list = ['', '', '//']
+    colors = [cat_snps.color(cat) for cat in list_cat]
+    colors_list = ["black", "silver", "white"]
+    edgecolors_list = ["black", "black", "black"]
+    bottom = np.array([0.0] * len(list_cat))
+    for p_i, param in enumerate(polydfe_cat_dico):
+        y = np.array([s_dico[cat][param] for cat in list_cat])
+        ax.bar(x_pos, y, bottom=bottom, edgecolor=edgecolors_list[p_i], color=colors_list[p_i], hatch=hatches_list[p_i])
+        bottom += y
+    ax.set_xlabel("Category of S at the phylogenetic scale")
+    ax.set_ylabel("Proportion estimated at the population scale")
+    ax.set_xticks(x_pos)
+    ax.set_ylim((0, 1))
+    ax.set_xticklabels([cat_snps.label(cat) for cat in list_cat])
+    for ticklabel, tickcolor in zip(plt.gca().get_xticklabels(), colors):
+        ticklabel.set_color(tickcolor)
     plt.tight_layout()
     plt.savefig(output)
     plt.close("all")
@@ -132,9 +140,9 @@ def main(args):
             out["S+"] = sum(p_list[3:] * s_list[3:])
             out["S-"] = sum(p_list[:3] * s_list[:3])
             out["S"] = sum(p_list * s_list)
-            out[polydfe_cat_list[0]] = sum(p_list[:2])
+            out[polydfe_cat_list[0]] = sum(p_list[3:])
             out[polydfe_cat_list[1]] = p_list[2]
-            out[polydfe_cat_list[2]] = sum(p_list[3:])
+            out[polydfe_cat_list[2]] = sum(p_list[:2])
         else:
             p_pos = out["p_b"]
             shape_neg = out["b"]
@@ -143,9 +151,9 @@ def main(args):
             scale_pos = out["S_b"]
             d_pos = expon(scale=scale_pos)
             out["S"] = d_pos.stats("m") * p_pos - d_neg.stats("m") * (1 - p_pos)
-            out[polydfe_cat_list[0]] = (1 - p_pos) * (1 - d_neg.cdf(1.0))
+            out[polydfe_cat_list[0]] = p_pos * (1 - d_pos.cdf(1.0))
             out[polydfe_cat_list[1]] = (1 - p_pos) * d_neg.cdf(1.0) + p_pos * d_pos.cdf(1.0)
-            out[polydfe_cat_list[2]] = p_pos * (1 - d_pos.cdf(1.0))
+            out[polydfe_cat_list[2]] = (1 - p_pos) * (1 - d_neg.cdf(1.0))
 
             for cat_poly in cat_poly_snps.non_syn_list:
                 if cat_poly == "neg-strong":
