@@ -29,6 +29,28 @@ def read_poly_dfe(path):
     return out_poly_dfe
 
 
+def plot_color_stack_param(list_cat, cat_snps, cat_poly_snps, s_dico, output):
+    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
+    x_pos = range(len(list_cat))
+    hatches_list = ['', '', '//', '//', '']
+    colors = [cat_snps.color(cat) for cat in list_cat]
+    bottom = np.array([0.0] * len(list_cat))
+    for p_i, param in enumerate(cat_poly_snps.non_syn_list[::-1]):
+        y = np.array([s_dico[cat][param] for cat in list_cat])
+        ax.bar(x_pos, y, bottom=bottom, edgecolor="black", color=cat_poly_snps.color(param), hatch=hatches_list[p_i])
+        bottom += y
+    ax.set_xlabel("Category of S at the phylogenetic scale")
+    ax.set_ylabel("Proportion estimated at the population scale")
+    ax.set_xticks(x_pos)
+    ax.set_ylim((0, 1))
+    ax.set_xticklabels([cat_snps.label(cat) for cat in list_cat])
+    for ticklabel, tickcolor in zip(plt.gca().get_xticklabels(), colors):
+        ticklabel.set_color(tickcolor)
+    plt.tight_layout()
+    plt.savefig(output)
+    plt.close("all")
+
+
 def plot_stack_param(list_cat, cat_snps, s_dico, output):
     fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
     x_pos = range(len(list_cat))
@@ -74,9 +96,8 @@ def plot_heatmap(cat_snps, cat_poly_snps, s_dico, output):
 
 
 def plot_dfe_stack_cat(list_cat, cat_snps, s_dico, output):
-    n = len(list_cat)
-    fig, axs = plt.subplots(n, 1, sharex='all', sharey='all', figsize=(1920 / my_dpi, 280 * (n + 1) / my_dpi),
-                            dpi=my_dpi)
+    fig, axs = plt.subplots(len(list_cat), 1, sharex='all', sharey='all', dpi=my_dpi,
+                            figsize=(1920 / my_dpi, 280 * (len(list_cat) + 1) / my_dpi))
     if "b" in s_dico["all"]:
         for cat_i, cat in enumerate(list_cat):
             p_pos = s_dico[cat]["p_b"]
@@ -173,6 +194,7 @@ def main(args):
     df_dico["category"] = list_cat
     pd.DataFrame(df_dico).to_csv(args.output.replace(".pdf", ".tsv"), sep="\t", index=False)
     plot_stack_param(list_cat, cat_snps, s_dico, args.output)
+    plot_color_stack_param(list_cat, cat_snps, cat_poly_snps, s_dico, args.output.replace(".pdf", ".colors.pdf"))
 
     if args.bins == 0 and args.windows == 0:
         plot_heatmap(cat_snps, cat_poly_snps, s_dico, args.output.replace(".pdf", ".heatmap.pdf"))

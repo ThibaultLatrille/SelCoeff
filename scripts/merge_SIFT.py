@@ -38,7 +38,7 @@ def open_vcf(vcf):
 def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     all_snps = open_vcf(args.vcf)
-    dict_ensg_sift = CdsRates("SIFT", args.sift_folder)
+    dict_ensg_sift = CdsRates("SIFT", sift_folder=args.sift_folder)
     dict_output = defaultdict(list)
     for snp in all_snps:
         if not os.path.exists(f"{args.sift_folder}/{snp.ensg}.fasta.gz"):

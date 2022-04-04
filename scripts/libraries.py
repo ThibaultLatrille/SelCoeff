@@ -58,7 +58,7 @@ rate_dico = {"MutSel": "Scaled selection coefficient (S)",
              "SIFT": "SIFT score"}
 
 
-def build_non_synonymous_codon_neighbors():
+def build_codon_neighbors():
     codon_neighbors = defaultdict(list)
     for ref_codon, ref_aa in codontable.items():
         if ref_aa == "-" or ref_aa == "X":
@@ -67,8 +67,9 @@ def build_non_synonymous_codon_neighbors():
             for alt_nuc in [nuc for nuc in nucleotides if nuc != ref_nuc]:
                 alt_codon = ref_codon[:frame] + alt_nuc + ref_codon[frame + 1:]
                 alt_aa = codontable[alt_codon]
-                if alt_aa != 'X' and alt_aa != ref_aa:
-                    codon_neighbors[ref_codon].append((ref_nuc, alt_nuc, alt_codon, alt_aa))
+                if alt_aa != 'X':
+                    syn = alt_aa == ref_aa
+                    codon_neighbors[ref_codon].append((syn, ref_nuc, alt_nuc, alt_codon, alt_aa))
     return codon_neighbors
 
 
@@ -111,10 +112,13 @@ def open_mask(file):
 
 
 class CdsRates(dict):
-    def __init__(self, method, exp_folder):
+    def __init__(self, method, exp_folder="", sift_folder=""):
         self.method = method
         assert self.method in ["Omega", "MutSel", "SIFT"], 'Method must be either "Omega", "MutSel" or "SIFT"'
+        if self.method == "SIFT":
+            assert sift_folder != ""
         self.exp_folder = exp_folder
+        self.sift_folder = sift_folder
         self.nuc_matrix = defaultdict(dict)
         super().__init__()
 
@@ -156,22 +160,26 @@ class CdsRates(dict):
         df = pd.read_csv(nuc_path, sep="\t")
         self.nuc_matrix[ensg] = {name: q for name, q in zip(df["Name"], df["Rate"])}
 
+    def add_mut_ensg(self, ensg):
+        nuc_path = clean_ensg_path(f"{self.exp_folder}/{ensg}_NT/sitemutsel_1.run.nucmatrix.tsv")
+        self.add_nuc_matrix(ensg, nuc_path)
+
     def add_ensg(self, ensg):
-        f_path = f"{self.exp_folder}/{ensg}"
-        self.add_nuc_matrix(ensg, f"{f_path}_NT/sitemutsel_1.run.nucmatrix.tsv")
         if self.method == "MutSel":
-            path = clean_ensg_path(f"{f_path}_NT/sitemutsel_1.run.siteprofiles")
+            path = clean_ensg_path(f"{self.exp_folder}/{ensg}_NT/sitemutsel_1.run.siteprofiles")
             self[ensg] = pd.read_csv(path, sep="\t", skiprows=1, header=None,
                                      names="site,A,C,D,E,F,G,H,I,K,L,M,N,P,Q,R,S,T,V,W,Y".split(","))
         elif self.method == "Omega":
-            path = clean_ensg_path(f"{f_path}_NT/siteomega_1.run.ci0.025.tsv")
+            path = clean_ensg_path(f"{self.exp_folder}/{ensg}_NT/siteomega_1.run.ci0.025.tsv")
             self[ensg] = pd.read_csv(path, sep="\t")["gene_omega"].values[1:]
         elif self.method == "SIFT":
-            self.add_sift(ensg, f_path)
+            self.add_sift(ensg, f"{self.sift_folder}/{ensg}")
 
     def rm_ensg(self, ensg):
-        self.pop(ensg)
-        self.nuc_matrix.pop(ensg)
+        if ensg in self:
+            self.pop(ensg)
+        if ensg in self.nuc_matrix:
+            self.nuc_matrix.pop(ensg)
 
     def log_fitness(self, ensg, ref_aa, c_site):
         if self.method == "MutSel":
@@ -193,7 +201,7 @@ class CdsRates(dict):
 
     def mutation_rate(self, ensg, ref_nuc, alt_nuc):
         if ensg not in self:
-            self.add_ensg(ensg)
+            self.add_mut_ensg(ensg)
         return self.nuc_matrix[ensg][f"q_{ref_nuc}_{alt_nuc}"]
 
     def seq_len(self, ensg):
@@ -211,25 +219,9 @@ def theta(sfs_epsilon, daf_n, weight_method):
     return sum(sfs_theta * weights) / sum(weights)
 
 
-def write_dofe(sfs_syn, sfs_non_syn, l_non_syn, d_non_syn, l_syn, d_syn, k, filepath, sp_focal, sp_sister, n_sites):
-    sfs_list = [k]
-    for sfs, nbr_site in [(sfs_non_syn, l_non_syn), (sfs_syn, l_syn)]:
-        sfs_list += [nbr_site] + [sfs[i] for i in range(1, k)]
-    sfs_list += [l_non_syn, d_non_syn, l_syn, d_syn]
-
-    dofe_file = open(filepath + ".dofe", 'w')
-    dofe_file.write(f"{sp_focal}+{sp_sister} ({int(n_sites)} sites)\n")
-    dofe_file.write("#unfolded\n")
-    dofe_file.write("Summed\t" + "\t".join(map(lambda i: str(int(i)), sfs_list)) + "\n")
-    dofe_file.close()
-
-
-def write_sfs(sfs_syn, sfs_non_syn, l_non_syn, d_non_syn, l_syn, d_syn, k, filepath, sp_focal, sp_sister, div=True):
+def write_sfs(sfs_syn, sfs_non_syn, l_non_syn, l_syn, k, filepath, sp_focal, sp_sister):
     sfs_syn_str = " ".join([str(int(sfs_syn[i])) for i in range(1, k)]) + f"\t{int(l_syn)}"
     sfs_non_syn_str = " ".join([str(int(sfs_non_syn[i])) for i in range(1, k)]) + f"\t{int(l_non_syn)}"
-    if div:
-        sfs_syn_str += f"\t{int(d_syn)}\t{int(l_syn)}\n"
-        sfs_non_syn_str += f"\t{int(d_non_syn)}\t{int(l_non_syn)}\n"
     sfs_file = open(filepath + ".sfs", 'w')
     sfs_file.write(f"#{sp_focal}+{sp_sister}\n")
     sfs_file.write("1 1 {0}".format(k) + "\n")

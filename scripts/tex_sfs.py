@@ -25,7 +25,7 @@ def main(args):
         heatmap_dict[method].append(result)
 
     o = open(args.tex_include, 'w')
-    o.write("\\section{Tajima's D - Fay \\& Hu's H} \n \n")
+    o.write("\\section{Summary statistics across all populations} \n \n")
     for method, list_heatmap in heatmap_dict.items():
         o.write("\\subsection{" + dict_method[method].capitalize() + '} \n')
         o.write("\\begin{center}\n")

@@ -24,7 +24,7 @@ def pfix(s):
         return s / (1 - np.exp(-s))
 
 
-def plot_histogram(counts, edges, cat_snps, dico_opp_sp, method, file):
+def plot_histogram(counts, edges, cat_snps, dico_opp, method, file):
     fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
     cats_list_edges = [cat_snps.rate2cats(b) for b in edges[1:]]
     colors = [cat_snps.color(cats[0]) if len(cats) > 0 else "black" for cats in cats_list_edges]
@@ -32,7 +32,7 @@ def plot_histogram(counts, edges, cat_snps, dico_opp_sp, method, file):
             align="edge")
     if cat_snps.bins <= 10:
         handles = [Rectangle((0, 0), 1, 1, color=c) for c in [cat_snps.color(cat) for cat in cat_snps.non_syn_list]]
-        labels = [cat_snps.label(cat) + f" ({dico_opp_sp[cat] * 100:.2f}% of total)" for cat in
+        labels = [cat_snps.label(cat) + f" ({dico_opp[cat] * 100:.2f}% of total)" for cat in
                   cat_snps.non_syn_list]
         plt.legend(handles, labels)
     plt.xlabel(rate_dico[method])
@@ -51,7 +51,7 @@ def plot_histogram(counts, edges, cat_snps, dico_opp_sp, method, file):
 
 def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
-    non_synonymous_codon_neighbors = build_non_synonymous_codon_neighbors()
+    codon_neighbors = build_codon_neighbors()
     cat_snps = CategorySNP(args.method, args.bounds, bins=args.bins, windows=args.windows)
 
     bins = np.linspace(xlim_dico[args.method][0], xlim_dico[args.method][1], 61)
@@ -61,12 +61,10 @@ def main(args):
     mask_grouped = open_mask(args.mask)
     unconserved_grouped = open_mask(args.unconserved)
 
-    cds_rates = CdsRates(args.method, args.exp_folder)
-    output_dict, dico_opp_sp = defaultdict(list), {cat: 0 for cat in cat_snps.non_syn_list}
-    dico_opp_sp["OutOfBounds"], dico_opp_sp["Adaptive"] = 0, 0
-    dico_flow_sp = dico_opp_sp.copy()
-    tot_opp = 0
-
+    cds_rates = CdsRates(args.method, args.exp_folder, args.sift_folder)
+    dico_opp, dico_flow = defaultdict(float), defaultdict(float)
+    for cat in cat_snps.non_syn_list:
+        dico_opp[cat] = 0.0
     seqs = open_fasta(args.fasta_pop)
     size = len(seqs) if args.subsample_genes < 1 else min(args.subsample_genes, len(seqs))
     np.random.seed(seed=0)
@@ -74,6 +72,7 @@ def main(args):
 
     for ensg in rd_ensg_list:
         cds_rates.add_ensg(ensg)
+        cds_rates.add_mut_ensg(ensg)
         seq = seqs[ensg]
         list_rates, list_mu, list_q = [], [], []
 
@@ -84,32 +83,40 @@ def main(args):
             if ref_aa == "X" or ref_aa == "-":
                 continue
 
+            dico_opp["nTotal"] += 1.0
+            if adaptive:
+                dico_opp["nAdaptive"] += 1.0
+                continue
+            dico_opp["nNonAdaptive"] += 1.0
+
             if args.method == "MutSel":
                 lf = cds_rates.log_fitness(ensg, ref_aa, c_site)
                 if (ensg not in unconserved_grouped) or (c_site not in unconserved_grouped[ensg]):
                     log_fitness.add(lf)
 
-            for (ref_nuc, alt_nuc, alt_codon, alt_aa) in non_synonymous_codon_neighbors[ref_codon]:
+            for (syn, ref_nuc, alt_nuc, alt_codon, alt_aa) in codon_neighbors[ref_codon]:
+                mutation_rate = cds_rates.mutation_rate(ensg, ref_nuc, alt_nuc)
+                assert np.isfinite(mutation_rate)
+                dico_opp["μTotal"] += mutation_rate
+
+                if syn:
+                    dico_opp["μSyn"] += mutation_rate
+                    continue
 
                 rate = cds_rates.rate(ensg, ref_aa, alt_aa, c_site)
                 if not np.isfinite(rate):
+                    dico_opp["μNotFinite"] += mutation_rate
                     continue
 
-                mutation_rate = cds_rates.mutation_rate(ensg, ref_nuc, alt_nuc)
-                assert np.isfinite(mutation_rate)
-                tot_opp += mutation_rate
-
-                if adaptive:
-                    dico_opp_sp["Adaptive"] += mutation_rate
-                    continue
+                dico_opp["μNonSyn"] += mutation_rate
 
                 cats = cat_snps.rate2cats(rate)
                 if len(cats) == 0:
-                    dico_opp_sp["OutOfBounds"] += mutation_rate
+                    dico_opp["μOut"] += mutation_rate
                     continue
 
                 for cat in cats:
-                    dico_opp_sp[cat] += mutation_rate
+                    dico_opp[cat] += mutation_rate
 
                 list_rates.append(rate)
                 list_mu.append(mutation_rate)
@@ -121,7 +128,7 @@ def main(args):
                 list_q.append(q)
                 if np.isfinite(q):
                     for cat in cats:
-                        dico_flow_sp[cat] += q
+                        dico_flow[cat] += q
 
                     (flow_pos if rate > 0 else flow_neg).add(q)
 
@@ -131,30 +138,33 @@ def main(args):
         if args.method == "MutSel":
             counts_q = counts_q + np.histogram(list_rates, bins=bins, weights=list_q)[0]
 
-    for cat in dico_opp_sp:
-        dico_opp_sp[cat] = dico_opp_sp[cat] / tot_opp
-        output_dict[cat].append(dico_opp_sp[cat])
+    for cat in cat_snps.non_syn_list:
+        dico_opp[cat] /= dico_opp["μNonSyn"]
         if args.method == "MutSel":
-            dico_flow_sp[cat] = dico_flow_sp[cat] / (flow_neg.total + flow_pos.total)
+            dico_flow[cat] = dico_flow[cat] / (flow_neg.total + flow_pos.total)
 
-    print(f'{output_dict["OutOfBounds"][0] * 100:.2f}% of opportunities out of bounds')
-    print(f'{output_dict["Adaptive"][0] * 100:.2f}% of opportunities are discarded because their are adaptive.')
+    dico_opp["Lds"] = dico_opp["nTotal"] * dico_opp["μSyn"] / dico_opp["μTotal"]
+    dico_opp["Ldn"] = dico_opp["nTotal"] * dico_opp["μNonSyn"] / dico_opp["μTotal"]
+
+    print(f'{dico_opp["μOut"] * 100 / dico_opp["μNonSyn"]:.2f}% of opportunities out of bounds')
+    print(f'{dico_opp["nAdaptive"] * 100 / dico_opp["nTotal"]:.2f}% of sites are discarded because their are adaptive.')
 
     if args.method == "MutSel":
-        output_dict["S_mean"].append(sel_coeff.mean())
-        output_dict["log_fitness"].append(log_fitness.mean())
-        output_dict["flow_pos"].append(flow_pos.total)
-        output_dict["flow_neg"].append(flow_neg.total)
-        plot_histogram(counts_q, bins, cat_snps, dico_flow_sp, args.method, args.output.replace(".tsv", ".Flow.pdf"))
+        dico_opp["SMean"] = sel_coeff.mean()
+        dico_opp["logFitness"] = log_fitness.mean()
+        dico_opp["flowPos"] = flow_pos.total
+        dico_opp["flowNeg"] = flow_neg.total
+        plot_histogram(counts_q, bins, cat_snps, dico_flow, args.method, args.output.replace(".tsv", ".Flow.pdf"))
 
-    plot_histogram(counts_mu, bins, cat_snps, dico_opp_sp, args.method, args.output.replace(".tsv", ".pdf"))
-    df = pd.DataFrame(output_dict)
+    plot_histogram(counts_mu, bins, cat_snps, dico_opp, args.method, args.output.replace(".tsv", ".pdf"))
+    df = pd.DataFrame({k: [v] for k, v in dico_opp.items()})
     df.to_csv(args.output, index=False, sep="\t")
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--exp_folder', required=True, type=str, dest="exp_folder", help="The experiment folder path")
+    parser.add_argument('--sift_folder', required=False, default="", type=str, dest="sift_folder", help="SIFT path")
     parser.add_argument('--fasta_pop', required=True, type=str, dest="fasta_pop", help="The fasta path")
     parser.add_argument('--bounds', required=False, default="", type=str, dest="bounds", help="Input bound file path")
     parser.add_argument('--mask', required=False, default="", type=str, dest="mask", help="Input mask file path")

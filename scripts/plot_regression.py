@@ -22,8 +22,8 @@ def discard_col(col, df):
 
 
 param_dict = {"watterson": "Watterson $\\theta_W$", "tajima": "Tajima $\\theta_{\\pi}$ ",
-              "flow_pos": "$\\Psi_{+}$", "flow_neg": "$\\Psi_{-}$", "flow_r": "$\\Psi_{+} / \\Psi_{-}$",
-              "log_fitness": "Mean log-fitness", "a": "Slope of $S^{pop}/S$", "S_mean": "$S$",
+              "flowPos": "$\\Psi_{+}$", "flowNeg": "$\\Psi_{-}$", "flowRatio": "$\\Psi_{+} / \\Psi_{-}$",
+              "logFitness": "Mean log-fitness", "a": "Slope of $S^{pop}/S$", "SMean": "$S$",
               "fay_wu": "Fay and Wu $\\theta_{H}$", "D_tajima": "Tajima's $D$", "H_fay_wu": "Fay and Wu's $H$"}
 
 
@@ -34,7 +34,7 @@ def main(args):
     if "species" not in df:
         df["species"] = df["species_x"]
     df = df.iloc[df.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
-    df["flow_r"] = df["flow_pos"] / df["flow_neg"]
+    df["flowRatio"] = df["flowPos"] / df["flowNeg"]
 
     species = {k: None for k in df["species"]}
     cm = get_cmap('tab10')
@@ -45,7 +45,7 @@ def main(args):
     for col_1 in ["watterson", "tajima", "fay_wu"]:
         if discard_col(col_1, df):
             continue
-        for col_2 in ["flow_pos", "flow_neg", "flow_r", "S_mean", "log_fitness", "a", "D_tajima", "H_fay_wu"]:
+        for col_2 in ["flowPos", "flowNeg", "flowRatio", "SMean", "logFitness", "a", "D_tajima", "H_fay_wu"]:
             if discard_col(col_2, df):
                 continue
             plt.figure(figsize=(1920 / my_dpi, 1080 / my_dpi), dpi=my_dpi)

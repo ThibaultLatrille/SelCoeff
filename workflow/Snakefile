@@ -101,7 +101,8 @@ rule mask_unconserved:
 rule opportunities:
     input:
         script=f'{FOLDER}/scripts/genome_opportunities.py',
-        exp_folder=lambda wildcards: f'{FOLDER}/data_div/Experiments' if wildcards.method != 'SIFT' else rules.SIFT_annotate.output,
+        exp_folder=f'{FOLDER}/data_div/Experiments',
+        sift_folder=rules.SIFT_annotate.output,
         fasta_pop=rules.fixed_snp_by_pop.output.fasta,
         bounds=rules.annotate_vcf.output.bounds,
         unconserved=rules.mask_unconserved.output.tsv,
@@ -112,7 +113,7 @@ rule opportunities:
         k=lambda wildcards: f"--subsample_genes {config['subsample_genes']}",
         mask=lambda wildcards, input, output: f"--mask {input.mask}" if config['mask_adaptation'] else ""
     shell:
-        'python3 {input.script} {params.mask} --unconserved {input.unconserved} --bins {bins} --windows {windows} --bounds {input.bounds} {params.k} --method {wildcards.method} --exp_folder {input.exp_folder} --fasta_pop {input.fasta_pop} --output {output.tsv}'
+        'python3 {input.script} {params.mask} --unconserved {input.unconserved} --bins {bins} --windows {windows} --bounds {input.bounds} {params.k} --method {wildcards.method} --exp_folder {input.exp_folder} --sift_folder {input.sift_folder} --fasta_pop {input.fasta_pop} --output {output.tsv}'
 
 rule gather_opportunities:
     input:
@@ -129,7 +130,6 @@ checkpoint sfs:
     input:
         script=f'{FOLDER}/scripts/plot_sfs.py',
         tsv=rules.annotate_vcf.output.tsv,
-        genome_results=f'{FOLDER}/data_div/genome_results.tsv',
         opportunities=rules.opportunities.output.tsv,
         bounds=rules.annotate_vcf.output.bounds
     output:
@@ -139,7 +139,7 @@ checkpoint sfs:
     params:
         config=f'--nbr_replicates {config["nbr_replicates"]} --subsample {config["subsample"]}'
     shell:
-        'python3 {input.script} --bins {bins} --windows {windows} --bounds {input.bounds} {params.config} --tsv {input.tsv} --pop {wildcards.popu} --method {wildcards.method} --genome_results {input.genome_results} --opportunities {input.opportunities} --output_tsv {output.tsv} --output_pdf {output.pdf} --output_dir {output.dir}'
+        'python3 {input.script} --bins {bins} --windows {windows} --bounds {input.bounds} {params.config} --tsv {input.tsv} --pop {wildcards.popu} --method {wildcards.method} --opportunities {input.opportunities} --output_tsv {output.tsv} --output_pdf {output.pdf} --output_dir {output.dir}'
 
 rule polyDFE:
     input:

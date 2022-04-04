@@ -68,15 +68,11 @@ def main(args):
     os.makedirs(args.output_dir, exist_ok=True)
     assert args.method in ["MutSel", "Omega", "SIFT"]
 
-    genome_results = pd.read_csv(args.genome, sep='\t')
-    row = genome_results[genome_results["pop"] == args.pop.replace("_", " ")]
-    assert len(row) > 0
-    ldn, dn, lds, ds = row["Ldn"].values[0], row["dn"].values[0], row["Lds"].values[0], row["ds"].values[0]
-    print(f'ratio Ldn/(Lds + Ldn)={ldn / (lds + ldn)}')
-
     cat_snps = CategorySNP(args.method, args.bounds, bins=args.bins, windows=args.windows)
     opp_results = pd.read_csv(args.opportunities, sep='\t')
-    opp_dico = {cat: opp_results[cat].values[0] for cat in opp_results}
+    opp_dico = {k: opp_results[k].values[0] for k in opp_results}
+    ldn, lds = opp_dico["Ldn"], opp_dico["Lds"]
+    print(f'ratio Ldn/(Lds + Ldn)={ldn / (lds + ldn)}')
 
     df_snps = pd.read_csv(args.tsv, sep='\t')
     assert len(set(df_snps["sample_size"])) == 1
@@ -99,8 +95,8 @@ def main(args):
     snp_sfs_mean = {cat: np.mean(sfs, axis=0) for cat, sfs in snp_sfs.items()}
 
     sfs_nonsyn_mean = np.sum([sfs for cat, sfs in snp_sfs_mean.items() if cat != "syn"], axis=0)
-    write_sfs(snp_sfs_mean["syn"], sfs_nonsyn_mean, ldn, dn, lds, ds, max_daf,
-              os.path.join(args.output_dir, 'all'), args.pop, "", div=False)
+    output_all = os.path.join(args.output_dir, 'all')
+    write_sfs(snp_sfs_mean["syn"], sfs_nonsyn_mean, ldn, lds, max_daf, output_all, args.pop, "")
 
     daf_axis = range(1, max_daf)
     theta_dict = defaultdict(list)
@@ -109,8 +105,8 @@ def main(args):
             ld_cat = lds
         else:
             ld_cat = ldn * opp_dico[cat]
-            write_sfs(snp_sfs_mean["syn"], mean_sfs, ld_cat, dn * opp_dico[cat], lds, ds, max_daf,
-                      os.path.join(args.output_dir, cat), args.pop, "", div=False)
+            output_cat = os.path.join(args.output_dir, cat)
+            write_sfs(snp_sfs_mean["syn"], mean_sfs, ld_cat, lds, max_daf, output_cat, args.pop, "")
 
         theta_dict["category"].append(cat)
         for theta_method in sfs_weight:
@@ -136,8 +132,6 @@ if __name__ == '__main__':
     parser.add_argument('--output_tsv', required=False, type=str, dest="output_tsv", help="Output tsv file")
     parser.add_argument('--output_pdf', required=False, type=str, dest="output_pdf", help="Output pdf file")
     parser.add_argument('--output_dir', required=False, type=str, dest="output_dir", help="Output directory for sfs")
-    parser.add_argument('--genome_results', required=False, type=str, dest="genome",
-                        help="Input genome results tsv file")
     parser.add_argument('--opportunities', required=False, type=str, dest="opportunities",
                         help="Input opportunities results tsv file")
     parser.add_argument('--pop', required=False, type=str, dest="pop", help="Focal population")
