@@ -1,9 +1,6 @@
 import argparse
 from scipy.stats import expon, gamma
-import statsmodels.api as sm
-import seaborn as sns
 from libraries import *
-from matplotlib import cm
 
 
 def read_poly_dfe(path):
@@ -29,28 +26,6 @@ def read_poly_dfe(path):
     return out_poly_dfe
 
 
-def plot_color_stack_param(list_cat, cat_snps, cat_poly_snps, s_dico, output):
-    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
-    x_pos = range(len(list_cat))
-    hatches_list = ['', '', '//', '//', '']
-    colors = [cat_snps.color(cat) for cat in list_cat]
-    bottom = np.array([0.0] * len(list_cat))
-    for p_i, param in enumerate(cat_poly_snps.non_syn_list[::-1]):
-        y = np.array([s_dico[cat][param] for cat in list_cat])
-        ax.bar(x_pos, y, bottom=bottom, edgecolor="black", color=cat_poly_snps.color(param), hatch=hatches_list[p_i])
-        bottom += y
-    ax.set_xlabel("Category of S at the phylogenetic scale")
-    ax.set_ylabel("Proportion estimated at the population scale")
-    ax.set_xticks(x_pos)
-    ax.set_ylim((0, 1))
-    ax.set_xticklabels([cat_snps.label(cat) for cat in list_cat])
-    for ticklabel, tickcolor in zip(plt.gca().get_xticklabels(), colors):
-        ticklabel.set_color(tickcolor)
-    plt.tight_layout()
-    plt.savefig(output)
-    plt.close("all")
-
-
 def plot_stack_param(list_cat, cat_snps, s_dico, output):
     fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
     x_pos = range(len(list_cat))
@@ -72,26 +47,6 @@ def plot_stack_param(list_cat, cat_snps, s_dico, output):
         ticklabel.set_color(tickcolor)
     plt.tight_layout()
     plt.savefig(output)
-    plt.close("all")
-
-
-def plot_heatmap(cat_snps, cat_poly_snps, s_dico, output):
-    cat_labels_cols = [cat_snps.label(cat) for cat in cat_snps.non_syn_list]
-    cat_labels_rows = [cat_poly_snps.label(cat) for cat in cat_poly_snps.non_syn_list]
-    matrix = np.zeros((len(cat_labels_cols), len(cat_labels_rows)))
-    for col, cat_col in enumerate(cat_snps.non_syn_list):
-        for row, cat_row in enumerate(cat_poly_snps.non_syn_list):
-            matrix[(row, col)] = s_dico[cat_col][cat_row]
-    _, ax = plt.subplots(figsize=(1920 / my_dpi, 880 / my_dpi), dpi=my_dpi)
-
-    rd_bu = cm.get_cmap('RdBu_r')
-    ax = sns.heatmap(matrix, xticklabels=cat_labels_cols, yticklabels=cat_labels_rows, linewidths=0.05,
-                     linecolor="black", ax=ax, cmap=rd_bu, cbar_kws={'label': "$p$"})
-    ax.set_xlabel("Phylogenetic scale")
-    ax.set_ylabel("Population scale")
-    plt.tight_layout()
-    plt.savefig(output, format="pdf")
-    plt.clf()
     plt.close("all")
 
 
@@ -125,24 +80,6 @@ def plot_dfe_stack_cat(list_cat, cat_snps, s_dico, output):
         axs[len(list_cat) - 1].set_xticklabels([label for label in polydfe_cat_dico.values()])
     plt.tight_layout()
     plt.savefig(output, format="pdf")
-    plt.close("all")
-
-
-def plot_scatter(x, y, method, file):
-    plt.figure(figsize=(1920 / my_dpi, 1080 / my_dpi), dpi=my_dpi)
-    plt.scatter(x, y, alpha=0.4, s=5.0)
-    idf = np.linspace(min(x), max(x), 30)
-    results = sm.OLS(y, sm.add_constant(x)).fit()
-    b, a = results.params[0:2]
-    linear = a * idf + b
-    reg = f'slope of {a:.2g} ($r^2$={results.rsquared:.2g})'
-    plt.plot(idf, linear, '-', linestyle="--", label=reg)
-    plt.xlabel(rate_dico[method])
-    plt.ylabel("S given by polyDFE")
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(file, format="pdf")
-    plt.clf()
     plt.close("all")
 
 
@@ -191,21 +128,18 @@ def main(args):
 
     list_cat = [cat for cat in list_cat if cat in s_dico]
     df_dico = {p: [s_dico[cat][p] for cat in list_cat] for p in polydfe_cat_list}
+    df_dico.update({f'P-{p}': [s_dico[cat][p] for cat in list_cat] for p in cat_poly_snps.non_syn_list})
     df_dico["category"] = list_cat
     pd.DataFrame(df_dico).to_csv(args.output.replace(".pdf", ".tsv"), sep="\t", index=False)
-    plot_stack_param(list_cat, cat_snps, s_dico, args.output)
-    plot_color_stack_param(list_cat, cat_snps, cat_poly_snps, s_dico, args.output.replace(".pdf", ".colors.pdf"))
+    plot_stack_param([c for c in list_cat if c != 'all'], cat_snps, s_dico, args.output)
 
     if args.bins == 0 and args.windows == 0:
-        plot_heatmap(cat_snps, cat_poly_snps, s_dico, args.output.replace(".pdf", ".heatmap.pdf"))
         plot_dfe_stack_cat(list_cat, cat_snps, s_dico, args.output.replace(".pdf", ".predictedDFE.pdf"))
     else:
         s_pop_list = [s_dico[cat]["S"] for cat in list_cat if cat != 'all']
         s_phy_list = [cat_snps.mean[cat] for cat in list_cat if cat != 'all']
-        x, y = zip(*[(s_phy, s_pop) for s_phy, s_pop in zip(s_phy_list, s_pop_list) if abs(s_phy) < 0.5])
-        scatter_dict = {"S_pop": s_pop_list, "S_phy": s_phy_list}
-        pd.DataFrame(scatter_dict).to_csv(args.output.replace(".pdf", ".scatter.tsv"), sep="\t", index=False)
-        plot_scatter(x, y, args.method, args.output.replace(".pdf", ".scatter.pdf"))
+        pd.DataFrame({"S_pop": s_pop_list, "S_phy": s_phy_list}).to_csv(args.output.replace(".pdf", ".scatter.tsv"),
+                                                                        sep="\t", index=False)
 
 
 if __name__ == '__main__':

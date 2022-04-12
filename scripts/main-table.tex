@@ -1,0 +1,27 @@
+\documentclass{article}
+
+\usepackage{lmodern}
+\usepackage{amssymb, amsmath}
+\usepackage[export]{adjustbox}
+\usepackage{tabu}
+\tabulinesep=0.6mm
+\newcommand\cellwidth{\TX@col@width}
+\usepackage{hhline}
+\setlength{\arrayrulewidth}{1.2pt}
+\usepackage{multicol,multirow,array}
+\usepackage{etoolbox}
+\AtBeginEnvironment{tabu}{\footnotesize}
+\usepackage{booktabs}
+\usepackage{bm}
+\usepackage[margin=40pt]{geometry}
+\usepackage{longtable}
+
+\newcommand{\specialcell}[2][c]{%
+	\begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+\begin{document}
+
+\tiny
+\input{results.tex}
+
+\end{document}

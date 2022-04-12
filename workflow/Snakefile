@@ -30,6 +30,7 @@ ruleorder: parse_results_DFE > sfs
 rule all:
     input:
         f'{FOLDER}/data_processed/opportunities_{binning}.tsv',
+        f'{FOLDER}/data_processed/bounds_{binning}.tsv',
         f'{EXP_FOLDER}/supp-mat.pdf'
 
 rule fixed_snp_by_pop:
@@ -83,9 +84,21 @@ rule annotate_vcf:
         tsv=f"{FOLDER}/data_processed/vcf_annotate_{binning}" + '/snps.{species}.{popu}.tsv.gz',
         bounds=f"{FOLDER}/data_processed/vcf_annotate_{binning}" + '/bounds.{species}.{popu}.tsv'
     params:
+        subsample=f'--subsample {config["subsample"]}',
         mask=lambda wildcards, input, output: f"--mask {input.mask}" if config['mask_adaptation'] else ""
     shell:
-        'python3 {input.script} {params.mask} --sift_file {input.sift_file} --vcf {input.vcf} --bins {bins} --windows {windows} --output_tsv {output.tsv} --output_bounds {output.bounds}'
+        'python3 {input.script} {params.subsample} {params.mask} --sift_file {input.sift_file} --vcf {input.vcf} --bins {bins} --windows {windows} --output_tsv {output.tsv} --output_bounds {output.bounds}'
+
+rule gather_bounds:
+    input:
+        script=f'{FOLDER}/scripts/gather_bounds.py',
+        tsv=[f'{FOLDER}/data_processed/vcf_annotate_{binning}/bounds.{species}.{popu}.tsv' for popu, species in
+             pop2sp.items()],
+        sample_list=sample_list
+    output:
+        tsv=f'{FOLDER}/data_processed/bounds_{binning}.tsv'
+    shell:
+        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --output {output.tsv}'
 
 rule mask_unconserved:
     input:
@@ -178,25 +191,16 @@ rule parse_results_DFE:
     shell:
         'python3 {input.script} --bins {bins} --windows {windows} --bounds {input.bounds} --input {input.modelfile} --method {wildcards.method} --output {output.pdf}'
 
-rule plot_theta_heatmap:
+rule plot_dfe_heatmap:
     input:
         script=f'{FOLDER}/scripts/plot_heatmap.py',
-        tsv=map(lambda p: f"{p}-sfs-summary-stats.tsv",SFS_LIST),
+        tsv_theta=map(lambda p: f"{p}-sfs-summary-stats.tsv",SFS_LIST),
+        tsv_dfe=map(lambda p: f"{p}.{model}.tsv",SFS_LIST),
         sample_list=sample_list
     output:
         tsv=f'{EXP_FOLDER}/results/Theta.results.tsv'
     shell:
-        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --bins {bins} --windows {windows} --output {output.tsv}'
-
-rule plot_dfe_heatmap:
-    input:
-        script=f'{FOLDER}/scripts/plot_heatmap.py',
-        tsv=map(lambda p: f"{p}.{model}.tsv",SFS_LIST),
-        sample_list=sample_list
-    output:
-        tsv=f'{EXP_FOLDER}/results/DFE.results.tsv'
-    shell:
-        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --bins {bins} --windows {windows} --output {output.tsv}'
+        'python3 {input.script} --tsv_theta {input.tsv_theta} --tsv_dfe {input.tsv_dfe} --sample_list {input.sample_list} --bins {bins} --windows {windows} --output {output.tsv}'
 
 rule plot_multiple_regression:
     input:
@@ -211,8 +215,9 @@ rule plot_multiple_regression:
 rule plot_regression:
     input:
         script=f'{FOLDER}/scripts/plot_regression.py',
-        tsv=([rules.plot_multiple_regression.output.tsv] if (bins != 0 and windows != 0) else []) +
-            [rules.gather_opportunities.output.tsv, rules.plot_theta_heatmap.output.tsv],
+        tsv=[rules.gather_opportunities.output.tsv, rules.gather_bounds.output.tsv] + (
+            [rules.plot_multiple_regression.output.tsv] if (bins != 0 and windows != 0) else [
+                rules.plot_dfe_heatmap.output.tsv]),
         sample_list=sample_list
     output:
         tsv=f'{EXP_FOLDER}/regression/results.tsv'
@@ -225,7 +230,6 @@ rule latex:
         script=f'{FOLDER}/scripts/tex_sfs.py',
         sfs=map(lambda p: f"{p}-sfs.pdf",SFS_LIST),
         tex_source=f'{FOLDER}/manuscript/supp-mat.tex',
-        tsv_theta=rules.plot_theta_heatmap.output.tsv,
         tsv_dfe=rules.plot_dfe_heatmap.output.tsv,
         tsv_reg=rules.plot_regression.output.tsv,
     output:
@@ -235,4 +239,4 @@ rule latex:
     params:
         hist_prefix=f'--hist_prefix {FOLDER}/data_processed/vcf_annotate_{binning}/snps.',
         dfe_prefix=f'--dfe_prefix {FOLDER}/data_processed/opportunities_{binning}/DFE.'
-    shell: 'python3 {input.script} {params.hist_prefix} {params.dfe_prefix} --sfs {input.sfs} --results {input.tsv_theta} --tex_source {input.tex_source} --tex_target {output.tex_target} --tex_include {output.tex_include}'
+    shell: 'python3 {input.script} {params.hist_prefix} {params.dfe_prefix} --sfs {input.sfs} --results {input.tsv_dfe} --tex_source {input.tex_source} --tex_target {output.tex_target} --tex_include {output.tex_include}'

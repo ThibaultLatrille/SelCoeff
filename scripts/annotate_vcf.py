@@ -17,7 +17,7 @@ def open_sift(sift_file):
     return output
 
 
-def read_vcf(vcf, sift_file, mask_grouped):
+def read_vcf(vcf, sift_file, mask_grouped, subsample):
     dict_sift = open_sift(sift_file)
     vcf_file = gzip.open(vcf, 'rt')
     dico_snp = defaultdict(list)
@@ -58,6 +58,9 @@ def read_vcf(vcf, sift_file, mask_grouped):
         dico_snp["snp_type"].append(dico_info["SNP_TYPE"])
         dico_snp["sample_size"].append(sample_size)
         dico_snp["count"].append(k)
+        max_daf = min(sample_size, subsample)
+        sampled_k = np.random.hypergeometric(k, sample_size - k, max_daf)
+        dico_snp["sampled"].append(sampled_k != 0 and sampled_k != max_daf)
         dico_snp["freq"].append(k / sample_size)
         dico_snp["SIFT"].append(s_sift)
         dico_snp["MutSel"].append(s_mutsel)
@@ -67,11 +70,15 @@ def read_vcf(vcf, sift_file, mask_grouped):
     return dico_snp, discarded
 
 
-def classify_snps(s_list, type_list, method, cat_snps):
+def classify_snps(dico_snp, method, cat_snps):
+    s_list = dico_snp[method]
+    type_list = dico_snp["snp_type"]
+    sampled = dico_snp["snp_type"]
     cat_list, intervals, dico_cat = list(), list(), defaultdict(list)
 
     if cat_snps.bins != 0:
-        s_ns_list = [s for s, snp_type in zip(s_list, type_list) if snp_type == "NonSyn" and np.isfinite(s)]
+        s_ns_list = [s for s, snp_type, sample in zip(s_list, type_list, sampled) if
+                     sample and snp_type == "NonSyn" and np.isfinite(s)]
         if cat_snps.windows == 0:
             array_split = np.array_split(sorted(s_ns_list), cat_snps.bins)
             assert len(array_split) == cat_snps.bins
@@ -100,7 +107,8 @@ def classify_snps(s_list, type_list, method, cat_snps):
         for cat in cat_snps.non_syn_list:
             intervals.append(BOUND(cat, cat_snps.dico[cat].lower, cat_snps.dico[cat].upper))
 
-    for s, snp_type in zip(s_list, type_list):
+    dico_sampled = defaultdict(float)
+    for s, snp_type, sample in zip(s_list, type_list, sampled):
         if snp_type == "Syn":
             cat_list.append("|syn|")
         elif np.isfinite(s):
@@ -112,14 +120,22 @@ def classify_snps(s_list, type_list, method, cat_snps):
             cat_list.append("|" + "|".join(cats) + "|")
             for cat in cats:
                 dico_cat[cat].append(s)
+
+            if sample:
+                dico_sampled['tot'] += 1
+                for cat in cats:
+                    dico_sampled[cat] += 1
         else:
             cat_list.append("None")
 
-    return cat_list, intervals, [np.mean(dico_cat[b.cat]) for b in intervals], [len(dico_cat[b.cat]) for b in intervals]
+    mean_list = [np.mean(dico_cat[b.cat]) for b in intervals]
+    count_list = [len(dico_cat[b.cat]) for b in intervals]
+    prop_sampled_list = [dico_sampled[b.cat] / dico_sampled['tot'] for b in intervals]
+    return cat_list, intervals, mean_list, count_list, prop_sampled_list
 
 
 def plot_sift(x_list, y_list, file):
-    plt.figure(figsize=(1920 / my_dpi, 1080 / my_dpi), dpi=my_dpi)
+    plt.figure(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
     x = [x for x, y in zip(x_list, y_list) if np.isfinite(x) and np.isfinite(y) and abs(x) < 20]
     y = [y for x, y in zip(x_list, y_list) if np.isfinite(x) and np.isfinite(y) and abs(x) < 20]
     plt.scatter(x, y, alpha=0.4, s=5.0)
@@ -166,16 +182,17 @@ def plot_histogram(score_list, cat_snps, method, file):
     xmin, xmax = xlim_dico[method][0], xlim_dico[method][1]
     n, bins, patches = plt.hist([s for s in score_list if np.isfinite(s)], bins=np.linspace(xmin, xmax, 61),
                                 range=(xmin, xmax), edgecolor="black", linewidth=1.0)
+    total_n = sum(n)
     if cat_snps.bins == 0:
-        n_cat = defaultdict(int)
+        n_cat = defaultdict(float)
         for i, b in enumerate(bins[1:]):
             cats = cat_snps.rate2cats(b)
             assert len(cats) >= 1
             cat = cats[0]
             patches[i].set_facecolor(cat_snps.color(cat))
-            n_cat[cat] += n[i]
+            n_cat[cat] += n[i] / total_n
         handles = [Rectangle((0, 0), 1, 1, color=c) for c in [cat_snps.color(cat) for cat in cat_snps.non_syn_list]]
-        labels = [cat_snps.label(cat) + f" $({int(n_cat[cat])}~mutations)$" for cat in cat_snps.non_syn_list]
+        labels = [cat_snps.label(cat) + f" ({n_cat[cat] * 100:.2f}% of total)" for cat in cat_snps.non_syn_list]
         plt.legend(handles, labels)
     plt.xlabel(rate_dico[method])
     plt.ylabel("Density")
@@ -196,14 +213,13 @@ def main(args):
     os.makedirs(os.path.dirname(args.output_bounds), exist_ok=True)
 
     mask_grouped = open_mask(args.mask)
-    dico_snp, discarded = read_vcf(args.vcf, args.sift_file, mask_grouped)
+    dico_snp, discarded = read_vcf(args.vcf, args.sift_file, mask_grouped, args.subsample)
     print(f'{discarded * 100 / len(dico_snp["snp_type"]):.2f}% of SNPs are discarded because their are adaptive.')
     dico_bounds = defaultdict(list)
 
     for method in ["MutSel", "Omega", "SIFT"]:
         cat_snps = CategorySNP(method, bins=args.bins, windows=args.windows)
-        cat_list, bounds, mean_list, count_list = classify_snps(dico_snp[method], dico_snp["snp_type"], method,
-                                                                cat_snps)
+        cat_list, bounds, mean_list, count_list, prop_list = classify_snps(dico_snp, method, cat_snps)
         dico_snp["cat_" + method] = cat_list
         dico_bounds["method"].extend([method] * len(bounds))
         dico_bounds["cat"].extend([b.cat for b in bounds])
@@ -211,11 +227,14 @@ def main(args):
         dico_bounds["upper"].extend([b.upper for b in bounds])
         dico_bounds["mean"].extend(mean_list)
         dico_bounds["count"].extend(count_list)
+        dico_bounds["sampled_fraction"].extend(prop_list)
 
         plot_density(dico_snp[method], dico_snp["freq"], method,
                      args.output_tsv.replace('.tsv.gz', f'.{method}.density.pdf'))
         plot_histogram(dico_snp[method], cat_snps, method,
-                       args.output_tsv.replace('.tsv.gz', f'.{method}.histogram.pdf'))
+                       args.output_tsv.replace('.tsv.gz', f'.{method}.histogram.full.pdf'))
+        sampled = [s for s, sample in zip(dico_snp[method], dico_snp["sampled"]) if sample]
+        plot_histogram(sampled, cat_snps, method, args.output_tsv.replace('.tsv.gz', f'.{method}.histogram.pdf'))
 
     plot_sift(dico_snp["SIFT"], dico_snp["MutSel"], args.output_tsv.replace('.tsv.gz', '.SIFT_vs_MutSel.pdf'))
 
@@ -235,4 +254,5 @@ if __name__ == '__main__':
     parser.add_argument('--mask', required=False, default="", type=str, dest="mask", help="Input mask file path")
     parser.add_argument('--output_tsv', required=False, type=str, dest="output_tsv", help="Output tsv file")
     parser.add_argument('--output_bounds', required=False, type=str, dest="output_bounds", help="Output bounds file")
+    parser.add_argument('--subsample', required=False, type=int, default=16, dest="subsample")
     main(parser.parse_args())

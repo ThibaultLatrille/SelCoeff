@@ -19,7 +19,7 @@ def normalize_sfs(sfs):
     return (sfs.T / np.sum(sfs, axis=1)).T
 
 
-def plot_sfs(cat_snps, snp_sfs, normed_sfs_syn_mean, max_daf, daf_axis, cat_dico_count, output, scaled):
+def plot_sfs(cat_snps, snp_sfs, normed_sfs_syn_mean, max_daf, daf_axis, output, scaled):
     fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
     for cat in snp_sfs:
         sfs = snp_sfs[cat][:, 1:].copy()
@@ -35,9 +35,8 @@ def plot_sfs(cat_snps, snp_sfs, normed_sfs_syn_mean, max_daf, daf_axis, cat_dico
 
         mean_sfs = np.mean(sfs, axis=0)
         std_sfs = np.std(sfs, axis=0)
-        label = cat_snps.label(cat) + f" $({int(cat_dico_count[cat])}~mutations)$"
         plt.scatter(daf_axis, mean_sfs, color=cat_snps.color(cat))
-        plt.plot(daf_axis, mean_sfs, label=label, color=cat_snps.color(cat), linewidth=1.0)
+        plt.plot(daf_axis, mean_sfs, label=cat_snps.label(cat), color=cat_snps.color(cat), linewidth=1.0)
         plt.fill_between(daf_axis, mean_sfs - std_sfs, mean_sfs + std_sfs, linewidth=1.0,
                          color=cat_snps.color(cat), alpha=0.2)
     if max_daf < 32:
@@ -90,7 +89,6 @@ def main(args):
                 count = [k]
             snps_daf[cat].append(count)
 
-    cat_dico_count = {cat: len(daf) for cat, daf in snps_daf.items()}
     snp_sfs = {cat: daf_to_sfs(daf, max_daf) for cat, daf in snps_daf.items()}
     snp_sfs_mean = {cat: np.mean(sfs, axis=0) for cat, sfs in snp_sfs.items()}
 
@@ -119,7 +117,7 @@ def main(args):
     normed_sfs_syn_mean = snp_sfs_mean["syn"][1:] / np.sum(snp_sfs_mean["syn"][1:])
     for scaled in ["", "neutral", "normalize", "synonymous"]:
         output = args.output_pdf.replace('.pdf', f'.{scaled}.pdf') if scaled != "" else args.output_pdf
-        plot_sfs(cat_snps, snp_sfs, normed_sfs_syn_mean, max_daf, daf_axis, cat_dico_count, output, scaled)
+        plot_sfs(cat_snps, snp_sfs, normed_sfs_syn_mean, max_daf, daf_axis, output, scaled)
 
 
 if __name__ == '__main__':

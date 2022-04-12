@@ -50,7 +50,11 @@ codontable.update({
     'TGC': 'C', 'TGT': 'C', 'TGA': 'X', 'TGG': 'W'})
 confidence_interval = namedtuple('confidence_interval', ['low', 'mean', 'up'])
 sfs_weight = {"watterson": lambda i, n: 1.0 / i, "tajima": lambda i, n: n - i, "fay_wu": lambda i, n: i}
-polydfe_cat_dico = {"P-Ssup0": "$p(1<S^{pop})$", "P-Seq0": "$p(-1<S^{pop}<1)$", "P-Sinf0": "$p(S^{pop}<-1)$"}
+polydfe_cat_dico = {
+    "P-Ssup0": "$\\mathbb{P} [ 1<\\beta ]$",
+    "P-Seq0": "$\\mathbb{P} [ -1<\\beta<1 ]$",
+    "P-Sinf0": "$\\mathbb{P} [ \\beta<-1 ]$",
+}
 polydfe_cat_list = list(polydfe_cat_dico.keys())
 xlim_dico = {"Omega": (0.0, 2.0), "MutSel": (-10, 10), "SIFT": (0.0, 1.0)}
 rate_dico = {"MutSel": "Scaled selection coefficient (S)",
@@ -285,6 +289,46 @@ def sp_sorted(pop, sp):
         return "T" + out
     else:
         return out
+
+
+def extend_pop(p, sample):
+    fp = format_pop(p)
+    if sample[p] == fp:
+        return p
+    else:
+        return f"{sample[p]} ({fp})"
+
+
+def sort_df(df, sample_list_path):
+    df = df.iloc[df.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
+    df["species"] = df.apply(lambda r: r["species"].replace("_", " "), axis=1)
+    df["species"] = df.apply(lambda r: "Ovis orientalis" if r["pop"] == "IROO" else r["species"], axis=1)
+    df["species"] = df.apply(lambda r: "Ovis vignei" if r["pop"] == "IROV" else r["species"], axis=1)
+    df["species"] = df.apply(lambda r: "Capra aegagrus" if r["pop"] == "IRCA" else r["species"], axis=1)
+
+    sample_iterrows = list(pd.read_csv(sample_list_path, sep='\t').iterrows())
+    dico_sample = {format_pop(r["SampleName"].replace("_", " ")): r["Location"] for _, r in sample_iterrows}
+
+    df["pop"] = df.apply(lambda r: extend_pop(r["pop"], dico_sample), axis=1)
+    return df
+
+
+def tex_f(x, highlight=False, pad=""):
+    if x == 0:
+        s = "0.0"
+    elif 0.001 < abs(x) < 10:
+        s = f"{x:6.3f}"
+    elif 10 <= abs(x) < 10000:
+        s = f"{x:6.1f}"
+    else:
+        s = f"{x:6.2g}"
+        if "e" in s:
+            mantissa, exp = s.split('e')
+            s = mantissa + '\\times 10^{' + str(int(exp)) + '}'
+    if highlight:
+        return "$\\bm{" + s + "{^*}}$"
+    else:
+        return f"${s}{pad}$"
 
 
 def multiline(xs, ys, c, ax, **kwargs):

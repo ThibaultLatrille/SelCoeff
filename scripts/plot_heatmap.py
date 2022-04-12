@@ -3,12 +3,6 @@ from matplotlib import cm
 import seaborn as sns
 from libraries import *
 
-theta_dict = {"watterson": "Watterson $\\theta_W$"}
-
-
-# theta_dict = {"watterson": "Watterson $\\theta_W$", "tajima": "Tajima $\\theta_{\\pi}$ ",
-#               "fay_wu": "Fay and Wu $\\theta_{H}$", "D_tajima": "Tajima's $D$", "H_fay_wu": "Fay and Wu's $H$"}
-
 
 def open_tsv(filepath):
     ddf = pd.read_csv(filepath, sep="\t")
@@ -17,29 +11,61 @@ def open_tsv(filepath):
     return ddf
 
 
+def plot_stack_param(list_pops, df_all, title, output):
+    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 640 / my_dpi), dpi=my_dpi)
+    x_pos = range(len(list_pops))
+    hatches_list = ['', '', '//']
+    colors_list = ["black", "silver", "white"]
+    edgecolors_list = ["black", "black", "black"]
+    bottom = np.array([0.0] * len(list_pops))
+    for p_i, param in enumerate(polydfe_cat_dico):
+        y = df_all[param].values
+        ax.bar(x_pos, y, bottom=bottom, edgecolor=edgecolors_list[p_i], color=colors_list[p_i], hatch=hatches_list[p_i])
+        bottom += y
+    ax.set_title(title)
+    ax.set_xlabel("Population")
+    ax.set_ylabel("Proportion estimated")
+    ax.set_xticks(x_pos)
+    ax.set_ylim((0, 1))
+    ax.set_xticklabels(list_pops)
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+    plt.tight_layout()
+    plt.savefig(output)
+    plt.close("all")
+
+
 def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
-    df_merge = pd.concat([open_tsv(filepath) for filepath in sorted(args.tsv)])
-    if ("tajima" in df_merge) and ("watterson" in df_merge) and ("fay_wu" in df_merge):
-        df_merge["D_tajima"] = df_merge["tajima"] - df_merge["watterson"]
-        df_merge["H_fay_wu"] = df_merge["tajima"] - df_merge["fay_wu"]
-        d_dict = theta_dict
-    else:
-        d_dict = polydfe_cat_dico
+    df_theta = pd.concat([open_tsv(filepath) for filepath in sorted(args.tsv_theta)])
+    df_dfe = pd.concat([open_tsv(filepath) for filepath in sorted(args.tsv_dfe)])
+    df_merge = pd.merge(df_theta, df_dfe, how="outer", on=["pop", "species", "method", "category"])
+    df_merge["D_tajima"] = df_merge["tajima"] - df_merge["watterson"]
+    df_merge["H_fay_wu"] = df_merge["tajima"] - df_merge["fay_wu"]
+    d_dict = {"watterson": "Watterson $\\theta_W$"}
+    d_dict.update(polydfe_cat_dico)
     df_merge.to_csv(args.output, sep="\t", index=False)
     pop2sp = {pop: sp for (pop, sp), d in df_merge.groupby(["pop", "species"])}
+    pop2theta = {pop: d["tajima"].values[0] for pop, d in df_merge[df_merge["category"] == "syn"].groupby(["pop"])}
 
+    df_merge = df_merge[df_merge["category"] != "syn"]
     for method, df in df_merge.groupby(["method"]):
         cat_snps = CategorySNP(method, bins=args.bins, windows=args.windows)
+        if cat_snps.bins == 0:
+            for cat, dfc in df.groupby(["category"]):
+                dfc = dfc.iloc[dfc.apply(lambda r: pop2theta[r["pop"]], axis=1).argsort()]
+                list_pops = dfc["pop"].values
+                plot_stack_param(list_pops, dfc, cat_snps.label(cat),
+                                 args.output.replace('results.tsv', f'{method}.{cat}.stacked.pdf'))
+
+        df = df[df["category"] != "all"]
+        cats_df = set(df["category"])
+        cats = [cat for cat in cat_snps.non_syn_list if cat in cats_df]
+        assert len(cats) == len(cats_df)
         for d, d_label in d_dict.items():
-            df = df[(df["category"] != "all") & (df["category"] != "syn")]
-            cats_df = set(df["category"])
-            cats = [cat for cat in cat_snps.non_syn_list if cat in cats_df]
-            assert len(cats) == len(cats_df)
             matrix = df.pivot(index="pop", columns="category", values=d)
             matrix = matrix.iloc[matrix.apply(lambda row: sp_sorted(row.name, pop2sp[row.name]), axis=1).argsort()]
             sp_list = [pop2sp[pop] for pop in matrix.index]
-            vlist = [i + 1 for i in range(len(sp_list) - 1) if sp_list[i] != sp_list[i + 1]]
+            vlist = [v + 1 for v in range(len(sp_list) - 1) if sp_list[v] != sp_list[v + 1]]
             matrix = matrix.reindex(cats, axis=1)
             matrix = matrix.rename(columns={cat: cat_snps.label(cat) for cat in cats})
             if abs(np.max(matrix.values)) < 1e-2:
@@ -47,6 +73,8 @@ def main(args):
                 d_label += ' ($\\times 10^4$)'
             _, ax = plt.subplots(figsize=(1920 / my_dpi, 880 / my_dpi), dpi=my_dpi)
             start, end = np.nanmin(matrix), np.nanmax(matrix)
+            if d.startswith("P-"):
+                start, end = 0.0, 1.0
             rd_bu = cm.get_cmap('viridis_r')
             if start != 0.0 and np.sign(start) != np.sign(end):
                 midpoint = - start / (np.nanmax(matrix) - start)
@@ -56,7 +84,7 @@ def main(args):
             if args.bins < 10:
                 cbar_ws.update(dict(shrink=0.3, fraction=0.1))
             ax = sns.heatmap(matrix.T, linewidths=0.05, linecolor="black", ax=ax, cmap=rd_bu,
-                             cbar_kws=cbar_ws, square=(args.bins < 10))
+                             cbar_kws=cbar_ws, square=(args.bins < 10), vmin=start, vmax=end)
             ax.set_xlabel("")
             ax.set_ylabel("")
             ax.vlines(vlist, color="black", linewidths=2.0, *ax.get_ylim())
@@ -70,7 +98,8 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--tsv', required=False, type=str, nargs="+", dest="tsv", help="Input tsv file")
+    parser.add_argument('--tsv_theta', required=False, type=str, nargs="+", dest="tsv_theta", help="Input theta files")
+    parser.add_argument('--tsv_dfe', required=False, type=str, nargs="+", dest="tsv_dfe", help="Input dfe files")
     parser.add_argument('--output', required=False, type=str, dest="output", help="Output tsv file")
     parser.add_argument('--sample_list', required=False, type=str, dest="sample_list", help="Sample list file")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")

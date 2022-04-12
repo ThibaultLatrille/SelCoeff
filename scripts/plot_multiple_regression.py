@@ -3,7 +3,6 @@ import argparse
 import numpy as np
 import pandas as pd
 from collections import defaultdict
-import statsmodels.api as sm
 from matplotlib.cm import get_cmap
 from matplotlib.lines import Line2D
 from libraries import my_dpi, format_pop, plt, sp_sorted
@@ -26,7 +25,7 @@ def main(args):
     cm = get_cmap('tab10')
     colors = {sp: cm((i + 1) / len(sp2pop)) for i, sp in enumerate(sp2pop)}
     for method, df_filter in df_merge.groupby(["method"]):
-        plt.figure(figsize=(1920 / my_dpi, 1080 / my_dpi), dpi=my_dpi)
+        plt.figure(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
         plt.xlim((-0.5, 0.5))
         idf = np.linspace(min(df_filter["S_phy"]), max(df_filter["S_phy"]), 30)
         dico_out = defaultdict(list)
@@ -49,7 +48,7 @@ def main(args):
             plt.scatter(x, y, s=8.0, color=c, edgecolors="dimgrey", alpha=0.5, linewidths=0.05, zorder=zorder + 100)
             dico_out["pop"].append(pop)
             dico_out["species"].append(sp)
-            dico_out["a"].append(ffit.deriv()(0))
+            dico_out["betaS_ratio"].append(ffit.deriv()(0))
 
         df_out = pd.DataFrame(dico_out)
         df_out = df_out.iloc[df_out.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
@@ -62,8 +61,8 @@ def main(args):
         legend_elements = [Line2D([0], [0], color=colors[sp],
                                   label=f'{sp.replace("_", " ")}: f\'(0)={sp_slopes[sp]}') for sp in sp2pop]
         plt.legend(handles=legend_elements)
-        plt.xlabel("$S$ at the phylogenetic scale (Mutation-selection)")
-        plt.ylabel("$S^{pop}$ at the population scale (polyDFE)")
+        plt.xlabel("$\\overline{S}$ at the phylogenetic scale (Mutation-selection)")
+        plt.ylabel("$\\overline{\\beta}$ at the population scale (polyDFE)")
         plt.tight_layout()
         plt.savefig(args.output.replace('results.tsv', f'{method}.SelCoeff.scatter.pdf'), format="pdf")
         plt.clf()
