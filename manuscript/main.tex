@@ -50,6 +50,9 @@
 \newcommand{\SpopMean}{\overline{\Spop}}
 \newcommand{\Sphy}{S}
 \newcommand{\SphyMean}{\overline{\Sphy}}
+\newcommand{\polyDel}{\proba \left[ {\Spop < -1} \right]}
+\newcommand{\polyNeutral}{\proba \left[ -1 < \Spop < 1 \right]}
+\newcommand{\polyAdv}{\proba \left[ 1 < \Spop  \right]}
 
 \renewcommand{\baselinestretch}{1.5}
 \linenumbers
@@ -86,16 +89,19 @@
     \keywords{Selection \and phylogenetic \and population genetics \and codon models}
 
     Adaptive evolution in proteins can be quantified by comparing sequence variation inside a population to the sequence divergence with a sister species\cite{mcdonald_adaptative_1991}.
-    This method has been largely improved\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009, galtier_adaptive_2016, tataru_inference_2017}, and it's application across many taxa has uncovered that a large proportion of substitutions are positively selected\cite{moutinho_variation_2019}.
-    In practice, the estimated proportion of fixed substitutions that are positively selected varies from 30\% to 70\%.
+    Indeed, strongly adaptive mutations are expected to be observed in substitutions but not in polymorphism because they reach fixation quickly.
+    This method has been largely improved to account for possible bias-inducing factors such as the presence of weak positive selection, background selection and demography fluctuations\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009, galtier_adaptive_2016, tataru_inference_2017}.
+    It's application across many taxa has uncovered that a large proportion of substitutions are positively selected\cite{moutinho_variation_2019}.
+    In practice, the estimated proportion of fixed substitutions that are positively selected varies from 30\% to 70\% (reference).
     Inside a protein, structural properties such as solvent exposure are positively correlated with the proportion of positively selected substitutions\cite{moutinho_impact_2019}.
-    The root causes for this widespread rate of positive selection are however scarcely investigated, often assumed to be the end result of change in the environment or in selection pressure driving individuals to adapt.
-    In this view, positive selection is adaptive and the two terms are confounded, such that the underlying fitness landscape is changing with time, theoretically known as seascape~\cite{mustonen_fitness_2009}.
-    However, even under the assumption that the fitness landscape is immutable, the nearly-neutral theory\cite{ohta_nearly_1992} predicts that positive selection can occur to compensate for deleterious substitutions that have accumulated along lineages.
-    Theoretically, at the nearly-neutral equilibrium, the net flow of deleterious and advantageous mutations reaching fixation are equal~\cite{sella_application_2005}.
+    The root causes for this widespread rate of positive selection are however scarcely investigated, often assumed to be the end result of change in the environment or in selection pressure driving individuals to adapt (reference).
+    In this view, positive selection is adaptive, such that the underlying fitness landscape is changing with time in response to external constraints, theoretically known as seascape\cite{mustonen_fitness_2009}.
+    However, even under the assumption that the fitness landscape is stable, the nearly-neutral theory\cite{ohta_nearly_1992} predicts that positive selection can occur to compensate for deleterious substitutions that have accumulated along lineages.
+    Theoretically, at the nearly-neutral equilibrium, the net flow of deleterious and advantageous mutations reaching fixation are equal\cite{sella_application_2005}.
     In other words, mutations are more likely to be deleterious but are less likely to reach fixation, and the total number of fixation are compensated.
-    In this view of positive selection, advantageous mutations are predictable and evolution is non-adaptive since individuals are not climbing toward higher fitness in the fitness landscape~\cite{lassig_predicting_2017}.
-    Altogether, the goad is this study is to evaluate the extent of non-adaptive positive selection, by combining population-genetics and phylogenetics datasets, and ask a broad range of questions.
+    Under this kind of positive selection, advantageous mutations are predictable and evolution is non-adaptive since there is no genetic innovation in response to external constraint, just an advantage to restore a good functioning of proteins\cite{lassig_predicting_2017}.
+
+    Altogether, the goal of this study is to evaluate the extent of non-adaptive positive selection, by combining population-genetics and phylogenetics datasets, and ask a broad range of questions.
     Are proteins optimal?
     Is the fitness landscape stable across the mammalian evolution?
     Can we use phylogenetics to predict the selection coefficient of a mutation?
@@ -129,9 +135,9 @@
     Compared to synonymous mutations (supposedly neutral), mutations predicted to be advantageous are over-represented at higher frequency, while severally deleterious are under-represented at high frequency, a signature that our prediction are qualitatively in the right direction.
     Aside from the frequency of the derived allele, another information is the total number of observed alleles compared to its expectation, given by the total mutation rate.
     The total mutation rate for each class is computed from the ancestral genome reconstruction (fig.~\ref{fig:homo-afr-results}C).
-    For example, for the category of selection with $1<\Sphy$, the expected total mutation rate is obtained by adding together mutation rates for all possible non-synonymous mutations for which the derived allele ($d$) is toward a fitter amino-acid than the ancestral allele ($a$) with $S > 1$.
-    The total mutation rate and the SFS are combined to estimate the distribution of the selection coefficient given by population-based model~\cite{tataru_inference_2017, tataru_polydfe_2020}.
-    These population based models cannot give a specific estimate of $\Spop$ for each SNP, but by gathering information across many SNPs, they can estimate the proportion of advantageous mutations $p_+=\proba \left( 1 < \Spop \right)$, of nearly-neutral mutations $p_0=\proba \left( -1 < \Spop < 1 \right)$ and of deleterious mutations $p_-=\proba \left( \Spop < -1 \right)$ (fig.~\ref{fig:homo-afr-results}D).
+    For example, for the category of selection with $1<\Sphy$, the expected total mutation rate is obtained by adding together mutation rates for all possible non-synonymous mutations for which the derived allele is toward a fitter amino-acid than the ancestral allele with $\Sphy > 1$.
+    The total mutation rate and the SFS are combined to estimate the distribution of the selection coefficient $\Spop$ given by population-based model\cite{tataru_inference_2017, tataru_polydfe_2020}.
+    These population based models cannot give a specific estimate of $\Spop$ for each SNP, but by gathering information across many SNPs, these models can estimate the proportion of advantageous mutations ($\polyAdv$), of nearly-neutral mutations ($\polyNeutral$) and of deleterious mutations ($\polyDel$) (fig.~\ref{fig:homo-afr-results}D).
 
 
     \begin{figure*}[!ht]
@@ -146,7 +152,7 @@
             Panel C. Histogram of predicted selection coefficient (S) for each possible mutation away from the ancestral human genome, weighted by the mutation rate.
             For each class of selection, the sum of histogram in this class thus gives the expected total mutation rate toward this class.
             If they are less mutations observed than expected, this class is thus undergoing purifying selection.
-            Panel D. For each class of selection (and for the set of all non-synonymous mutations), information from the SFS and the expected total mutation rate are combined at the population-genetic scale to estimate the proportion of advantageous mutations $p_+=\proba \left( 1 < \Spop \right)$, of nearly-neutral mutations $p_0=\proba \left( -1 < \Spop < 1 \right)$ and of deleterious mutations $p_-=\proba \left( \Spop < -1 \right)$.
+            Panel D. For each class of selection (and for the set of all non-synonymous mutations), information from the SFS and the expected total mutation rate are combined at the population-genetic scale to estimate the proportion of advantageous mutations $\polyAdv$, of nearly-neutral mutations $\polyNeutral$ and of deleterious mutations $\polyDel$.
         }
         \label{fig:homo-afr-results}
     \end{figure*}
@@ -156,33 +162,35 @@
         \includegraphics[width=\textwidth, page=1] {artworks/figure3}
         \caption{
             Reproducibility of results shown in figure~\ref{fig:homo-afr-results} in 29 populations across 7 genera.
-            From a site-frequency spectrum and total mutation rates are combined at the population-genetic scale to estimate the proportion of advantageous mutations $p_+=\proba \left( 1 < \Spop \right)$ in top panel, of nearly-neutral mutations $p_0=\proba \left( -1 < \Spop < 1 \right)$ in middle panel and of deleterious mutations $p_-=\proba \left( \Spop < -1 \right)$ in bottom panel.
+            From a site-frequency spectrum and total mutation rates are combined at the population-genetic scale to estimate the proportion of advantageous mutations $\polyAdv$ in top panel, of nearly-neutral mutations $\polyNeutral$ in middle panel and of deleterious mutations $\polyDel$ in bottom panel.
         }
         \label{fig:all-pop-results}
     \end{figure*}
-    
+
     Because of this observed overlap between phylogenetic and population-genetic methods, both estimating a scaled selection coefficient, we could study the estimation of the mean $\SpopMean$ as a function of the mean $\SphyMean$.
     However, the mean selection coefficient estimated at the phylogenetic scale is usually drastically negative because of the heavy tail of the negative part of the estimated DFE.
-    Hence we focused on the relationship between $\SpopMean$ and $\SphyMean$ for a subset of SNPs, for which $\Sphy$ is close to $0$.
-    Sliding window of groups of $5.000$ SNPs are taken with a mean $\SphyMean$ between $-0.5$ and $0.5$ (fig.~\ref{fig:selcoeff-pop-phylo}A). 
+    Hence we focused on the relationship between $\SpopMean$ and $\SphyMean$ for a subset of SNPs, for which $\SphyMean$ is close to $0$.
+    Sliding window of groups of $5.000$ SNPs are taken with a mean $\SphyMean$ between $-0.5$ and $0.5$ (fig.~\ref{fig:selcoeff-pop-phylo}A).
     $\SpopMean$ is estimated for each group, with some groups that might have part of same SNPs that overlap.
-    The relationship between $\Spop$ and $\SphyMean$ is best described as a second order polynomial, and the slope of this polynomial at $\SphyMean=0$ gives the ratio $\Spop/\Sphy$ for each population.
-    We observ that $\Spop/\Sphy$, representing the efficiency of selection at the short versus long term is positively correlated with synonymous diversity, a proxy of effective population siz.
+    The relationship between $\SpopMean$ and $\SphyMean$ is best described as a second order polynomial, and the slope of this polynomial at $\SphyMean=0$ gives the ratio $\SpopMean/\SphyMean$ for each population.
+    We observ that $\SpopMean/\SphyMean$, representing the efficiency of selection at the short versus long term is positively correlated with synonymous diversity, a proxy of effective population siz.
     Altogether, population with large effective population size are under more efficient selection.
 
     \begin{figure*}[!ht]
         \centering
         \includegraphics[width=\textwidth, page=1] {artworks/figure4}
         \caption{
-            Panel A. Mean selection coefficient at the population scale $\SpopMean$ as a function of phylogenetic $\SphyMean$.
-            Observed SNPs are sorted and groups of $5.000$ SNPs are taken as a sliding windows with increasing mean $\SphyMean$.
-            For each group, $\SpopMean$ (y-axis) is estimated based on SFS and the total mutation rate (between both extreme of $\SphyMean$ in the group) and compared to the mean $\Sphy$ (y-axis).
+            Panel A. For each population, proportion of advantageous ($\polyAdv$), nearly-neutral ($\polyNeutral$) and of deleterious ($\polyDel$) mutations estimated at the population-genetic scale.
+            Estimation is performed with SNPs predicted to be weakly-advantageous at the phylogenetic scale $0<\Sphy<1<$.
+            Panel B. Mean selection coefficient at the population scale $\SpopMean$ as a function of phylogenetic $\SphyMean$.
+            Observed SNPs are sorted and groups of $5.000$ SNPs are taken as a sliding windows with increasing mean $-0.5 \leq \SphyMean \leq 0.5$.
+            For each group along the sliding window, $\SpopMean$ (y-axis) is estimated based on SFS and the total mutation rate, and compared to the mean $\SphyMean$ (x-axis).
             A second order polynomial is fitted for each population, and the slope of this polynomial at $\SphyMean=0$ gives the ratio $\SpopMean/\SphyMean$ given in legend.
-            Panel B. Ratio $\SpopMean/\SphyMean$ as a function of the synonymous diversity for each population.
-            Populations with higher diversity are showing higher ratio of ratio $\SpopMean/\Sphy$.
+            Panel C. Ratio $\SpopMean/\SphyMean$ as a function of the synonymous diversity for each population.
+            Populations with higher diversity are showing higher ratio of ratio $\SpopMean/\SphyMean$.
         }
         \label{fig:selcoeff-pop-phylo}
-    \end{figure*}d
+    \end{figure*}
 
     % Our study is a bridge between phylogenetic and population genetics
     From a theoretical evolution perspective, we found that we could use phylogenetics to predict the selection coefficient of a mutation.
@@ -287,31 +295,31 @@
     The probability to sample allele at a given frequency (before fixation or extinction) is informative of its scaled selection coefficient at the population-scale ($\Spop$).
     Pooled across many sites, the SFS is thus informative on the underlying $\Spop$ of mutations, given we have a neutral expectation.
     In this configuration, a single $\Spop$ for all sampled mutations is biologically not realistic.
-    Accordingly, a distribution of fitness effects of mutations (DFE) is assumed, usually modelled as a continuous distribution~\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009}.
+    Accordingly, a distribution of fitness effects of mutations (DFE) is assumed, usually modelled as a continuous distribution\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009}.
     In this study, we used the software polyDFE\cite{tataru_inference_2017, tataru_polydfe_2020}, for which the DFE ($\phi$) is given by a mixture of a $\Gamma$ and Exponential distributions, parameterized by $\Spop_d$ , $b$, $p_b$
     and $\Spop_b$ as:
     \begin{equation*}
         \phi \left( \Spop; \Spop_d , b, p_b, \Spop_b \right) =
         \begin{dcases}
             \left( 1 - p_b \right) f_{\Gamma}(-\Spop; -\Spop_d, b) & \text{ if $\Spop \leq 0$,} \\
-            p_b f_{e}(\Spop; \Spop_b) & \text{ if $\Spop \leq 0$,} \\
+            p_b f_{e}(\Spop; \Spop_b) & \text{ if $\Spop > 0$,} \\
         \end{dcases}
     \end{equation*}
-    where $\Spop_d$ is the mean of the DFE for $\Spop \leq 0$
-    $b$ is the shape of the $\Gamma$ distribution,
-    $p_b$ is the probability that $\Spop > 0$,
-    $\Spop_b$ is the mean of the DFE for $\Spop > 0$,
+    where $\Spop_d < 0 $ is the mean of the DFE for $\Spop \leq 0$,
+    $b > 0$ is the shape of the $\Gamma$ distribution,
+    $0 \leq p_b \leq 1$ is the probability that $\Spop > 0$,
+    $\Spop_b > 0$ is the mean of the DFE for $\Spop > 0$,
     and $f_{\Gamma}(x; m, b)$ is the density of the $\Gamma$ distribution with mean m and shape b, while $f_{e}(x; m)$ is the density of the Exponential distribution with mean $m$.
-    Once the DFE is fitted to the data, the proportion of advantageous ($p_+$), nearly-neutral ($p_0$) and deleterious mutations ($p_-$) are given as:
+    Once the DFE is fitted to the data, the proportion of advantageous ($\polyAdv$), nearly-neutral ($\polyNeutral$) and deleterious mutations ($\polyDel$) are given as:
     \begin{align*}
-        p_+ &= \proba_{\phi} \left( 1 < \Spop \right) = p_b \int_{1}^{+\infty} f_{e}(\Spop; \Spop_b)  \\
-        p_0 &= \proba_{\phi} \left( -1 < \Spop < 1 \right) = p_b \int_{0}^{1} f_{e}(\Spop; \Spop_b) + \left( 1 - p_b \right) \int_{0}^{1} f_{\Gamma}(\Spop; \Spop_d, b) \\
-        p_- &= \proba_{\phi} \left( \Spop < -1 \right) = \left( 1 - p_b \right) \int_{1}^{+\infty} f_{\Gamma}(\Spop; \Spop_d, b)
+        \polyAdv &= p_b \int_{1}^{+\infty} f_{e}(\Spop; \Spop_b) \der \Spop  \\
+        \polyNeutral &= p_b \int_{0}^{1} f_{e}(\Spop; \Spop_b) \der \Spop + \left( 1 - p_b \right) \int_{0}^{1} f_{\Gamma}(\Spop; -\Spop_d, b) \der \Spop \\
+        \polyDel &= \left( 1 - p_b \right) \int_{1}^{+\infty} f_{\Gamma}(\Spop; -\Spop_d, b) \der \Spop
     \end{align*}
     And finally, the mean of the DFE $\overline{\Spop}$ is given by:
     \begin{align*}
-        \SpopMean & = \int_{-\infty}^{+\infty} \Spop \phi \left( \Spop; \Spop_d , b, p_b, \Spop_b \right) \\
-                         & =  p_b \Spop_b - \left( 1 - p_b \right) \Spop_d
+        \SpopMean & = \int_{-\infty}^{+\infty} \Spop \phi \left( \Spop; \Spop_d , b, p_b, \Spop_b \right) \der \Spop \\
+        & =  p_b \Spop_b + \left( 1 - p_b \right) \Spop_d
     \end{align*}
     PolyDFE requires one SFS for non-synonymous mutations and one for synonymous mutations (neutral expectation), as well as the total mutation rate (mutation rate per site multiplied by number of sites) on which each SFS has been sampled.
     The total mutation rate for each SFS is thus obtained using the following three-steps procedure.

@@ -1,0 +1,56 @@
+%TC:ignore
+\documentclass{article}
+
+\usepackage{xcolor, colortbl}
+\definecolor{BLUELINK}{HTML}{0645AD}
+\definecolor{DARKBLUELINK}{HTML}{0B0080}
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[colorlinks=false]{hyperref}
+% for linking between references, figures, TOC, etc in the pdf document
+\hypersetup{colorlinks,
+    linkcolor=DARKBLUELINK,
+    anchorcolor=DARKBLUELINK,
+    citecolor=DARKBLUELINK,
+    filecolor=DARKBLUELINK,
+    menucolor=DARKBLUELINK,
+    urlcolor=BLUELINK
+} % Color citation links in purple
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{naturalnames}{hyperref}
+
+\usepackage[margin=60pt]{geometry}
+\usepackage{amssymb,amsfonts,amsmath,amsthm,mathtools}
+\usepackage{lmodern}
+\usepackage{bm,bbold}
+\usepackage{verbatim}
+\usepackage{float}
+\usepackage{listings, enumerate, enumitem}
+\usepackage[export]{adjustbox}
+\usepackage{tabu}
+\usepackage{longtable}
+\tabulinesep=0.6mm
+\newcommand\cellwidth{\TX@col@width}
+\usepackage{hhline}
+\setlength{\arrayrulewidth}{1.2pt}
+\usepackage{multicol,multirow,array}
+\usepackage{etoolbox}
+\AtBeginEnvironment{tabu}{\footnotesize}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\pdfinclusioncopyfonts=1
+
+\title{Selection coefficients at the phylogenetic and population-genetic scale}
+
+\author{
+    \large
+    T. {Latrille}$^{1}$, J. {Joseph}$^{2}$, N. {Salamin}$^{1}$\\
+    $^{1}$Université de Lausanne, Lausanne, Switzerland
+    $^{1}$Université de Lyon, Lyon, France
+}
+
+\begin{document}
+    \maketitle
+    \tableofcontents
+
+    \include{include-figures}
+\end{document}

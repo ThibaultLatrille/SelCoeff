@@ -2,7 +2,7 @@ import argparse
 from glob import glob
 from collections import defaultdict
 import os
-from libraries import format_pop
+from libraries import format_pop, sample_list_dico
 
 dict_method = {"MutSel": "Site-specific Mutation-Selection codon models.",
                "Omega": "Site-specific codon models.",
@@ -18,37 +18,35 @@ def minipage(size, file):
 
 def main(args):
     os.makedirs(os.path.dirname(args.results), exist_ok=True)
+    sample_dico = sample_list_dico(args.sample_list)
     heatmap_dict = defaultdict(list)
     for result in sorted(glob(f"{os.path.dirname(args.results)}/*.pdf")):
         _, method_lr, theta, plot, ext = os.path.basename(result).replace("_", " ").split(".")
         method = method_lr.split("-")[0]
         heatmap_dict[method].append(result)
 
+    nested_dict = defaultdict(lambda: defaultdict(dict))
+    for sfs in sorted(args.sfs):
+        sp, pop, method_lr, ext = os.path.basename(sfs).replace("_", " ").split(".")
+        method = method_lr.split("-")[0]
+        nested_dict[method][sp][pop] = sfs
+
     o = open(args.tex_include, 'w')
-    o.write("\\section{Summary statistics across all populations} \n \n")
-    for method, list_heatmap in heatmap_dict.items():
-        o.write("\\subsection{" + dict_method[method].capitalize() + '} \n')
+    for method, nested_dict_1 in nested_dict.items():
+        o.write("\\section{" + dict_method[method].capitalize() + '} \n')
+
+        list_heatmap = heatmap_dict[method]
+        o.write("\\subsection{All populations} \n")
         o.write("\\begin{center}\n")
         for plot in list_heatmap:
             o.write("\\includegraphics[width=0.95\\linewidth, page=1]{" + plot + "} \\\\\n")
         o.write("\\end{center}\n")
 
-    nested_dict = defaultdict(lambda: defaultdict(dict))
-    for sfs in sorted(args.sfs):
-        sp, pop, method_lr, ext = os.path.basename(sfs).replace("_", " ").split(".")
-        method = method_lr.split("-")[0]
-        nested_dict[sp][pop][method] = sfs
-
-    for sp, nested_dict_1 in nested_dict.items():
-        o.write("\\section{" + sp + "} \n \n")
-        for pop, nested_dict_2 in nested_dict_1.items():
-            if " " in pop:
-                o.write("\\subsection{" + f"{pop} ({format_pop(pop)})" + "} \n \n")
-            else:
-                o.write("\\subsection{" + format_pop(pop) + "} \n \n")
-
-            for method, sfs in nested_dict_2.items():
-                o.write("\\subsubsection*{" + dict_method[method] + '} \n')
+        for sp, nested_dict_2 in nested_dict_1.items():
+            o.write("\\subsection{" + (sp.split(" ")[0] if sp in ["Capra hircus", "Ovis aries"] else sp) + "} \n \n")
+            for pop, sfs in nested_dict_2.items():
+                if len(nested_dict_2) > 1:
+                    o.write("\\subsubsection{" + sample_dico[format_pop(pop)] + "} \n \n")
                 hist_suffix = f"{sp}.{pop}.{method}.histogram.pdf".replace(' ', '_')
                 hist_path = f"{args.hist_prefix}{hist_suffix}"
                 o.write(minipage(0.49, hist_path))
@@ -77,4 +75,5 @@ if __name__ == '__main__':
     parser.add_argument('--tex_target', required=False, type=str, dest="tex_target", help="Main document target file")
     parser.add_argument('--results', required=False, type=str, dest="results", help="Results tsv file")
     parser.add_argument('--tex_include', required=False, type=str, dest="tex_include", help="Include tex file")
+    parser.add_argument('--sample_list', required=False, type=str, dest="sample_list", help="Sample list file")
     main(parser.parse_args())

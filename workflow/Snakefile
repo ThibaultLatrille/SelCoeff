@@ -229,9 +229,10 @@ rule latex:
     input:
         script=f'{FOLDER}/scripts/tex_sfs.py',
         sfs=map(lambda p: f"{p}-sfs.pdf",SFS_LIST),
-        tex_source=f'{FOLDER}/manuscript/supp-mat.tex',
+        tex_source=f'{FOLDER}/scripts/supp-mat.tex',
         tsv_dfe=rules.plot_dfe_heatmap.output.tsv,
         tsv_reg=rules.plot_regression.output.tsv,
+        sample_list=sample_list
     output:
         tex_include=f'{EXP_FOLDER}/include-figures.tex',
         tex_target=f'{EXP_FOLDER}/supp-mat.tex',
@@ -239,4 +240,4 @@ rule latex:
     params:
         hist_prefix=f'--hist_prefix {FOLDER}/data_processed/vcf_annotate_{binning}/snps.',
         dfe_prefix=f'--dfe_prefix {FOLDER}/data_processed/opportunities_{binning}/DFE.'
-    shell: 'python3 {input.script} {params.hist_prefix} {params.dfe_prefix} --sfs {input.sfs} --results {input.tsv_dfe} --tex_source {input.tex_source} --tex_target {output.tex_target} --tex_include {output.tex_include}'
+    shell: 'python3 {input.script} {params.hist_prefix} {params.dfe_prefix} --sample_list {input.sample_list} --sfs {input.sfs} --results {input.tsv_dfe} --tex_source {input.tex_source} --tex_target {output.tex_target} --tex_include {output.tex_include}'

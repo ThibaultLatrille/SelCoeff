@@ -22,8 +22,9 @@ def open_tsv(filepath):
         df_dfe = ddf[(ddf["method"] == "MutSel") & (ddf["category"] != "syn")]
         m_list = []
         for cat_poly in list(polydfe_cat_dico) + [f"P-{cat}" for cat in cat_snps.non_syn_list]:
-            matrix = df_dfe.pivot(index="pop", columns="category", values=cat_poly).add_suffix(f'_{cat_poly}')
-            m_list.append(matrix)
+            if cat_poly in df_dfe:
+                matrix = df_dfe.pivot(index="pop", columns="category", values=cat_poly).add_suffix(f'_{cat_poly}')
+                m_list.append(matrix)
         df_pivot = pd.concat(m_list, axis=1)
         ddf = pd.merge(df_pivot, df_theta, on=["pop"])
     elif "bounds" in os.path.basename(filepath):
@@ -49,16 +50,26 @@ def generate_xy_plot():
     y_dico.update({f'all_{cat_poly}': v for cat_poly, v in polydfe_cat_dico.items()})
 
     for cat in cat_snps.non_syn_list + ['weak', 'all']:
-        label = cat_snps.label(cat).replace("$", "") if cat != "weak" else "-1 < S < 1"
-        y_dico.update({f'{cat}_{cat_poly}': v.replace(']', f'| {label}]') for cat_poly, v in polydfe_cat_dico.items()})
-        y_dico.update(
-            {f'{cat}_P-{cat_poly}': cat_snps.label(cat_poly).replace('S', '\\beta').replace(']', f'| {label}]') for
-             cat_poly in cat_snps.all() if cat_poly != "syn"})
+        s = ""
+        if cat == "weak":
+            s = " -1 < S < 1"
+        elif cat != "all":
+            s = cat_snps.label(cat).replace("$", "")
 
-    y_dico.update({f'pos-weak_P-pos-weak': "$\\mathbb{P} [ 0<\\beta<1 | 0<S<1]$"})
-    y_dico.update({'pos_snps': "$\\mathbb{P}_{obs} [ 1 < S ]$"})
-    y_dico.update({'pos': "$\\mathbb{P}_{exp} [ 1 < S ]$"})
-    dico_label |= y_dico
+        dico_label[cat] = "$\\mathbb{P}" + f"[{s}]$"
+        dico_label[f"{cat}_snps"] = "$\\mathbb{P}_{obs}" + f"[{s}]$"
+        for cat_poly, beta_tex in polydfe_cat_dico.items():
+            beta = beta_tex[beta_tex.find("[")+1:beta_tex.rfind("]")]
+            s_given_beta_key = f'{cat_poly}_P-{cat}'
+            dico_label[s_given_beta_key] = "$\\mathbb{P}" + f"[ {s} | {beta}]$"
+
+        if cat != "all":
+            s = f" | {s}"
+        y_dico.update({f'{cat}_{cat_poly}': v.replace(']', f'{s}]') for cat_poly, v in polydfe_cat_dico.items()})
+        for cat_beta in cat_snps.non_syn_list + ['all']:
+            beta = cat_snps.label(cat_beta).replace('S', '\\beta').replace("$", "")
+            beta_given_s_key = f'{cat}_P-{cat_beta}'
+            y_dico[beta_given_s_key] = "$\\mathbb{P}" + f"[{beta} {s}]$"
 
     for y, y_label in y_dico.items():
         xy_dico["x"].append("watterson")
@@ -76,16 +87,7 @@ def generate_xy_plot():
     df_xy["group"] = df_xy["x"] + "." + df_xy["y"]
     df_xy["y_group"] = df_xy["y"]
 
-    gr_Seq0 = (df_xy['x'] == "watterson") & (
-            (df_xy['y'] == "all_P-Seq0") | (df_xy['y'] == "weak_P-Seq0") | (df_xy['y'] == "pos-weak_P-Seq0") | (
-            df_xy['y'] == "neg-weak_P-Seq0"))
-    df_xy.loc[gr_Seq0, "group"] = "watterson.Seq0"
-    df_xy.loc[gr_Seq0, "y_group"] = "all_P-Seq0"
-
-    gr_Sneq0 = (df_xy['x'] == "watterson") & ((df_xy['y'] == "all_P-Sinf0") | (df_xy['y'] == "all_P-Ssup0"))
-    df_xy.loc[gr_Sneq0, "group"] = "watterson.Sneq0"
-    df_xy.loc[gr_Sneq0, "y_group"] = "proba"
-
+    dico_label |= y_dico
     return df_xy, dico_label
 
 
@@ -101,10 +103,25 @@ def main(args):
         df["species"] = df["species_x"]
     df = df.iloc[df.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
     df["flowRatio"] = df["flowPos"] / df["flowNeg"]
+
+    '''
     for cat_poly in polydfe_cat_dico:
         if f'weak_{cat_poly}' not in df:
             num = (df[f'neg-weak_{cat_poly}'] * df[f'neg-weak'] + df[f'pos-weak_{cat_poly}'] * df[f'pos-weak'])
             df[f'weak_{cat_poly}'] = num / (df[f'neg-weak'] + df[f'pos-weak'])
+    '''
+
+    assert (np.abs(np.sum([df[cat] for cat in cat_snps.non_syn_list], axis=0) - 1.0) < 1e-6).all()
+    assert (np.abs(np.sum([df[f"{cat}_snps"] for cat in cat_snps.non_syn_list], axis=0) - 1.0) < 1e-6).all()
+    for cat in cat_snps.non_syn_list + ["all"]:
+        assert (np.abs(np.sum([df[f'{cat}_{cat_poly}'] for cat_poly in polydfe_cat_dico], axis=0) - 1.0) < 1e-12).all()
+
+    for cat_poly in polydfe_cat_dico:
+        given_cat = cat_poly.replace("P-", '')
+        for cat in cat_snps.non_syn_list:
+            assert f'{given_cat}_P-{cat}' not in df
+            df[f'{given_cat}_P-{cat}'] = df[cat] * df[f'{cat}_P-{given_cat}'] / df[f'all_P-{given_cat}']
+        print(np.sum([df[f'{given_cat}_P-{cat}'] for cat in cat_snps.non_syn_list], axis=0))
 
     species = {k: None for k in df["species"]}
     cm = get_cmap('tab10')
@@ -134,7 +151,7 @@ def main(args):
             label = f'${a:.2f}$ ($r^2={results.rsquared:.2g}$)'
             label = f'Slope of {label}' if len(df_group) == 1 else f'{dico_label[col_y]}: slope of {label}'
             marker = markers[row_id % len(markers)]
-            legend_elements += [Line2D([0], [0], color='black', label=label, marker=marker, linestyle='None')]
+            legend_elements += [Line2D([0], [0], color='black', label=label)]
             plt.plot(idf, pred, '-', color='black', linewidth=2)
             plt.scatter(x, y, s=80.0, edgecolors="black", linewidths=0.5, marker=marker, color=color_list,
                         zorder=5, label=label)
@@ -147,11 +164,11 @@ def main(args):
 
         plt.xlabel(dico_label[col_x])
         plt.ylabel(dico_label[y_group])
-        # legend_elements += [Line2D([0], [0], marker='o', color='w', markerfacecolor=color_dict[sp],
-        #                            label=f'{sp.replace("_", " ")}') for sp in species]
-        plt.legend(handles=legend_elements)
-        plt.tight_layout()
         if len(legend_elements) != 0:
+            legend_elements += [Line2D([0], [0], marker='o', color='w', markerfacecolor=color_dict[sp],
+                                       label=f'{sp.replace("_", " ")}') for sp in species]
+            plt.legend(handles=legend_elements)
+            plt.tight_layout()
             plt.savefig(args.output.replace('.tsv', f'.{group}.scatter.pdf'), format="pdf")
         plt.clf()
         plt.close("all")
@@ -167,7 +184,7 @@ def main(args):
     o = open(args.output.replace(".tsv", ".tex"), 'w')
     o.write("\\section{Table} \n")
     o.write("\\begin{center}\n")
-    output_columns = ["pop", "species", "tajima", "pos_snps", "pos", 'all_P-Ssup0', 'pos_P-Ssup0']
+    output_columns = ["pop", "species", "tajima", "pos_snps", 'all_P-Ssup0', 'pos_P-Ssup0']
     columns = [c for c in output_columns if c in df]
     sub_header = [dico_label[i] if i in dico_label else i for i in columns]
     o.write(df.to_latex(index=False, escape=False, longtable=True, float_format=tex_f,

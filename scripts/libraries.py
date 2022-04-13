@@ -299,16 +299,32 @@ def extend_pop(p, sample):
         return f"{sample[p]} ({fp})"
 
 
-def sort_df(df, sample_list_path):
-    df = df.iloc[df.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
+def set_species(df):
     df["species"] = df.apply(lambda r: r["species"].replace("_", " "), axis=1)
     df["species"] = df.apply(lambda r: "Ovis orientalis" if r["pop"] == "IROO" else r["species"], axis=1)
     df["species"] = df.apply(lambda r: "Ovis vignei" if r["pop"] == "IROV" else r["species"], axis=1)
     df["species"] = df.apply(lambda r: "Capra aegagrus" if r["pop"] == "IRCA" else r["species"], axis=1)
+    return df
 
-    sample_iterrows = list(pd.read_csv(sample_list_path, sep='\t').iterrows())
+
+def sample_list_dico(sample_list_path):
+    df = pd.read_csv(sample_list_path, sep='\t')
+    df["pop"] = df.apply(lambda r: format_pop(r["SampleName"].replace("_", " ")), axis=1)
+    df["species"] = df.apply(lambda r: r["Species"].replace("_", " "), axis=1)
+    df = set_species(df)
+    dico_sample = {r["pop"]: r["Location"] for _, r in df.iterrows()}
+    df["ext_pop"] = df.apply(lambda r: extend_pop(r["pop"], dico_sample), axis=1)
+    dico_sample = {
+        r["pop"]: r["ext_pop"] + (f' - {r["species"]}' if r["species"].split(" ")[0] in ["Capra", "Ovis"] else "") for
+        _, r in df.iterrows()}
+    return dico_sample
+
+
+def sort_df(df, sample_list_path):
+    df = df.iloc[df.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
+    df = set_species(df)
+    sample_iterrows = pd.read_csv(sample_list_path, sep='\t').iterrows()
     dico_sample = {format_pop(r["SampleName"].replace("_", " ")): r["Location"] for _, r in sample_iterrows}
-
     df["pop"] = df.apply(lambda r: extend_pop(r["pop"], dico_sample), axis=1)
     return df
 
