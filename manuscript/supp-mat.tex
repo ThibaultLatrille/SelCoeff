@@ -39,6 +39,16 @@
 \usepackage{graphicx}
 \pdfinclusioncopyfonts=1
 
+\newcommand{\proba}{\mathbb{P}}
+\newcommand{\pfix}{\proba_{\mathrm{fix}}}
+\newcommand{\Spop}{\beta}
+\newcommand{\SpopMean}{\overline{\Spop}}
+\newcommand{\Sphy}{S}
+\newcommand{\SphyMean}{\overline{\Sphy}}
+\newcommand{\polyDel}{\proba \left[ {\Spop < -1} \right]}
+\newcommand{\polyNeutral}{\proba \left[ -1 < \Spop < 1 \right]}
+\newcommand{\polyAdv}{\proba \left[ 1 < \Spop  \right]}
+
 \title{Selection coefficients at the phylogenetic and population-genetic scale}
 
 \author{
@@ -104,40 +114,42 @@
 
     \subsection{Correlation with diversity}
 
-    \subsubsection{Proportion of positive selection}
+    \subsubsection{Proportion of nearly-neutral mutations ($\polyNeutral$)}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5cat-polyDFE-mC-non-adaptive/regression/results.watterson.all_P-Ssup0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.all_P-Seq0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5cat-polyDFE-mC-non-adaptive/regression/results.watterson.pos_P-Ssup0.scatter.pdf}
-    \end{minipage}
-
-    \subsubsection{Proportion of negative selection}
-    \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5cat-polyDFE-mC-non-adaptive/regression/results.watterson.all_P-Sinf0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.neg-weak_P-Seq0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5cat-polyDFE-mC-non-adaptive/regression/results.watterson.neg_P-Sinf0.scatter.pdf}
-    \end{minipage}
-    \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5cat-polyDFE-mC-non-adaptive/regression/results.watterson.neg-strong_P-Sinf0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.pos-weak_P-Seq0.scatter.pdf}
     \end{minipage}
 
-    \subsubsection{Proportion of weak selection}
+    \subsubsection{Proportion of deleterious mutations ($\polyDel$)}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5cat-polyDFE-mC-non-adaptive/regression/results.watterson.all_P-Seq0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.all_P-Sinf0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5cat-polyDFE-mC-non-adaptive/regression/results.watterson.neg-weak_P-Seq0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.neg_P-Sinf0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5cat-polyDFE-mC-non-adaptive/regression/results.watterson.pos-weak_P-Seq0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.neg-strong_P-Sinf0.scatter.pdf}
+    \end{minipage}
+
+    \subsubsection{Proportion of advantageous mutations ($\polyAdv$)}
+    \begin{minipage}{0.32\linewidth}
+        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.all_P-Ssup0.scatter.pdf}
+    \end{minipage}
+    \begin{minipage}{0.32\linewidth}
+        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.pos_P-Ssup0.scatter.pdf}
     \end{minipage}
 
     \input{include-MutSel-non-adaptive}
 
+
     \section{SIFT scores}
     \input{include-SIFT-non-adaptive}
+
 
     \section{Site-specific codon models.}
     \input{include-Omega-adaptive}

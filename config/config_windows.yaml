@@ -1,9 +1,9 @@
-experiment: "50windows-polyDFE-mC-non-adaptive"
+experiment: "sliding-polyDFE-mC-non-adaptive"
 SAMPLE_LIST: "sample_all.tsv"
 subsample: 16
 nbr_replicates: 12
 subsample_genes: -1
-bins: 50 # bins: 0 to classify based on predetermined bins
+bins: 100 # bins: 0 to classify based on predetermined bins
 windows: 5000 # True for sliding windows, 0 for bins
 mask_adaptation: true
 METHOD_LIST: [ "MutSel" ]

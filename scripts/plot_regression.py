@@ -9,11 +9,10 @@ from matplotlib.cm import get_cmap
 from matplotlib.lines import Line2D
 from libraries import my_dpi, plt, polydfe_cat_dico, tex_f, sort_df, sp_sorted, format_pop, CategorySNP
 
-cat_snps = CategorySNP("MutSel")
 markers = ["o", "d", "s", '.']
 
 
-def open_tsv(filepath):
+def open_tsv(filepath, cat_snps):
     ddf = pd.read_csv(filepath, sep="\t")
     if os.path.basename(filepath) == "Theta.results.tsv":
         df_theta = ddf[(ddf["method"] == "MutSel") & (ddf["category"] == "syn")]
@@ -37,7 +36,7 @@ def discard_col(col, df):
     return (col not in df) or (df.dtypes[col] == np.object) or (not np.all(np.isfinite(df[col])))
 
 
-def generate_xy_plot():
+def generate_xy_plot(cat_snps):
     xy_dico = defaultdict(list)
     dico_label = {'pop': "Population", "species": "Species", "watterson": "Watterson $\\theta_W$",
                   "proba": "$\\mathbb{P}$"}
@@ -59,7 +58,7 @@ def generate_xy_plot():
         dico_label[cat] = "$\\mathbb{P}" + f"[{s}]$"
         dico_label[f"{cat}_snps"] = "$\\mathbb{P}_{obs}" + f"[{s}]$"
         for cat_poly, beta_tex in polydfe_cat_dico.items():
-            beta = beta_tex[beta_tex.find("[")+1:beta_tex.rfind("]")]
+            beta = beta_tex[beta_tex.find("[") + 1:beta_tex.rfind("]")]
             s_given_beta_key = f'{cat_poly}_P-{cat}'
             dico_label[s_given_beta_key] = "$\\mathbb{P}" + f"[ {s} | {beta}]$"
 
@@ -95,9 +94,14 @@ def column_format(size):
     return "|" + "|".join(["l"] * 2 + ["r"] * (size - 2)) + "|"
 
 
+def logit(x):
+    return np.log(x / (1 - x))
+
+
 def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
-    df_list = [open_tsv(filepath) for filepath in sorted(args.tsv)]
+    cat_snps = CategorySNP("MutSel", bins=args.bins, windows=args.windows)
+    df_list = [open_tsv(filepath, cat_snps) for filepath in sorted(args.tsv)]
     df = reduce(lambda left, right: pd.merge(left, right, how="inner", on=["pop"]), df_list)
     if "species" not in df:
         df["species"] = df["species_x"]
@@ -111,17 +115,19 @@ def main(args):
             df[f'weak_{cat_poly}'] = num / (df[f'neg-weak'] + df[f'pos-weak'])
     '''
 
-    assert (np.abs(np.sum([df[cat] for cat in cat_snps.non_syn_list], axis=0) - 1.0) < 1e-6).all()
-    assert (np.abs(np.sum([df[f"{cat}_snps"] for cat in cat_snps.non_syn_list], axis=0) - 1.0) < 1e-6).all()
-    for cat in cat_snps.non_syn_list + ["all"]:
-        assert (np.abs(np.sum([df[f'{cat}_{cat_poly}'] for cat_poly in polydfe_cat_dico], axis=0) - 1.0) < 1e-12).all()
+    if args.bins == 0:
+        assert (np.abs(np.sum([df[cat] for cat in cat_snps.non_syn_list], axis=0) - 1.0) < 1e-6).all()
+        assert (np.abs(np.sum([df[f"{cat}_snps"] for cat in cat_snps.non_syn_list], axis=0) - 1.0) < 1e-6).all()
+        for cat in cat_snps.non_syn_list + ["all"]:
+            assert (np.abs(
+                np.sum([df[f'{cat}_{cat_poly}'] for cat_poly in polydfe_cat_dico], axis=0) - 1.0) < 1e-12).all()
 
-    for cat_poly in polydfe_cat_dico:
-        given_cat = cat_poly.replace("P-", '')
-        for cat in cat_snps.non_syn_list:
-            assert f'{given_cat}_P-{cat}' not in df
-            df[f'{given_cat}_P-{cat}'] = df[cat] * df[f'{cat}_P-{given_cat}'] / df[f'all_P-{given_cat}']
-        print(np.sum([df[f'{given_cat}_P-{cat}'] for cat in cat_snps.non_syn_list], axis=0))
+        for cat_poly in polydfe_cat_dico:
+            given_cat = cat_poly.replace("P-", '')
+            for cat in cat_snps.non_syn_list:
+                assert f'{given_cat}_P-{cat}' not in df
+                df[f'{given_cat}_P-{cat}'] = df[cat] * df[f'{cat}_P-{given_cat}'] / df[f'all_P-{given_cat}']
+            print(np.sum([df[f'{given_cat}_P-{cat}'] for cat in cat_snps.non_syn_list], axis=0))
 
     species = {k: None for k in df["species"]}
     cm = get_cmap('tab10')
@@ -129,7 +135,7 @@ def main(args):
     color_list = [color_dict[sp] for sp in df["species"]]
 
     out_dict = defaultdict(list)
-    df_xy, dico_label = generate_xy_plot()
+    df_xy, dico_label = generate_xy_plot(cat_snps)
     for (group, col_x, y_group), df_group in df_xy.groupby(["group", "x", "y_group"]):
         if discard_col(col_x, df):
             continue
@@ -145,6 +151,11 @@ def main(args):
             if discard_col(col_y, df):
                 continue
             x, y = df[col_x], df[col_y]
+            if 'P-' in col_y:
+                y = logit(y)
+            elif 'P-' in col_x:
+                x = logit(x)
+
             results = sm.OLS(y, sm.add_constant(x)).fit()
             b, a = results.params[0:2]
             pred = a * idf + b
@@ -162,8 +173,14 @@ def main(args):
             out_dict['b'].append(b)
             out_dict['rsquared'].append(results.rsquared)
 
-        plt.xlabel(dico_label[col_x])
-        plt.ylabel(dico_label[y_group])
+        x_label = dico_label[col_x]
+        if 'P-' in col_x:
+            x_label = f'logit({x_label})'
+        plt.xlabel(x_label)
+        y_label = dico_label[y_group]
+        if 'P-' in y_group:
+            y_label = f'logit({y_label})'
+        plt.ylabel(y_label)
         if len(legend_elements) != 0:
             legend_elements += [Line2D([0], [0], marker='o', color='w', markerfacecolor=color_dict[sp],
                                        label=f'{sp.replace("_", " ")}') for sp in species]
@@ -206,4 +223,6 @@ if __name__ == '__main__':
                         help="Main document source file")
     parser.add_argument('--output', required=False, type=str, dest="output", help="Output tsv file")
     parser.add_argument('--sample_list', required=False, type=str, dest="sample_list", help="Sample list file")
+    parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
+    parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
     main(parser.parse_args())

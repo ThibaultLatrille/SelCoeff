@@ -55,14 +55,12 @@ def main(args):
         df_out["method"] = method
         merge_out.append(df_out)
 
-        sp_slopes = {
-            sp: (f"[{min(df['a']):.2f}, {max(df['a']):.2f}]" if len(df) > 1 else f"{df['a'].values[0]:.2f}") for
-            sp, df in df_out.groupby(["species"])}
+        sp_slopes = {sp: (f"[{min(df['betaS_ratio']):.2f}, {max(df['betaS_ratio']):.2f}]" if len(df) > 1 else f"{df['betaS_ratio'].values[0]:.2f}") for sp, df in df_out.groupby(["species"])}
         legend_elements = [Line2D([0], [0], color=colors[sp],
                                   label=f'{sp.replace("_", " ")}: f\'(0)={sp_slopes[sp]}') for sp in sp2pop]
         plt.legend(handles=legend_elements)
-        plt.xlabel("$\\overline{S}$ at the phylogenetic scale (Mutation-selection)")
-        plt.ylabel("$\\overline{\\beta}$ at the population scale (polyDFE)")
+        plt.xlabel("Mean $\\overline{S}$ (phylogenetic)")
+        plt.ylabel("Mean $\\overline{\\beta}$ (population-genetics)")
         plt.tight_layout()
         plt.savefig(args.output.replace('results.tsv', f'{method}.SelCoeff.scatter.pdf'), format="pdf")
         plt.clf()

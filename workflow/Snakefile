@@ -222,7 +222,7 @@ rule plot_regression:
     output:
         tsv=f'{EXP_FOLDER}/regression/results.tsv'
     shell:
-        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --output {output.tsv}'
+        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --bins {bins} --windows {windows} --output {output.tsv}'
 
 
 rule latex:
