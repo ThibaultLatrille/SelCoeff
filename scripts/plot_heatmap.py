@@ -11,8 +11,8 @@ def open_tsv(filepath):
     return ddf
 
 
-def plot_stack_param(list_pops, df_all, title, output):
-    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 640 / my_dpi), dpi=my_dpi)
+def plot_stack_param(list_pops, df_all, pop_colors, title, output):
+    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 780 / my_dpi), dpi=my_dpi)
     x_pos = range(len(list_pops))
     hatches_list = ['', '', '//']
     colors_list = ["black", "silver", "white"]
@@ -22,13 +22,21 @@ def plot_stack_param(list_pops, df_all, title, output):
         y = df_all[param].values
         ax.bar(x_pos, y, bottom=bottom, edgecolor=edgecolors_list[p_i], color=colors_list[p_i], hatch=hatches_list[p_i])
         bottom += y
-    ax.set_title(title)
-    ax.set_xlabel("Population")
+
+    if title == 'All':
+        ax.set_title("Estimation for all SNPs:", loc='left')
+    else:
+        ax.set_title("Estimation for SNPs with " + title + ":", loc='left')
+
+    ax.set_xlabel("Populations")
     ax.set_ylabel("Proportion estimated")
     ax.set_xticks(x_pos)
     ax.set_ylim((0, 1))
     ax.set_xticklabels(list_pops)
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+    ax.tick_params(top=True, bottom=False, labeltop=True, labelbottom=False)
+    plt.setp(ax.get_xticklabels(), rotation=-45, ha="right", rotation_mode="anchor")
+    for ticklabel, tickcolor in zip(plt.gca().get_xticklabels(), pop_colors):
+        ticklabel.set_color(tickcolor)
     plt.tight_layout()
     plt.savefig(output)
     plt.close("all")
@@ -43,18 +51,26 @@ def main(args):
     df_merge["H_fay_wu"] = df_merge["tajima"] - df_merge["fay_wu"]
     d_dict = {"watterson": "Watterson $\\theta_W$"}
     d_dict.update(polydfe_cat_dico)
+
+    df_merge = df_merge.iloc[df_merge.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
     df_merge.to_csv(args.output, sep="\t", index=False)
     pop2sp = {pop: sp for (pop, sp), d in df_merge.groupby(["pop", "species"])}
     pop2theta = {pop: d["tajima"].values[0] for pop, d in df_merge[df_merge["category"] == "syn"].groupby(["pop"])}
 
+    species = {k: None for k in df_merge["species"]}
+    cmtab10 = get_cmap('tab10')
+    colors = {sp: cmtab10((t_i + 1) / len(species)) for t_i, sp in enumerate(species)}
+
+    sample_dico = sample_list_dico(args.sample_list)
     df_merge = df_merge[df_merge["category"] != "syn"]
     for method, df in df_merge.groupby(["method"]):
         cat_snps = CategorySNP(method, bins=args.bins, windows=args.windows)
         if cat_snps.bins == 0:
             for cat, dfc in df.groupby(["category"]):
                 dfc = dfc.iloc[dfc.apply(lambda r: pop2theta[r["pop"]], axis=1).argsort()]
-                list_pops = dfc["pop"].values
-                plot_stack_param(list_pops, dfc, cat_snps.label(cat),
+                list_pops = [sample_dico[pop] for pop in dfc["pop"].values]
+                pop_colors = [colors[pop2sp[pop]] for pop in dfc["pop"].values]
+                plot_stack_param(list_pops, dfc, pop_colors, cat_snps.label(cat),
                                  args.output.replace('results.tsv', f'{method}.{cat}.stacked.pdf'))
 
         df = df[df["category"] != "all"]
@@ -67,11 +83,11 @@ def main(args):
             sp_list = [pop2sp[pop] for pop in matrix.index]
             vlist = [v + 1 for v in range(len(sp_list) - 1) if sp_list[v] != sp_list[v + 1]]
             matrix = matrix.reindex(cats, axis=1)
-            matrix = matrix.rename(columns={cat: cat_snps.label(cat) for cat in cats})
+            matrix = matrix.rename(columns={cat: cat_snps.label(cat) for cat in cats}, index=sample_dico)
             if abs(np.max(matrix.values)) < 1e-2:
                 matrix *= 1e4
                 d_label += ' ($\\times 10^4$)'
-            _, ax = plt.subplots(figsize=(1920 / my_dpi, 880 / my_dpi), dpi=my_dpi)
+            _, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
             start, end = np.nanmin(matrix), np.nanmax(matrix)
             if d.startswith("P-"):
                 start, end = 0.0, 1.0

@@ -39,15 +39,38 @@
 \usepackage{graphicx}
 \pdfinclusioncopyfonts=1
 
+\newcommand{\UniDimArray}[1]{\bm{#1}}
+\newcommand{\BiDimArray}[1]{\bm{#1}}
+\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator{\Var}{\mathrm{Var}}
+\newcommand{\der}{\mathrm{d}}
+\newcommand{\e}{\mathrm{e}}
+\newcommand{\avg}[1]{\left< #1 \right>} % for average
+\newcommand{\Ne}{N_{\mathrm{e}}}
 \newcommand{\proba}{\mathbb{P}}
 \newcommand{\pfix}{\proba_{\mathrm{fix}}}
-\newcommand{\Spop}{\beta}
-\newcommand{\SpopMean}{\overline{\Spop}}
+
 \newcommand{\Sphy}{S}
 \newcommand{\SphyMean}{\overline{\Sphy}}
-\newcommand{\polyDel}{\proba \left[ {\Spop < -1} \right]}
-\newcommand{\polyNeutral}{\proba \left[ -1 < \Spop < 1 \right]}
-\newcommand{\polyAdv}{\proba \left[ 1 < \Spop  \right]}
+\newcommand{\divStrongDel}{\Sphy < -3}
+\newcommand{\divDel}{-3 < \Sphy < -1}
+\newcommand{\divWeakDel}{-1 < \Sphy < 0}
+\newcommand{\divWeakAdv}{0 < \Sphy < 1}
+\newcommand{\divAdv}{ \Sphy > 1}
+\newcommand{\PdivStrongDel}{\proba \left[ \divStrongDel \right]}
+\newcommand{\PdivDel}{\proba \left[ \divDel \right]}
+\newcommand{\PdivWeakDel}{\proba \left[ \divWeakDel \right]}
+\newcommand{\PdivWeakAdv}{\proba \left[ \divWeakAdv \right]}
+\newcommand{\PdivAdv}{\proba \left[ \divAdv \right]}
+
+\newcommand{\Spop}{\beta}
+\newcommand{\SpopMean}{\overline{\Spop}}
+\newcommand{\polyDel}{\Spop < -1}
+\newcommand{\polyNeutral}{-1 < \Spop < 1}
+\newcommand{\polyAdv}{ \Spop > 1}
+\newcommand{\PpolyDel}{\proba \left[ \polyDel \right]}
+\newcommand{\PpolyNeutral}{\proba \left[ \polyNeutral \right]}
+\newcommand{\PpolyAdv}{\proba \left[ \polyAdv \right]}
 
 \title{Selection coefficients at the phylogenetic and population-genetic scale}
 
@@ -66,11 +89,31 @@
 
     \section{Site-specific mutation-selection codon models}
 
+    In BayesCode (\url{https://github.com/ThibaultLatrille/bayescode}), mutation-selection codon models are obtained by running \textit{mutselomega} for 2000 points of MCMC with the options:
+    \begin{scriptsize}
+        \begin{verbatim}
+        mutselomega ---omegashift 0.0 --ncat 30 -a my_alignment.phy -t my_tree.newick -u 2000 my_genename
+        \end{verbatim}
+    \end{scriptsize}
+    The collection of site-specific fitness profiles ($\UniDimArray{F^{(i)}}, \forall i$) are then obtained by running \textit{readmutselomega}, reading 1000 points of MCMC (first 1000 are considered as burn-in) with the options:
+    \begin{scriptsize}
+        \begin{verbatim}
+        readmutselomega --every 1 --until 2000 --burnin 1000 --ss my_genename
+        \end{verbatim}
+    \end{scriptsize}
+    The gene-specific mutation matrix ($\UniDimArray{\mu}$) is also obtained by running \textit{readmutselomega}, reading 1000 points of MCMC (first 1000 are considered as burn-in) with the options:
+    \begin{scriptsize}
+        \begin{verbatim}
+        readmutselomega --every 1 --until 2000 --burnin 1000 --nuc my_genename
+        \end{verbatim}
+    \end{scriptsize}
+
     \subsection{Summary table}
+
     \begin{center}
         \begin{longtable}{|l|l|r|r|r|r|}
             \toprule
-            Population                     & Species             & Tajima $\theta_{\pi}$ & $\mathbb{P}_{obs}[1<S]$ & $\mathbb{P} [ 1<\beta ]$ & $\mathbb{P} [ 1<\beta  | 1<S]$ \\
+            Population                     & Species             & Tajima $\theta$ & $\proba_{obs}[\divAdv]$ & $\PpolyAdv$ & $\proba [ \polyAdv | \divAdv]$ \\
             \midrule
             \endhead
             \midrule
@@ -80,41 +123,48 @@
 
             \bottomrule
             \endlastfoot
-            Diverse (Equus)                & Equus caballus      & $ 0.003$              & $ 0.161$                & $ 0.073$                 & $ 0.779$                     \\
-            Diverse (Canis)                & Canis familiaris    & $ 0.004$              & $ 0.069$                & $ 0.041$                 & $ 0.262$                     \\
-            Iran (IRBT)                    & Bos taurus          & $ 0.009$              & $ 0.123$                & $ 0.054$                 & $ 0.300$                     \\
-            Uganda (UGBT)                  & Bos taurus          & $ 0.010$              & $ 0.139$                & $ 0.060$                 & $ 0.779$                     \\
-            Australia (AUCH)               & Capra hircus        & $ 0.004$              & $ 0.105$                & $ 0.061$                 & $ 0.119$                     \\
-            France (FRCH)                  & Capra hircus        & $ 0.004$              & $ 0.105$                & $ 0.060$                 & $ 0.059$                     \\
-            Iran (IRCA)                    & Capra aegagrus      & $ 0.004$              & $ 0.105$                & $ 0.062$                 & $ 0.053$                     \\
-            Iran (IRCH)                    & Capra hircus        & $ 0.005$              & $ 0.093$                & $ 0.058$                 & $ 0.094$                     \\
-            Italy (ITCH)                   & Capra hircus        & $ 0.004$              & $ 0.103$                & $ 0.059$                 & $ 0.053$                     \\
-            Morocco (MOCH)                 & Capra hircus        & $ 0.005$              & $ 0.077$                & $ 0.057$                 & $ 0.045$                     \\
-            Iran (IROA)                    & Ovis aries          & $ 0.009$              & $ 0.107$                & $ 0.048$                 & $ 0.144$                     \\
-            Iran (IROO)                    & Ovis orientalis     & $ 0.010$              & $ 0.110$                & $ 0.050$                 & $ 0.177$                     \\
-            Iran (IROV)                    & Ovis vignei         & $ 0.009$              & $ 0.127$                & $ 0.049$                 & $ 0.252$                     \\
-            Various (ISGC)                 & Ovis aries          & $ 0.009$              & $ 0.108$                & $ 0.049$                 & $ 0.194$                     \\
-            Morocco (MOOA)                 & Ovis aries          & $ 0.009$              & $ 0.086$                & $ 0.045$                 & $ 0.144$                     \\
-            Barbados                       & Chlorocebus sabaeus & $ 0.004$              & $ 0.104$                & $ 0.072$                 & $ 0.484$                     \\
-            Central African Republic (CAR) & Chlorocebus sabaeus & $ 0.007$              & $ 0.105$                & $ 0.066$                 & $ 0.312$                     \\
-            Ethiopia                       & Chlorocebus sabaeus & $ 0.006$              & $ 0.097$                & $ 0.068$                 & $ 0.245$                     \\
-            Gambia                         & Chlorocebus sabaeus & $ 0.006$              & $ 0.101$                & $ 0.064$                 & $ 0.411$                     \\
-            Kenya                          & Chlorocebus sabaeus & $ 0.006$              & $ 0.104$                & $ 0.066$                 & $ 0.323$                     \\
-            Nevis                          & Chlorocebus sabaeus & $ 0.004$              & $ 0.105$                & $ 0.068$                 & $ 0.445$                     \\
-            South Africa (SA)              & Chlorocebus sabaeus & $ 0.007$              & $ 0.095$                & $ 0.065$                 & $ 0.233$                     \\
-            Saint Kitts (SK)               & Chlorocebus sabaeus & $ 0.005$              & $ 0.101$                & $ 0.071$                 & $ 0.442$                     \\
-            Zambia                         & Chlorocebus sabaeus & $ 0.007$              & $ 0.101$                & $ 0.070$                 & $ 0.290$                     \\
-            African (AFR)                  & Homo sapiens        & $ 0.003$              & $ 0.052$                & $ 0.092$                 & $ 0.779$                     \\
-            Ad Mixed American (AMR)        & Homo sapiens        & $ 0.002$              & $ 0.055$                & $ 0.087$                 & $ 0.779$                     \\
-            East Asian (EAS)               & Homo sapiens        & $ 0.002$              & $ 0.051$                & $ 0.084$                 & $ 0.779$                     \\
-            European (EUR)                 & Homo sapiens        & $ 0.002$              & $ 0.053$                & $ 0.087$                 & $ 0.779$                     \\
-            South Asian (SAS)              & Homo sapiens        & $ 0.002$              & $ 0.051$                & $ 0.084$                 & $ 0.779$                     \\
+            Diverse (Equus)                & Equus caballus      & $ 0.003$        & $ 0.161$                & $ 0.073$    & $ 0.779$                       \\
+            Diverse (Canis)                & Canis familiaris    & $ 0.004$        & $ 0.069$                & $ 0.041$    & $ 0.262$                       \\
+            Iran (IRBT)                    & Bos taurus          & $ 0.009$        & $ 0.123$                & $ 0.054$    & $ 0.300$                       \\
+            Uganda (UGBT)                  & Bos taurus          & $ 0.010$        & $ 0.139$                & $ 0.060$    & $ 0.779$                       \\
+            Australia (AUCH)               & Capra hircus        & $ 0.004$        & $ 0.105$                & $ 0.061$    & $ 0.119$                       \\
+            France (FRCH)                  & Capra hircus        & $ 0.004$        & $ 0.105$                & $ 0.060$    & $ 0.059$                       \\
+            Iran (IRCA)                    & Capra aegagrus      & $ 0.004$        & $ 0.105$                & $ 0.062$    & $ 0.053$                       \\
+            Iran (IRCH)                    & Capra hircus        & $ 0.005$        & $ 0.093$                & $ 0.058$    & $ 0.094$                       \\
+            Italy (ITCH)                   & Capra hircus        & $ 0.004$        & $ 0.103$                & $ 0.059$    & $ 0.053$                       \\
+            Morocco (MOCH)                 & Capra hircus        & $ 0.005$        & $ 0.077$                & $ 0.057$    & $ 0.045$                       \\
+            Iran (IROA)                    & Ovis aries          & $ 0.009$        & $ 0.107$                & $ 0.048$    & $ 0.144$                       \\
+            Iran (IROO)                    & Ovis orientalis     & $ 0.010$        & $ 0.110$                & $ 0.050$    & $ 0.177$                       \\
+            Iran (IROV)                    & Ovis vignei         & $ 0.009$        & $ 0.127$                & $ 0.049$    & $ 0.252$                       \\
+            Various (ISGC)                 & Ovis aries          & $ 0.009$        & $ 0.108$                & $ 0.049$    & $ 0.194$                       \\
+            Morocco (MOOA)                 & Ovis aries          & $ 0.009$        & $ 0.086$                & $ 0.045$    & $ 0.144$                       \\
+            Barbados                       & Chlorocebus sabaeus & $ 0.004$        & $ 0.104$                & $ 0.072$    & $ 0.484$                       \\
+            Central African Republic (CAR) & Chlorocebus sabaeus & $ 0.007$        & $ 0.105$                & $ 0.066$    & $ 0.312$                       \\
+            Ethiopia                       & Chlorocebus sabaeus & $ 0.006$        & $ 0.097$                & $ 0.068$    & $ 0.245$                       \\
+            Gambia                         & Chlorocebus sabaeus & $ 0.006$        & $ 0.101$                & $ 0.064$    & $ 0.411$                       \\
+            Kenya                          & Chlorocebus sabaeus & $ 0.006$        & $ 0.104$                & $ 0.066$    & $ 0.323$                       \\
+            Nevis                          & Chlorocebus sabaeus & $ 0.004$        & $ 0.105$                & $ 0.068$    & $ 0.445$                       \\
+            South Africa (SA)              & Chlorocebus sabaeus & $ 0.007$        & $ 0.095$                & $ 0.065$    & $ 0.233$                       \\
+            Saint Kitts (SK)               & Chlorocebus sabaeus & $ 0.005$        & $ 0.101$                & $ 0.071$    & $ 0.442$                       \\
+            Zambia                         & Chlorocebus sabaeus & $ 0.007$        & $ 0.101$                & $ 0.070$    & $ 0.290$                       \\
+            African (AFR)                  & Homo sapiens        & $ 0.003$        & $ 0.052$                & $ 0.092$    & $ 0.779$                       \\
+            Ad Mixed American (AMR)        & Homo sapiens        & $ 0.002$        & $ 0.055$                & $ 0.087$    & $ 0.779$                       \\
+            East Asian (EAS)               & Homo sapiens        & $ 0.002$        & $ 0.051$                & $ 0.084$    & $ 0.779$                       \\
+            European (EUR)                 & Homo sapiens        & $ 0.002$        & $ 0.053$                & $ 0.087$    & $ 0.779$                       \\
+            South Asian (SAS)              & Homo sapiens        & $ 0.002$        & $ 0.051$                & $ 0.084$    & $ 0.779$                       \\
         \end{longtable}
     \end{center}
+    \begin{itemize}
+        \item Tajima $\theta$ is the synonymous diversity.
+        \item $\proba_{obs}[\divAdv]$ is the proportion of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) larger than 1.
+        \item $\PpolyAdv $ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) larger than 1, estimated for the whole genome.
+        \item $\proba [ \polyAdv | \divAdv]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) larger than 1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) larger than 1.
+    \end{itemize}
 
     \subsection{Correlation with diversity}
 
     \subsubsection{Proportion of nearly-neutral mutations ($\polyNeutral$)}
+
     \begin{minipage}{0.32\linewidth}
         \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.all_P-Seq0.scatter.pdf}
     \end{minipage}
@@ -125,7 +175,14 @@
         \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.pos-weak_P-Seq0.scatter.pdf}
     \end{minipage}
 
+    \begin{itemize}
+        \item $\ \proba [ \polyNeutral ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) between -1 and 1, estimated for the whole genome.
+        \item $\ \proba [ \polyNeutral | \divWeakDel]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) between -1 and 1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) between -1 and 0.
+        \item $\ \proba [ \polyNeutral | \divWeakAdv ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) between -1 and 1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) between 0 and 1.
+    \end{itemize}
+
     \subsubsection{Proportion of deleterious mutations ($\polyDel$)}
+
     \begin{minipage}{0.32\linewidth}
         \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.all_P-Sinf0.scatter.pdf}
     \end{minipage}
@@ -136,13 +193,27 @@
         \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.neg-strong_P-Sinf0.scatter.pdf}
     \end{minipage}
 
+    \begin{itemize}
+        \item $\ \proba [ \polyDel ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) lower than -1, estimated for the whole genome.
+        \item $\ \proba [ \polyDel | \divDel]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) lower than -1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) between -3 and -3.
+        \item $\ \proba [ \polyDel | \divStrongDel ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) lower than -1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) lower than -3.
+    \end{itemize}
+
+
     \subsubsection{Proportion of advantageous mutations ($\polyAdv$)}
+
     \begin{minipage}{0.32\linewidth}
         \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.all_P-Ssup0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
         \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.pos_P-Ssup0.scatter.pdf}
     \end{minipage}
+
+    \begin{itemize}
+        \item $\ \proba [ \polyAdv  ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) greater than 1, estimated for the whole genome.
+        \item $\ \proba [ \polyAdv | \divAdv] $ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) greater than 1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) greater than 1.
+    \end{itemize}
+
 
     \input{include-MutSel-non-adaptive}
 
@@ -151,6 +222,32 @@
     \input{include-SIFT-non-adaptive}
 
 
-    \section{Site-specific codon models.}
+    \section{Site-specific $\omega$-based codon models.}
+    The $61$-by-$61$ codon substitution matrix ($\UniDimArray{q^{(i)}}$) at site $i$ is defined entirely by the mutation matrix ($\UniDimArray{\mu}$), $\omega^{(i)}$ and the genetic code:
+    \begin{equation}
+        \begin{dcases}
+            q_{a \mapsto b}^{(i)} & = 0 \text{ if codons $a$ and $b$ are more than one mutation away,} \\
+            q_{a \mapsto b}^{(i)} & = \mu_{a \mapsto b} \text{ if codons $a$ and $b$ are synonymous,} \\
+            q_{a \mapsto b}^{(i)} & = \omega^{(i)} \mu_{a \mapsto b} \text{ if codons $a$ and $b$ are non-synonymous}.
+        \end{dcases}
+    \end{equation}
+    By definition of the instantaneous rate matrix, the sum of the entries in each row of the codon substitution rate matrix $\UniDimArray{q}$ is equal to $0$, giving the diagonal entries:
+    \begin{equation}
+        q_{a \mapsto b}^{(i)}= - \sum\limits_{b \neq a, b = 1}^{61} q_{a \mapsto b}^{(i)}.
+    \end{equation}
+
+    In BayesCode (\url{https://github.com/ThibaultLatrille/bayescode}), $\omega$-based site-specific codon models are obtained by running \textit{mutselomega} with the options:
+    \begin{scriptsize}
+        \begin{verbatim}
+        mutselomega --omegashift 0.0 --freeomega --omegancat 30 --flatfitness -a my_alignment.phy -t my_tree.newick -u 2000 my_genename
+        \end{verbatim}
+    \end{scriptsize}
+    The mean value of $\omega$ per site is then obtained by running \textit{readmutselomega} with the options:
+    \begin{scriptsize}
+        \begin{verbatim}
+        readmutselomega --every 1 --until 2000 --burnin 1000 -c 0.025 my_genename
+        \end{verbatim}
+    \end{scriptsize}
+
     \input{include-Omega-adaptive}
 \end{document}

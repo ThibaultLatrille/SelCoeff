@@ -51,7 +51,7 @@ codontable.update({
 confidence_interval = namedtuple('confidence_interval', ['low', 'mean', 'up'])
 sfs_weight = {"watterson": lambda i, n: 1.0 / i, "tajima": lambda i, n: n - i, "fay_wu": lambda i, n: i}
 polydfe_cat_dico = {
-    "P-Ssup0": "$\\mathbb{P} [ 1<\\beta ]$",
+    "P-Ssup0": "$\\mathbb{P} [ \\beta > 1 ]$",
     "P-Seq0": "$\\mathbb{P} [ -1<\\beta<1 ]$",
     "P-Sinf0": "$\\mathbb{P} [ \\beta<-1 ]$",
 }
@@ -299,33 +299,18 @@ def extend_pop(p, sample):
         return f"{sample[p]} ({fp})"
 
 
-def set_species(df):
-    df["species"] = df.apply(lambda r: r["species"].replace("_", " "), axis=1)
-    df["species"] = df.apply(lambda r: "Ovis orientalis" if r["pop"] == "IROO" else r["species"], axis=1)
-    df["species"] = df.apply(lambda r: "Ovis vignei" if r["pop"] == "IROV" else r["species"], axis=1)
-    df["species"] = df.apply(lambda r: "Capra aegagrus" if r["pop"] == "IRCA" else r["species"], axis=1)
-    return df
-
-
 def sample_list_dico(sample_list_path):
     df = pd.read_csv(sample_list_path, sep='\t')
     df["pop"] = df.apply(lambda r: format_pop(r["SampleName"].replace("_", " ")), axis=1)
-    df["species"] = df.apply(lambda r: r["Species"].replace("_", " "), axis=1)
-    df = set_species(df)
-    dico_sample = {r["pop"]: r["Location"] for _, r in df.iterrows()}
-    df["ext_pop"] = df.apply(lambda r: extend_pop(r["pop"], dico_sample), axis=1)
-    dico_sample = {
-        r["pop"]: r["ext_pop"] + (f' - {r["species"]}' if r["species"].split(" ")[0] in ["Capra", "Ovis"] else "") for
-        _, r in df.iterrows()}
+    dico_sample = {r["pop"]: r["DisplayName"] for _, r in df.iterrows()}
     return dico_sample
 
 
 def sort_df(df, sample_list_path):
     df = df.iloc[df.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
-    df = set_species(df)
-    sample_iterrows = pd.read_csv(sample_list_path, sep='\t').iterrows()
-    dico_sample = {format_pop(r["SampleName"].replace("_", " ")): r["Location"] for _, r in sample_iterrows}
-    df["pop"] = df.apply(lambda r: extend_pop(r["pop"], dico_sample), axis=1)
+    df["species"] = df.apply(lambda r: r["species"].replace("_", " "), axis=1)
+    dico_sample = sample_list_dico(sample_list_path)
+    df["pop"] = df.apply(lambda r: dico_sample[r["pop"]], axis=1)
     return df
 
 
@@ -422,7 +407,7 @@ class CategorySNP(list):
                 "neg": P("$0.05<SIFT<0.1$", GREEN, 0.05, 0.1),
                 "neg-weak": P("$0.1<SIFT<0.3$", LIGHTGREEN, 0.1, 0.3),
                 "pos-weak": P("$0.3<SIFT<0.8$", YELLOW, 0.3, 0.8),
-                "pos": P("$0.8<SIFT$", RED, 0.8, 1.0),
+                "pos": P("$SIFT > 0.8$", RED, 0.8, 1.0),
                 "syn": P("$Synonymous$", 'black', None, None)
             }
             self.update()
@@ -433,7 +418,7 @@ class CategorySNP(list):
                 "neg": P("$0.05<\\omega<0.1$", GREEN, 0.05, 0.1),
                 "neg-weak": P("$0.1<\\omega<0.3$", LIGHTGREEN, 0.1, 0.3),
                 "pos-weak": P("$0.3<\\omega<1.0$", YELLOW, 0.3, 1.0),
-                "pos": P("$1.0<\\omega$", RED, 1.0, np.float("infinity")),
+                "pos": P("$\\omega > 1$", RED, 1.0, np.float("infinity")),
                 "syn": P("$Synonymous$", 'black', None, None)
             }
             self.update()
@@ -446,7 +431,7 @@ class CategorySNP(list):
                 "neg-weak": P("$-1<S<0$", LIGHTGREEN, -1, 0),
                 "syn": P("$Synonymous$", 'black', None, None),
                 "pos-weak": P("$0<S<1$", YELLOW, 0, 1),
-                "pos": P("$1<S$", RED, 1, np.float("infinity"))
+                "pos": P("$S>1$", RED, 1, np.float("infinity"))
             }
             self.update()
 
