@@ -65,7 +65,7 @@ def main(args):
     df_merge = df_merge[df_merge["category"] != "syn"]
     for method, df in df_merge.groupby(["method"]):
         cat_snps = CategorySNP(method, bins=args.bins, windows=args.windows)
-        if cat_snps.bins == 0:
+        if cat_snps.bins <= 10:
             for cat, dfc in df.groupby(["category"]):
                 dfc = dfc.iloc[dfc.apply(lambda r: pop2theta[r["pop"]], axis=1).argsort()]
                 list_pops = [sample_dico[pop] for pop in dfc["pop"].values]

@@ -158,8 +158,8 @@ rule polyDFE:
     input:
         sfs=os.path.join(rules.sfs.output.dir,'{cat}.sfs'),
         polyDFE=f'{FOLDER}/utils/polyDFE/polyDFE-2.0-linux-64-bit',
-        init_file=FOLDER + '/config/{model}_init.txt',
-        range_file=FOLDER + '/config/{model}_range.txt'
+        init_file=FOLDER + '/config/{model}_init.tsv',
+        range_file=FOLDER + '/config/{model}_range.tsv'
     output:
         out=EXP_FOLDER + '/analysis/{species}.{popu}.{method}/{cat}.{model}.out',
         stderr=EXP_FOLDER + '/analysis/{species}.{popu}.{method}/{cat}.{model}.stderr'
@@ -183,13 +183,14 @@ def gather_model_results(wildcards):
 rule parse_results_DFE:
     input:
         script=f'{FOLDER}/scripts/parse_results_DFE.py',
+        postprocessing=f'{FOLDER}/scripts/postprocessing.R',
         modelfile=gather_model_results,
         bounds=rules.annotate_vcf.output.bounds
     output:
         pdf=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{model}.pdf',
         tsv=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{model}.tsv'
     shell:
-        'python3 {input.script} --bins {bins} --windows {windows} --bounds {input.bounds} --input {input.modelfile} --method {wildcards.method} --output {output.pdf}'
+        'python3 {input.script} --postprocessing {input.postprocessing} --bins {bins} --windows {windows} --bounds {input.bounds} --input {input.modelfile} --method {wildcards.method} --output {output.pdf}'
 
 rule plot_dfe_heatmap:
     input:
@@ -216,7 +217,7 @@ rule plot_regression:
     input:
         script=f'{FOLDER}/scripts/plot_regression.py',
         tsv=[rules.gather_opportunities.output.tsv, rules.gather_bounds.output.tsv] + (
-            [rules.plot_multiple_regression.output.tsv] if (bins != 0 and windows != 0) else [
+            [rules.plot_multiple_regression.output.tsv] if (bins > 10 and windows != 0) else [
                 rules.plot_dfe_heatmap.output.tsv]),
         sample_list=sample_list
     output:

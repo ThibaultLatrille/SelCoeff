@@ -7,7 +7,8 @@ from collections import defaultdict
 import statsmodels.api as sm
 from matplotlib.cm import get_cmap
 from matplotlib.lines import Line2D
-from libraries import my_dpi, plt, polydfe_cat_dico, tex_f, sort_df, sp_sorted, format_pop, CategorySNP
+from libraries import my_dpi, plt, polydfe_cat_dico, tex_f, sort_df, sp_sorted, format_pop, CategorySNP, \
+    alpha_sup_limits
 
 markers = ["o", "d", "s", '.']
 
@@ -19,10 +20,13 @@ def open_tsv(filepath, cat_snps):
         df_theta = df_theta.dropna(axis='columns')
         df_theta = df_theta.drop(["method", "species", "category"], axis=1)
         df_dfe = ddf[(ddf["method"] == "MutSel") & (ddf["category"] != "syn")]
+        cols = list(polydfe_cat_dico) + [f"P-{cat}" for cat in cat_snps.non_syn_list]
+        cols += ['p_b', 'S_b', 'S_d', 'b', 'logL', 'S', 'S+', 'S-']
+        cols += [f"alpha{sup}" for sup in alpha_sup_limits]
         m_list = []
-        for cat_poly in list(polydfe_cat_dico) + [f"P-{cat}" for cat in cat_snps.non_syn_list]:
-            if cat_poly in df_dfe:
-                matrix = df_dfe.pivot(index="pop", columns="category", values=cat_poly).add_suffix(f'_{cat_poly}')
+        for col in cols:
+            if col in df_dfe:
+                matrix = df_dfe.pivot(index="pop", columns="category", values=col).add_suffix(f'_{col}')
                 m_list.append(matrix)
         df_pivot = pd.concat(m_list, axis=1)
         ddf = pd.merge(df_pivot, df_theta, on=["pop"])
@@ -39,7 +43,14 @@ def discard_col(col, df):
 def generate_xy_plot(cat_snps):
     xy_dico = defaultdict(list)
     dico_label = {'pop': "Population", "species": "Species", "watterson": "Watterson $\\theta_W$",
-                  "proba": "$\\mathbb{P}$"}
+                  "proba": "$\\mathbb{P}$", "logL": "logL"}
+    for sup in alpha_sup_limits:
+        dico_label |= {f'all_alpha{sup}': f"$\\alpha^{sup} $",
+                       f'pos_alpha{sup}': f"$\\alpha^{sup} | S > 0$",
+                       f'neg_alpha{sup}': f"$\\alpha^{sup} | S < 0$"}
+    for p, s in [('S_b', "\\beta_b"), ('S_d', "\\beta_s"), ('b', "b"), ('p_b', "p_b"), ('logL', "LnL"), ('S', "S"),
+                 ('S+', "S^+"), ('S-', "S^-")]:
+        dico_label |= {f'all_{p}': f"${s}$", f'pos_{p}': f"${s} | S > 0$", f'neg_{p}': f"${s} | S < 0$"}
 
     y_dico = {"tajima": "Tajima $\\theta_{\\pi}$ ",
               "flowPos": "$\\Psi_{+}$", "flowNeg": "$\\Psi_{-}$", "flowRatio": "$\\Psi_{+} / \\Psi_{-}$",
@@ -115,19 +126,19 @@ def main(args):
             df[f'weak_{cat_poly}'] = num / (df[f'neg-weak'] + df[f'pos-weak'])
     '''
 
-    if args.bins == 0:
+    if args.bins <= 10:
         assert (np.abs(np.sum([df[cat] for cat in cat_snps.non_syn_list], axis=0) - 1.0) < 1e-6).all()
         assert (np.abs(np.sum([df[f"{cat}_snps"] for cat in cat_snps.non_syn_list], axis=0) - 1.0) < 1e-6).all()
         for cat in cat_snps.non_syn_list + ["all"]:
-            assert (np.abs(
-                np.sum([df[f'{cat}_{cat_poly}'] for cat_poly in polydfe_cat_dico], axis=0) - 1.0) < 1e-12).all()
+            s_list = np.abs(np.sum([df[f'{cat}_{cat_poly}'] for cat_poly in polydfe_cat_dico], axis=0) - 1.0) < 1e-6
+            assert s_list.all()
 
         for cat_poly in polydfe_cat_dico:
             given_cat = cat_poly.replace("P-", '')
             for cat in cat_snps.non_syn_list:
                 assert f'{given_cat}_P-{cat}' not in df
                 df[f'{given_cat}_P-{cat}'] = df[cat] * df[f'{cat}_P-{given_cat}'] / df[f'all_P-{given_cat}']
-            print(np.sum([df[f'{given_cat}_P-{cat}'] for cat in cat_snps.non_syn_list], axis=0))
+            # print(np.sum([df[f'{given_cat}_P-{cat}'] for cat in cat_snps.non_syn_list], axis=0))
 
     species = {k: None for k in df["species"]}
     cm = get_cmap('tab10')
@@ -173,15 +184,16 @@ def main(args):
             out_dict['b'].append(b)
             out_dict['rsquared'].append(results.rsquared)
 
-        x_label = dico_label[col_x]
-        if 'P-' in col_x:
-            x_label = f'logit({x_label})'
-        plt.xlabel(x_label)
-        y_label = dico_label[y_group]
-        if 'P-' in y_group:
-            y_label = f'logit({y_label})'
-        plt.ylabel(y_label)
         if len(legend_elements) != 0:
+            x_label = dico_label[col_x]
+            if 'P-' in col_x:
+                x_label = f'logit({x_label})'
+            plt.xlabel(x_label)
+            y_label = dico_label[y_group]
+            if 'P-' in y_group:
+                y_label = f'logit({y_label})'
+            plt.ylabel(y_label)
+
             legend_elements += [Line2D([0], [0], marker='o', color='w', markerfacecolor=color_dict[sp],
                                        label=f'{sp.replace("_", " ")}') for sp in species]
             plt.legend(handles=legend_elements)
@@ -201,11 +213,33 @@ def main(args):
     o = open(args.output.replace(".tsv", ".tex"), 'w')
     o.write("\\section{Table} \n")
     o.write("\\begin{center}\n")
-    output_columns = ["pop", "species", "tajima", "pos_snps", 'all_P-Ssup0', 'pos_P-Ssup0']
-    columns = [c for c in output_columns if c in df]
-    sub_header = [dico_label[i] if i in dico_label else i for i in columns]
-    o.write(df.to_latex(index=False, escape=False, longtable=True, float_format=tex_f,
-                        column_format=column_format(len(columns)), header=sub_header, columns=columns))
+    # output_columns = ["pop", "species", "tajima", "pos_snps", 'all_P-Ssup0', 'pos_P-Ssup0']
+
+    df["R_Ssup0"] = 100 * (1 - df["neg_P-Ssup0"] / df["all_P-Ssup0"])
+    dico_label['R_Ssup0'] = f"1 - {dico_label['neg_P-Ssup0']} / {dico_label['all_P-Ssup0']} (\\%)"
+
+    cols = [['all_S_b', 'neg_S_b', 'pos_S_b', 'all_p_b', 'neg_p_b', 'pos_p_b'],
+            ['all_logL', 'neg_logL', 'pos_logL'],
+            ['all_S_d', 'neg_S_d', 'pos_S_d', 'all_b', 'neg_b', 'pos_b'],
+            ['all_P-Ssup0', 'neg_P-Ssup0', 'pos_P-Ssup0', 'R_Ssup0'],
+            ['all_P-Seq0', 'neg_P-Seq0', 'pos_P-Seq0'],
+            ['all_P-Sinf0', 'neg_P-Sinf0', 'pos_P-Sinf0'],
+            ['all_S', 'neg_S', 'pos_S'],
+            ['all_S-', 'neg_S-', 'pos_S-', 'all_S+', 'neg_S+', 'pos_S+']]
+    for sup in alpha_sup_limits:
+        if f"all_alpha{sup}" not in df:
+            continue
+        df[f"R_alpha{sup}"] = 100 * (1 - df[f"neg_alpha{sup}"] / df[f"all_alpha{sup}"])
+        dico_label[f"R_alpha{sup}"] = f"1 - {dico_label[f'neg_alpha{sup}']} / {dico_label[f'all_alpha{sup}']} (\\%)"
+        cols.append([f'all_alpha{sup}', f'neg_alpha{sup}', f'pos_alpha{sup}', f'R_alpha{sup}'])
+
+    for c in cols:
+        columns = [c for c in ["pop", "species"] + c if c in df]
+        if len(columns) == 2:
+            continue
+        sub_header = [dico_label[i] if i in dico_label else i for i in columns]
+        o.write(df.to_latex(index=False, escape=False, longtable=True, float_format=tex_f,
+                            column_format=column_format(len(columns)), header=sub_header, columns=columns))
     o.write("\\end{center}\n")
     o.write("\\newpage\n")
     o.close()

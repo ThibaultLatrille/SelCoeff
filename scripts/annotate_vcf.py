@@ -76,7 +76,7 @@ def classify_snps(dico_snp, method, cat_snps):
     sampled = dico_snp["snp_type"]
     cat_list, intervals, dico_cat = list(), list(), defaultdict(list)
 
-    if cat_snps.bins != 0:
+    if cat_snps.bins > 10:
         s_ns_list = [s for s, snp_type, sample in zip(s_list, type_list, sampled) if
                      sample and snp_type == "NonSyn" and np.isfinite(s)]
         if cat_snps.windows == 0:
@@ -113,7 +113,7 @@ def classify_snps(dico_snp, method, cat_snps):
             cat_list.append("|syn|")
         elif np.isfinite(s):
             cats = cat_snps.rate2cats(s)
-            if cat_snps.bins == 0 or (cat_snps.bins != 0 and cat_snps.windows == 0):
+            if cat_snps.windows == 0:
                 if len(cats) != 1:
                     cats = [cats[0]]
                 assert len(cats) == 1
@@ -183,7 +183,7 @@ def plot_histogram(score_list, cat_snps, method, file):
     n, bins, patches = plt.hist([s for s in score_list if np.isfinite(s)], bins=np.linspace(xmin, xmax, 61),
                                 range=(xmin, xmax), edgecolor="black", linewidth=1.0)
     total_n = sum(n)
-    if cat_snps.bins == 0:
+    if cat_snps.bins <= 10:
         n_cat = defaultdict(float)
         for i, b in enumerate(bins[1:]):
             cats = cat_snps.rate2cats(b)
