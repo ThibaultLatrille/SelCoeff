@@ -1,5 +1,6 @@
 import argparse
 from scipy.stats import expon, gamma
+import scipy.integrate as integrate
 from libraries import *
 from rpy2.robjects.packages import SignatureTranslatedAnonymousPackage
 
@@ -21,8 +22,8 @@ def read_poly_dfe(path, proc_R):
                         out_poly_dfe[h] = float(values[h_i])
 
                     estimates = proc_R.parseOutput(path)[0]
-                    for sup_limit in alpha_sup_limits:
-                        out_poly_dfe[f"alpha{sup_limit}"] = proc_R.estimateAlpha(estimates, supLimit=sup_limit)[0]
+                    for lim_left in alpha_sup_limits:
+                        out_poly_dfe[f"alpha{lim_left}"] = proc_R.estimateAlpha(estimates, supLimit=lim_left)[0]
                 elif "Model: D" in line:
                     for v_i, v in enumerate(values):
                         out_poly_dfe[f"S_{v_i + 1}"] = float(header[v_i * 2 + 1])
@@ -91,21 +92,35 @@ def plot_dfe_stack_cat(list_cat, cat_snps, s_dico, output):
 
 
 def pfix(s):
-    if s == 0.0:
+    if s < -100:
+        return 0.0
+    elif s == 0.0:
         return 1.0
     else:
         return s / (1 - np.exp(-s))
 
 
-def alpha_model_C(p_pos, d_neg, d_pos, sup_limit=1):
-    s_linspace = np.linspace(-200, 200, 10000)
-    q_linspace = [((1 - p_pos) * d_neg.pdf(-s) if s < 0 else p_pos * d_pos.pdf(s)) * pfix(s) for s in s_linspace]
-    return sum([q for s, q in zip(s_linspace, q_linspace) if s > sup_limit]) / sum(q_linspace)
+def omega_div(df_div, cat):
+    div_non_syn = float(df_div[f"div_{cat}"].values[0])
+    l_non_syn = float(df_div[f"L_{cat}"].values[0])
+    div_syn = float(df_div[f"div_syn"].values[0])
+    l_syn = float(df_div[f"L_syn"].values[0])
+    return (div_non_syn / div_syn) * (l_syn / l_non_syn)
 
 
-def alpha_model_D(p_list, s_list, sup_limit=1):
+def omega_na_model_C(p_pos, d_neg, d_pos):
+    neg_res = integrate.quad(lambda s: (1 - p_pos) * d_neg.pdf(-s) * pfix(s), -100, 0)
+    pos_res = integrate.quad(lambda s: p_pos * d_pos.pdf(s) * pfix(s), 0, 0)
+    return neg_res[0] + pos_res[0]
+
+
+def omega_na_model_D(p_list, s_list):
+    return sum([p * pfix(s) for p, s in zip(p_list, s_list) if s <= 0])
+
+
+def alpha_model_D(p_list, s_list, lim_left=0.0):
     q_linspace = [p * pfix(s) for p, s in zip(p_list, s_list)]
-    return sum([q for s, q in zip(s_list, q_linspace) if s > sup_limit]) / sum(q_linspace)
+    return sum([q for s, q in zip(s_list, q_linspace) if lim_left < s]) / sum(q_linspace)
 
 
 def main(args):
@@ -113,6 +128,7 @@ def main(args):
     string = ''.join(open(args.postprocessing, "r").readlines())
     proc_R = SignatureTranslatedAnonymousPackage(string, "postprocessing")
 
+    df_div = pd.read_csv(args.substitutions, sep="\t") if args.substitutions != "" else None
     cat_snps = CategorySNP(args.method, args.bounds, bins=args.bins, windows=args.windows)
     cat_poly_snps = CategorySNP("MutSel", bins=0, windows=0)
     list_cat = cat_snps.all()
@@ -129,8 +145,17 @@ def main(args):
             out[polydfe_cat_list[0]] = sum(p_list[3:])
             out[polydfe_cat_list[1]] = p_list[2]
             out[polydfe_cat_list[2]] = sum(p_list[:2])
-            for sup_limit in alpha_sup_limits:
-                out[f'alpha{sup_limit}'] = alpha_model_D(p_list, s_list, sup_limit)
+            for lim_left in alpha_sup_limits:
+                out[f'alpha{lim_left}'] = alpha_model_D(p_list, s_list, lim_left=lim_left)
+
+            if df_div is not None:
+                omega = omega_div(df_div, cat)
+                omega_na = omega_na_model_D(p_list, s_list)
+                out[f'omega'] = omega
+                out[f'omega_na'] = omega_na
+                out[f'omega_a'] = omega - omega_na
+                out[f'alpha_div'] = (omega - omega_na) / omega
+
         else:
             p_pos = out["p_b"]
             shape_neg = out["b"]
@@ -154,6 +179,13 @@ def main(args):
                     out[cat_poly] = p_pos * d_pos.cdf(1.0)
                 elif cat_poly == "pos":
                     out[cat_poly] = p_pos * (1 - d_pos.cdf(1.0))
+            if df_div is not None:
+                omega = omega_div(df_div, cat)
+                omega_na = omega_na_model_C(p_pos, d_neg, d_pos)
+                out[f'omega'] = omega
+                out[f'omega_na'] = omega_na
+                out[f'omega_a'] = omega - omega_na
+                out[f'alpha_div'] = (omega - omega_na) / omega
         s_dico[cat] = out
 
     list_cat = [cat for cat in list_cat if cat in s_dico]
@@ -178,6 +210,8 @@ if __name__ == '__main__':
     parser.add_argument('--sample_list', required=False, type=str, dest="sample_list", help="Sample list file")
     parser.add_argument('--method', required=False, type=str, dest="method", help="Sel coeff parameter")
     parser.add_argument('--postprocessing', required=True, type=str, dest="postprocessing", help="polyDFE processing")
+    parser.add_argument('--substitutions', required=False, default="", type=str, dest="substitutions",
+                        help="Substitutions mapping")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
     parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
     parser.add_argument('--bounds', required=False, default="", type=str, dest="bounds", help="Input bound file path")

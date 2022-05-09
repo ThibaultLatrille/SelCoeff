@@ -43,6 +43,9 @@ def read_vcf(vcf, sift_file, mask_grouped, subsample):
             discarded += 1
             continue
 
+        if float(dico_info["ANC_PROBA"]) < 0.95:
+            continue
+
         sample_size = int(dico_info["SAMPLE_SIZE"])
         k = int(dico_info["COUNT_POLARIZED"])
         if k == 0 or k == sample_size:

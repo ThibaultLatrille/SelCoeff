@@ -388,7 +388,7 @@ class CategorySNP(list):
         self.bins, self.windows = bins, windows
         self.non_syn_list, self.inner_bound = [], []
         self.dico, self.mean = {}, {}
-        if bins > 0 and (bins != 2 and bins != 5):
+        if bins > 0 and (bins != 2 and bins != 3 and bins != 5):
             intervals = []
             if bound_file != "":
                 df = pd.read_csv(bound_file, sep="\t")
@@ -406,6 +406,14 @@ class CategorySNP(list):
                 self.inner_bound = [0.8]
                 self.dico = {
                     "neg": P("$SIFT < 0.8$", BLUE, 0, 0.8),
+                    "pos": P("$SIFT > 0.8$", RED, 0.8, 1.0),
+                    "syn": P("$Synonymous$", 'black', None, None)
+                }
+            elif self.bins == 3:
+                self.inner_bound = [0.05, 0.8]
+                self.dico = {
+                    "neg-strong": P("$SIFT<0.05$", BLUE, 0, 0.05),
+                    "weak": P("$0.05<SIFT<0.8$", LIGHTGREEN, 0.05, 0.8),
                     "pos": P("$SIFT > 0.8$", RED, 0.8, 1.0),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
@@ -428,6 +436,14 @@ class CategorySNP(list):
                     "pos": P("$\\omega > 1$", RED, 1.0, np.float("infinity")),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
+            elif self.bins == 3:
+                self.inner_bound = [0.05, 1.0]
+                self.dico = {
+                    "neg": P("$\\omega<0.05$", BLUE, 0, 0.05),
+                    "weak": P("$0.05<\\omega<1.0$", LIGHTGREEN, 0.05, 1.0),
+                    "pos": P("$\\omega > 1$", RED, 1.0, np.float("infinity")),
+                    "syn": P("$Synonymous$", 'black', None, None)
+                }
             else:
                 self.inner_bound = [0.05, 0.1, 0.3, 1.0]
                 self.dico = {
@@ -447,6 +463,14 @@ class CategorySNP(list):
                     "neg": P("$S<0$", BLUE, -np.float("infinity"), 0),
                     "syn": P("$Synonymous$", 'black', None, None),
                     "pos": P("$S>0$", RED, 0, np.float("infinity"))
+                }
+            elif self.bins == 3:
+                self.inner_bound = [-1, 1]
+                self.dico = {
+                    "neg": P("$S<-1$", BLUE, -np.float("infinity"), -1),
+                    "weak": P("$-1<S<1$", LIGHTGREEN, -1, 1),
+                    "pos": P("$S>1$", RED, 1, np.float("infinity")),
+                    "syn": P("$Synonymous$", 'black', None, None)
                 }
             else:
                 self.inner_bound = [-3, -1, 0, 1]

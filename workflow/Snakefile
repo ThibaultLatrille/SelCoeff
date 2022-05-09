@@ -139,6 +139,32 @@ rule gather_opportunities:
     shell:
         'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --output {output.tsv}'
 
+rule ancestral_reconstruction:
+    input:
+        script=f'{FOLDER}/scripts/ancestral_reconstruction.py',
+        fasta_folder=f'{FOLDER}/data_div/omm_NT_fasta.v10c_116',
+        tree_folder=f'{FOLDER}/data_div/omm_RooTree.v10b_116',
+        fasta_pop=rules.fixed_snp_by_pop.output.fasta,
+        exec=f'{FOLDER}/utils/FastML.v3.11/programs/fastml/fastml'
+    output:
+        folder=directory(f"{FOLDER}/data_processed/ancestral_reconstruction/" + '{species}.{popu}'),
+    params:
+        k=lambda wildcards: f"--subsample_genes {config['subsample_genes_ancestral']}",
+    shell:
+        'python3 {input.script} --exec {input.exec} {params.k} --species {wildcards.species} --fasta_folder {input.fasta_folder} --tree_folder {input.tree_folder} --fasta_pop {input.fasta_pop} --output {output.folder}'
+
+rule mapping:
+    input:
+        script=f'{FOLDER}/scripts/substitutions_mapping.py',
+        exp_folder=f'{FOLDER}/data_div/Experiments',
+        ancestral=rules.ancestral_reconstruction.output.folder,
+        bounds=rules.annotate_vcf.output.bounds,
+        opp=f"{FOLDER}/data_processed/opportunities_{binning}/DFE." + '{species}.{popu}.MutSel.tsv',
+    output:
+        tsv=f"{FOLDER}/data_processed/ancestral_{binning}/" + '{species}.{popu}.tsv',
+    shell:
+        'python3 {input.script} --opp {input.opp} --species {wildcards.species} --bins {bins} --windows {windows} --bounds {input.bounds} --exp_folder {input.exp_folder} --ancestral {input.ancestral} --output {output.tsv}'
+
 checkpoint sfs:
     input:
         script=f'{FOLDER}/scripts/plot_sfs.py',
@@ -185,12 +211,15 @@ rule parse_results_DFE:
         script=f'{FOLDER}/scripts/parse_results_DFE.py',
         postprocessing=f'{FOLDER}/scripts/postprocessing.R',
         modelfile=gather_model_results,
+        subs=lambda wildcards: rules.mapping.output.tsv if (config["ALPHA"] and wildcards.method == "MutSel") else [],
         bounds=rules.annotate_vcf.output.bounds
     output:
         pdf=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{model}.pdf',
         tsv=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{model}.tsv'
+    params:
+        substitutions=lambda wildcards, input, output: f"--substitutions {input.subs}" if len(input.subs) > 0 else ""
     shell:
-        'python3 {input.script} --postprocessing {input.postprocessing} --bins {bins} --windows {windows} --bounds {input.bounds} --input {input.modelfile} --method {wildcards.method} --output {output.pdf}'
+        'python3 {input.script} --postprocessing {input.postprocessing} {params.substitutions} --bins {bins} --windows {windows} --bounds {input.bounds} --input {input.modelfile} --method {wildcards.method} --output {output.pdf}'
 
 rule plot_dfe_heatmap:
     input:

@@ -95,9 +95,12 @@ def main(args):
     sfs_nonsyn_mean = np.sum([sfs for cat, sfs in snp_sfs_mean.items() if cat != "syn"], axis=0)
     output_all = os.path.join(args.output_dir, 'all')
     write_sfs(snp_sfs_mean["syn"], sfs_nonsyn_mean, ldn, lds, max_daf, output_all, args.pop, "")
+    theta_dict = defaultdict(list)
+    theta_dict["category"].append('all')
+    for theta_method in sfs_weight:
+        theta_dict[theta_method].append(theta(sfs_nonsyn_mean[1:] / ldn, max_daf, theta_method))
 
     daf_axis = range(1, max_daf)
-    theta_dict = defaultdict(list)
     for cat, mean_sfs in snp_sfs_mean.items():
         if cat == "syn":
             ld_cat = lds

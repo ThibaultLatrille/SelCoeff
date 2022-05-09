@@ -3,6 +3,7 @@ import argparse
 import numpy as np
 import pandas as pd
 from functools import reduce
+from itertools import product
 from collections import defaultdict
 import statsmodels.api as sm
 from matplotlib.cm import get_cmap
@@ -11,6 +12,8 @@ from libraries import my_dpi, plt, polydfe_cat_dico, tex_f, sort_df, sp_sorted, 
     alpha_sup_limits
 
 markers = ["o", "d", "s", '.']
+alpha_suffix = alpha_sup_limits + ["_div", "_MKF", "_MKW", "_MKT"]
+omega_suffix = ["", "_na", "_a"]
 
 
 def open_tsv(filepath, cat_snps):
@@ -21,8 +24,9 @@ def open_tsv(filepath, cat_snps):
         df_theta = df_theta.drop(["method", "species", "category"], axis=1)
         df_dfe = ddf[(ddf["method"] == "MutSel") & (ddf["category"] != "syn")]
         cols = list(polydfe_cat_dico) + [f"P-{cat}" for cat in cat_snps.non_syn_list]
-        cols += ['p_b', 'S_b', 'S_d', 'b', 'logL', 'S', 'S+', 'S-']
-        cols += [f"alpha{sup}" for sup in alpha_sup_limits]
+        cols += ['p_b', 'S_b', 'S_d', 'b', 'logL', 'S', 'S+', 'S-', 'fay_wu', 'tajima', 'watterson']
+        cols += [f"omega{sup}" for sup in omega_suffix]
+        cols += [f"alpha{sup}" for sup in alpha_suffix]
         m_list = []
         for col in cols:
             if col in df_dfe:
@@ -44,13 +48,6 @@ def generate_xy_plot(cat_snps):
     xy_dico = defaultdict(list)
     dico_label = {'pop': "Population", "species": "Species", "watterson": "Watterson $\\theta_W$",
                   "proba": "$\\mathbb{P}$", "logL": "logL"}
-    for sup in alpha_sup_limits:
-        dico_label |= {f'all_alpha{sup}': f"$\\alpha^{sup} $",
-                       f'pos_alpha{sup}': f"$\\alpha^{sup} | S > 0$",
-                       f'neg_alpha{sup}': f"$\\alpha^{sup} | S < 0$"}
-    for p, s in [('S_b', "\\beta_b"), ('S_d', "\\beta_s"), ('b', "b"), ('p_b', "p_b"), ('logL', "LnL"), ('S', "S"),
-                 ('S+', "S^+"), ('S-', "S^-")]:
-        dico_label |= {f'all_{p}': f"${s}$", f'pos_{p}': f"${s} | S > 0$", f'neg_{p}': f"${s} | S < 0$"}
 
     y_dico = {"tajima": "Tajima $\\theta_{\\pi}$ ",
               "flowPos": "$\\Psi_{+}$", "flowNeg": "$\\Psi_{-}$", "flowRatio": "$\\Psi_{+} / \\Psi_{-}$",
@@ -59,11 +56,9 @@ def generate_xy_plot(cat_snps):
               "fay_wu": "Fay and Wu $\\theta_{H}$", "D_tajima": "Tajima's $D$", "H_fay_wu": "Fay and Wu's $H$"}
     y_dico.update({f'all_{cat_poly}': v for cat_poly, v in polydfe_cat_dico.items()})
 
-    for cat in cat_snps.non_syn_list + ['weak', 'all']:
+    for cat in cat_snps.non_syn_list + ['all']:
         s = ""
-        if cat == "weak":
-            s = " -1 < S < 1"
-        elif cat != "all":
+        if cat != "all":
             s = cat_snps.label(cat).replace("$", "")
 
         dico_label[cat] = "$\\mathbb{P}" + f"[{s}]$"
@@ -75,6 +70,16 @@ def generate_xy_plot(cat_snps):
 
         if cat != "all":
             s = f" | {s}"
+
+        for sup in alpha_suffix:
+            dico_label[f'{cat}_alpha{sup}'] = f"$\\alpha^{{{str(sup).replace('_', '')}}} {s}$"
+        for sup in omega_suffix:
+            dico_label[f'{cat}_omega{sup}'] = f"$\\omega^{{{str(sup).replace('_', '')}}} {s}$"
+        for p, param in [('S_b', "\\beta_b"), ('S_d', "\\beta_d"), ('b', "b"), ('p_b', "p_b"), ('logL', "LnL"),
+                         ('S', "S"), ('S+', "S^+"), ('S-', "S^-"), ('pnpsT', "\\pi_T"),
+                         ('pnpsF', "\\pi_F"), ('pnpsW', "\\pi_W")]:
+            dico_label[f'{cat}_{p}'] = f"${param} {s}$"
+
         y_dico.update({f'{cat}_{cat_poly}': v.replace(']', f'{s}]') for cat_poly, v in polydfe_cat_dico.items()})
         for cat_beta in cat_snps.non_syn_list + ['all']:
             beta = cat_snps.label(cat_beta).replace('S', '\\beta').replace("$", "")
@@ -118,13 +123,6 @@ def main(args):
         df["species"] = df["species_x"]
     df = df.iloc[df.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
     df["flowRatio"] = df["flowPos"] / df["flowNeg"]
-
-    '''
-    for cat_poly in polydfe_cat_dico:
-        if f'weak_{cat_poly}' not in df:
-            num = (df[f'neg-weak_{cat_poly}'] * df[f'neg-weak'] + df[f'pos-weak_{cat_poly}'] * df[f'pos-weak'])
-            df[f'weak_{cat_poly}'] = num / (df[f'neg-weak'] + df[f'pos-weak'])
-    '''
 
     if args.bins <= 10:
         assert (np.abs(np.sum([df[cat] for cat in cat_snps.non_syn_list], axis=0) - 1.0) < 1e-6).all()
@@ -214,24 +212,32 @@ def main(args):
     o.write("\\section{Table} \n")
     o.write("\\begin{center}\n")
     # output_columns = ["pop", "species", "tajima", "pos_snps", 'all_P-Ssup0', 'pos_P-Ssup0']
+    cat_list = ['all'] + cat_snps.non_syn_list
 
-    df["R_Ssup0"] = 100 * (1 - df["neg_P-Ssup0"] / df["all_P-Ssup0"])
-    dico_label['R_Ssup0'] = f"1 - {dico_label['neg_P-Ssup0']} / {dico_label['all_P-Ssup0']} (\\%)"
+    for cat in cat_list:
+        if f"{cat}_tajima" in df and "tajima" in df and f"{cat}_omega" in df:
+            df[f"{cat}_pnpsT"] = df[f"{cat}_tajima"] / df["tajima"]
+            df[f"{cat}_pnpsW"] = df[f"{cat}_watterson"] / df["watterson"]
+            df[f"{cat}_pnpsF"] = df[f"{cat}_fay_wu"] / df["fay_wu"]
+            df[f"{cat}_alpha_MKT"] = (df[f"{cat}_omega"] - df[f"{cat}_pnpsT"]) / df[f"{cat}_omega"]
+            df[f"{cat}_alpha_MKW"] = (df[f"{cat}_omega"] - df[f"{cat}_pnpsW"]) / df[f"{cat}_omega"]
+            df[f"{cat}_alpha_MKF"] = (df[f"{cat}_omega"] - df[f"{cat}_pnpsF"]) / df[f"{cat}_omega"]
 
-    cols = [['all_S_b', 'neg_S_b', 'pos_S_b', 'all_p_b', 'neg_p_b', 'pos_p_b'],
-            ['all_logL', 'neg_logL', 'pos_logL'],
-            ['all_S_d', 'neg_S_d', 'pos_S_d', 'all_b', 'neg_b', 'pos_b'],
-            ['all_P-Ssup0', 'neg_P-Ssup0', 'pos_P-Ssup0', 'R_Ssup0'],
-            ['all_P-Seq0', 'neg_P-Seq0', 'pos_P-Seq0'],
-            ['all_P-Sinf0', 'neg_P-Sinf0', 'pos_P-Sinf0'],
-            ['all_S', 'neg_S', 'pos_S'],
-            ['all_S-', 'neg_S-', 'pos_S-', 'all_S+', 'neg_S+', 'pos_S+']]
-    for sup in alpha_sup_limits:
-        if f"all_alpha{sup}" not in df:
+    if "neg_P-Ssup0" in df:
+        df["neg_R_Ssup0"] = 100 * (1 - df["neg_P-Ssup0"] / df["all_P-Ssup0"])
+        dico_label['neg_R_Ssup0'] = f"1 - {dico_label['neg_P-Ssup0']} / {dico_label['all_P-Ssup0']} (\\%)"
+
+    cols_suffix = [['S_b', 'p_b'], ['logL'], ['S_d', 'b'], ['S-', 'S'], ['P-Ssup0', 'R_Ssup0'], ['P-Seq0'], ['P-Sinf0'],
+                   ['omega'], ['omega_na', 'pnpsT'], ['pnpsW', 'pnpsF'], ['omega_a']]
+    cat_list = ['all'] + cat_snps.non_syn_list
+    cols = [[f'{cat}_{suffix}' for suffix, cat in product(suffix_list, cat_list)] for suffix_list in cols_suffix]
+
+    for suf in alpha_suffix:
+        if f"all_alpha{suf}" not in df or f"neg_alpha{suf}" not in df:
             continue
-        df[f"R_alpha{sup}"] = 100 * (1 - df[f"neg_alpha{sup}"] / df[f"all_alpha{sup}"])
-        dico_label[f"R_alpha{sup}"] = f"1 - {dico_label[f'neg_alpha{sup}']} / {dico_label[f'all_alpha{sup}']} (\\%)"
-        cols.append([f'all_alpha{sup}', f'neg_alpha{sup}', f'pos_alpha{sup}', f'R_alpha{sup}'])
+        df[f"R_alpha{suf}"] = 100 * (1 - df[f"neg_alpha{suf}"] / df[f"all_alpha{suf}"])
+        dico_label[f"R_alpha{suf}"] = f"1 - {dico_label[f'neg_alpha{suf}']} / {dico_label[f'all_alpha{suf}']} (\\%)"
+        cols.append([f'{cat}_alpha{suf}' for cat in cat_list] + [f'R_alpha{suf}'])
 
     for c in cols:
         columns = [c for c in ["pop", "species"] + c if c in df]
