@@ -111,54 +111,55 @@
     \subsection{Summary table}
 
     \begin{center}
-        \begin{longtable}{|l|l|r|r|r|r|}
+        \begin{longtable}{|l|l|r|r|r|r|r|}
             \toprule
-            Population                     & Species             & Tajima $\theta$ & $\proba_{obs}[\divAdv]$ & $\PpolyAdv$ & $\proba [ \polyAdv | \divAdv]$ \\
+            Population           & Species             & Tajima $\theta_{\pi}$ & $\mathbb{P}_{div}(S > 0)$ & $\mathbb{P}_{obs}[S>0]$ & $\mathbb{P} [ \beta > 0 ]$ & $\mathbb{P} [ \beta > 0  | S>0]$ \\
             \midrule
             \endhead
             \midrule
-            \multicolumn{6}{r}{{Continued on next page}} \\
+            \multicolumn{7}{r}{{Continued on next page}} \\
             \midrule
             \endfoot
 
             \bottomrule
             \endlastfoot
-            Diverse (Equus)                & Equus caballus      & $ 0.003$        & $ 0.161$                & $ 0.073$    & $ 0.779$                       \\
-            Diverse (Canis)                & Canis familiaris    & $ 0.004$        & $ 0.069$                & $ 0.041$    & $ 0.262$                       \\
-            Iran (IRBT)                    & Bos taurus          & $ 0.009$        & $ 0.123$                & $ 0.054$    & $ 0.300$                       \\
-            Uganda (UGBT)                  & Bos taurus          & $ 0.010$        & $ 0.139$                & $ 0.060$    & $ 0.779$                       \\
-            Australia (AUCH)               & Capra hircus        & $ 0.004$        & $ 0.105$                & $ 0.061$    & $ 0.119$                       \\
-            France (FRCH)                  & Capra hircus        & $ 0.004$        & $ 0.105$                & $ 0.060$    & $ 0.059$                       \\
-            Iran (IRCA)                    & Capra aegagrus      & $ 0.004$        & $ 0.105$                & $ 0.062$    & $ 0.053$                       \\
-            Iran (IRCH)                    & Capra hircus        & $ 0.005$        & $ 0.093$                & $ 0.058$    & $ 0.094$                       \\
-            Italy (ITCH)                   & Capra hircus        & $ 0.004$        & $ 0.103$                & $ 0.059$    & $ 0.053$                       \\
-            Morocco (MOCH)                 & Capra hircus        & $ 0.005$        & $ 0.077$                & $ 0.057$    & $ 0.045$                       \\
-            Iran (IROA)                    & Ovis aries          & $ 0.009$        & $ 0.107$                & $ 0.048$    & $ 0.144$                       \\
-            Iran (IROO)                    & Ovis orientalis     & $ 0.010$        & $ 0.110$                & $ 0.050$    & $ 0.177$                       \\
-            Iran (IROV)                    & Ovis vignei         & $ 0.009$        & $ 0.127$                & $ 0.049$    & $ 0.252$                       \\
-            Various (ISGC)                 & Ovis aries          & $ 0.009$        & $ 0.108$                & $ 0.049$    & $ 0.194$                       \\
-            Morocco (MOOA)                 & Ovis aries          & $ 0.009$        & $ 0.086$                & $ 0.045$    & $ 0.144$                       \\
-            Barbados                       & Chlorocebus sabaeus & $ 0.004$        & $ 0.104$                & $ 0.072$    & $ 0.484$                       \\
-            Central African Republic (CAR) & Chlorocebus sabaeus & $ 0.007$        & $ 0.105$                & $ 0.066$    & $ 0.312$                       \\
-            Ethiopia                       & Chlorocebus sabaeus & $ 0.006$        & $ 0.097$                & $ 0.068$    & $ 0.245$                       \\
-            Gambia                         & Chlorocebus sabaeus & $ 0.006$        & $ 0.101$                & $ 0.064$    & $ 0.411$                       \\
-            Kenya                          & Chlorocebus sabaeus & $ 0.006$        & $ 0.104$                & $ 0.066$    & $ 0.323$                       \\
-            Nevis                          & Chlorocebus sabaeus & $ 0.004$        & $ 0.105$                & $ 0.068$    & $ 0.445$                       \\
-            South Africa (SA)              & Chlorocebus sabaeus & $ 0.007$        & $ 0.095$                & $ 0.065$    & $ 0.233$                       \\
-            Saint Kitts (SK)               & Chlorocebus sabaeus & $ 0.005$        & $ 0.101$                & $ 0.071$    & $ 0.442$                       \\
-            Zambia                         & Chlorocebus sabaeus & $ 0.007$        & $ 0.101$                & $ 0.070$    & $ 0.290$                       \\
-            African (AFR)                  & Homo sapiens        & $ 0.003$        & $ 0.052$                & $ 0.092$    & $ 0.779$                       \\
-            Ad Mixed American (AMR)        & Homo sapiens        & $ 0.002$        & $ 0.055$                & $ 0.087$    & $ 0.779$                       \\
-            East Asian (EAS)               & Homo sapiens        & $ 0.002$        & $ 0.051$                & $ 0.084$    & $ 0.779$                       \\
-            European (EUR)                 & Homo sapiens        & $ 0.002$        & $ 0.053$                & $ 0.087$    & $ 0.779$                       \\
-            South Asian (SAS)              & Homo sapiens        & $ 0.002$        & $ 0.051$                & $ 0.084$    & $ 0.779$                       \\
+            Equus c.             & Equus caballus      & $ 0.002$              & $ 0.301$                  & $ 0.243$                & $ 0.113$                   & $ 0.793$                       \\
+            Canis f.             & Canis familiaris    & $ 0.003$              & $ 0.421$                  & $ 0.181$                & $ 0.048$                   & $ 0.761$                       \\
+            Iran                 & Bos taurus          & $ 0.005$              & $ 0.249$                  & $ 0.264$                & $ 0.098$                   & $ 0.605$                       \\
+            Uganda               & Bos taurus          & $ 0.006$              & $ 0.254$                  & $ 0.249$                & $ 0.095$                   & $ 0.630$                       \\
+            Australia            & Capra hircus        & $ 0.003$              & $ 0.286$                  & $ 0.265$                & $ 0.096$                   & $ 0.512$                       \\
+            France               & Capra hircus        & $ 0.004$              & $ 0.285$                  & $ 0.274$                & $ 0.092$                   & $ 0.529$                       \\
+            Iran (C. aegagrus)   & Capra hircus        & $ 0.004$              & $ 0.284$                  & $ 0.270$                & $ 0.095$                   & $ 0.455$                       \\
+            Iran                 & Capra hircus        & $ 0.004$              & $ 0.297$                  & $ 0.239$                & $ 0.080$                   & $ 0.500$                       \\
+            Italy                & Capra hircus        & $ 0.004$              & $ 0.285$                  & $ 0.265$                & $ 0.087$                   & $ 0.500$                       \\
+            Morocco              & Capra hircus        & $ 0.004$              & $ 0.296$                  & $ 0.200$                & $ 0.080$                   & $ 0.509$                       \\
+            Iran                 & Ovis aries          & $ 0.008$              & $ 0.229$                  & $ 0.259$                & $ 0.060$                   & $ 0.366$                       \\
+            Iran (O. orientalis) & Ovis aries          & $ 0.009$              & $ 0.226$                  & $ 0.272$                & $ 0.067$                   & $ 0.344$                       \\
+            Iran (O. vignei)     & Ovis aries          & $ 0.008$              & $ 0.235$                  & $ 0.307$                & $ 0.075$                   & $ 0.464$                       \\
+            Various              & Ovis aries          & $ 0.009$              & $ 0.226$                  & $ 0.279$                & $ 0.065$                   & $ 0.378$                       \\
+            Morocco              & Ovis aries          & $ 0.008$              & $ 0.225$                  & $ 0.212$                & $ 0.054$                   & $ 0.377$                       \\
+            Barbados             & Chlorocebus sabaeus & $ 0.004$              & $ 0.314$                  & $ 0.258$                & $ 0.109$                   & $ 0.670$                       \\
+            Central Afr. Rep.    & Chlorocebus sabaeus & $ 0.006$              & $ 0.315$                  & $ 0.264$                & $ 0.094$                   & $ 0.619$                       \\
+            Ethiopia             & Chlorocebus sabaeus & $ 0.005$              & $ 0.307$                  & $ 0.252$                & $ 0.107$                   & $ 0.660$                       \\
+            Gambia               & Chlorocebus sabaeus & $ 0.005$              & $ 0.303$                  & $ 0.249$                & $ 0.085$                   & $ 0.666$                       \\
+            Kenya                & Chlorocebus sabaeus & $ 0.006$              & $ 0.311$                  & $ 0.272$                & $ 0.095$                   & $ 0.602$                       \\
+            Nevis                & Chlorocebus sabaeus & $ 0.004$              & $ 0.302$                  & $ 0.252$                & $ 0.102$                   & $ 0.642$                       \\
+            South Africa         & Chlorocebus sabaeus & $ 0.007$              & $ 0.312$                  & $ 0.246$                & $ 0.094$                   & $ 0.638$                       \\
+            Saint Kitts          & Chlorocebus sabaeus & $ 0.004$              & $ 0.306$                  & $ 0.250$                & $ 0.106$                   & $ 0.664$                       \\
+            Zambia               & Chlorocebus sabaeus & $ 0.006$              & $ 0.308$                  & $ 0.261$                & $ 0.103$                   & $ 0.630$                       \\
+            African              & Homo sapiens        & $ 0.003$              & $ 0.256$                  & $ 0.141$                & $ 0.103$                   & $ 1.000$                       \\
+            Admixed American     & Homo sapiens        & $ 0.002$              & $ 0.247$                  & $ 0.145$                & $ 0.103$                   & $ 0.945$                       \\
+            East Asian           & Homo sapiens        & $ 0.002$              & $ 0.241$                  & $ 0.129$                & $ 0.098$                   & $ 0.918$                       \\
+            European             & Homo sapiens        & $ 0.002$              & $ 0.254$                  & $ 0.130$                & $ 0.098$                   & $ 0.919$                       \\
+            South Asian          & Homo sapiens        & $ 0.002$              & $ 0.246$                  & $ 0.131$                & $ 0.096$                   & $ 0.912$                       \\
         \end{longtable}
     \end{center}
     \begin{itemize}
         \item Tajima $\theta$ is the synonymous diversity.
-        \item $\proba_{obs}[\divAdv]$ is the proportion of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) larger than 1.
-        \item $\PpolyAdv $ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) larger than 1, estimated for the whole genome.
-        \item $\proba [ \polyAdv | \divAdv]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) larger than 1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) larger than 1.
+        \item $\mathbb{P}_{div}(S > 0)$ is the proportion of substitution in the terminal branch observed with a selection coefficient at the phylogenetic scale ($\Sphy$) larger than 0.
+        \item $\mathbb{P}_{obs}[S>0]$ is the proportion of SNPs observed with a predicted selection coefficient at the phylogenetic scale ($\Sphy$) larger than 0.
+        \item $\mathbb{P} [ \beta > 0 ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) larger than 1, estimated for the whole genome.
+        \item $\proba [ \polyAdv | \divAdv]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) larger than 1, estimated on the subset of SNPs observed with a predicted selection coefficient at the phylogenetic scale ($\Sphy$) larger than 0.
     \end{itemize}
 
     \subsection{Correlation with diversity}
@@ -166,13 +167,13 @@
     \subsubsection{Proportion of nearly-neutral mutations ($\polyNeutral$)}
 
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.all_P-Seq0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression/results.watterson.all_P-Seq0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.neg-weak_P-Seq0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression/results.watterson.neg-weak_P-Seq0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.pos-weak_P-Seq0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression/results.watterson.pos-weak_P-Seq0.scatter.pdf}
     \end{minipage}
 
     \begin{itemize}
@@ -184,13 +185,13 @@
     \subsubsection{Proportion of deleterious mutations ($\polyDel$)}
 
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.all_P-Sinf0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression/results.watterson.all_P-Sinf0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.neg_P-Sinf0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression/results.watterson.neg_P-Sinf0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.neg-strong_P-Sinf0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression/results.watterson.neg-strong_P-Sinf0.scatter.pdf}
     \end{minipage}
 
     \begin{itemize}
@@ -199,14 +200,13 @@
         \item $\ \proba [ \polyDel | \divStrongDel ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) lower than -1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) lower than -3.
     \end{itemize}
 
-
     \subsubsection{Proportion of advantageous mutations ($\polyAdv$)}
 
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.all_P-Ssup0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression/results.watterson.all_P-Ssup0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/polyDFE-mC-non-adaptive/regression/results.watterson.pos_P-Ssup0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression/results.watterson.pos_P-Ssup0.scatter.pdf}
     \end{minipage}
 
     \begin{itemize}

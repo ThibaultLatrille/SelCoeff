@@ -58,6 +58,8 @@ def main(args):
             for cat in cats:
                 dico_div[f"div_{cat}"] += 1.0
 
+        cds_rates.rm_ensg(ensg)
+
     df_opp = pd.read_csv(args.opp, sep="\t")
     for cat in cat_snps.non_syn_list:
         dico_div[f"L_{cat}"] = df_opp[cat].values[0] * df_opp["Ldn"].values[0]

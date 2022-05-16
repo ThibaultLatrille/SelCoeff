@@ -108,14 +108,27 @@ def omega_div(df_div, cat):
     return (div_non_syn / div_syn) * (l_syn / l_non_syn)
 
 
-def omega_na_model_C(p_pos, d_neg, d_pos):
-    neg_res = integrate.quad(lambda s: (1 - p_pos) * d_neg.pdf(-s) * pfix(s), -100, 0)
-    pos_res = integrate.quad(lambda s: p_pos * d_pos.pdf(s) * pfix(s), 0, 0)
-    return neg_res[0] + pos_res[0]
+def omega_model_C(p_pos, d_neg, d_pos, min_s, max_s):
+    out = 0.0
+    if min_s < 0:
+        out += integrate.quad(lambda s: (1 - p_pos) * d_neg.pdf(-s) * pfix(s), min_s, 0)[0]
+    if max_s > 0:
+        out += integrate.quad(lambda s: p_pos * d_pos.pdf(s) * pfix(s), 0, max_s)[0]
+    return out
 
 
-def omega_na_model_D(p_list, s_list):
-    return sum([p * pfix(s) for p, s in zip(p_list, s_list) if s <= 0])
+def omega_model_D(p_list, s_list, min_s, max_s):
+    return sum([p * pfix(s) for p, s in zip(p_list, s_list) if min_s <= s < max_s])
+
+
+def omega_dico(df_div, cat, omega_dfe, omega_na_dfe, omega_a_dfe):
+    out = {f'omega_dfe': omega_dfe, f'omega_NAdfe': omega_na_dfe, f'omega_Adfe': omega_a_dfe}
+    if df_div is not None:
+        omega = omega_div(df_div, cat)
+        div = float(df_div[f"div_{cat}"].values[0])
+        out |= {f"div": div, f'omega_div': omega, f'omega_Adiv': omega - omega_na_dfe,
+                f'alpha_div': (omega - omega_na_dfe) / omega}
+    return out
 
 
 def alpha_model_D(p_list, s_list, lim_left=0.0):
@@ -148,14 +161,10 @@ def main(args):
             for lim_left in alpha_sup_limits:
                 out[f'alpha{lim_left}'] = alpha_model_D(p_list, s_list, lim_left=lim_left)
 
-            if df_div is not None:
-                omega = omega_div(df_div, cat)
-                omega_na = omega_na_model_D(p_list, s_list)
-                out[f'omega'] = omega
-                out[f'omega_na'] = omega_na
-                out[f'omega_a'] = omega - omega_na
-                out[f'alpha_div'] = (omega - omega_na) / omega
-
+            omega_dfe = omega_model_D(p_list, s_list, -100, 100)
+            omega_na_dfe = omega_model_D(p_list, s_list, -100, 0)
+            omega_a_dfe = omega_model_D(p_list, s_list, 0, 100)
+            out |= omega_dico(df_div, cat, omega_dfe, omega_na_dfe, omega_a_dfe)
         else:
             p_pos = out["p_b"]
             shape_neg = out["b"]
@@ -179,13 +188,11 @@ def main(args):
                     out[cat_poly] = p_pos * d_pos.cdf(1.0)
                 elif cat_poly == "pos":
                     out[cat_poly] = p_pos * (1 - d_pos.cdf(1.0))
-            if df_div is not None:
-                omega = omega_div(df_div, cat)
-                omega_na = omega_na_model_C(p_pos, d_neg, d_pos)
-                out[f'omega'] = omega
-                out[f'omega_na'] = omega_na
-                out[f'omega_a'] = omega - omega_na
-                out[f'alpha_div'] = (omega - omega_na) / omega
+
+            omega_dfe = omega_model_C(p_pos, d_neg, d_pos, -100, 100)
+            omega_na_dfe = omega_model_C(p_pos, d_neg, d_pos, -100, 0)
+            omega_a_dfe = omega_model_C(p_pos, d_neg, d_pos, 0, 100)
+            out |= omega_dico(df_div, cat, omega_dfe, omega_na_dfe, omega_a_dfe)
         s_dico[cat] = out
 
     list_cat = [cat for cat in list_cat if cat in s_dico]

@@ -3,11 +3,20 @@ import argparse
 from ete3 import Tree
 import subprocess
 import numpy as np
-from libraries import open_fasta, write_fasta, nucleotides
+from libraries import open_fasta, write_fasta, codontable
 
 
 def most_common(lst):
     return max(set(lst), key=lst.count)
+
+
+def clean_sequence(seq):
+    codon_list = []
+    for pos in range(len(seq) // 3):
+        codon = seq[pos * 3: pos * 3 + 3]
+        codon = codon if (codontable[codon] != "-" and codontable[codon] != "X") else "---"
+        codon_list.append(codon)
+    return "".join(codon_list)
 
 
 def SubsetMostCommon(alignment, specie, tree_path, fasta_pop):
@@ -18,7 +27,7 @@ def SubsetMostCommon(alignment, specie, tree_path, fasta_pop):
     assert len(leaves) == 1
     node = leaves[0]
 
-    subali = {specie: fasta_pop.replace("!", "-")}
+    subali = {specie: clean_sequence(fasta_pop)}
     while len(subali) < 4:
         if node is None:
             break
@@ -33,9 +42,10 @@ def SubsetMostCommon(alignment, specie, tree_path, fasta_pop):
 
                 seqs = [alignment[sp] for sp in diff_genus_names]
                 ref_seq = []
-                for pos in range(len(seqs[0])):
-                    states = [s[pos] for s in seqs if s[pos] in nucleotides]
-                    ref_seq.append("-" if len(states) == 0 else most_common(states))
+                for pos in range(len(seqs[0]) // 3):
+                    codons = [s[pos * 3: pos * 3 + 3] for s in seqs]
+                    codons = [c for c in codons if codontable[c] != "-" and codontable[c] != "X"]
+                    ref_seq.append("---" if len(codons) == 0 else most_common(codons))
 
                 subali[sister_names[0]] = "".join(ref_seq)
 
@@ -44,23 +54,6 @@ def SubsetMostCommon(alignment, specie, tree_path, fasta_pop):
     tree.prune(subali.keys())
     print(subali.keys())
     return subali, tree
-
-
-def Subset(alignment, specie, tree_path, fasta_pop):
-    if not os.path.exists(tree_path):
-        tree_path = tree_path.replace("_null_", "__")
-
-    t = Tree(tree_path)
-    leaves = t.get_leaves_by_name(specie)
-    assert len(leaves) == 1
-    node = leaves[0]
-    for gr in [1, 2, 3]:
-        if node is not None:
-            node = node.up
-
-    subali = {k: alignment[k] for k in (t if node is None else node).get_leaf_names()}
-    subali[specie] = fasta_pop
-    return subali, (t if node is None else node)
 
 
 def main(args):
@@ -126,23 +119,27 @@ def main(args):
         ensg = fasta_file.replace("__", "_null_").replace("_NT.fasta", "")
         fasta_dict = open_fasta(f"{args.fasta_folder}/{fasta_file}")
         tree_path = f"{args.tree_folder}/{ensg}_NT.rootree"
-        if args.species in fasta_dict:
-            subali, subtree = SubsetMostCommon(fasta_dict, args.species, tree_path, fasta_pop[ensg])
+        if args.species not in fasta_dict:
+            continue
 
-            # Write fasta file
-            s = f"{args.output}/{ensg}_NT.fasta"
-            write_fasta(subali, s)
-            # Write the tree
-            t = f"{args.output}/{ensg}_NT.rootree"
-            subtree.write(outfile=t, format=5, format_root_node=True)
+        o = f"{args.output}/{ensg}.fastml"
+        if os.path.exists(f"{o}.joint.fasta") and os.path.isfile(f"{o}.joint.fasta"):
+            continue
+        subali, subtree = SubsetMostCommon(fasta_dict, args.species, tree_path, fasta_pop[ensg])
 
-            o = f"{args.output}/{ensg}.fastml"
+        # Write fasta file
+        s = f"{args.output}/{ensg}_NT.fasta"
+        write_fasta(subali, s)
+        # Write the tree
+        t = f"{args.output}/{ensg}_NT.rootree"
+        subtree.write(outfile=t, format=5, format_root_node=True)
 
-            cmd = f"{args.exec} -mh -qf -s {s} -t {t} -x {o}.newick -y {o}.ancestor -j {o}.joint.fasta -k {o}.marginal.fasta -d {o}.join.prob -e {o}.marginal.prob"
-            # print(cmd)
-            subprocess.check_output(cmd, shell=True)
-            os.remove(f"{o}.marginal.prob")
-            os.remove(f"{o}.marginal.fasta")
+        cmd = f"{args.exec} -g -my -qf -s {s} -t {t} -x {o}.newick -y {o}.ancestor -j {o}.joint.fasta -k {o}.marginal" \
+              f".fasta -d {o}.join.prob -e {o}.marginal.prob "
+        # print(cmd)
+        subprocess.check_output(cmd, shell=True)
+        os.remove(f"{o}.marginal.prob")
+        os.remove(f"{o}.marginal.fasta")
 
 
 if __name__ == '__main__':

@@ -12,8 +12,8 @@ from libraries import my_dpi, plt, polydfe_cat_dico, tex_f, sort_df, sp_sorted, 
     alpha_sup_limits
 
 markers = ["o", "d", "s", '.']
-alpha_suffix = alpha_sup_limits + ["_div", "_MKF", "_MKW", "_MKT"]
-omega_suffix = ["", "_na", "_a"]
+alpha_suffix = alpha_sup_limits + ["_div", "_mkt", "_mkw", "_mkf"]
+omega_suffix = ["_div", "_dfe", "_NAdfe", "_Adiv", "_Adfe", "_Amkt", "_Amkw", "_Amkf"]
 
 
 def open_tsv(filepath, cat_snps):
@@ -24,7 +24,7 @@ def open_tsv(filepath, cat_snps):
         df_theta = df_theta.drop(["method", "species", "category"], axis=1)
         df_dfe = ddf[(ddf["method"] == "MutSel") & (ddf["category"] != "syn")]
         cols = list(polydfe_cat_dico) + [f"P-{cat}" for cat in cat_snps.non_syn_list]
-        cols += ['p_b', 'S_b', 'S_d', 'b', 'logL', 'S', 'S+', 'S-', 'fay_wu', 'tajima', 'watterson']
+        cols += ['p_b', 'S_b', 'S_d', 'b', 'logL', 'S', 'S+', 'S-', 'fay_wu', 'tajima', 'watterson', 'div']
         cols += [f"omega{sup}" for sup in omega_suffix]
         cols += [f"alpha{sup}" for sup in alpha_suffix]
         m_list = []
@@ -77,7 +77,7 @@ def generate_xy_plot(cat_snps):
             dico_label[f'{cat}_omega{sup}'] = f"$\\omega^{{{str(sup).replace('_', '')}}} {s}$"
         for p, param in [('S_b', "\\beta_b"), ('S_d', "\\beta_d"), ('b', "b"), ('p_b', "p_b"), ('logL', "LnL"),
                          ('S', "S"), ('S+', "S^+"), ('S-', "S^-"), ('pnpsT', "\\pi_T"),
-                         ('pnpsF', "\\pi_F"), ('pnpsW', "\\pi_W")]:
+                         ('pnpsF', "\\pi_F"), ('pnpsW', "\\pi_W"), ('div', "d")]:
             dico_label[f'{cat}_{p}'] = f"${param} {s}$"
 
         y_dico.update({f'{cat}_{cat_poly}': v.replace(']', f'{s}]') for cat_poly, v in polydfe_cat_dico.items()})
@@ -215,22 +215,32 @@ def main(args):
     cat_list = ['all'] + cat_snps.non_syn_list
 
     for cat in cat_list:
-        if f"{cat}_tajima" in df and "tajima" in df and f"{cat}_omega" in df:
+        if f"{cat}_tajima" in df and "tajima" in df:
             df[f"{cat}_pnpsT"] = df[f"{cat}_tajima"] / df["tajima"]
             df[f"{cat}_pnpsW"] = df[f"{cat}_watterson"] / df["watterson"]
             df[f"{cat}_pnpsF"] = df[f"{cat}_fay_wu"] / df["fay_wu"]
-            df[f"{cat}_alpha_MKT"] = (df[f"{cat}_omega"] - df[f"{cat}_pnpsT"]) / df[f"{cat}_omega"]
-            df[f"{cat}_alpha_MKW"] = (df[f"{cat}_omega"] - df[f"{cat}_pnpsW"]) / df[f"{cat}_omega"]
-            df[f"{cat}_alpha_MKF"] = (df[f"{cat}_omega"] - df[f"{cat}_pnpsF"]) / df[f"{cat}_omega"]
+            if f"{cat}_omega_div" in df:
+                df[f"{cat}_omega_Amkt"] = df[f"{cat}_omega_div"] - df[f"{cat}_pnpsT"]
+                df[f"{cat}_omega_Amkw"] = df[f"{cat}_omega_div"] - df[f"{cat}_pnpsW"]
+                df[f"{cat}_omega_Amkf"] = df[f"{cat}_omega_div"] - df[f"{cat}_pnpsF"]
+                df[f"{cat}_alpha_mkt"] = df[f"{cat}_omega_Amkt"] / df[f"{cat}_omega_div"]
+                df[f"{cat}_alpha_mkw"] = df[f"{cat}_omega_Amkw"] / df[f"{cat}_omega_div"]
+                df[f"{cat}_alpha_mkf"] = df[f"{cat}_omega_Amkf"] / df[f"{cat}_omega_div"]
 
     if "neg_P-Ssup0" in df:
         df["neg_R_Ssup0"] = 100 * (1 - df["neg_P-Ssup0"] / df["all_P-Ssup0"])
         dico_label['neg_R_Ssup0'] = f"1 - {dico_label['neg_P-Ssup0']} / {dico_label['all_P-Ssup0']} (\\%)"
 
-    cols_suffix = [['S_b', 'p_b'], ['logL'], ['S_d', 'b'], ['S-', 'S'], ['P-Ssup0', 'R_Ssup0'], ['P-Seq0'], ['P-Sinf0'],
-                   ['omega'], ['omega_na', 'pnpsT'], ['pnpsW', 'pnpsF'], ['omega_a']]
+    if "pos_div" in df and "neg_div" in df:
+        df["proba_pos_div"] = df["pos_div"] / (df["neg_div"] + df["pos_div"])
+        dico_label['proba_pos_div'] = "$\\mathbb{P}_{div}(S > 0)$"
+
+    cols_suffix = [['S_b'], ['p_b'], ['logL'], ['S_d'], ['b'], ['S-'], ['S'], ['P-Ssup0'], ['R_Ssup0'], ['P-Seq0'],
+                   ['P-Sinf0'], ['omega_div'], ['omega_dfe'], ['omega_NAdfe'], ['pnpsW'], ['omega_Adfe'],
+                   ['omega_Adiv'], ['omega_Amkt'], ['omega_Amkw']]
     cat_list = ['all'] + cat_snps.non_syn_list
     cols = [[f'{cat}_{suffix}' for suffix, cat in product(suffix_list, cat_list)] for suffix_list in cols_suffix]
+    cols.append(["tajima", 'proba_pos_div', "pos_snps", 'all_p_b', 'pos_p_b'])
 
     for suf in alpha_suffix:
         if f"all_alpha{suf}" not in df or f"neg_alpha{suf}" not in df:

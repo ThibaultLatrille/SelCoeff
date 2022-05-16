@@ -89,12 +89,12 @@
     \begin{abstract}
         Evidence for positive selection occurring in protein-coding DNA sequence is widespread across different taxa.
         Positive selection can be a result of adaptive evolution, meaning that individuals have had to adapt to a change in environment or selective pressure.
-        However, current positive selection can also be the result of mutations compensating for deleterious substitutions that have accumulated along lineages, in which case positive selection is non-adaptive and predictable.
+        However, recent positive selection can also be the result of mutations compensating for deleterious substitutions that have accumulated along lineages, in which case positive selection is non-adaptive.
         To evaluate the extent of non-adaptive positive selection, we have combined population genetics and phylogenetic datasets.
         We first leveraged phylogenetic codon models which are based on a population-genetics formalism, assuming a non-adaptive fitness landscape.
         These models estimate the fitness of each of the 20 amino acids for each protein site, given mammalian protein-coding DNA alignments and gene tree topologies.
         Second, we integrated mammalian divergence data with polymorphic variants found in 29 populations across 7 mammalian genera.
-        For each non-synonymous variant observed at the population level, we predicted its change in fitness from amino-acid fitness estimated at the mammalian scale.
+        For each non-synonymous variant observed at the population level, we predicted its change in fitness from amino-acid fitnesses estimated at the mammalian scale.
         We found that a large proportion of observed non-synonymous changes are predicted to be positively selected, meaning that the ancestral allele is suboptimal.
         These supposedly advantageous variants are indeed showing signs of recent positive selection in all populations.
         Our work confirms that deleterious substitutions have accumulated across the phylogeny and are currently being compensated for, resulting in widespread positive selection that is not adaptive evolution.
@@ -105,50 +105,54 @@
 
     We usually say that a mutation is undergoing positive selection when it brings a fitness advantage to its bearer, and thus facilitate its own transmission to the next generation.
     However, the causes of this advantage can be diverse.
-    We can distinguish two main advantages.
-    The first advantage allows its bearer to become better adapted to a new or a changing environment, what we typically call adaptive evolution.
-    The population as a whole is thus climbing the fitness landscape along an adaptive walk\cite{tenaillon_utility_2014}.
-    The second is non-adaptive, in the sense that the increase in fitness of a new mutation is not a response to a new or a changing environment.
+    We can distinguish two main scenarios in which a mutation is advantageous.
+    The first scenario concerns environmental change.
+    The bearer of the mutation that is advantageous in a new environment will be better adapted. Hence, its chances of survival and reproduction will be higher.
+    This process is typically referred to as adaptive evolution.
+    The second scenario involves the fixation of a deleterious mutation by drift, in which case the mutation restores the ancestral state which corresponded to an optimal state of the individual.
+    This process is non-adaptive, in the sense that the increase in fitness of the new mutation is not in response to a new or a changing environment.
     Instead, the mutation restores the ancestral state which corresponded to an optimal functioning of the individual in a constant environment, but has been lost due to the fixation of a deleterious mutation by drift.
-    The population as a whole is thus merely staying in the same position in fitness landscape at this equilibrium, and positive selection compensates for deleterious mutations that reach fixation due to drift\cite{sella_application_2005, mustonen_fitness_2009}.
+    Regarding the difference between these two scenarios at the population scale, while in the case of environmental change, the population as a whole is climbing the fitness landscape along an adaptive walk\cite{tenaillon_utility_2014}, in the case of
+    non-adaptive positive selection, the population as a whole is thus merely staying in the same position in fitness landscape at this equilibrium, and positive selection compensates for deleterious mutations that reach fixation due to drift\cite{sella_application_2005, mustonen_fitness_2009}.
     These two different kinds of selection result in a positive transmission bias of the advantageous allele, but their consequences are conceptually different.
     While adaptive evolution promotes phenotype diversification, non-adaptive positive selection promotes phenotype stability and preserves well established biological systems.
     It is thus of importance to be able to distinguish those two kinds of positive selection in order to understand the diversification of species.
 
-    Inside proteins, positive selection can be quantified by comparing sequence variation inside a population with the sequence divergence with a sister species\cite{mcdonald_adaptative_1991}.
+    Positive selection can be quantified by comparing sequence variation inside a population with the sequence divergence with a sister species\cite{mcdonald_adaptative_1991}.
     Indeed, strongly advantageous mutations are expected to be observed in substitutions but not in polymorphism because they reach fixation quickly.
     This method has been largely improved to account for possible bias-inducing factors such as the presence of weak positive selection, background selection and demography fluctuations\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009, galtier_adaptive_2016, tataru_inference_2017}.
-    It's application across many taxa has uncovered that a large proportion of substitutions are positively selected\cite{moutinho_variation_2019}.
+    It's application across many taxa has uncovered widespread positive selection\cite{moutinho_variation_2019}.
     The root cause for this widespread rate of positive selection is, however, scarcely investigated, often assumed to be the end result of adaptive evolution.
     However, as mentioned above, not all these mutations contribute to genetic innovation and diversification.
     Adaptive evolution can only be well estimated if non-adaptive positive selection is taken into account.
     While adaptive evolution is unpredictable because it brings an advantage concerning an unpredictable change in the environment of organisms, the second is predictable because optimal states should be more or less the same for closely related organisms which share most of their environment and physiology.
     A way to thus measure non-adaptive positive selection is to compute selection coefficients assuming a constant and stable fitness landscape estimated from the alignment of protein-coding genes.
     For each site of the protein alignment, amino-acid frequencies in the alignment is a proxy for its fitness, since for example a deleterious amino acid will be absent in the alignment.
-    One of the most used methods to make these predictions is SIFT (Sort Intolerant From Tolerant) which reliably detects deleterious mutations in many taxa\cite{ng_sift_2003, vaser_sift_2016}.
+    One of the most used methods to make these predictions is SIFT (Sort Intolerant From Tolerant), which reliably detects deleterious mutations in many taxa\cite{ng_sift_2003, vaser_sift_2016}.
     However, this method has two major shortcomings.
     First, this method uses amino-acid frequency as a proxy for amino-acid fitness, even if we know that a lot of mechanisms can influence amino-acid frequency other than fitness (phylogeny, mutation biases, GC-biased gene conversion, mutational paths).
     Second, each mutation is attributed a score to describe if it should be under purifying selection on one hand or be neutral or advantageous, on the other hand.
     But this score makes little sense to actual measure of fitness, and is not interpretable in terms of population genetics.
-    In the other hand, at the DNA level, so-called mutation-selection codon models are rooted with population genetics formalism\cite{halpern_evolutionary_1998, mccandlish_modeling_2014}.
+    At a finer scale, modelling at the codon level can disentangle processes of mutation at the DNA level and selection at the amino-acid level.
+    For example, so-called mutation-selection codon models are rooted with population genetics formalism\cite{halpern_evolutionary_1998, mccandlish_modeling_2014}.
     Such models provide a nearly-neutral framework of evolution by estimating the fitness landscape over amino-acid sequences for each site of the sequence while taking into account non-adaptive processes impacting codon frequency\cite{halpern_evolutionary_1998, rodrigue_mechanistic_2010, tamuri_estimating_2012}.
     Only nearly-neutral mutations between high fitness amino acids will tend to be permitted by the model, allowing for the explicit calculation of the scaled selection coefficient of non-synonymous mutations between codons.
-    These models have been used as a null model to predict the overall rate of evolution of proteins\cite{spielman_relationship_2015, dosreis_how_2015}.
-    A departure from this model indicates that proteins are evolving under a changing fitness landscape\cite{rodrigue_detecting_2017, tamuri_mutationselection_2021} and is a signal of adaptive evolution\cite{rodrigue_bayesian_2021}.
-    In this study we want to address three main questions: which proportions of the polymorphism we observe in mammals is undergoing non-adaptive positive selection ?
-    Are these mutations actually under positive selection at the scale of populations ?
-    How does effective population size modulates positive, negative and weak selection ?
+    As a consequence, by integrating datasets at the species and population level, we can estimate the selection coefficient for each mutation currently segregating in a population.
+    Such dataset can allow us to address different questions regarding positive selection affecting protein-coding DNA sequences.
+    Which proportion of the segregating polymorphism are predicted to be positively selected, from a suboptimal to a more optimal amino acid?
+    Are these polymorphism actually under ongoing positive selection at the scale of populations?
+    How does effective population size modulates positive, negative and weak selection?
+    Finally, how much of the recent substitutions are due to non-adaptive positive selection?
 
-    \begin{figure*}[!ht]
-        \
-        \centering
-        \includegraphics[width=\textwidth, page=1] {artworks/figure1}
-        \caption{
-            Integrating divergence and polymorphism for the detection of adaptation.
-            At the phylogenetic level (panel A), amino-acid Wrightian fitness for each site are estimated from protein-coding DNA alignments using mutation-selection codon models.
-            At the population-genetic level (panel B), for each observed single nucleotide polymorphism (SNP), selection coefficient are computed as the difference in amino-acid fitness between the ancestral and derived variant.
-        }
-        \label{fig:method}
+    \begin{figure*}[!ht]\
+    \centering
+    \includegraphics[width=\textwidth, page=1] {artworks/figure1}
+    \caption{
+        Integrating divergence and polymorphism.
+        At the phylogenetic level (panel A), amino-acid Wrightian fitness for each site are estimated from protein-coding DNA alignments using mutation-selection codon models.
+        At the population-genetic level (panel B), for each observed single nucleotide polymorphism (SNP) segregating in the population, selection coefficient are computed as the difference in amino-acid fitness between the ancestral and derived variant.
+    }
+    \label{fig:method}
     \end{figure*}
 
     For this we used available multiple sequence alignment between mammalian species\cite{ranwez_orthomam_2007, howe_ensembl_2021} to estimate fitness landscape on long-term evolution.
@@ -187,14 +191,20 @@
     The relationship between $\SpopMean$ and $\SphyMean$ is described as a second-order polynomial, and the slope of this polynomial at $\SphyMean=0$ gives the ratio $\SpopMean/\SphyMean$ for each population.
     We observe that $\SpopMean/\SphyMean$, representing the efficacy of selection at the short versus long-term is positively correlated with synonymous diversity (fig.~\ref{fig:selcoeff-pop-phylo}C), a proxy of effective population size.
     Altogether, populations with large effective population size are under more efficient selection, confirming the prediction of the nearly-neutral theory of evolution.
-
     As a consequence of increased selection efficacy, mutations in populations with high diversity are mechanically more likely to be deleterious (fig.~S4), especially for mutations predicted already to be deleterious at the phylogenetic scale (fig.~S5-6).
-    However, and surprisingly, a decrease in the proportion of neutral mutation did not translate into a mechanical increase in the proportion of advantageous mutations.
-    Instead, populations with higher diversity have a lower proportion of advantageous mutations (fig.~S7), this effect is also more pronounced for mutations predicted to be advantageous at the phylogenetic scale (red row in fig.~\ref{fig:all-pop-results}C and fig.~S8).
-    This discrepancy can be explained by the fact that populations with larger diversity have already depleted the putatively advantageous mutations, and that only deleterious are remaining possible.
-    In other words, being on the top of a fixed fitness landscape leaves you with only paths going downhill.
-    Altogether, populations with increased diversity are showing signature of increased selection efficiency and are also less likely to generate positively selected mutations.
 
+    Finally, we computed the proportion of substitutions in the terminal branches that were predicted to be under positive selection ($\Sphy > 0$).
+    To this aim, for each population with polymorphism data available, we reconstructed the ancestral sequences before the last genus split in the tree.
+    In these populations, we show that out of all polarized substitutions in the branches, between 22 and 42\% of all substitutions are under $\Sphy > 0$ (table S1).
+    This proportion must be compared to the estimated probability of a mutation to be positively selected ($\Spop > 0$), which is between 4.8 and 11.3\%(table S1).
+    As a result, these observed substitutions are likely to have been positive selected because they restored the state which corresponded to an optimal state of the population.
+    Statistically, genomes are thus involved in a tug-of-war between a large volume deleterious mutations that eventually reach fixation due to drift, and scarce advantageous mutations that are repairing ancestral deleterious substitutions.
+    Taking into account that observed substitutions are likely to be due to positive selection that is not adaptive is thus crucial if one seek to estimate the proportion of adaptation while relying on substitutions between close species\cite{mcdonald_adaptative_1991}.
+    % However, and surprisingly, a decrease in the proportion of neutral mutation did not translate into a mechanical increase in the proportion of advantageous mutations.
+    % Instead, populations with higher diversity have a lower proportion of advantageous mutations (fig.~S7), this effect is also more pronounced for mutations predicted to be advantageous at the phylogenetic scale (red row in fig.~\ref{fig:all-pop-results}C and fig.~S8).
+    % This discrepancy can be explained by the fact that populations with larger diversity have already depleted the putatively advantageous mutations, and that only deleterious are remaining possible.
+    % In other words, being on the top of a fixed fitness landscape leaves you with only paths going downhill.
+    % Altogether, populations with increased diversity are showing signature of increased selection efficiency and are also less likely to generate positively selected mutations.
 
     \begin{figure*}[!ht]
         \centering
@@ -239,10 +249,6 @@
         \label{fig:selcoeff-pop-phylo}
     \end{figure*}
 
-    From a structural biology perspective, we found that proteins are not optimal, with a large proportion of mutations still toward more optimal amino acids.
-    Seen from another angle, it means that we could theoretically derive the fittest proteins using only the amino acid with the highest fitness.
-    Another way to confirm our predictions on amino acid fitness would be to test whether fittest proteins are also thermodynamically more stable, leveraging recent developments able to compute efficiently and accurately the folding of proteins.
-
     % Our study is a bridge between phylogenetic and population genetics
     From a theoretical evolution perspective, we found that we could use phylogenetic signal to predict the selection coefficient of a mutation.
     Apart from phylogenetic mutation-selection codon models, SIFT scores based on amino-acid alignments across species have already been found to be informative of the selection pressure exerted at the population scale\cite{chen_hunting_2021}.
@@ -271,11 +277,15 @@
     Such effect is not found for neutral SNPs and to method to accurately estimate the mean value of selection coefficients from SFS without assuming any shape for the DFE remains yet to be available.
 
     Aside from methodological limitations, the mammalian case study might also not be representative of other clades.
-    Indeed, our dataset is quite convenient because of relatively small population sizes since a large amount of deleterious mutations are fixed, and thus, there is a lot of opportunities for non-adaptive positive selection to arise.
+    Indeed, our dataset is quite convenient because mammals have relatively small population sizes, which allow large amount of deleterious mutations to be fixed, and thus, there is a lot of opportunities for non-adaptive positive selection to arise.
     It would thus be of great interest to reproduce our experiment with other clades, such as \textit{drosophila} or birds which have higher effective population size.
     It would also be interesting to have access to more shallow but wider phylogenies to increase the resolution of our predictions.
     % Moreover, mammalian are less affected by codon usage
 
+    From a structural biology perspective, we found that proteins are not optimal for their fitness, which has been proved for their kinetics and thermodynamics.
+    We argue that mutation-selection models are thus a mandatory tool in evolutionary biology to detect and quantify adaptation since they genuinely take into account the tug-of-war between scarce advantageous mutations likely to reach fixation and a bulk of deleterious mutations eventually reaching fixations due to their sheer mass.
+    Indeed, these models can be used as a null model to predict the overall rate of evolution of proteins\cite{spielman_relationship_2015, dosreis_how_2015}.
+    A departure from this model indicates that proteins are evolving under a changing fitness landscape\cite{rodrigue_detecting_2017, tamuri_mutationselection_2021} and is a signal of adaptive evolution\cite{rodrigue_bayesian_2021}.
 
     \section*{Acknowledgment}
     \label{sec:acknowledgment}
