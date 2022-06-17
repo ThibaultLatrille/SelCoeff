@@ -1,11 +1,39 @@
-import os
 import argparse
-import numpy as np
-import pandas as pd
 from glob import glob
-from collections import defaultdict
 from ete3 import Tree
-from libraries import CdsRates, CategorySNP, open_fasta, codontable
+from matplotlib.patches import Rectangle
+from libraries import *
+
+
+def plot_histogram(score_list, cat_snps, method, file):
+    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
+    xmin, xmax = xlim_dico[method][0], xlim_dico[method][1]
+    n, bins, patches = plt.hist([s for s in score_list if np.isfinite(s)], bins=np.linspace(xmin, xmax, 61),
+                                range=(xmin, xmax), edgecolor="black", linewidth=1.0)
+    total_n = sum(n)
+    if cat_snps.bins <= 10:
+        n_cat = defaultdict(float)
+        for i, b in enumerate(bins[1:]):
+            cats = cat_snps.rate2cats(b)
+            assert len(cats) >= 1
+            cat = cats[0]
+            patches[i].set_facecolor(cat_snps.color(cat))
+            n_cat[cat] += n[i] / total_n
+        handles = [Rectangle((0, 0), 1, 1, color=c) for c in [cat_snps.color(cat) for cat in cat_snps.non_syn_list]]
+        labels = [cat_snps.label(cat) + f" ({n_cat[cat] * 100:.2f}% of total)" for cat in cat_snps.non_syn_list]
+        plt.legend(handles, labels)
+    plt.xlabel(rate_dico[method])
+    plt.ylabel("Density")
+    for x in cat_snps.inner_bound:
+        plt.axvline(x, color="grey", lw=1, ls='--')
+    if xmin < -1.0 and xmax > 1.0:
+        ax.xaxis.set_major_locator(plt.MultipleLocator(1))
+    plt.axvline(0, color="black", lw=2)
+    plt.xlim((xmin, xmax))
+    plt.tight_layout()
+    plt.savefig(file, format="pdf")
+    plt.clf()
+    plt.close("all")
 
 
 def main(args):
@@ -13,6 +41,7 @@ def main(args):
     dico_div = defaultdict(float)
     cat_snps = CategorySNP("MutSel", args.bounds, bins=args.bins, windows=args.windows)
     cds_rates = CdsRates("MutSel", args.exp_folder)
+    score_list = []
 
     for anc_file in glob(os.path.join(args.ancestral, "*.joint.fasta")):
         seqs = open_fasta(anc_file)
@@ -55,10 +84,13 @@ def main(args):
                 dico_div["div_Out"] += 1.0
                 continue
 
+            score_list.append(rate)
             for cat in cats:
                 dico_div[f"div_{cat}"] += 1.0
 
         cds_rates.rm_ensg(ensg)
+
+    plot_histogram(score_list, cat_snps, "MutSel", args.output.replace(".tsv", ".pdf"))
 
     df_opp = pd.read_csv(args.opp, sep="\t")
     for cat in cat_snps.non_syn_list:

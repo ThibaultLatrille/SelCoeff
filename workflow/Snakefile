@@ -175,7 +175,7 @@ checkpoint sfs:
         opportunities=rules.opportunities.output.tsv,
         bounds=rules.annotate_vcf.output.bounds
     output:
-        dir=directory(EXP_FOLDER + '/analysis/{species}.{popu}.{method}/'),
+        dir=directory(EXP_FOLDER + '/analysis/{species}.{popu}.{method}'),
         pdf=EXP_FOLDER + '/analysis/{species}.{popu}.{method}-sfs.pdf',
         tsv=EXP_FOLDER + '/analysis/{species}.{popu}.{method}-sfs-summary-stats.tsv'
     params:

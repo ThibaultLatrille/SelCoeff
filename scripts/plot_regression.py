@@ -61,8 +61,10 @@ def generate_xy_plot(cat_snps):
         if cat != "all":
             s = cat_snps.label(cat).replace("$", "")
 
-        dico_label[cat] = "$\\mathbb{P}" + f"[{s}]$"
-        dico_label[f"{cat}_snps"] = "$\\mathbb{P}_{obs}" + f"[{s}]$"
+        dico_label[cat] = "$\\mathbb{P}_{mut}" + f"[{s}]$"
+        dico_label[f"{cat}_snps"] = "$\\mathbb{P}_{poly}" + f"[{s}]$"
+        dico_label[f"proba_{cat}_div"] = "$\\mathbb{P}_{div}" + f"[{s}]$"
+
         for cat_poly, beta_tex in polydfe_cat_dico.items():
             beta = beta_tex[beta_tex.find("[") + 1:beta_tex.rfind("]")]
             s_given_beta_key = f'{cat_poly}_P-{cat}'
@@ -227,20 +229,20 @@ def main(args):
                 df[f"{cat}_alpha_mkw"] = df[f"{cat}_omega_Amkw"] / df[f"{cat}_omega_div"]
                 df[f"{cat}_alpha_mkf"] = df[f"{cat}_omega_Amkf"] / df[f"{cat}_omega_div"]
 
+        if f"{cat}_div" in df and "all_div" in df:
+            df[f"proba_{cat}_div"] = df[f"{cat}_div"] / df["all_div"]
+
     if "neg_P-Ssup0" in df:
         df["neg_R_Ssup0"] = 100 * (1 - df["neg_P-Ssup0"] / df["all_P-Ssup0"])
         dico_label['neg_R_Ssup0'] = f"1 - {dico_label['neg_P-Ssup0']} / {dico_label['all_P-Ssup0']} (\\%)"
 
-    if "pos_div" in df and "neg_div" in df:
-        df["proba_pos_div"] = df["pos_div"] / (df["neg_div"] + df["pos_div"])
-        dico_label['proba_pos_div'] = "$\\mathbb{P}_{div}(S > 0)$"
-
     cols_suffix = [['S_b'], ['p_b'], ['logL'], ['S_d'], ['b'], ['S-'], ['S'], ['P-Ssup0'], ['R_Ssup0'], ['P-Seq0'],
                    ['P-Sinf0'], ['omega_div'], ['omega_dfe'], ['omega_NAdfe'], ['pnpsW'], ['omega_Adfe'],
                    ['omega_Adiv'], ['omega_Amkt'], ['omega_Amkw']]
+
     cat_list = ['all'] + cat_snps.non_syn_list
-    cols = [[f'{cat}_{suffix}' for suffix, cat in product(suffix_list, cat_list)] for suffix_list in cols_suffix]
-    cols.append(["tajima", 'proba_pos_div', "pos_snps", 'all_p_b', 'pos_p_b'])
+    cols = [["tajima", 'pos', "all_P-Ssup0", "pos_snps", "pos_P-Ssup0", 'proba_pos_div', 'pos_omega_div']]
+    cols.extend([[f'{cat}_{suffix}' for suffix, cat in product(suffix_list, cat_list)] for suffix_list in cols_suffix])
 
     for suf in alpha_suffix:
         if f"all_alpha{suf}" not in df or f"neg_alpha{suf}" not in df:

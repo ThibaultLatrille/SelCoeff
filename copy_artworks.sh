@@ -9,3 +9,5 @@
 \cp -rf ./experiments/5bins-polyDFE-mC/analysis/Homo_sapiens.AFR.MutSel.polyDFE_C.pdf ./manuscript/artworks/AFR.polyDFE.pdf
 \cp -rf ./data_processed/opportunities_bins5/DFE.Homo_sapiens.AFR.MutSel.pdf ./manuscript/artworks/AFR.histogramDFE.pdf
 \cp -rf ./data_processed/vcf_annotate_bins5/snps.Homo_sapiens.AFR.MutSel.histogram.pdf ./manuscript/artworks/AFR.histogramSNP.pdf
+\cp -rf ./data_processed/vcf_annotate_bins5/snps.Homo_sapiens.AFR.MutSel.histogram.full.pdf ./manuscript/artworks/AFR.histogramSNP.full.pdf
+\cp -rf ./data_processed/ancestral_bins5/Homo_sapiens.AFR.pdf ./manuscript/artworks/AFR.histogramDiv.pdf
