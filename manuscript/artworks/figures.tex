@@ -81,7 +81,7 @@ denoted $\pfix(s)$ is given by:
 	\end{frame}
 	\begin{frame}
 		\begin{itemize}[label=$\bullet$]
-			\item $\Ne$ is the number of diploid individuals. 
+			\item $\Ne$ is the number of diploid individuals.
 			\item $q$ is the substitution rate of new alleles.
 			\item $\mu$ is the mutation rate of new alleles.
 			\item $\pfix(s)$ is the probability of fixation of new allele, with selection coefficient $s$.
@@ -98,10 +98,10 @@ denoted $\pfix(s)$ is given by:
 			\begin{axis}[
 				width=\textwidth,
 				height=0.5\textwidth,
-				ylabel={Relative fixation probability},
+				ylabel={$\frac{Q}{\mu} = \frac{S}{1 - \e^{-S}}$},
 				xlabel={Scaled selection coefficient ($S=4 \Ne s$)},
 				cycle list name=colors,
-				domain=-5:5,
+				domain=-10:10,
 				ymin=0.0, ymax=5.0,
 				samples=200,
 				legend entries={$\frac{S}{1 - \e^{-S}}$},
@@ -112,12 +112,12 @@ denoted $\pfix(s)$ is given by:
 				legend style={at={(0.02,0.9)},anchor=north west}
 				]
 				\addplot[line width=2.0pt, BLUE]{ x / (1 - exp(- x))};
-				\addplot[name path=B, dashed, YELLOW, line width=0.5pt] coordinates {(-1, 0) (-1, 5)};
-				\addplot[name path=A, line width=0pt] coordinates {(-5, 0) (-5, 5)};
+				\addplot[name path=B, dashed, YELLOW, line width=0.5pt] coordinates {(-1, 0) (-1, 10)};
+				\addplot[name path=A, line width=0pt] coordinates {(-10, 0) (-10, 10)};
 				\addplot[black, dashed, line width=1.0pt]{1.0};
-				\addplot[black, dashed, line width=1.0pt] coordinates {(0, 0) (0, 5)};
-				\addplot[name path=C, dashed, YELLOW, line width=0.5pt] coordinates {(1, 0) (1, 5)};
-				\addplot[name path=D, line width=0pt] coordinates {(5, 0) (5, 5)};
+				\addplot[black, dashed, line width=1.0pt] coordinates {(0, 0) (0, 10)};
+				\addplot[name path=C, dashed, YELLOW, line width=0.5pt] coordinates {(1, 0) (1, 10)};
+				\addplot[name path=D, line width=0pt] coordinates {(10, 0) (10, 10)};
 				\addplot[fill=RED, opacity=0.2] fill between[ of = A and B];
 				\addplot[fill=YELLOW, opacity=0.2] fill between[ of = B and C];
 				\addplot[fill=GREEN, opacity=0.2] fill between[ of = C and D];
@@ -145,8 +145,8 @@ denoted $\pfix(s)$ is given by:
 	\end{itemize}
 	\begin{equation*}
 		\begin{dcases}
-			q_{\itoj} = \mu_{\itoj} & \text{for synonymous substitutions} \\
-			q_{\itoj} = \mu_{\itoj} \frac{F_j - F_i}{1 - \e^{ F_i - F_j}} & \text{for non-synonymous substitutions}\\
+			q_{\itoj} = \mu_{\itoj} & \text{if synonymous,} \\
+			q_{\itoj} = \mu_{\itoj} \frac{F_j - F_i}{1 - \e^{ F_i - F_j}} & \text{if non-synonymous.}\\
 		\end{dcases}
 	\end{equation*}
 	\end{frame}

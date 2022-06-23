@@ -311,9 +311,10 @@
 
     \subsection{Phylogenetic dataset}
 
-    Protein-coding DNA sequences alignments in placental mammals are extracted from the \href{https://www.orthomam.univ-montp2.fr}{OrthoMaM} database\cite{ranwez_orthomam_2007, douzery_orthomam_2014, scornavacca_orthomam_2019}.
+    Protein-coding DNA sequences alignments in placental mammals and gene trees are extracted from the \href{https://www.orthomam.univ-montp2.fr}{OrthoMaM} database, containing $116$ mammalian reference sequences in v10c\cite{ranwez_orthomam_2007, douzery_orthomam_2014, scornavacca_orthomam_2019}.
     Genes located on the X, Y and mitochondrial chromosome are discarded from the analysis, since the number of polymorphism, necessary in population-based method, is expected to be different on these sequences.
     Additionally, sequences from the species for which polymorphism are available, as well as their sister species have been discarded from the analysis to ensure independence between the data used in the phylogenetic and population-genetic method.
+    Altogether, $14,509$ protein-coding DNA sequences alignment have been analyzed containing at most $87$ reference sequences of placental mammals per alignment.
 
     \subsection{Selection coefficient ($\Sphy$) in phylogeny-based method}
     \label{subsec:s-phylogeny-method}
@@ -346,18 +347,18 @@
     Secondly, relative position in the CDS is converted to position in the multiple sequence alignment (containing gaps) from OrthoMaM database\cite{ranwez_orthomam_2007, douzery_orthomam_2014, scornavacca_orthomam_2019} by doing a global pairwise alignment (Biopython pairwise2) between the CDS fasta and the sequence found in the alignment.
     This conversion from genomic position to position in the alignment is only possible if the assembly used for SNP calling is the same as the one used in the alignment, the GTF annotations and the FASTA sequences.
     We retrieved polymorphism from different projects.
-    \textit{Equus caballus} variants called on the EquCab2 assembly in the EVA study PRJEB9799.
-    \textit{Canis familiars} variants called on the CanFam3.1 assembly in the EVA study PRJEB24066.
-    \textit{Bos taurus} variants called on the UMD3.1 assembly in the next-gen project.
-    \textit{Ovis aries} variants called on the Oar\_v3.1 assembly in the next-gen project.
-    \textit{Capra Hircus} variants called on the CHIR1 assembly in the next-gen project, we performed a liftover to the ARS1 assembly.
-    \textit{Chlorocebus sabaeus} variants are called on the ChlSab1.1 assembly in the EVA study PRJEB22989\cite{svardal_ancient_2017}.
-    \textit{Homo sapiens} variants are called on the GRCh38 assembly in the 1000-genome project\cite{consortium_integrated_2012, the1000genomesprojectconsortium_global_2015}.
+    \textit{Equus caballus} variants called on the EquCab2 assembly in the EVA study PRJEB9799, we considered \textit{Ceratotherium simum simum} as its sister species.
+    \textit{Canis familiars} variants called on the CanFam3.1 assembly in the EVA study PRJEB24066, we considered \textit{Ursus maritimus} as its sister species.
+    \textit{Bos taurus} variants called on the UMD3.1 assembly in the next-gen project, we considered \textit{Bison bison bison} as its sister species.
+    \textit{Ovis aries} variants called on the Oar\_v3.1 assembly in the next-gen project, we considered \textit{Pantholops hodgsonii} as its sister species.
+    \textit{Capra Hircus} variants called on the CHIR1 assembly in the next-gen project, we performed a liftover to the ARS1 assembly and considered \textit{Pantholops hodgsonii} as its sister species.
+    \textit{Chlorocebus sabaeus} variants are called on the ChlSab1.1 assembly in the EVA study PRJEB22989\cite{svardal_ancient_2017}, we considered \textit{Macaca mulatta} as its sister species.
+    \textit{Homo sapiens} variants are called on the GRCh38 assembly in the 1000-genome project\cite{consortium_integrated_2012, the1000genomesprojectconsortium_global_2015}, we considered \textit{Pan troglodytes} as its sister species.
     Variants not inside genes are discarded at the beginning of the analysis.
     Insertions and deletions are not analyzed, and only Single Nucleotide Polymorphisms (SNPs) with only one mutant allele are considered.
     Stop codon mutants are also discarded.
     For populations containing more than $8$ sampled individuals, the site-frequency spectrum (SFS) is subsampled down to $16$ chromosomes ($8$ diploid individuals) without replacement (hyper-geometric distribution) to alleviate the effect of different sampling depth in the $29$ populations.
-    SNPs are polarized using the $3$ closest out-groups found in the OrthoMam alignment with est-usfs\cite{keightley_inferring_2018}.
+    SNPs are polarized using the $3$ closest out-groups found in the OrthoMam alignment with est-usfs v2.04\cite{keightley_inferring_2018}.
     The Snakemake pipeline for integrating polymorphism and divergence data uses custom scripts written in python 3.9.
 
     \subsection{Selection coefficient ($\Spop$) in population-based method}
