@@ -49,12 +49,13 @@ def main(args):
                     o.write("\\subsubsection{" + sample_dico[format_pop(pop)] + "} \n \n")
                 hist_suffix = f"{sp}.{pop}.{method}.histogram.pdf".replace(' ', '_')
                 hist_path = f"{args.hist_prefix}{hist_suffix}"
-                o.write(minipage(0.49, hist_path))
-                o.write(minipage(0.49, sfs.replace(".pdf", ".normalize.pdf")))
-                o.write("\\\\ \n")
                 dfe_suffix = f"{sp}.{pop}.{method}.pdf".replace(' ', '_')
                 dfe_path = f"{args.dfe_prefix}{dfe_suffix}"
+
                 o.write(minipage(0.49, dfe_path))
+                o.write(minipage(0.49, hist_path))
+                o.write("\\\\ \n")
+                o.write(minipage(0.49, sfs.replace(".pdf", ".normalize.pdf")))
                 for model in ["C", "D"]:
                     polyDFE = sfs.replace("-sfs.pdf", f".polyDFE_{model}.pdf")
                     if os.path.exists(polyDFE):

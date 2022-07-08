@@ -93,6 +93,7 @@ def generate_xy_plot(cat_snps):
         xy_dico["y"].append(y)
 
     xy_list = [("pos_snps", "all_P-Ssup0"), ("pos_snps", "pos_P-Ssup0"), ("pos_snps", "pos")]
+    xy_list += [("watterson", "all_p_b"), ("watterson", "ratio_neg_p_b"), ("watterson", "ratio_neg_omega_div")]
     xy_list += [("pos", "all_P-Ssup0"), ("pos", "pos_P-Ssup0")]
     xy_list += [("all_P-Seq0", "weak_P-Seq0"), ("all_P-Seq0", "pos-weak_P-Seq0"), ("all_P-Seq0", "neg-weak_P-Seq0")]
     xy_list += [("all_P-neg-weak", "neg-weak_P-neg-weak"), ("all_P-pos-weak", "pos-weak_P-pos-weak")]
@@ -147,6 +148,32 @@ def main(args):
 
     out_dict = defaultdict(list)
     df_xy, dico_label = generate_xy_plot(cat_snps)
+
+    cat_list = ['all'] + cat_snps.non_syn_list
+    for cat in cat_list:
+        if f"{cat}_tajima" in df and "tajima" in df:
+            df[f"{cat}_pnpsT"] = df[f"{cat}_tajima"] / df["tajima"]
+            df[f"{cat}_pnpsW"] = df[f"{cat}_watterson"] / df["watterson"]
+            df[f"{cat}_pnpsF"] = df[f"{cat}_fay_wu"] / df["fay_wu"]
+            if f"{cat}_omega_div" in df:
+                df[f"{cat}_omega_Amkt"] = df[f"{cat}_omega_div"] - df[f"{cat}_pnpsT"]
+                df[f"{cat}_omega_Amkw"] = df[f"{cat}_omega_div"] - df[f"{cat}_pnpsW"]
+                df[f"{cat}_omega_Amkf"] = df[f"{cat}_omega_div"] - df[f"{cat}_pnpsF"]
+                df[f"{cat}_alpha_mkt"] = df[f"{cat}_omega_Amkt"] / df[f"{cat}_omega_div"]
+                df[f"{cat}_alpha_mkw"] = df[f"{cat}_omega_Amkw"] / df[f"{cat}_omega_div"]
+                df[f"{cat}_alpha_mkf"] = df[f"{cat}_omega_Amkf"] / df[f"{cat}_omega_div"]
+
+        if f"{cat}_div" in df and "all_div" in df:
+            df[f"proba_{cat}_div"] = df[f"{cat}_div"] / df["all_div"]
+
+        if f"{cat}_omega_div" in df and "all_omega_div" in df:
+            df[f"ratio_{cat}_omega_div"] = 100 * (df["all_omega_div"] - df[f"{cat}_omega_div"]) / df["all_omega_div"]
+            dico_label[f"ratio_{cat}_omega_div"] = f"R({dico_label['all_omega_div']})"
+
+        if f"{cat}_p_b" in df and "all_p_b" in df:
+            df[f"ratio_{cat}_p_b"] = 100 * (df["all_p_b"] - df[f"{cat}_p_b"]) / df["all_p_b"]
+            dico_label[f"ratio_{cat}_p_b"] = f"R({dico_label['all_p_b']})"
+
     for (group, col_x, y_group), df_group in df_xy.groupby(["group", "x", "y_group"]):
         if discard_col(col_x, df):
             continue
@@ -213,24 +240,6 @@ def main(args):
     o = open(args.output.replace(".tsv", ".tex"), 'w')
     o.write("\\section{Table} \n")
     o.write("\\begin{center}\n")
-    # output_columns = ["pop", "species", "tajima", "pos_snps", 'all_P-Ssup0', 'pos_P-Ssup0']
-    cat_list = ['all'] + cat_snps.non_syn_list
-
-    for cat in cat_list:
-        if f"{cat}_tajima" in df and "tajima" in df:
-            df[f"{cat}_pnpsT"] = df[f"{cat}_tajima"] / df["tajima"]
-            df[f"{cat}_pnpsW"] = df[f"{cat}_watterson"] / df["watterson"]
-            df[f"{cat}_pnpsF"] = df[f"{cat}_fay_wu"] / df["fay_wu"]
-            if f"{cat}_omega_div" in df:
-                df[f"{cat}_omega_Amkt"] = df[f"{cat}_omega_div"] - df[f"{cat}_pnpsT"]
-                df[f"{cat}_omega_Amkw"] = df[f"{cat}_omega_div"] - df[f"{cat}_pnpsW"]
-                df[f"{cat}_omega_Amkf"] = df[f"{cat}_omega_div"] - df[f"{cat}_pnpsF"]
-                df[f"{cat}_alpha_mkt"] = df[f"{cat}_omega_Amkt"] / df[f"{cat}_omega_div"]
-                df[f"{cat}_alpha_mkw"] = df[f"{cat}_omega_Amkw"] / df[f"{cat}_omega_div"]
-                df[f"{cat}_alpha_mkf"] = df[f"{cat}_omega_Amkf"] / df[f"{cat}_omega_div"]
-
-        if f"{cat}_div" in df and "all_div" in df:
-            df[f"proba_{cat}_div"] = df[f"{cat}_div"] / df["all_div"]
 
     if "neg_P-Ssup0" in df:
         df["neg_R_Ssup0"] = 100 * (1 - df["neg_P-Ssup0"] / df["all_P-Ssup0"])
@@ -241,7 +250,9 @@ def main(args):
                    ['omega_Adiv'], ['omega_Amkt'], ['omega_Amkw']]
 
     cat_list = ['all'] + cat_snps.non_syn_list
-    cols = [["tajima", 'pos', "all_P-Ssup0", "pos_snps", "pos_P-Ssup0", 'proba_pos_div', 'pos_omega_div']]
+    cols = [["tajima", "all_P-Ssup0", 'pos', "pos_P-Ssup0", 'proba_pos_div', 'pos_omega_div'],
+            ["tajima", 'proba_pos_div', 'all_omega_div', 'neg_omega_div', 'ratio_neg_omega_div', 'all_p_b', 'neg_p_b',
+             'ratio_neg_p_b']]
     cols.extend([[f'{cat}_{suffix}' for suffix, cat in product(suffix_list, cat_list)] for suffix_list in cols_suffix])
 
     for suf in alpha_suffix:
