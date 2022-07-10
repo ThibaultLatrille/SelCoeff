@@ -36,6 +36,19 @@ def plot_histogram(score_list, cat_snps, method, file):
     plt.close("all")
 
 
+def open_prob(path):
+    prob_list = []
+    with open(path) as f:
+        for line in f:
+            if "joint probs" in line:
+                f.readline()
+                break
+        for line in f:
+            prob = line.strip().split(",")[1]
+            prob_list.append(float(prob))
+    return prob_list
+
+
 def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     dico_div = defaultdict(float)
@@ -54,10 +67,16 @@ def main(args):
         ancestor = t.get_leaves_by_name(args.species)[0].up.name
         anc_seq = seqs[ancestor]
         der_seq = seqs[args.species]
-
         assert len(anc_seq) == len(der_seq)
 
+        proba_path = anc_file.replace(".joint.fasta", ".join.prob")
+        prob_list = open_prob(proba_path)
+        assert len(prob_list) == (len(anc_seq) // 3)
+
         for c_site in range(len(anc_seq) // 3):
+            if prob_list[c_site] < args.threshold:
+                continue
+
             anc_codon = anc_seq[c_site * 3:c_site * 3 + 3]
             der_codon = der_seq[c_site * 3:c_site * 3 + 3]
             if anc_codon == der_codon:
@@ -111,4 +130,6 @@ if __name__ == '__main__':
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
     parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
     parser.add_argument('--species', required=True, type=str, dest="species", help="The focal species")
+    parser.add_argument('--threshold', required=False, default=0.0, type=float, dest="threshold",
+                        help="The threshold for the probability")
     main(parser.parse_args())

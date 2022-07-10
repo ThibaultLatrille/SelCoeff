@@ -16,13 +16,13 @@ alpha_suffix = alpha_sup_limits + ["_div", "_mkt", "_mkw", "_mkf"]
 omega_suffix = ["_div", "_dfe", "_NAdfe", "_Adiv", "_Adfe", "_Amkt", "_Amkw", "_Amkf"]
 
 
-def open_tsv(filepath, cat_snps):
+def open_tsv(filepath, cat_snps, method):
     ddf = pd.read_csv(filepath, sep="\t")
     if os.path.basename(filepath) == "Theta.results.tsv":
-        df_theta = ddf[(ddf["method"] == "MutSel") & (ddf["category"] == "syn")]
+        df_theta = ddf[(ddf["method"] == method) & (ddf["category"] == "syn")]
         df_theta = df_theta.dropna(axis='columns')
         df_theta = df_theta.drop(["method", "species", "category"], axis=1)
-        df_dfe = ddf[(ddf["method"] == "MutSel") & (ddf["category"] != "syn")]
+        df_dfe = ddf[(ddf["method"] == method) & (ddf["category"] != "syn")]
         cols = list(polydfe_cat_dico) + [f"P-{cat}" for cat in cat_snps.non_syn_list]
         cols += ['p_b', 'S_b', 'S_d', 'b', 'logL', 'S', 'S+', 'S-', 'fay_wu', 'tajima', 'watterson', 'div']
         cols += [f"omega{sup}" for sup in omega_suffix]
@@ -35,7 +35,7 @@ def open_tsv(filepath, cat_snps):
         df_pivot = pd.concat(m_list, axis=1)
         ddf = pd.merge(df_pivot, df_theta, on=["pop"])
     elif "bounds" in os.path.basename(filepath):
-        ddf = ddf[ddf["method"] == "MutSel"]
+        ddf = ddf[ddf["method"] == method]
         ddf = ddf.pivot(index="pop", columns="cat", values="sampled_fraction").add_suffix('_snps')
     return ddf
 
@@ -93,7 +93,7 @@ def generate_xy_plot(cat_snps):
         xy_dico["y"].append(y)
 
     xy_list = [("pos_snps", "all_P-Ssup0"), ("pos_snps", "pos_P-Ssup0"), ("pos_snps", "pos")]
-    xy_list += [("watterson", "all_p_b"), ("watterson", "ratio_neg_p_b"), ("watterson", "ratio_neg_omega_div")]
+    xy_list += [("watterson", "all_p_b"), ("watterson", "ratio_neg_P-Ssup0"), ("watterson", "ratio_neg_omega_div")]
     xy_list += [("pos", "all_P-Ssup0"), ("pos", "pos_P-Ssup0")]
     xy_list += [("all_P-Seq0", "weak_P-Seq0"), ("all_P-Seq0", "pos-weak_P-Seq0"), ("all_P-Seq0", "neg-weak_P-Seq0")]
     xy_list += [("all_P-neg-weak", "neg-weak_P-neg-weak"), ("all_P-pos-weak", "pos-weak_P-pos-weak")]
@@ -119,8 +119,8 @@ def logit(x):
 
 def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
-    cat_snps = CategorySNP("MutSel", bins=args.bins, windows=args.windows)
-    df_list = [open_tsv(filepath, cat_snps) for filepath in sorted(args.tsv)]
+    cat_snps = CategorySNP(args.method, bins=args.bins, windows=args.windows)
+    df_list = [open_tsv(filepath, cat_snps, args.method) for filepath in sorted(args.tsv)]
     df = reduce(lambda left, right: pd.merge(left, right, how="inner", on=["pop"]), df_list)
     if "species" not in df:
         df["species"] = df["species_x"]
@@ -170,9 +170,9 @@ def main(args):
             df[f"ratio_{cat}_omega_div"] = 100 * (df["all_omega_div"] - df[f"{cat}_omega_div"]) / df["all_omega_div"]
             dico_label[f"ratio_{cat}_omega_div"] = f"R({dico_label['all_omega_div']})"
 
-        if f"{cat}_p_b" in df and "all_p_b" in df:
-            df[f"ratio_{cat}_p_b"] = 100 * (df["all_p_b"] - df[f"{cat}_p_b"]) / df["all_p_b"]
-            dico_label[f"ratio_{cat}_p_b"] = f"R({dico_label['all_p_b']})"
+        if f"{cat}_P-Ssup0" in df and "all_P-Ssup0" in df:
+            df[f"ratio_{cat}_P-Ssup0"] = 100 * (df["all_P-Ssup0"] - df[f"{cat}_P-Ssup0"]) / df["all_P-Ssup0"]
+            dico_label[f"ratio_{cat}_P-Ssup0"] = f"R({dico_label['all_P-Ssup0']})"
 
     for (group, col_x, y_group), df_group in df_xy.groupby(["group", "x", "y_group"]):
         if discard_col(col_x, df):
@@ -189,9 +189,9 @@ def main(args):
             if discard_col(col_y, df):
                 continue
             x, y = df[col_x], df[col_y]
-            if 'P-' in col_y:
+            if 'P-' in col_y and "ratio" not in col_y:
                 y = logit(y)
-            elif 'P-' in col_x:
+            elif 'P-' in col_x and "ratio" not in col_x:
                 x = logit(x)
 
             results = sm.OLS(y, sm.add_constant(x)).fit()
@@ -213,11 +213,11 @@ def main(args):
 
         if len(legend_elements) != 0:
             x_label = dico_label[col_x]
-            if 'P-' in col_x:
+            if 'P-' in col_x and "ratio" not in col_x:
                 x_label = f'logit({x_label})'
             plt.xlabel(x_label)
             y_label = dico_label[y_group]
-            if 'P-' in y_group:
+            if 'P-' in y_group and "ratio" not in y_group:
                 y_label = f'logit({y_label})'
             plt.ylabel(y_label)
 
@@ -251,8 +251,8 @@ def main(args):
 
     cat_list = ['all'] + cat_snps.non_syn_list
     cols = [["tajima", "all_P-Ssup0", 'pos', "pos_P-Ssup0", 'proba_pos_div', 'pos_omega_div'],
-            ["tajima", 'proba_pos_div', 'all_omega_div', 'neg_omega_div', 'ratio_neg_omega_div', 'all_p_b', 'neg_p_b',
-             'ratio_neg_p_b']]
+            ["tajima", 'proba_pos_div', 'all_omega_div', 'neg_omega_div', 'ratio_neg_omega_div', 'all_P-Ssup0',
+             'neg_P-Ssup0', 'ratio_neg_P-Ssup0']]
     cols.extend([[f'{cat}_{suffix}' for suffix, cat in product(suffix_list, cat_list)] for suffix_list in cols_suffix])
 
     for suf in alpha_suffix:
@@ -263,7 +263,7 @@ def main(args):
         cols.append([f'{cat}_alpha{suf}' for cat in cat_list] + [f'R_alpha{suf}'])
 
     for c in cols:
-        columns = [c for c in ["pop", "species"] + c if c in df]
+        columns = [c for c in ["pop", "species"] + c if ((c in df) and not pd.isna(df[c]).all())]
         if len(columns) == 2:
             continue
         sub_header = [dico_label[i] if i in dico_label else i for i in columns]
@@ -284,6 +284,7 @@ if __name__ == '__main__':
     parser.add_argument('--tsv', required=False, type=str, nargs="+", dest="tsv", help="Input tsv file")
     parser.add_argument('--tex_source', required=False, type=str, default="scripts/main-table.tex", dest="tex_source",
                         help="Main document source file")
+    parser.add_argument('--method', required=False, type=str, dest="method", help="Sel coeff parameter")
     parser.add_argument('--output', required=False, type=str, dest="output", help="Output tsv file")
     parser.add_argument('--sample_list', required=False, type=str, dest="sample_list", help="Sample list file")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")

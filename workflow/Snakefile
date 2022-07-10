@@ -166,7 +166,7 @@ rule mapping:
     params:
         folder=f"{FOLDER}/data_processed/ancestral_reconstruction/" + '{species}.{popu}',
     shell:
-        'python3 {input.script} --opp {input.opp} --species {wildcards.species} --bins {bins} --windows {windows} --bounds {input.bounds} --exp_folder {input.exp_folder} --ancestral {params.folder} --output {output.tsv}'
+        'python3 {input.script} --threshold 1e-6 --opp {input.opp} --species {wildcards.species} --bins {bins} --windows {windows} --bounds {input.bounds} --exp_folder {input.exp_folder} --ancestral {params.folder} --output {output.tsv}'
 
 checkpoint sfs:
     input:
@@ -253,9 +253,9 @@ rule plot_regression:
                 rules.plot_dfe_heatmap.output.tsv]),
         sample_list=sample_list
     output:
-        tsv=f'{EXP_FOLDER}/regression/results.tsv'
+        tsv=f'{EXP_FOLDER}/regression-' + '{method}/results.tsv'
     shell:
-        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --bins {bins} --windows {windows} --output {output.tsv}'
+        'python3 {input.script} --tsv {input.tsv} --method {wildcards.method} --sample_list {input.sample_list} --bins {bins} --windows {windows} --output {output.tsv}'
 
 
 rule latex:
@@ -264,7 +264,7 @@ rule latex:
         sfs=map(lambda p: f"{p}-sfs.pdf",SFS_LIST),
         tex_source=f'{FOLDER}/scripts/supp-mat.tex',
         tsv_dfe=rules.plot_dfe_heatmap.output.tsv,
-        tsv_reg=rules.plot_regression.output.tsv,
+        tsv_reg=expand(rules.plot_regression.output.tsv, method=config['METHOD_LIST']),
         sample_list=sample_list
     output:
         tex_include=f'{EXP_FOLDER}/include-figures.tex',
