@@ -39,13 +39,13 @@
 \newcommand{\UniDimArray}[1]{\bm{#1}}
 \newcommand{\BiDimArray}[1]{\bm{#1}}
 \DeclareMathOperator{\E}{\mathbb{E}}
-\DeclareMathOperator{\Var}{\mathrm{Var}}
-\newcommand{\der}{\mathrm{d}}
-\newcommand{\e}{\mathrm{e}}
+\DeclareMathOperator{\Var}{\textrm{Var}}
+\newcommand{\der}{\textrm{d}}
+\newcommand{\e}{\textrm{e}}
 \newcommand{\avg}[1]{\left< #1 \right>} % for average
-\newcommand{\Ne}{N_{\mathrm{e}}}
+\newcommand{\Ne}{N_{\textrm{e}}}
 \newcommand{\proba}{\mathbb{P}}
-\newcommand{\pfix}{\proba_{\mathrm{fix}}}
+\newcommand{\pfix}{\proba_{\textrm{fix}}}
 \newcommand{\dn}{d_N}
 \newcommand{\ds}{d_S}
 \newcommand{\dnds}{\dn / \ds}
@@ -100,18 +100,18 @@
 
     \keywords{Selection \and phylogenetic \and population genetics \and codon models \and adaptation }
 
-    We usually say that a mutation is undergoing positive selection when it brings a fitness advantage to its bearer, and thus facilitate its own transmission to the next generation.
+    We usually say that a mutation is undergoing positive selection when it brings a fitness advantage to its bearer, and thus facilitates its own transmission to the next generation.
     However, the causes of this advantage can be diverse.
     We can distinguish two main scenarios in which a mutation is advantageous.
     The first scenario concerns environmental change.
-    The bearer of the mutation that is advantageous in a new environment will be better adapted, and its chances of survival and reproduction will be higher.
+    The bearer of the mutation that is advantageous in a new environment will be better adapted, and its chances of survival and reproduction will be higher (fig.~\ref{fig:fitness-landscape}A).
     This process is typically referred to as adaptive evolution.
-    The second scenario involves a mutation restoring the ancestral allele which corresponded to an optimal state of the individual in a constant environment, but has been lost due to the fixation of a deleterious mutation by drift.
+    The second scenario involves a mutation restoring the ancestral allele which corresponded to an optimal state of the individual in a constant environment, but has been lost due to the fixation of a deleterious mutation by drift (fig.~\ref{fig:fitness-landscape}B).
     In this manuscript, this process will be referred to as maintenance positive selection.
     Regarding the difference between these two scenarios at the population scale, while in the case of environmental change, the population as a whole is climbing the fitness landscape along an adaptive walk\cite{tenaillon_utility_2014}, in the case of maintenance positive selection, the population as a whole is thus merely staying in the same position in the fitness landscape at the mutation-selection equilibrium, and positive selection compensates for deleterious mutations that reach fixation due to drift\cite{sella_application_2005, mustonen_fitness_2009}.
-    These two different kinds of selection result in a positive transmission bias of the advantageous allele, but their consequences are conceptually different.
-    While adaptive evolution promotes phenotype diversification, maintenance positive selection promotes phenotype stability and preserves well established biological systems (fig.~\ref{fig:fitness-landscape}).
-    It is thus of importance to be able to distinguish those two kinds of positive selection in order to understand the diversification of species.
+    These two different kinds of selection result in a positive transmission bias of the advantageous allele, but their consequences at a macro-evolutionary scale are fundamentally different.
+    While adaptive evolution promotes phenotype diversification (fig.~\ref{fig:fitness-landscape}C), maintenance positive selection promotes phenotype stability and preserves well established biological systems (fig.~\ref{fig:fitness-landscape}D).
+    It is thus of importance to be able to distinguish those two kinds of positive selection in order to understand how selection impacts the diversification of species.
 
     Positive selection can be quantified by comparing sequence variation inside a population with the sequence divergence with a sister species\cite{mcdonald_adaptative_1991}.
     Indeed, strongly advantageous mutations are expected to be observed in substitutions but not in polymorphism because they reach fixation quickly.
@@ -122,15 +122,14 @@
     Adaptive evolution can only be well estimated if maintenance positive selection is taken into account.
     While adaptive evolution is unpredictable because it brings an advantage concerning an unpredictable change in the environment of organisms, the second is predictable because optimal states should be more or less the same for closely related organisms which share most of their environment and physiology.
     A way to thus measure maintenance positive selection is to compute selection coefficients assuming a constant and stable fitness landscape estimated from the alignment of protein-coding genes.
-    For each site of the protein alignment, amino-acid frequencies in the alignment is a proxy for its fitness, since for example a deleterious amino acid will be absent in the alignment.
+    For each site of the protein alignment, amino-acid frequency is a proxy for its fitness, since for example a deleterious amino acid will be more likely to be absent in the alignment.
     One of the most used methods to make these predictions is SIFT (Sort Intolerant From Tolerant), which reliably detects deleterious mutations in many taxa\cite{ng_sift_2003, vaser_sift_2016}.
     However, this method has two major shortcomings.
     First, this method uses amino-acid frequency as a proxy for amino-acid fitness, even if we know that a lot of mechanisms can influence amino-acid frequency other than fitness (phylogeny, mutation biases, GC-biased gene conversion, mutational paths).
-    Second, each mutation is attributed a score to describe if it should be under purifying selection on one hand or be neutral or advantageous, on the other hand.
-    However, this score makes little sense as an actual measure of fitness, and is not interpretable in terms of population genetics.
-    At a finer scale, modelling at the codon level can disentangle processes of mutation at the DNA level and selection at the amino-acid level.
-    For example, the so-called mutation-selection codon models are rooted within a population genetics formalism\cite{halpern_evolutionary_1998, mccandlish_modeling_2014}.
-    Such models provide a nearly-neutral framework of evolution by estimating the fitness landscape over amino-acid sequences for each site of the sequence while taking into account non-adaptive processes impacting codon frequency\cite{halpern_evolutionary_1998, rodrigue_mechanistic_2010, tamuri_estimating_2012}.
+    Second, SIFT scores makes little sense as an actual measure of fitness, and is not interpretable in terms of population genetics.
+    Contrarily, so-called mutation-selection codon models are rooted within a population genetics formalism\cite{halpern_evolutionary_1998, mccandlish_modeling_2014}.
+    These phylogenetic codon models can disentangle processes of mutation at the DNA level and selection at the amino-acid level.
+    Such codon models provide a nearly-neutral framework of evolution by estimating the fitness landscape over amino-acid sequences for each site of the sequence (fig~\ref{fig:method}A) while taking into account non-adaptive processes impacting codon frequency\cite{halpern_evolutionary_1998, rodrigue_mechanistic_2010, tamuri_estimating_2012}.
     Only nearly-neutral mutations between high fitness amino acids will tend to be permitted by the model, allowing for the explicit calculation of the scaled selection coefficient of non-synonymous mutations between codons.
     As a consequence, by integrating datasets at the species and population level, we can estimate the selection coefficient for each mutation currently segregating in a population.
     Such a dataset can allow us to address different questions regarding positive selection affecting protein-coding DNA sequences.
@@ -139,7 +138,6 @@
     Finally, how much of the recent substitutions are due to maintenance positive selection?
 
     \begin{figure*}[!ht]
-        \
         \centering
         \includegraphics[width=\textwidth, page=1] {artworks/figure.fitness-landscape}
         \caption{
@@ -155,7 +153,6 @@
     \end{figure*}
 
     \begin{figure*}[!ht]
-        \
         \centering
         \includegraphics[width=\textwidth, page=1] {artworks/figure.method}
         \caption{
@@ -167,27 +164,26 @@
     \end{figure*}
 
     To answer these questions, we have estimated a fitness landscape for long-term evolution using available multiple sequence alignments between mammalian species\cite{ranwez_orthomam_2007, howe_ensembl_2021}.
-    We then developed and leveraged a pipeline integrating divergence and polymorphism data across the entire exome for 28 populations across 6 genera, namely \textit{Equus},  \textit{Bos}, \textit{Capra}, \textit{Ovis}, \textit{Chlorocebus} and \textit{Homo} (fig.~\ref{fig:method}).
+    We then developed and leveraged a pipeline integrating divergence and polymorphism data across the entire exome for 28 populations across 6 genera, namely \textit{Equus},  \textit{Bos}, \textit{Capra}, \textit{Ovis}, \textit{Chlorocebus} and \textit{Homo} (fig.~\ref{fig:method}A\&B).
 
 
     \subsection*{SNPs which are predicted to be advantageous are positively selected at the population scale}
 
 
-    For each non-synonymous SNP observed at the population level, we predicted its scaled selection coefficient ($\Sphy$) from amino-acid fitnesses estimated at the mammalian scale (fig.~\ref{fig:homo-afr-results}A).
+    For each non-synonymous SNP observed at the population level, we predicted its scaled selection coefficient ($\Sphy$) from amino-acid fitnesses estimated at the mammalian scale (fig.~\ref{fig:method}B).
     Then we ask whether the variants that are supposedly advantageous are showing signatures of short term positive selection.
     For example, if a variant is found to be fixed in many mammals but not in ancestral humans, and a mutation in humans is toward the mammalian version, is this mutation advantageous for the individual carrying it?
-    At the population level (e.g. in humans of Asian descent in fig.~\ref{fig:homo-afr-results}), we divided all observed SNPs in 5 classes of predicted selection coefficient: severely deleterious with $\divStrongDel$, deleterious with $\divDel$, weakly deleterious with $\divWeakDel$, weakly advantageous with $\divWeakAdv$ and advantageous with $\divAdv$.
-    In each of theses classes, SNPs are then grouped by the number of derived alleles in the population (fig.~\ref{fig:homo-afr-results}B), generating a so called site-frequency spectrum (SFS).
-    Compared to synonymous mutations which are supposedly neutral (black line in fig.~\ref{fig:homo-afr-results}B), mutations predicted to be deleterious (blue and green lines in fig.~\ref{fig:homo-afr-results}B) are underrepresented at high frequencies in the population, a signature of ongoing purifying selection.
-    Remarkably, SNPs predicted to be advantageous (red line in fig.~\ref{fig:homo-afr-results}B) are overrepresented at higher frequencies in the population, meaning they are more likely to reach fixation as a consequence of ongoing positive selection.
+    At the population level (e.g. in humans of Asian descent in fig.~\ref{fig:homo-afr-results}), we divided all observed SNPs in 5 classes of predicted selection coefficient: severely deleterious with $\divStrongDel$, deleterious with $\divDel$, weakly deleterious with $\divWeakDel$, weakly advantageous with $\divWeakAdv$ and advantageous with $\divAdv$ (fig.~\ref{fig:homo-afr-results}B).
+    In each of theses classes, SNPs are then grouped by the number of derived alleles in the population (fig.~\ref{fig:homo-afr-results}C), generating a so called site-frequency spectrum (SFS).
+    Compared to synonymous mutations which are supposedly neutral (black line in fig.~\ref{fig:homo-afr-results}C), mutations predicted to be deleterious (blue and green lines in fig.~\ref{fig:homo-afr-results}C) are underrepresented at high frequencies in the population, a signature of ongoing purifying selection.
     However, these observations remain qualitative.
 
     To obtain a quantitative estimate of the distribution of selection coefficient for each category of SNPs, we used the model polyDFE\cite{tataru_inference_2017, tataru_polydfe_2020}.
     This model uses the count of derived alleles for each frequency class of the SFS to infer the distribution of fitness effects (DFE) of the region under study.
-    The model uses both the mutational expectation for each category (fig.~\ref{fig:homo-afr-results}C) (see Material and Methods), and the counts of synonymous derived allele as a neutral model, which allow to control for demographic effects, and polarization errors when inferring the ancestral state.
+    The model uses both the number of sites ($L$) for each category (fig.~\ref{fig:homo-afr-results}A, see Material and Methods), and the counts of synonymous derived allele as a neutral model, which allow to control for demographic effects, and polarization errors when inferring the ancestral state.
     These population-based models cannot give a specific estimate of the selection coefficient at the population-genetic scale ($\Spop$) for each SNP, but by gathering information across many SNPs, these models can estimate the proportion of advantageous mutations ($\PpolyAdv$), of nearly-neutral mutations ($\PpolyNeutral$) and of deleterious mutations ($\PpolyDel$) (fig.~\ref{fig:homo-afr-results}D).
     We found that SNPs predicted to be deleterious given their selection coefficient $\Sphy$ across mammals are effectively purged at the population-genetic scale, demonstrating that purifying selection is largely predictable and amino acids with low fitness across mammals are effectively purged away in each population.
-    Notably, SNPs predicted to be advantageous given their selection coefficient $\Sphy$ are indeed under positive selection at the population-genetic scale, confirming that there is a local ongoing selection toward amino acids that are restoring the optimally functioning protein.
+    Notably, SNPs predicted to be advantageous given their selection coefficient $\Sphy$ are indeed under positive selection at the population-genetic scale, confirming that there is a local ongoing selection towards amino acids that are restoring the optimally functioning protein.
     In between these two extremes, mutations predicted to be weakly selected (cyan and orange in fig.~\ref{fig:homo-afr-results}) are effectively composed of neutral, positively and negatively selected mutations.
 
     We replicated such experiment across 28 populations (fig.~\ref{fig:heatmap}), and found that mutations predicted to be deleterious are indeed purged at the population-genetic scale (blue and green rows in fig.~\ref{fig:heatmap}A).
@@ -195,25 +191,40 @@
     Similarly, mutations predicted to be advantageous are found to be positively selected with varying proportions across populations (red row in fig.~\ref{fig:heatmap}C).
     These variable proportions between populations can be explained by the effective number of individuals in the population ($\Ne$), a major driver of selection efficacy.
     Since $\Ne$ is not directly measurable, a reasonable proxy usually used is the synonymous diversity (see material and methods).
-    We thus ordered populations by their levels of synonymous diversity (fig.~\ref{fig:diversity}A) and confirmed that higher synonymous diversity is usually accompanied by a smaller proportion of neutral mutations.
-    This result suggests that populations with higher diversity (e.g.~\textit{Bos} or \textit{Ovis}) are more likely to discriminate whether mutations are advantageous or deleterious.
+    We thus ordered populations by their levels of synonymous diversity (fig.~\ref{fig:diversity}A) and confirmed that higher synonymous diversity is typically accompanied by a smaller proportion of neutral mutations.
+    This result suggests that populations with higher diversity (e.g.~\textit{Bos} or \textit{Ovis}) are more likely to discriminate whether mutations are advantageous or deleterious (fig~S1-S5).
     Alternatively stated, mutations in populations with low diversity (e.g.~\textit{Homo}) are effectively nearly-neutral and behave as would a neutral mutation.
+    %, especially for mutations already predicted to be nearly-neutral at the phylogenetic scale (fig~S8-S9).
     This result is qualitatively in accordance with the nearly-neutral theory of evolution which argues that mutations are less efficiently selected for in small populations.
-
-    We then tried to estimate the proportion of restoring mutations among advantageous ones.
-    Since adaptation does not fit the fitness predictions, the proportion of adaptive mutation is expected to be the same among SNPs which are predicted to be advantageous, and among SNPs which are predicted to be deleterious.
-    Thus the proportion of advantageous mutations among SNPs which are predicted to be deleterious directly correspond to the proportion of all mutations which are adaptive.
-    So if we divide the proportion of mutations which are predicted to be advantageous among supposedly deleterious SNPs by the proportion of mutations which are predicted to be advantageous among all SNPs.
-    We directly get the proportion of mutations which are adaptive among advantageous ones. It results that 60 to 80\% of advantageous mutations are adaptive.
 
     Finally, we reconstructed the substitutions in the terminal branches of the phylogenetic tree in order to determine the distribution of their selection coefficients.
     To this aim, for each population with polymorphism data available, we first reconstructed the ancestral sequence (which is different than the reference sequence), then we mapped the substitutions from the last genus split to this reconstructed ancestral sequence.
     In these populations, we show that out of all polarized substitutions in the branches, between 10 and 17\% of all substitutions have an $\Sphy > 1$ (table S1) and between 22 and 42\% of all substitutions have an $\Sphy > 0$ (table S2).
     Most importantly, there is clear signal that the substitutions with an $\Sphy > 1$ have been positively selected since their ratio of non-synonymous over synonymous divergence, a ratio called $\dnds$, is between 1.05 and 1.81 in the different populations (table S1), meaning that mutations with $\Sphy > 1$ reach fixation more frequently that synonymous mutations (supposedly neutral).
     %This also means that the ratio $\dnds$ usually used to detect adaptation while relying on substitutions between close species\cite{mcdonald_adaptative_1991, galtier_adaptive_2016} or at the phylogenetic scale\cite{goldman_codonbased_1994, yang_codonsubstitution_2002} is overestimated.
-    These observed substitutions are likely to have been positive selected because they restored a more optimal state, not because they are driving innovations to a new environment or a function.
+    These observed substitutions are likely to have been positive selected because they restored a more optimal state, not because they are driving innovations to a new environment or a new function.
+
+    \subsection*{A large proportion of advantageous mutations are non-adaptive}
+
+    We then tried to estimate the proportion of restoring mutations among advantageous ones.
+    Since adaptation does not fit the fitness predictions, the proportion of adaptive mutation is expected to be the same among SNPs which are predicted to be advantageous, and among SNPs which are predicted to be deleterious.
+    Thus the proportion of advantageous mutations among SNPs which are predicted to be deleterious directly correspond to the proportion of all mutations which are adaptive.
+    So if we divide the proportion of mutations which are predicted to be advantageous among supposedly deleterious SNPs by the proportion of mutations which are predicted to be advantageous among all SNPs, we directly get the proportion of mutations which are adaptive among advantageous ones.
+    It results that 20 to 40\% of advantageous mutations are due to maintenance positive selection (fig~\ref{fig:diversity}B \& table S2).
+
+    In a similar way, we can consider that the total $\dnds$ encompasses the rate of evolution of deleterious, restoring and adaptive substitutions.
+    Then, the $\dnds$ computed exclusively on non-synonymous sites with a $\Sphy < 0$ only represent the rate of evolution of solely deleterious and adaptive substitutions, discarding the restoring substitutions by construction.
+    Thus, if we divide the $\dnds$ estimated on all substitutions, by the one estimated only on substitutions predicted to be deleterious, we directly get the proportion of the rate of evolution which is due to maintenance positive selection.
+    This way, we estimated that between 20 and 25\% of the evolutionary rate is due to maintenance positive selection (fig~\ref{fig:diversity}C \& table S2).
+
+    Interestingly, the proportion of restoring mutations among advantageous ones and the proportion of the rate of evolution explained by maintenance positive selection do not show a clear relationship with the synonymous diversity (a proxy for the effective population size) (fig.~\ref{fig:diversity}B and C).
+    Indeed, the relationship between $\Ne$ and the proportion of restoring mutations is not trivial and should highly depend on time scales.
+    A population which experienced a high long term $\Ne$ in the past is supposed to be closer to the optimal state (under a stable fitness landscape), and should not leave much space for restoring mutations.
+    On the other hand a high short term $\Ne$ will induce more extreme fitness effects and a larger proportion of otherwise effectively neutral restoring mutations will be positively selected, thus increasing the proportion of restoring mutations.
+    Overall, the proportion of restoring mutations is expected to be more dependent on effective population size contraction or expansion rather than on the short term effective population size captured by the synonymous diversity.
+
     %Altogether, we estimated that between 18 and 39\% of $\dnds$ is over-estimated (table S1), corresponding to maintenance positive selection.
-    In a nearly neutral framework, genomes could be viewed as the arena of a tug-of-war between a large volume of deleterious mutations that eventually reach fixation due to drift, and scarce advantageous mutations that are restoring a more optimal ancestral state.
+    %In a nearly neutral framework, genomes could be viewed as the arena of a tug-of-war between a large volume of deleterious mutations that eventually reach fixation due to drift, and scarce advantageous mutations that are restoring a more optimal ancestral state.
     % However, and surprisingly, a decrease in the proportion of neutral mutation did not translate into a mechanical increase in the proportion of advantageous mutations.
     % Instead, populations with higher diversity have a lower proportion of advantageous mutations (fig.~S7), this effect is also more pronounced for mutations predicted to be advantageous at the phylogenetic scale (red row in fig.~\ref{fig:heatmap}C and fig.~S8).
     % This discrepancy can be explained by the fact that populations with larger diversity have already depleted the putatively advantageous mutations, and that only deleterious are remaining possible.
@@ -224,7 +235,7 @@
         \centering
         \includegraphics[width=\textwidth, page=1] {artworks/figure.homo-afr-results}
         \caption{
-            Panel A: Histogram of predicted selection coefficients ($\Sphy$) for all possible mutations away from the ancestral human genome, weighted by the mutation rate.
+            Panel A: Histogram of predicted selection coefficients ($\Sphy$) for all possible mutations away from the ancestral human genome, giving the number of sites ($L$, in y-axis) across the genome with a given $\Sphy$.
             Mutations are divided into 5 classes: severely deleterious (blue), deleterious (green), weakly deleterious (light green), weakly advantageous (yellow) and advantageous (red).
             Panel B. Histogram of predicted selection coefficients ($\Sphy$) for all observed mutations in a sample of 8 individuals (out of 512 in the original dataset) of African descent.
             If they are less mutations observed than expected, this class is thus undergoing purifying selection.
@@ -252,21 +263,13 @@
         \caption{
             Panel A. For each population, the proportion of advantageous ($p_+=\PpolyAdv$), nearly-neutral ($\PpolyNeutral$) and of deleterious ($\PpolyDel$) mutations estimated at the population-genetic scale is shown.
             Estimation is performed with SNPs predicted to be weakly advantageous at the phylogenetic scale ($\divWeakAdv$).
-            Panel B. $R(p_+)=\dfrac{p_+ - p_+[\Sphy < 0]}{p_+}$ is the fraction of the probability for a new mutation to be advantageous ($p_+=\PpolyAdv$) that is over-estimated, $p_+$ is compared to its estimation when we had removed all the restoring mutations $p_+[\Sphy < 0]$.
+            Panel B. $R(p_+)=\dfrac{p_+ - p_+(\Sphy < 0)}{p_+}$ is the fraction of non-adaptive advantageous mutations, $p_+$ is compared to its estimation when we had removed all the restoring mutations $p_+(\Sphy < 0)$.
             $R(p_+)$ (y-axis) is shown as a function of the synonymous diversity (Watterson $\theta_w$ in x-axis).
-            Panel C. $R(\dnds)=\dfrac{\dnds - \dnds[\Sphy < 0]}{\dnds}$ is the fraction of the divergence ($\dnds$) that is over-estimated, where $\dnds$ is compared to the estimated divergence when we removed the restoring substitutions $\dnds[\Sphy < 0]$.
-            $R(\dnds)$ (y-axis) is shown as a function of the synonymous diversity (Watterson $\theta_w$ in x-axis).
+            Panel C. $R(\dnds)=\dfrac{\dnds - \dn(\Sphy < 0) / \ds}{\dnds}$ is the fraction of divergence ($\dnds$) that is due to maintenance positive selection, where $\dnds$ is compared to the estimated divergence when we removed the restoring substitutions $\dn(\Sphy < 0)/\ds$.
+            $R(\dn)$ (y-axis) is shown as a function of the synonymous diversity (Watterson $\theta_w$ in x-axis).
         }
         \label{fig:diversity}
     \end{figure*}
-
-    Biologically, another repairing mechanism is compensatory mutations, which are repairing damage caused by deleterious mutations at another site in the genome and generating a widespread signal of non-adaptive positive selection\cite{hartl_compensatory_1996, pollock_strong_2014, starr_epistasis_2016}.
-    In our study we focused on mutations restoring the more optimal ancestral state at a given site, not accounting for compensatory mutations since we assumed a model of fitness landscape without epistasis, providing a reasonable estimate of average fitness profiles\cite{youssef_consequences_2020}.
-    But most importantly, we argue that our estimation of the amount of maintenance positive selection is an underestimation, and that accounting for compensatory mutations by means of epistasis would mechanically increase that amount.
-    Indeed, a fluctuating fitness landscape due to an external forces (e.i. changes in environment) results in an acceleration of the rate of evolution\cite{ rodrigue_detecting_2017, rodrigue_bayesian_2021} which generates epistatic mutations that are immediately beneficial\cite{gong_epistatically_2014}.
-    On the contrary, pervasive epistasis generates the opposite, an entrenchment\cite{goldstein_evolutionary_2004, goldstein_nonadaptive_2015} resulting in a slowing down of the rate evolution\cite{rodrigue_detecting_2017, patel_epistasis_2022} or a standstill\cite{youssef_evolution_2022}.
-    In other words, under pervasive epistasis, finding empirical evidence for restoring mutations is harder since restoring mutations becomes less and less likely to occur over time\cite{goldstein_nonadaptive_2015, goldstein_sequence_2017, park_epistatic_2022}.
-    Our study thus shows that restoring mutations should instead not be overlooked, and we argue that both restoring and compensatory mutations play an important role to avoid our genome to collapse under a mutation load.
 
     % Our study is a bridge between phylogenetic and population genetics
     From a theoretical evolution perspective, we have found that we can use phylogenetic signals and mutation-selection codon models to predict the selection coefficient of a mutation.
@@ -276,6 +279,14 @@
     Moreover, SIFT scores based on amino-acid alignments across species have also been found to be informative of the selection pressure exerted at the population scale\cite{chen_hunting_2021}.
     Accordingly, our study shows that sites with a higher SIFT score at the phylogenetic scale are more positively selected in the different populations (supp.\ mat\  section 2).
     In practice, SIFT scores are more coarse grained, with for example a bulk of mutations with a score of 1.0 (the highest), and does not provide a boundary between advantageous and deleterious mutations, nor are they based on a population-genetics formalism.
+
+    Biologically, another mechanism which generate maintenance positive selection is compensatory mutations, which are repairing damage caused by deleterious mutations at another site in the genome and generating a widespread signal of non-adaptive positive selection\cite{hartl_compensatory_1996, pollock_strong_2014, starr_epistasis_2016}.
+    In our study we focused on mutations restoring the more optimal ancestral state at a given site, not accounting for compensatory mutations since we assumed a model of fitness landscape without epistasis, providing a reasonable estimate of average fitness profiles\cite{youssef_consequences_2020}.
+    But most importantly, we argue that our estimation of the amount of maintenance positive selection is an underestimation, and that accounting for compensatory mutations by means of epistasis would mechanically increase that amount.
+    Indeed, a fluctuating fitness landscape due to an external forces (e.i. changes in environment) results in an acceleration of the rate of evolution\cite{ rodrigue_detecting_2017, rodrigue_bayesian_2021} which generates epistatic mutations that are immediately beneficial\cite{gong_epistatically_2014}.
+    On the contrary, pervasive epistasis generates the opposite, an entrenchment\cite{goldstein_evolutionary_2004, goldstein_nonadaptive_2015} resulting in a slowing down of the rate evolution\cite{rodrigue_detecting_2017, patel_epistasis_2022} or a standstill\cite{youssef_evolution_2022}.
+    In other words, under pervasive epistasis, finding empirical evidence for restoring mutations is harder since restoring mutations become less and less likely to occur over time\cite{goldstein_nonadaptive_2015, goldstein_sequence_2017, park_epistatic_2022}.
+    Our study thus shows that restoring mutations should not be overlooked, and we argue that both restoring and compensatory mutations play an important role in preventing our genome from collapsing under a mutation load.
 
     %Second, epistasis is not modelled while it can have drastic consequences on the change in fitness landscape\cite{latrille_quantifying_2021}.
     %Some models using Direct Coupling Analysis (DCA) can infer coevolution between sites, and thus provide a fitness score for amino acids which depends on other sites of the sequence\cite{bisardi_modeling_2022}.
@@ -288,26 +299,26 @@
     %Most importantly, such models do not leverage the information of the source and target amino acid involve in the mutation, and thus cannot be used to estimate the non-adaptive part of positive selection.
     %Altogether, we here show that mutation-selection codon models formalize a bridge between phylogenetics and population genetics models, but both ends have its limitation and could be improved.
 
-    In population genetics, models also have shortcomings, such that there is no consensus on the expected shape of the DFE\cite{welch_divergence_2008, bataillon_effects_2014}, but it has indeed been found to be reliably constant between species\cite{castellano_comparison_2019}.
+    At the population-genetic level, our study relied on models with some shortcomings, such that there is no consensus on the expected shape of the DFE\cite{welch_divergence_2008, bataillon_effects_2014}, although it has been found to be reliably constant between species\cite{castellano_comparison_2019}.
     The model we used allows the inference of a full DFE, modelling the negative part of the DFE as a gamma distribution, and the positive part as an exponential distribution.
     However, when we aggregate SNPs that are expected to be strongly deleterious or strongly advantageous, the model struggles to fit their DFE to a gamma or an exponential distribution.\cite{brevet_reconstructing_2021}
     As a result, while the proportions of negative/weak/positive mutations stays reliable, the mean values for selection coefficients ($\Spop$) estimated by polyDFE become biologically absurd ($\Spop \ll -10^3$).
-    Such effect is not found for neutral SNPs and a method to accurately estimate the mean value of selection coefficients from SFS without assuming any shape for the DFE remains yet to be available.
+    Such effect is not found for neutral SNPs and a method to accurately estimate the mean value of selection coefficients from SFS without assuming any shape for the DFE remains yet to be developed.
     Aside from methodological limitations, the mammalian case study might also not be representative of other clades.
-    Indeed, our dataset is quite convenient because mammals have relatively small population sizes, which allow large amount of deleterious mutations to be fixed, and thus, there are a lot of opportunities for maintenance positive selection to arise.
+    Indeed, mammals have relatively small long term population sizes, which allow large amounts of deleterious mutations to be fixed, and thus, there are a lot of opportunities for maintenance positive selection to arise.
     It would thus be of great interest to reproduce our experiment with other clades, such as \textit{Drosophila} or birds which tend to have higher effective population size.
     It would also be interesting to have access to more shallow but wider phylogenies to increase the resolution of our predictions.
     % Moreover, mammalian are less affected by codon usage
 
     From a structural biology perspective, we have found that proteins are not optimal for their fitness, which has been proved for their kinetics and thermodynamics\cite{taverna_why_2002, goldstein_evolution_2011}.
     We argue that mutation-selection models are thus a mandatory tool in evolutionary biology to detect and quantify adaptation since they genuinely take into account the tug-of-war between scarce advantageous mutations likely to reach fixation and a bulk of deleterious mutations eventually reaching fixation due to their sheer mass.
-    Indeed, these models can be used as a null model to predict the overall rate of evolution of proteins\cite{spielman_relationship_2015, dosreis_how_2015}.
-    A departure from this model indicates that proteins are evolving under a changing fitness landscape\cite{rodrigue_detecting_2017, tamuri_mutationselection_2021} and is a signal of adaptive evolution\cite{rodrigue_bayesian_2021}.
+    Indeed, these models can be used as a null model to predict the expected rate of evolution of proteins\cite{spielman_relationship_2015, dosreis_how_2015} under a stable fitness landscape.
+    A departure from this model indicates that proteins are evolving under a changing fitness landscape\cite{rodrigue_detecting_2017, tamuri_mutationselection_2021} and is a signal of pervasive adaptive evolution\cite{rodrigue_bayesian_2021} or of pervasive epistasis\cite{rodrigue_detecting_2017}.
 
 
     \section*{Acknowledgments}
     \label{sec:acknowledgment}
-    We gratefully also acknowledge the help of Diego A. Hartasánchez Frenk for his advice and review concerning this manuscript.
+    We gratefully acknowledge the help of Diego A. Hartasánchez Frenk for his advice and review concerning this manuscript.
     This work was performed using the computing facilities of the CC LBBE/PRABI\@.
     \textbf{Funding:}
     Université de Lausanne;
@@ -346,7 +357,7 @@
         \begin{dcases}
             q_{a \mapsto b}^{(i)} & = 0 \text{ if codons $a$ and $b$ are more than one mutation away,} \\
             q_{a \mapsto b}^{(i)} & = \mu_{a \mapsto b} \text{ if codons $a$ and $b$ are synonymous,} \\
-            q_{a \mapsto b}^{(i)} & = \mu_{a \mapsto b}  \mu_{a \mapsto b} \dfrac{F_b^{(i)} - F_a^{(i)}}{1 - \e^{F_a^{(i)} - F_b^{(i)}}} \text{ if codons $a$ and $b$ are non-synonymous}.
+            q_{a \mapsto b}^{(i)} & = \mu_{a \mapsto b} \dfrac{F_b^{(i)} - F_a^{(i)}}{1 - \e^{F_a^{(i)} - F_b^{(i)}}} \text{ if codons $a$ and $b$ are non-synonymous}.
         \end{dcases}
     \end{equation}
     Fitting the mutation-selection model on a sequence alignment leads to an estimation of the mutation rate matrix ($\UniDimArray{\mu}$) as well as the 20 amino-acid fitness landscape ($\UniDimArray{F^{(i)}}$) at each site $i$.
@@ -387,37 +398,42 @@
     Accordingly, a distribution of fitness effects of mutations (DFE) is assumed, usually modeled as a continuous distribution\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009}.
     In this study, we used the software polyDFE\cite{tataru_inference_2017, tataru_polydfe_2020}, for which the DFE ($\phi$) is given by a mixture of a $\Gamma$ and Exponential distributions, parameterized by $\Spop_d$ , $b$, $p_b$
     and $\Spop_b$ as:
-    \begin{equation*}
+    \begin{equation}
         \phi \left( \Spop; \Spop_d , b, p_b, \Spop_b \right) =
         \begin{dcases}
             \left( 1 - p_b \right) f_{\Gamma}(-\Spop; -\Spop_d, b) & \text{ if $\Spop \leq 0$,} \\
             p_b f_{e}(\Spop; \Spop_b) & \text{ if $\Spop > 0$,} \\
         \end{dcases}
-    \end{equation*}
+    \end{equation}
     where $\Spop_d \leq -1 $ is the estimated mean of the DFE for $\Spop \leq 0$,
     $b \geq 0.4$ is the estimated shape of the $\Gamma$ distribution,
     $0 \leq p_b \leq 1$ is the estimated probability that $\Spop > 0$,
     $\Spop_b \geq 1$ is the estimated mean of the DFE for $\Spop > 0$,
     and $f_{\Gamma}(x; m, b)$ is the density of the $\Gamma$ distribution with mean m and shape b, while $f_{e}(x; m)$ is the density of the Exponential distribution with mean $m$.
     Once the DFE is fitted to the data, the proportion of advantageous ($\PpolyAdv$), nearly-neutral ($\PpolyNeutral$) and deleterious mutations ($\PpolyDel$) are given as:
-    \begin{align*}
-        \PpolyAdv &= p_b \int_{1}^{+\infty} f_{e}(\Spop; \Spop_b) \der \Spop  \\
-        \PpolyNeutral &= p_b \int_{0}^{1} f_{e}(\Spop; \Spop_b) \der \Spop + \left( 1 - p_b \right) \int_{0}^{1} f_{\Gamma}(\Spop; -\Spop_d, b) \der \Spop \\
-        \PpolyDel &= \left( 1 - p_b \right) \int_{1}^{+\infty} f_{\Gamma}(\Spop; -\Spop_d, b) \der \Spop
-    \end{align*}
+    \begin{align}
+        p_+ = \PpolyAdv &= p_b \int_{1}^{+\infty} f_{e}(\Spop; \Spop_b) \der \Spop,  \\
+        \PpolyNeutral &= p_b \int_{0}^{1} f_{e}(\Spop; \Spop_b) \der \Spop + \left( 1 - p_b \right) \int_{0}^{1} f_{\Gamma}(\Spop; -\Spop_d, b) \der \Spop, \\
+        \PpolyDel &= \left( 1 - p_b \right) \int_{1}^{+\infty} f_{\Gamma}(\Spop; -\Spop_d, b) \der \Spop.
+    \end{align}
 
     PolyDFE requires one SFS for non-synonymous mutations and one for synonymous mutations (neutral expectation), as well as the total mutation rate (mutation rate per site multiplied by the number of sites) on which each SFS has been sampled.
     The number of sites for each SFS is thus obtained using the following four-step procedure.
     First, for each gene, the reference DNA sequence is adjusted with ancestral and fixed polymorphism for each population.
-    Second, from this reconstructed sequence, all possible mutations are computed, weighted by the mutation rate between nucleotide estimated at the phylogenetic scale $\UniDimArray{\mu}$.
-    Third, the total mutation rate for synonymous mutations, called $\mu_{\mathrm{syn}}$, is the sum across the genome.
-    Similarly, the total mutation rate for each class of selection, called  $\mu_{\Sphyclass}$, is the sum across all non-synonymous mutations if their selection coefficient at the phylogenetic scale ($\Sphy$) is in the class $\Sphyclass$, where $\Sphyclass \in \{\divStrongDel, \divDel, \divWeakDel, \divWeakAdv, \divAdv \}$.
-    Fourth, the number of sites ($L$) for each class of selection coefficient ($\Sphyclass$) is then computed as the total number of sites across the genome ($L_{tot}$) weighted by the ratio of the aggregated mutations rates falling in the class ($\mu_{\Sphyclass}$) over the total mutation rate for all possible mutations:
-    \begin{align*}
-        L_{\mathrm{non-syn}} | \Sphyclass &= L_{tot} \frac{\mu_{\Sphyclass}}{\mu_{tot}},
-        L_{\mathrm{syn}} &= L_{tot} \frac{\mu_{\mathrm{syn}}}{\mu_{tot}},
-    \end{align*}
+    Second, from this reconstructed sequence, all possible mutations are computed, weighted by the mutation rate between nucleotide ($\mu$) estimated at the phylogenetic scale.
+    Third, the total mutation rate for synonymous mutations, called $\mu_{\textrm{syn}}$, is the sum across the genome.
+    Similarly, the total mutation rate for each class of selection, called  $\mu\left( \Sphyclass \right)$, is the sum across all non-synonymous mutations if their selection coefficient at the phylogenetic scale ($\Sphy$) is in the class $\Sphyclass$ (e.g. $\Sphyclass = \divAdv$).
+    Fourth, the number of sites ($L$) for each class of selection coefficient ($\Sphyclass$) is then computed as the total number of sites across the genome ($L_{tot}$) weighted by the ratio of the aggregated mutations rates falling in the class ($\mu\left( \Sphyclass \right)$) over the total mutation rate for all possible mutations:
+    \begin{align}
+        L_{\textrm{non-syn}} \left( \Sphyclass \right) &= L_{tot} \frac{\mu\left( \Sphyclass \right)}{\mu_{tot}}, \\
+        L_{\textrm{syn}} &= L_{tot} \frac{\mu_{\textrm{syn}}}{\mu_{tot}}.
+    \end{align}
     From the SFS and the number of sites $L$ for the both synonymous and for the class of non-synonymous, polyDFE estimates parameters of the DFE $\phi \left( \Spop; \Spop_d , b, p_b, \Spop_b \right)$ using maximum likelihood.
+
+    The fraction of non-adaptive advantageous mutations $R(p_+)$ is computed the fraction of advantageous mutations ($p_+$) that is due to maintenance positive selection, where $p_+$ is compared to the estimated divergence when we removed the restoring substitutions $p_+(\Sphy < 0)$.
+    \begin{equation}
+        R(p_+)=\dfrac{p_+ - p_+(\Sphy < 0)}{p_+}
+    \end{equation}
 
     \subsection*{Substitution mapping in the terminal branch}
     \label{subsec:substitution-mapping-in-the-terminal-branch}
@@ -429,10 +445,16 @@
     We considered \textit{Ceratotherium simum simum} as \textit{Equus caballus} sister species; \textit{Bison bison bison} as \textit{Bos taurus} sister species; \textit{Pantholops hodgsonii} as \textit{Ovis aries} sister species; \textit{Pantholops hodgsonii} as \textit{Capra Hircus} sister species; \textit{Macaca mulatta} as \textit{Chlorocebus sabaeus} sister species and finally we considered \textit{Pan troglodytes} as \textit{Homo sapiens} sister species.
     The selection coefficient ($\Sphy$) of each substitution is then obtained by comparing the difference in amino-acid fitnesses for each polarized non-synonymous codon substitution, by referring to the site-specific fitness profile obtained in the phylogeny-based method (see~\ref{subsec:s-phylogeny-method}).
     Finally, the rate of non-synonymous over synonymous substitution for a given class of selection coefficient ($\Sphyclass$) is computed as:
-    \begin{equation*}
-        \dnds | \Sphyclass = \frac{\sfrac{D_{\mathrm{non-syn} | \Sphyclass}}{L_{\mathrm{non-syn}} | \Sphyclass}}{\sfrac{D_{\mathrm{syn}}}{L_{\mathrm{syn}}}},
-    \end{equation*}
-    where $D_{\mathrm{non-syn}} | \Sphyclass $ is the number of non-synonymous substitutions in the class $\Sphyclass$, $D_{\mathrm{syn}}$ is the number of synonymous substitutions across the genome, while $L_{\mathrm{non-syn}} | \Sphyclass$ and $L_{\mathrm{syn}}$ are the number of non-synonymous and synonymous sites as defined in the previous section.
+    \begin{align}
+        \dn \left( \Sphyclass \right) &= \dfrac{D_{\textrm{non-syn}}\left( \Sphyclass \right)}{L_{\textrm{non-syn}} \left( \Sphyclass \right)}, \\
+        \ds &= \dfrac{D_{\textrm{syn}}}{L_{\textrm{syn}}},
+    \end{align}
+    where $D_{\textrm{non-syn}} \left( \Sphyclass \right) $ is the number of non-synonymous substitutions in the class $\Sphyclass$, $D_{\textrm{syn}}$ is the number of synonymous substitutions across the genome, while $L_{\textrm{non-syn}} \left( \Sphyclass \right)$ and $L_{\textrm{syn}}$ are the number of non-synonymous and synonymous sites as defined in the previous section.
+    Of note, the quantities $R(\dn)$ and $R(\dnds)$ are equivalent due to simplification of the factor $\ds$:
+    \begin{align}
+        R(\dnds) &= \dfrac{\dnds - \dn(\Sphy < 0) / \ds}{\dnds} = \dfrac{\dn - \dn(\Sphy < 0)}{\dn} = R(\dn) \\
+        &= 1 - \dfrac{ L_{\textrm{non-syn}} \cdot D_{\textrm{non-syn}}\left( \Sphyclass \right) }{ D_{\textrm{non-syn}} \cdot L_{\textrm{non-syn}} \left( \Sphyclass \right)}
+    \end{align}
 
     \printbibliography
 \end{document}
