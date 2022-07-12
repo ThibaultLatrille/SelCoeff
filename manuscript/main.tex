@@ -193,8 +193,7 @@
     Since $\Ne$ is not directly measurable, a reasonable proxy usually used is the synonymous diversity (see material and methods).
     We thus ordered populations by their levels of synonymous diversity (fig.~\ref{fig:diversity}A) and confirmed that higher synonymous diversity is typically accompanied by a smaller proportion of neutral mutations.
     This result suggests that populations with higher diversity (e.g.~\textit{Bos} or \textit{Ovis}) are more likely to discriminate whether mutations are advantageous or deleterious (fig~S1-S5).
-    Alternatively stated, mutations in populations with low diversity (e.g.~\textit{Homo}) are effectively nearly-neutral and behave as would a neutral mutation.
-    %, especially for mutations already predicted to be nearly-neutral at the phylogenetic scale (fig~S8-S9).
+    Alternatively stated, mutations in populations with low diversity (e.g.~\textit{Homo}) are effectively nearly-neutral and behave as would a neutral mutation, especially for mutations already predicted to be nearly-neutral at the phylogenetic scale (fig~S8-S9).
     This result is qualitatively in accordance with the nearly-neutral theory of evolution which argues that mutations are less efficiently selected for in small populations.
 
     Finally, we reconstructed the substitutions in the terminal branches of the phylogenetic tree in order to determine the distribution of their selection coefficients.
@@ -223,14 +222,6 @@
     On the other hand a high short term $\Ne$ will induce more extreme fitness effects and a larger proportion of otherwise effectively neutral restoring mutations will be positively selected, thus increasing the proportion of restoring mutations.
     Overall, the proportion of restoring mutations is expected to be more dependent on effective population size contraction or expansion rather than on the short term effective population size captured by the synonymous diversity.
 
-    %Altogether, we estimated that between 18 and 39\% of $\dnds$ is over-estimated (table S1), corresponding to maintenance positive selection.
-    %In a nearly neutral framework, genomes could be viewed as the arena of a tug-of-war between a large volume of deleterious mutations that eventually reach fixation due to drift, and scarce advantageous mutations that are restoring a more optimal ancestral state.
-    % However, and surprisingly, a decrease in the proportion of neutral mutation did not translate into a mechanical increase in the proportion of advantageous mutations.
-    % Instead, populations with higher diversity have a lower proportion of advantageous mutations (fig.~S7), this effect is also more pronounced for mutations predicted to be advantageous at the phylogenetic scale (red row in fig.~\ref{fig:heatmap}C and fig.~S8).
-    % This discrepancy can be explained by the fact that populations with larger diversity have already depleted the putatively advantageous mutations, and that only deleterious are remaining possible.
-    % In other words, being on the top of a fixed fitness landscape leaves you with only paths going downhill.
-    % Altogether, populations with increased diversity are showing signature of increased selection efficiency and are also less likely to generate positively selected mutations.
-
     \begin{figure*}[!ht]
         \centering
         \includegraphics[width=\textwidth, page=1] {artworks/figure.homo-afr-results}
@@ -252,8 +243,8 @@
         \includegraphics[width=\textwidth, page=1] {artworks/figure.heatmap}
         \caption{
             Reproducibility of results shown in figure~\ref{fig:homo-afr-results} in 28 populations across 6 genera.
-            Site-frequency spectra and total mutation rates are combined at the population-genetic scale to estimate the proportion of advantageous mutations ($\PpolyAdv$) in the top panel, of nearly-neutral mutations ($\PpolyNeutral$) in the middle panel and of deleterious mutations ($\PpolyDel$) in the bottom panel.
-        }
+            For each class of selection at the phylogenetic scale ($\Sphyclass \in \{ \divStrongDel, \divDel,  \divWeakDel,  \divWeakAdv, \divAdv \}$, in rows), site-frequency spectra and total number of sites are combined at the population-genetic scale to estimate the proportion of advantageous mutations ($\PpolyAdv$) in the top panel, of nearly-neutral mutations ($\PpolyNeutral$) in the middle panel and of deleterious mutations ($\PpolyDel$) in the bottom panel.
+        }.
         \label{fig:heatmap}
     \end{figure*}
 
@@ -261,8 +252,8 @@
         \centering
         \includegraphics[width=\textwidth, page=1] {artworks/figure.diversity}
         \caption{
-            Panel A. For each population, the proportion of advantageous ($p_+=\PpolyAdv$), nearly-neutral ($\PpolyNeutral$) and of deleterious ($\PpolyDel$) mutations estimated at the population-genetic scale is shown.
-            Estimation is performed with SNPs predicted to be weakly advantageous at the phylogenetic scale ($\divWeakAdv$).
+            Panel A. For each population, the proportion of advantageous ($p_+=\PpolyAdv$), nearly-neutral ($\PpolyNeutral$) and of deleterious ($\PpolyDel$) mutations estimated at the population-genetic scale using all SNPs available.
+            Population are sorted for increased synonymous diversity.
             Panel B. $R(p_+)=\dfrac{p_+ - p_+(\Sphy < 0)}{p_+}$ is the fraction of non-adaptive advantageous mutations, $p_+$ is compared to its estimation when we had removed all the restoring mutations $p_+(\Sphy < 0)$.
             $R(p_+)$ (y-axis) is shown as a function of the synonymous diversity (Watterson $\theta_w$ in x-axis).
             Panel C. $R(\dnds)=\dfrac{\dnds - \dn(\Sphy < 0) / \ds}{\dnds}$ is the fraction of divergence ($\dnds$) that is due to maintenance positive selection, where $\dnds$ is compared to the estimated divergence when we removed the restoring substitutions $\dn(\Sphy < 0)/\ds$.
@@ -277,7 +268,7 @@
     Estimating effective population sizes along with fitness landscapes is possible\cite{latrille_inferring_2021}, but is, for the moment, too computational intensive to be performed genome-wide\cite{latrille_inferring_2021}.
     Hybrid mutation-selection and $\omega$-based codon models could provide a way forward\cite{brevet_reconstructing_2021}.
     Moreover, SIFT scores based on amino-acid alignments across species have also been found to be informative of the selection pressure exerted at the population scale\cite{chen_hunting_2021}.
-    Accordingly, our study shows that sites with a higher SIFT score at the phylogenetic scale are more positively selected in the different populations (supp.\ mat\  section 2).
+    Accordingly, our study shows that sites with a higher SIFT score at the phylogenetic scale are more positively selected in the different populations (supp.\ mat\  section SIFT scores).
     In practice, SIFT scores are more coarse grained, with for example a bulk of mutations with a score of 1.0 (the highest), and does not provide a boundary between advantageous and deleterious mutations, nor are they based on a population-genetics formalism.
 
     Biologically, another mechanism which generate maintenance positive selection is compensatory mutations, which are repairing damage caused by deleterious mutations at another site in the genome and generating a widespread signal of non-adaptive positive selection\cite{hartl_compensatory_1996, pollock_strong_2014, starr_epistasis_2016}.
@@ -308,7 +299,6 @@
     Indeed, mammals have relatively small long term population sizes, which allow large amounts of deleterious mutations to be fixed, and thus, there are a lot of opportunities for maintenance positive selection to arise.
     It would thus be of great interest to reproduce our experiment with other clades, such as \textit{Drosophila} or birds which tend to have higher effective population size.
     It would also be interesting to have access to more shallow but wider phylogenies to increase the resolution of our predictions.
-    % Moreover, mammalian are less affected by codon usage
 
     From a structural biology perspective, we have found that proteins are not optimal for their fitness, which has been proved for their kinetics and thermodynamics\cite{taverna_why_2002, goldstein_evolution_2011}.
     We argue that mutation-selection models are thus a mandatory tool in evolutionary biology to detect and quantify adaptation since they genuinely take into account the tug-of-war between scarce advantageous mutations likely to reach fixation and a bulk of deleterious mutations eventually reaching fixation due to their sheer mass.
