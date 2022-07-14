@@ -39,6 +39,9 @@
 \usepackage{graphicx}
 \pdfinclusioncopyfonts=1
 
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+
 \newcommand{\UniDimArray}[1]{\bm{#1}}
 \newcommand{\BiDimArray}[1]{\bm{#1}}
 \DeclareMathOperator{\E}{\mathbb{E}}
@@ -81,9 +84,11 @@
     \large
     \textbf{T. {Latrille}$^{1}$, J. {Joseph}$^{2}$, N. {Salamin}$^{1}$}\\
     \normalsize $^{1}$Université de Lausanne, Lausanne, Switzerland\\
-    \normalsize $^{2}$Université de Lyon, Lyon, France \\
+    \normalsize $^{2}$Université de Lyon, CNRS, LBBE UMR 5558, Villeurbanne, France \\
     \normalsize \texttt{\href{mailto:thibault.latrille@ens-lyon.org}{thibault.latrille@ens-lyon.org}} \\
 }
+
+\date{}
 
 \begin{document}
     \maketitle
