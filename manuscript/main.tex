@@ -102,16 +102,18 @@
 
     \keywords{Selection \and phylogenetic \and population genetics \and codon models \and adaptation }
 
-    \NS{on devrait plus placer le départ de l'intro dans un contexte historique, pour dire que de connaître si une mutation est avantageuse est la base de la génétique moléculaire (en citant des papiers clés)}
-
+    %\NS{on devrait plus placer le départ de l'intro dans un contexte historique, pour dire que de connaître si une mutation est avantageuse est la base de la génétique moléculaire (en citant des papiers clés)}
     We usually say that a mutation is undergoing positive selection when it brings a fitness advantage to its bearer with the consequence of facilitating its own transmission to the next generation.
     We can distinguish two main scenarios that can lead to such positive selection.
-    In the first scenario, a change of environment will modify the fitness of the individuals and the bearer of the mutation that is advantageous in the new environment will be better adapted.
-    Its chances of survival and reproduction will be higher and this process is typically referred to as adaptive evolution (fig.~\ref{fig:fitness-landscape}A).
+    In the first scenario, a mutation towards a state which was deleterious is now advantageous because of a change of environment.
+    A change of environment could be a change of temperature, viral exposition but it could also be a change in another part of the species' genome.
+    In the new environment, the mutation allows its bearer to survive and reproduce more than the others and thus will be positively selected.
+    This process is typically referred to as adaptive evolution (fig.~\ref{fig:fitness-landscape}A).
+
     The second scenario involves a mutation restoring the ancestral allele which corresponded to an optimal fitness for an individual in a constant environment, but has been lost due to the fixation of a deleterious mutation by drift (fig.~\ref{fig:fitness-landscape}B).
     In this study, this process will be referred to as maintenance positive selection.
     At the scale of a population, these two scenarios display different dynamics.
-    While in the case of environmental change, the population as a whole is climbing the fitness landscape along an adaptive walk\cite{tenaillon_utility_2014}, in the case of maintenance positive selection, the population as a whole is at mutation-selection equilibrium and therefore merely stays at the same location in the fitness landscape \cite{sella_application_2005, mustonen_fitness_2009}.
+    While in the case of environmental change, the population as a whole is climbing the fitness landscape along an adaptive walk\cite{tenaillon_utility_2014}, in the case of maintenance positive selection, the population as a whole is at mutation-selection equilibrium and therefore merely stays at the same location in the fitness landscape\cite{sella_application_2005, mustonen_fitness_2009}.
 
     At the population scale, these two different kinds of selection are indistinguishable and both result in a positive transmission bias of the advantageous allele, but their consequences at a macro-evolutionary scale are fundamentally different.
     While adaptive evolution promotes phenotype diversification (fig.~\ref{fig:fitness-landscape}C), maintenance positive selection promotes phenotype stability and preserves well established biological systems (fig.~\ref{fig:fitness-landscape}D).
@@ -121,7 +123,7 @@
     The basic idea is that advantageous mutations are expected to be observed in substitutions between species but not in polymorphism within a population because they reach fixation too quickly.
     This method has been largely improved to account for possible bias-inducing factors such as the presence of weak positive selection, background selection and demographic fluctuations\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009, galtier_adaptive_2016, tataru_inference_2017}.
     It has been applied across many organisms and enabled the discovery of widespread positive selection\cite{moutinho_variation_2019}.
-    However, the exact causes for this widespread occurrence of positive selection have been scarcely investigated\NS{is it the case in the conclusion of the previous paper?? would be nice to back it up with references}.
+    However, the exact causes for this widespread occurrence of positive selection have been scarcely investigated\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009, galtier_adaptive_2016} %\NS{is it the case in the conclusion of the previous paper?? would be nice to back it up with references}.
     As mentioned above, not all advantageous mutations contribute to genetic innovation and diversification and truly adaptive evolution can only be well estimated if maintenance positive selection is taken into account.
     While adaptive evolution is unpredictable because it caused by an unpredictable change in the environment of organisms, the second is predictable because optimal states should be more or less the same for closely related organisms which share most of their environment and physiology.
     A way to thus measure maintenance positive selection is to predict selection coefficients assuming a constant and stable fitness landscape estimated from the alignment of protein-coding genes.
@@ -317,7 +319,7 @@
     This study makes use of data generated by the NextGen Consortium.
     The European Union’s Seventh Framework Programme (FP7/2010-2014) provided funding for the project under grant agreement no 244356 - “NextGen”.
     \textbf{Funding:}
-    Université de Lausanne; French National Research Agency, Grant ANR-15-CE12-0010-01 / DASIRE.
+    Université de Lausanne; Agence Nationale de la Recherche, Grant ANR-19-CE12-0019 / HotRec.
     \textbf{Author contributions:}
     Original idea: T.L.\ and J.J.;
     Model conception: T.L., J.J.\ and N.S.;
