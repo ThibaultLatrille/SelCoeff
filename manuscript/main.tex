@@ -127,14 +127,14 @@
     As mentioned above, not all advantageous mutations contribute to genetic innovation and diversification and truly adaptive evolution can only be well estimated if maintenance positive selection is taken into account.
     While adaptive evolution is unpredictable because it caused by an unpredictable change in the environment of organisms, the second is predictable because optimal states should be more or less the same for closely related organisms which share most of their environment and physiology.
     A way to thus measure maintenance positive selection is to predict selection coefficients assuming a constant and stable fitness landscape estimated from the alignment of protein-coding genes.
-    For each site of the protein alignment, a first approximation would be to consider that the frequency of an amino-acid is a proxy for its fitness, since for example a deleterious amino acid will be more likely to be absent in the alignment.
+    For each site of the protein alignment, a first approximation would be to consider that the frequency of an amino acid is a proxy for its fitness, since for example a deleterious amino acid will be more likely to be absent in the alignment.
     One of the most used methods to make these predictions is SIFT (Sort Intolerant From Tolerant), which reliably detects deleterious mutations in many taxa\cite{ng_sift_2003, vaser_sift_2016}.
     However, this method has two major shortcomings.
-    First, we know that a lot of mechanisms can influence amino-acid frequency other than fitness (phylogeny, mutation biases, GC-biased gene conversion, mutational paths) which are not accounted for in SIFT.
+    First, we know that a lot of mechanisms can influence amino acid frequency other than fitness (phylogeny, mutation biases, GC-biased gene conversion, mutational paths) which are not accounted for in SIFT.
     Second, SIFT scores makes little sense as an actual measure of fitness, and is not interpretable in terms of population genetics.
     Contrarily, so-called mutation-selection codon models are rooted within a population genetics formalism\cite{halpern_evolutionary_1998, mccandlish_modeling_2014}.
-    These phylogenetic codon models can disentangle processes of mutation at the DNA level and selection at the amino-acid level.
-    Such codon models provide a nearly-neutral framework of evolution by estimating the fitness landscape over amino-acid sequences for each site of the sequence (fig~\ref{fig:method}A) while taking into account non-adaptive processes impacting codon frequency\cite{halpern_evolutionary_1998, rodrigue_mechanistic_2010, tamuri_estimating_2012}.
+    These phylogenetic codon models can disentangle processes of mutation at the DNA level and selection at the amino acid level.
+    Such codon models provide a nearly-neutral framework of evolution by estimating the fitness landscape over amino acid sequences for each site of the sequence (fig~\ref{fig:method}A) while taking into account non-adaptive processes impacting codon frequency\cite{halpern_evolutionary_1998, rodrigue_mechanistic_2010, tamuri_estimating_2012}.
     %Only nearly-neutral mutations between high fitness amino acids will tend to be permitted by the model, allowing for the explicit calculation of the scaled selection coefficient of non-synonymous mutations between codons.
     As a consequence, by integrating datasets at the species and population level, we can estimate the selection coefficient for each mutation currently segregating in a population.
     Such a dataset can allow us to address different questions regarding positive selection affecting protein-coding DNA sequences.
@@ -162,20 +162,20 @@
         \includegraphics[width=\textwidth, page=1] {artworks/figure.method}
         \caption{
             Integrating divergence and polymorphism.
-            At the phylogenetic level (panel A), the amino-acid Wrightian fitness for each site is estimated from protein-coding DNA alignments using mutation-selection codon models.
-            At the population-genetic level (panel B), for each observed single nucleotide polymorphism (SNP) segregating in the population, selection coefficient are computed as the difference in amino-acid fitness between the ancestral and derived variants.
+            At the phylogenetic level (panel A), the amino acid Wrightian fitness for each site is estimated from protein-coding DNA alignments using mutation-selection codon models.
+            At the population-genetic level (panel B), for each observed single nucleotide polymorphism (SNP) segregating in the population, selection coefficient are computed as the difference in amino acid fitness between the ancestral and derived variants.
         }
         \label{fig:method}
     \end{figure*}
 
-    To answer these questions, we estimated the fitness landscape of amino-acid for long-term evolution using available multiple sequence alignments between mammalian species\cite{ranwez_orthomam_2007, howe_ensembl_2021}.
+    To answer these questions, we estimated the fitness landscape of amino acid for long-term evolution using available multiple sequence alignments between mammalian species\cite{ranwez_orthomam_2007, howe_ensembl_2021}.
     We developed a pipeline to integrate data at the phylogenetic and population scale to estimate divergence and polymorphism, respectively, across the entire exome for 28 populations from 6 genera (\textit{Equus},  \textit{Bos}, \textit{Capra}, \textit{Ovis}, \textit{Chlorocebus} and \textit{Homo}; fig.~\ref{fig:method}A\&B).
 
 
     \subsection*{SNPs which are predicted to be advantageous are positively selected at the population scale}
 
 
-    For each non-synonymous SNP observed at the population level, we predicted its scaled selection coefficient ($\Sphy$) from amino-acid fitnesses estimated at the mammalian scale (fig.~\ref{fig:method}B).
+    For each non-synonymous SNP observed at the population level, we predicted its scaled selection coefficient ($\Sphy$) from amino acid fitnesses estimated at the mammalian scale (fig.~\ref{fig:method}B).
     Then we ask whether the variants that are supposedly advantageous are showing signatures of short term positive selection.
     For example, if a variant is found to be fixed in many mammals but not in ancestral humans, and a mutation in humans is toward the mammalian version, is this mutation advantageous for the individual carrying it?
     At the population level (e.g. in humans of Asian descent in fig.~\ref{fig:homo-afr-results}), we divided all observed SNPs in 5 classes of predicted selection coefficient: severely deleterious with $\divStrongDel$, deleterious with $\divDel$, weakly deleterious with $\divWeakDel$, weakly advantageous with $\divWeakAdv$ and advantageous with $\divAdv$ (fig.~\ref{fig:homo-afr-results}B).
@@ -273,7 +273,7 @@
     However, we so far assumed no changes in effective population size while it has been established that population size changes have a major effect on selection dynamics\cite{lanfear_population_2014, jones_shifting_2017, platt_protein_2018}.
     Estimating effective population sizes along with fitness landscapes is possible\cite{latrille_inferring_2021}, but is, for the moment, too computational intensive to be performed genome-wide\cite{latrille_inferring_2021}.
     Hybrid mutation-selection and $\omega$-based codon models could provide a way forward\cite{brevet_reconstructing_2021}.
-    Moreover, SIFT scores based on amino-acid alignments across species have also been found to be informative of the selection pressure exerted at the population scale\cite{chen_hunting_2021}.
+    Moreover, SIFT scores based on amino acid alignments across species have also been found to be informative of the selection pressure exerted at the population scale\cite{chen_hunting_2021}.
     Accordingly, our study shows that sites with a higher SIFT score at the phylogenetic scale are more positively selected in the different populations (supp.\ mat\  section SIFT scores).
     In practice, SIFT scores are more coarse grained, with for example a bulk of mutations with a score of 1.0 (the highest), and does not provide a boundary between advantageous and deleterious mutations, nor are they based on a population-genetics formalism.
 
@@ -347,9 +347,9 @@
     \subsection{Selection coefficient ($\Sphy$) in phylogeny-based method}
     \label{subsec:s-phylogeny-method}
 
-    We analyzed the phylogenetic level data using mutation-selection models. These models assume that the protein-coding sequence are at mutation-selection balance under a fixed fitness landscape characterized by a fitness vector over the $20$ amino-acid at each site\cite{yang_mutationselection_2008, halpern_evolutionary_1998, rodrigue_mechanistic_2010}.
+    We analyzed the phylogenetic level data using mutation-selection models. These models assume that the protein-coding sequence are at mutation-selection balance under a fixed fitness landscape characterized by a fitness vector over the $20$ amino acid at each site\cite{yang_mutationselection_2008, halpern_evolutionary_1998, rodrigue_mechanistic_2010}.
     Mathematically, the rate of non-synonymous substitution from codon $a$ to codon $b$ ($q_{a \mapsto b}^{(i)}$) at site $i$ of the sequence is equal to the rate of mutation of the underlying nucleotide change ($\mu_{a \mapsto b}$) multiplied by the scaled probability of fixation of the mutation ($\proba_{a \mapsto b}^{(i)}$).
-    The probability of fixation depends on the difference of scaled fitness of the amino-acid encoded by the mutated codon ($F_b^{(i)}$) and the amino-acid encoded by the original codon ($F_a^{(i)}$) at site $i$\cite{wright_evolution_1931, fisher_genetical_1930}.
+    The probability of fixation depends on the difference of scaled fitness of the amino acid encoded by the mutated codon ($F_b^{(i)}$) and the amino acid encoded by the original codon ($F_a^{(i)}$) at site $i$\cite{wright_evolution_1931, fisher_genetical_1930}.
     The rate of substitution from codon $a$ to $b$ at a site $i$ is thus:
     \begin{equation}
         \begin{dcases}
@@ -358,14 +358,14 @@
             q_{a \mapsto b}^{(i)} & = \mu_{a \mapsto b} \dfrac{F_b^{(i)} - F_a^{(i)}}{1 - \e^{F_a^{(i)} - F_b^{(i)}}} \text{ if codons $a$ and $b$ are non-synonymous}.
         \end{dcases}
     \end{equation}
-    Fitting the mutation-selection model on a sequence alignment leads to an estimation of the mutation rate matrix ($\UniDimArray{\mu}$) as well as the 20 amino-acid fitness landscape ($\UniDimArray{F^{(i)}}$) at each site $i$.
+    Fitting the mutation-selection model on a sequence alignment leads to an estimation of the mutation rate matrix ($\UniDimArray{\mu}$) as well as the 20 amino acid fitness landscape ($\UniDimArray{F^{(i)}}$) at each site $i$.
     The selection coefficient for a mutation from codon $a$ to codon $b$ at site $i$ is defined :
     \begin{equation}
         S_{a \mapsto b}^{(i)} = \Delta F^{(i)} = F^{(i)}_{b} - F^{(i)}_{a}.
     \end{equation}
     In the manuscript and the following material, the source ($a$) and target ($b$) codons as well as the site ($i$) are implicit and thus never explicitly written.
     We ran the Bayesian software \href{https://github.com/bayesiancook/bayescode}{BayesCode} on each protein-coding DNA alignment\cite{lartillot_phylobayes_2013, rodrigue_detecting_2017, rodrigue_bayesian_2021}.
-    We ran a Markov chain Monte-Carlo (MCMC) analysis during $2000$ generations, with a burn-in period of $1000$ generations, to obtain posterior mean estimates of the amino-acid fitness landscape ($\UniDimArray{F^{(i)}}$) at each site $i$\@.
+    We ran a Markov chain Monte-Carlo (MCMC) analysis during $2000$ generations, with a burn-in period of $1000$ generations, to obtain posterior mean estimates of the amino acid fitness landscape ($\UniDimArray{F^{(i)}}$) at each site $i$\@.
 
     \subsection{Polymorphism dataset}
     \label{subsec:polymorphism-dataset}
@@ -438,7 +438,7 @@
     Then, using this ancestral DNA reference and the $3$ closest outgroups found in the OrthoMam alignment, we reconstructed the ancestral protein-coding DNA sequences for each node of the 4-leaves tree with the yang M5 codon model (gamma site rate variation) in FastML.v3.11\cite{ashkenazy_fastml_2012}.
     All polarized codon substitutions are then obtained by comparing the ancestral protein-coding DNA sequences before the split to the sister species (closest outgroup) to the ancestral DNA reference for the population of interest (without segregating polymorphism).
     We considered \textit{Ceratotherium simum simum} as \textit{Equus caballus} sister species; \textit{Bison bison bison} as \textit{Bos taurus} sister species; \textit{Pantholops hodgsonii} as \textit{Ovis aries} sister species; \textit{Pantholops hodgsonii} as \textit{Capra Hircus} sister species; \textit{Macaca mulatta} as \textit{Chlorocebus sabaeus} sister species and finally we considered \textit{Pan troglodytes} as \textit{Homo sapiens} sister species.
-    The selection coefficient ($\Sphy$) of each substitution is then obtained by comparing the difference in amino-acid fitnesses for each polarized non-synonymous codon substitution, by referring to the site-specific fitness profile obtained in the phylogeny-based method (see~\ref{subsec:s-phylogeny-method}).
+    The selection coefficient ($\Sphy$) of each substitution is then obtained by comparing the difference in amino acid fitnesses for each polarized non-synonymous codon substitution, by referring to the site-specific fitness profile obtained in the phylogeny-based method (see~\ref{subsec:s-phylogeny-method}).
     Finally, the rate of non-synonymous over synonymous substitution for a given class of selection coefficient ($\Sphyclass$) is computed as:
     \begin{align}
         \dn \left( \Sphyclass \right) &= \dfrac{D_{\textrm{non-syn}}\left( \Sphyclass \right)}{L_{\textrm{non-syn}} \left( \Sphyclass \right)}, \\
