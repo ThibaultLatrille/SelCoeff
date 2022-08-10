@@ -20,7 +20,7 @@
 \PassOptionsToPackage{naturalnames}{hyperref}
 
 \usepackage{biorxiv}
-\usepackage[backend=biber,style=nature]{biblatex}
+\usepackage[backend=biber,,isbn=false,url=false,intitle=true,style=nature]{biblatex}
 \addbibresource{codon_models.bib}
 
 \usepackage{url}
@@ -35,6 +35,8 @@
 \usepackage{pdfpages}
 \pdfinclusioncopyfonts=1
 \usepackage{lineno}
+
+\newcommand{\NS}[1]{\textcolor{red}{\textbf{\emph{[NS: #1]}}}}
 
 \newcommand{\UniDimArray}[1]{\bm{#1}}
 \newcommand{\BiDimArray}[1]{\bm{#1}}
@@ -100,37 +102,38 @@
 
     \keywords{Selection \and phylogenetic \and population genetics \and codon models \and adaptation }
 
-    We usually say that a mutation is undergoing positive selection when it brings a fitness advantage to its bearer, and thus facilitates its own transmission to the next generation.
-    However, the causes of this advantage can be diverse.
-    We can distinguish two main scenarios in which a mutation is advantageous.
-    The first scenario concerns environmental change.
-    The bearer of the mutation that is advantageous in a new environment will be better adapted, and its chances of survival and reproduction will be higher (fig.~\ref{fig:fitness-landscape}A).
-    This process is typically referred to as adaptive evolution.
-    The second scenario involves a mutation restoring the ancestral allele which corresponded to an optimal state of the individual in a constant environment, but has been lost due to the fixation of a deleterious mutation by drift (fig.~\ref{fig:fitness-landscape}B).
-    In this manuscript, this process will be referred to as maintenance positive selection.
-    Regarding the difference between these two scenarios at the population scale, while in the case of environmental change, the population as a whole is climbing the fitness landscape along an adaptive walk\cite{tenaillon_utility_2014}, in the case of maintenance positive selection, the population as a whole is thus merely staying in the same position in the fitness landscape at the mutation-selection equilibrium, and positive selection compensates for deleterious mutations that reach fixation due to drift\cite{sella_application_2005, mustonen_fitness_2009}.
-    These two different kinds of selection result in a positive transmission bias of the advantageous allele, but their consequences at a macro-evolutionary scale are fundamentally different.
-    While adaptive evolution promotes phenotype diversification (fig.~\ref{fig:fitness-landscape}C), maintenance positive selection promotes phenotype stability and preserves well established biological systems (fig.~\ref{fig:fitness-landscape}D).
-    It is thus of importance to be able to distinguish those two kinds of positive selection in order to understand how selection impacts the diversification of species.
+    \NS{on devrait plus placer le départ de l'intro dans un contexte historique, pour dire que de connaître si une mutation est avantageuse est la base de la génétique moléculaire (en citant des papiers clés)}
 
-    Positive selection can be quantified by comparing sequence variation inside a population with the sequence divergence with a sister species\cite{mcdonald_adaptative_1991}.
-    Indeed, strongly advantageous mutations are expected to be observed in substitutions but not in polymorphism because they reach fixation quickly.
-    This method has been largely improved to account for possible bias-inducing factors such as the presence of weak positive selection, background selection and demography fluctuations\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009, galtier_adaptive_2016, tataru_inference_2017}.
-    It's application across many taxa has uncovered widespread positive selection\cite{moutinho_variation_2019}.
-    The root cause for this widespread rate of positive selection is, however, scarcely investigated, often assumed to be the end result of adaptive evolution.
-    However, as mentioned above, not all these mutations contribute to genetic innovation and diversification.
-    Adaptive evolution can only be well estimated if maintenance positive selection is taken into account.
-    While adaptive evolution is unpredictable because it brings an advantage concerning an unpredictable change in the environment of organisms, the second is predictable because optimal states should be more or less the same for closely related organisms which share most of their environment and physiology.
-    A way to thus measure maintenance positive selection is to compute selection coefficients assuming a constant and stable fitness landscape estimated from the alignment of protein-coding genes.
-    For each site of the protein alignment, amino-acid frequency is a proxy for its fitness, since for example a deleterious amino acid will be more likely to be absent in the alignment.
+    We usually say that a mutation is undergoing positive selection when it brings a fitness advantage to its bearer with the consequence of facilitating its own transmission to the next generation.
+    We can distinguish two main scenarios that can lead to such positive selection.
+    In the first scenario, a change of environment will modify the fitness of the individuals and the bearer of the mutation that is advantageous in the new environment will be better adapted.
+    Its chances of survival and reproduction will be higher and this process is typically referred to as adaptive evolution (fig.~\ref{fig:fitness-landscape}A).
+    The second scenario involves a mutation restoring the ancestral allele which corresponded to an optimal fitness for an individual in a constant environment, but has been lost due to the fixation of a deleterious mutation by drift (fig.~\ref{fig:fitness-landscape}B).
+    In this study, this process will be referred to as maintenance positive selection.
+    At the scale of a population, these two scenarios display different dynamics.
+    While in the case of environmental change, the population as a whole is climbing the fitness landscape along an adaptive walk\cite{tenaillon_utility_2014}, in the case of maintenance positive selection, the population as a whole is at mutation-selection equilibrium and therefore merely stays at the same location in the fitness landscape \cite{sella_application_2005, mustonen_fitness_2009}.
+
+    At the population scale, these two different kinds of selection are indistinguishable and both result in a positive transmission bias of the advantageous allele, but their consequences at a macro-evolutionary scale are fundamentally different.
+    While adaptive evolution promotes phenotype diversification (fig.~\ref{fig:fitness-landscape}C), maintenance positive selection promotes phenotype stability and preserves well established biological systems (fig.~\ref{fig:fitness-landscape}D).
+    It is thus essential to distinguish these two types of positive selection to understand the long term effects of selection on the diversification of species.
+
+    Positive selection can be quantified by comparing sequence variation inside a population with the sequence divergence from a sister species\cite{mcdonald_adaptative_1991}.
+    The basic idea is that advantageous mutations are expected to be observed in substitutions between species but not in polymorphism within a population because they reach fixation too quickly.
+    This method has been largely improved to account for possible bias-inducing factors such as the presence of weak positive selection, background selection and demographic fluctuations\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009, galtier_adaptive_2016, tataru_inference_2017}.
+    It has been applied across many organisms and enabled the discovery of widespread positive selection\cite{moutinho_variation_2019}.
+    However, the exact causes for this widespread occurrence of positive selection have been scarcely investigated\NS{is it the case in the conclusion of the previous paper?? would be nice to back it up with references}.
+    As mentioned above, not all advantageous mutations contribute to genetic innovation and diversification and truly adaptive evolution can only be well estimated if maintenance positive selection is taken into account.
+    While adaptive evolution is unpredictable because it caused by an unpredictable change in the environment of organisms, the second is predictable because optimal states should be more or less the same for closely related organisms which share most of their environment and physiology.
+    A way to thus measure maintenance positive selection is to predict selection coefficients assuming a constant and stable fitness landscape estimated from the alignment of protein-coding genes.
+    For each site of the protein alignment, a first approximation would be to consider that the frequency of an amino-acid is a proxy for its fitness, since for example a deleterious amino acid will be more likely to be absent in the alignment.
     One of the most used methods to make these predictions is SIFT (Sort Intolerant From Tolerant), which reliably detects deleterious mutations in many taxa\cite{ng_sift_2003, vaser_sift_2016}.
     However, this method has two major shortcomings.
-    First, this method uses amino-acid frequency as a proxy for amino-acid fitness, even if we know that a lot of mechanisms can influence amino-acid frequency other than fitness (phylogeny, mutation biases, GC-biased gene conversion, mutational paths).
+    First, we know that a lot of mechanisms can influence amino-acid frequency other than fitness (phylogeny, mutation biases, GC-biased gene conversion, mutational paths) which are not accounted for in SIFT.
     Second, SIFT scores makes little sense as an actual measure of fitness, and is not interpretable in terms of population genetics.
     Contrarily, so-called mutation-selection codon models are rooted within a population genetics formalism\cite{halpern_evolutionary_1998, mccandlish_modeling_2014}.
     These phylogenetic codon models can disentangle processes of mutation at the DNA level and selection at the amino-acid level.
     Such codon models provide a nearly-neutral framework of evolution by estimating the fitness landscape over amino-acid sequences for each site of the sequence (fig~\ref{fig:method}A) while taking into account non-adaptive processes impacting codon frequency\cite{halpern_evolutionary_1998, rodrigue_mechanistic_2010, tamuri_estimating_2012}.
-    Only nearly-neutral mutations between high fitness amino acids will tend to be permitted by the model, allowing for the explicit calculation of the scaled selection coefficient of non-synonymous mutations between codons.
+    %Only nearly-neutral mutations between high fitness amino acids will tend to be permitted by the model, allowing for the explicit calculation of the scaled selection coefficient of non-synonymous mutations between codons.
     As a consequence, by integrating datasets at the species and population level, we can estimate the selection coefficient for each mutation currently segregating in a population.
     Such a dataset can allow us to address different questions regarding positive selection affecting protein-coding DNA sequences.
     Which proportion of the segregating polymorphisms are predicted to be positively selected, from a suboptimal to a more optimal amino acid?
@@ -163,8 +166,8 @@
         \label{fig:method}
     \end{figure*}
 
-    To answer these questions, we have estimated a fitness landscape for long-term evolution using available multiple sequence alignments between mammalian species\cite{ranwez_orthomam_2007, howe_ensembl_2021}.
-    We then developed and leveraged a pipeline integrating divergence and polymorphism data across the entire exome for 28 populations across 6 genera, namely \textit{Equus},  \textit{Bos}, \textit{Capra}, \textit{Ovis}, \textit{Chlorocebus} and \textit{Homo} (fig.~\ref{fig:method}A\&B).
+    To answer these questions, we estimated the fitness landscape of amino-acid for long-term evolution using available multiple sequence alignments between mammalian species\cite{ranwez_orthomam_2007, howe_ensembl_2021}.
+    We developed a pipeline to integrate data at the phylogenetic and population scale to estimate divergence and polymorphism, respectively, across the entire exome for 28 populations from 6 genera (\textit{Equus},  \textit{Bos}, \textit{Capra}, \textit{Ovis}, \textit{Chlorocebus} and \textit{Homo}; fig.~\ref{fig:method}A\&B).
 
 
     \subsection*{SNPs which are predicted to be advantageous are positively selected at the population scale}
@@ -192,16 +195,17 @@
     These variable proportions between populations can be explained by the effective number of individuals in the population ($\Ne$), a major driver of selection efficacy.
     Since $\Ne$ is not directly measurable, a reasonable proxy usually used is the synonymous diversity (see material and methods).
     We thus ordered populations by their levels of synonymous diversity (fig.~\ref{fig:diversity}A) and confirmed that higher synonymous diversity is typically accompanied by a smaller proportion of neutral mutations.
-    This result suggests that populations with higher diversity (e.g.~\textit{Bos} or \textit{Ovis}) are more likely to discriminate whether mutations are advantageous or deleterious (fig~S1-S5).
-    Alternatively stated, mutations in populations with low diversity (e.g.~\textit{Homo}) are effectively nearly-neutral and behave as would a neutral mutation, especially for mutations already predicted to be nearly-neutral at the phylogenetic scale (fig~S8-S9).
+    This result suggests that populations with higher diversity (e.g.~\textit{Bos} or \textit{Ovis}) are more likely to discriminate between advantageous and deleterious mutations (fig~S1-S5).
+    Alternatively stated, mutations in populations with low diversity (e.g.~\textit{Homo}) are effectively nearly-neutral and behave as would a neutral mutation.
+    %, especially for mutations already predicted to be nearly-neutral at the phylogenetic scale (fig~S8-S9).
     This result is qualitatively in accordance with the nearly-neutral theory of evolution which argues that mutations are less efficiently selected for in small populations.
 
-    Finally, we reconstructed the substitutions in the terminal branches of the phylogenetic tree in order to determine the distribution of their selection coefficients.
-    To this aim, for each population with polymorphism data available, we first reconstructed the ancestral sequence (which is different than the reference sequence), then we mapped the substitutions from the last genus split to this reconstructed ancestral sequence.
+    Finally, we reconstructed the substitutions in the terminal branches of the phylogenetic tree to determine the distribution of their selection coefficients.
+    For each population with available polymorphism data, we first reconstructed the ancestral sequence (which is different than the reference sequence), then we mapped the substitutions from the last genus split to this reconstructed ancestral sequence.
     In these populations, we show that out of all polarized substitutions in the branches, between 10 and 17\% of all substitutions have an $\Sphy > 1$ (table S1) and between 22 and 42\% of all substitutions have an $\Sphy > 0$ (table S2).
     Most importantly, there is clear signal that the substitutions with an $\Sphy > 1$ have been positively selected since their ratio of non-synonymous over synonymous divergence, a ratio called $\dnds$, is between 1.05 and 1.81 in the different populations (table S1), meaning that mutations with $\Sphy > 1$ reach fixation more frequently that synonymous mutations (supposedly neutral).
     %This also means that the ratio $\dnds$ usually used to detect adaptation while relying on substitutions between close species\cite{mcdonald_adaptative_1991, galtier_adaptive_2016} or at the phylogenetic scale\cite{goldman_codonbased_1994, yang_codonsubstitution_2002} is overestimated.
-    These observed substitutions are likely to have been positive selected because they restored a more optimal state, not because they are driving innovations to a new environment or a new function.
+    These observed substitutions are likely to have been positively selected because they restored a more optimal state, not because they are driving innovations to a new environment or a new function.
 
     \subsection*{A large proportion of advantageous mutations are non-adaptive}
 
@@ -310,8 +314,10 @@
     \label{sec:acknowledgment}
     We gratefully acknowledge the help of Diego A. Hartasánchez Frenk for his advice and review concerning this manuscript.
     This work was performed using the computing facilities of the CC LBBE/PRABI\@.
+    This study makes use of data generated by the NextGen Consortium.
+    The European Union’s Seventh Framework Programme (FP7/2010-2014) provided funding for the project under grant agreement no 244356 - “NextGen”.
     \textbf{Funding:}
-    Université de Lausanne;
+    Université de Lausanne; French National Research Agency, Grant ANR-15-CE12-0010-01 / DASIRE.
     \textbf{Author contributions:}
     Original idea: T.L.\ and J.J.;
     Model conception: T.L., J.J.\ and N.S.;
@@ -331,18 +337,18 @@
 
     \subsection{Phylogenetic dataset}
 
-    Protein-coding DNA sequences alignments in placental mammals and gene trees are extracted from the \href{https://www.orthomam.univ-montp2.fr}{OrthoMaM} database, containing $116$ mammalian reference sequences in v10c\cite{ranwez_orthomam_2007, douzery_orthomam_2014, scornavacca_orthomam_2019}.
-    Genes located on the X, Y and mitochondrial chromosome are discarded from the analysis, since the number of polymorphism, necessary in population-based method, is expected to be different on these sequences.
-    Additionally, sequences from the species for which polymorphism are available, as well as their sister species have been discarded from the analysis to ensure independence between the data used in the phylogenetic and population-genetic method.
-    Altogether, $14,509$ protein-coding DNA sequences alignment have been analyzed containing at most $87$ reference sequences of placental mammals per alignment.
+    Protein-coding DNA sequences alignments in placental mammals and their corresponding gene trees were extracted from the \href{https://www.orthomam.univ-montp2.fr}{OrthoMaM} database. It contained a total of $116$ mammalian reference sequences in v10c\cite{ranwez_orthomam_2007, douzery_orthomam_2014, scornavacca_orthomam_2019}.
+    Genes located on the X, Y chromosomes and the mitochondrial genome were discarded from the analysis, because the level of polymorphism, which is necessary in the population-based analyses, is expected to be different in these three genomic regions.
+    Sequences of species for which we used poppulation-level polymorphism (see below), as well as their sister species, were removed from the analysis to ensure independence between the data used in the phylogenetic and population genetic scale.
+    Altogether, we analyzed $14,509$ protein-coding DNA sequences for at most $87$ sequences of placental mammals.
 
     \subsection{Selection coefficient ($\Sphy$) in phylogeny-based method}
     \label{subsec:s-phylogeny-method}
 
-    Mutation-selection models assume that the protein-coding sequence is at mutation-selection balance under a fixed fitness landscape, which is itself characterized by a fitness vector over the $20$ amino-acid at each site\cite{yang_mutationselection_2008, halpern_evolutionary_1998, rodrigue_mechanistic_2010}.
-    Mathematically, the rate of non-synonymous substitution from codon $a$ to codon $b$ ($q_{a \mapsto b}^{(i)}$) at site $i$ of the sequence is equal to the rate of mutation from the underlying DNA change ($\mu_{a \mapsto b}$) multiplied by the scaled probability of fixation of the mutation ($\proba_{a \mapsto b}^{(i)}$).
-    Crucially, the probability of fixation depends on the difference of scaled fitness between the amino-acid encoded by the mutated codon ($F_b^{(i)}$) and the fitness of the amino-acid encoded by the original codon ($F_a^{(i)}$) of site $i$\cite{wright_evolution_1931, fisher_genetical_1930}.
-    Altogether, the rate of substitution from codon $a$ to $b$ at a given site $i$ is:
+    We analyzed the phylogenetic level data using mutation-selection models. These models assume that the protein-coding sequence are at mutation-selection balance under a fixed fitness landscape characterized by a fitness vector over the $20$ amino-acid at each site\cite{yang_mutationselection_2008, halpern_evolutionary_1998, rodrigue_mechanistic_2010}.
+    Mathematically, the rate of non-synonymous substitution from codon $a$ to codon $b$ ($q_{a \mapsto b}^{(i)}$) at site $i$ of the sequence is equal to the rate of mutation of the underlying nucleotide change ($\mu_{a \mapsto b}$) multiplied by the scaled probability of fixation of the mutation ($\proba_{a \mapsto b}^{(i)}$).
+    The probability of fixation depends on the difference of scaled fitness of the amino-acid encoded by the mutated codon ($F_b^{(i)}$) and the amino-acid encoded by the original codon ($F_a^{(i)}$) at site $i$\cite{wright_evolution_1931, fisher_genetical_1930}.
+    The rate of substitution from codon $a$ to $b$ at a site $i$ is thus:
     \begin{equation}
         \begin{dcases}
             q_{a \mapsto b}^{(i)} & = 0 \text{ if codons $a$ and $b$ are more than one mutation away,} \\
@@ -357,37 +363,34 @@
     \end{equation}
     In the manuscript and the following material, the source ($a$) and target ($b$) codons as well as the site ($i$) are implicit and thus never explicitly written.
     We ran the Bayesian software \href{https://github.com/bayesiancook/bayescode}{BayesCode} on each protein-coding DNA alignment\cite{lartillot_phylobayes_2013, rodrigue_detecting_2017, rodrigue_bayesian_2021}.
-    Each Monte-Carlo Markov-Chain (MCMC) is run during $2000$ points, with a burn-in of $1000$ points, allowing to compute the mean amino-acid fitness landscape ($\UniDimArray{F^{(i)}}$) at each site $i$ across the MCMC\@.
+    We ran a Markov chain Monte-Carlo (MCMC) analysis during $2000$ generations, with a burn-in period of $1000$ generations, to obtain posterior mean estimates of the amino-acid fitness landscape ($\UniDimArray{F^{(i)}}$) at each site $i$\@.
 
     \subsection{Polymorphism dataset}
     \label{subsec:polymorphism-dataset}
 
-    In order to compare polymorphism and divergence, each SNP (chromosome, position, strand) in the focal species must be matched to its relative position in the protein-coding DNA alignment.
-    First, genomic positions are converted to relative position in the coding sequence (CDS) using gene annotation files (GTF format) downloaded from Ensembl (\url{ensembl.org}), we verified the SNP match the reference in the CDS (FASTA format) also downloaded from Ensembl.
-    Secondly, relative position in the CDS is converted to position in the multiple sequence alignment (containing gaps) from OrthoMaM database\cite{ranwez_orthomam_2007, douzery_orthomam_2014, scornavacca_orthomam_2019} by doing a global pairwise alignment (Biopython pairwise2) between the CDS fasta and the sequence found in the alignment.
+    We retrieved the genetic variants representing the population level polymorphism from the following species and respective available datasets: \textit{Equus caballus} (EquCab2 assembly in the EVA study PRJEB9799\cite{alabri_whole_2020}), \textit{Bos taurus} (UMD3.1 assembly in the NextGen project: \url{https://projects.ensembl.org/nextgen/}), \textit{Ovis aries} (Oar\_v3.1 assembly in the NextGen project: \url{https://projects.ensembl.org/nextgen/}), \textit{Capra Hircus} (CHIR1 assembly in the NextGen project: \url{https://projects.ensembl.org/nextgen/}, liftover to the ARS1 assembly), \textit{Chlorocebus sabaeus} (ChlSab1.1 assembly in the EVA project PRJEB22989\cite{svardal_ancient_2017}), \textit{Homo sapiens} (GRCh38 assembly from the 1000-genome project\cite{consortium_integrated_2012, the1000genomesprojectconsortium_global_2015}).
+    In total, we analyzed 28 populations across the 6 different species with polymorphism data.
+    Genetic variants that were not found within a gene were not used in further analyses.
+    We also did not analyzed insertions and deletions and focused only on Single Nucleotide Polymorphisms (SNPs) with a single mutant allele.
+    Finally, stop codon mutants were also discarded.
+
+    Each SNP (chromosome, position, strand) in the focal species was matched to its relative position (chromosome, position, strand) in the protein-coding DNA alignment by first converting the genomic positions to relative position in the coding sequence (CDS) using gene annotation files (GTF format) downloaded from Ensembl (\url{ensembl.org}).
+    We then verified that the SNP downloaded from Ensembl were matching the reference in the CDS (FASTA format).
+    Second, the relative position in the CDS was converted to position in the multiple sequence alignment (containing gaps) from OrthoMaM database\cite{ranwez_orthomam_2007, douzery_orthomam_2014, scornavacca_orthomam_2019} by doing a global pairwise alignment, using the Biopython function pairwise2, between the CDS fasta and the sequence found in the alignment.
     This conversion from genomic position to position in the alignment is only possible if the assembly used for SNP calling is the same as the one used in the alignment, the GTF annotations and the FASTA sequences.
-    We retrieved polymorphism from different projects.
-    \textit{Equus caballus} variants called on the EquCab2 assembly in the EVA study PRJEB9799.
-    \textit{Bos taurus} variants called on the UMD3.1 assembly in the next-gen project.
-    \textit{Ovis aries} variants called on the Oar\_v3.1 assembly in the next-gen project.
-    \textit{Capra Hircus} variants called on the CHIR1 assembly in the next-gen project, we performed a liftover to the ARS1 assembly.
-    \textit{Chlorocebus sabaeus} variants are called on the ChlSab1.1 assembly in the EVA study PRJEB22989\cite{svardal_ancient_2017}.
-    \textit{Homo sapiens} variants are called on the GRCh38 assembly in the 1000-genome project\cite{consortium_integrated_2012, the1000genomesprojectconsortium_global_2015}.
-    Variants not inside genes are discarded at the beginning of the analysis.
-    Insertions and deletions are not analyzed, and only Single Nucleotide Polymorphisms (SNPs) with only one mutant allele are considered.
-    Stop codon mutants are also discarded.
-    SNPs are polarized using the $3$ closest outgroups found in the OrthoMam alignment with est-usfs v2.04\cite{keightley_inferring_2018}.
-    For populations containing more than $8$ sampled individuals, the site-frequency spectrum (SFS) is subsampled down to $16$ chromosomes ($8$ diploid individuals) without replacement (hyper-geometric distribution) to alleviate the effect of different sampling depth in the 28 populations.
-    The Snakemake pipeline for integrating polymorphism and divergence data uses custom scripts written in python 3.9.
+
+    SNPs were polarized using the $3$ closest outgroups found in the OrthoMam alignment with est-usfs v2.04\cite{keightley_inferring_2018}.
+    For populations containing more than $8$ individuals, the site-frequency spectrum (SFS) was subsampled down to $16$ chromosomes ($8$ diploid individuals) without replacement (hyper-geometric distribution) to alleviate the effect of different sampling depth in the 28 populations.
+
+    We developped a Snakemake pipeline to integrate polymorphism and divergence data with custom scripts written in python 3.9.
 
     \subsection{Selection coefficient ($\Spop$) in population-based method}
     \label{subsec:s-polymorphism-method}
-    The probability to sample allele at a given frequency (before fixation or extinction) is informative of its scaled selection coefficient at the population scale ($\Spop$).
-    Pooled across many sites, the SFS is thus informative on the underlying $\Spop$ of mutations, given we have a neutral expectation.
-    In this configuration, a single $\Spop$ for all sampled mutations is biologically not realistic.
-    Accordingly, a distribution of fitness effects of mutations (DFE) is assumed, usually modeled as a continuous distribution\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009}.
-    In this study, we used the software polyDFE\cite{tataru_inference_2017, tataru_polydfe_2020}, for which the DFE ($\phi$) is given by a mixture of a $\Gamma$ and Exponential distributions, parameterized by $\Spop_d$ , $b$, $p_b$
-    and $\Spop_b$ as:
+    The probability to sample an allele at a given frequency (before fixation or extinction) is informative of its scaled selection coefficient at the population scale ($\Spop$).
+    Pooled across many sites, the SFS provides therefore information on the underlying $\Spop$ of mutations.
+    However, estimating a single $\Spop$ for all sampled mutations is biologically unrealistic and a distribution of fitness effects of mutations (DFE) is usually assumed~\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009}.
+    In this study, we used the software polyDFE\cite{tataru_inference_2017, tataru_polydfe_2020}, which used a mixture of a $\Gamma$ and Exponential distributions to model the DFE of non-synonymous mutations, while synonymous mutations are considered neutral.
+    The model estimates the parameters $\Spop_d$ , $b$, $p_b$ and $\Spop_b$ for non-synonymous mutations as:
     \begin{equation}
         \phi \left( \Spop; \Spop_d , b, p_b, \Spop_b \right) =
         \begin{dcases}
@@ -400,38 +403,38 @@
     $0 \leq p_b \leq 1$ is the estimated probability that $\Spop > 0$,
     $\Spop_b \geq 1$ is the estimated mean of the DFE for $\Spop > 0$,
     and $f_{\Gamma}(x; m, b)$ is the density of the $\Gamma$ distribution with mean m and shape b, while $f_{e}(x; m)$ is the density of the Exponential distribution with mean $m$.
-    Once the DFE is fitted to the data, the proportion of advantageous ($\PpolyAdv$), nearly-neutral ($\PpolyNeutral$) and deleterious mutations ($\PpolyDel$) are given as:
+    Once the DFE was fitted to the data, the proportion of advantageous ($\PpolyAdv$), nearly-neutral ($\PpolyNeutral$) and deleterious mutations ($\PpolyDel$) were given as:
     \begin{align}
         p_+ = \PpolyAdv &= p_b \int_{1}^{+\infty} f_{e}(\Spop; \Spop_b) \der \Spop,  \\
         \PpolyNeutral &= p_b \int_{0}^{1} f_{e}(\Spop; \Spop_b) \der \Spop + \left( 1 - p_b \right) \int_{0}^{1} f_{\Gamma}(\Spop; -\Spop_d, b) \der \Spop, \\
         \PpolyDel &= \left( 1 - p_b \right) \int_{1}^{+\infty} f_{\Gamma}(\Spop; -\Spop_d, b) \der \Spop.
     \end{align}
 
-    PolyDFE requires one SFS for non-synonymous mutations and one for synonymous mutations (neutral expectation), as well as the total mutation rate (mutation rate per site multiplied by the number of sites) on which each SFS has been sampled.
-    The number of sites for each SFS is thus obtained using the following four-step procedure.
-    First, for each gene, the reference DNA sequence is adjusted with ancestral and fixed polymorphism for each population.
-    Second, from this reconstructed sequence, all possible mutations are computed, weighted by the mutation rate between nucleotide ($\mu$) estimated at the phylogenetic scale.
-    Third, the total mutation rate for synonymous mutations, called $\mu_{\textrm{syn}}$, is the sum across the genome.
-    Similarly, the total mutation rate for each class of selection, called  $\mu\left( \Sphyclass \right)$, is the sum across all non-synonymous mutations if their selection coefficient at the phylogenetic scale ($\Sphy$) is in the class $\Sphyclass$ (e.g. $\Sphyclass = \divAdv$).
-    Fourth, the number of sites ($L$) for each class of selection coefficient ($\Sphyclass$) is then computed as the total number of sites across the genome ($L_{tot}$) weighted by the ratio of the aggregated mutations rates falling in the class ($\mu\left( \Sphyclass \right)$) over the total mutation rate for all possible mutations:
+    PolyDFE required one SFS for non-synonymous mutations and one for synonymous mutations (neutral expectation), as well as the total mutation rate (i.e.~mutation rate per site multiplied by the number of sites) on which each SFS has been sampled.
+    We performed the following four-step procedure to obtain the number of sites for each SFS.
+    First, for each population with polymorphism data available, the polarized SNPs (ancestral and derived alleles) were used to reconstruct the ancestral DNA sequence, containing only substitutions and no segregating polymorphisms.
+    If a SNP is still segregating in the population, the ancestral version of the SNP is used.
+    However, if the derived allele is shared by all individuals in the population, the allele is considered fixed and the derived allele of the SNP is used instead.
+    Second, from this reconstructed ancestral sequence, all possible mutations were computed, weighted by the mutation rate between nucleotide ($\mu$), which was estimated at the phylogenetic scale.
+    Third, the total mutation rate for synonymous mutations, called $\mu_{\textrm{syn}}$, was estimated as the sum across the whole genome.
+    Similarly, the total mutation rate for each class of selection, called  $\mu\left( \Sphyclass \right)$, was estimated as the sum across all non-synonymous mutations if their selection coefficient at the phylogenetic scale ($\Sphy$) was in the class $\Sphyclass$ (e.g. $\Sphyclass = \divAdv$).
+    Fourth, the number of sites ($L$) for each class of selection coefficient ($\Sphyclass$) was finally computed as the total number of sites across the genome ($L_{tot}$) weighted by the ratio of the aggregated mutations rates falling in the class ($\mu\left( \Sphyclass \right)$) over the total mutation rate for all possible mutations:
     \begin{align}
         L_{\textrm{non-syn}} \left( \Sphyclass \right) &= L_{tot} \frac{\mu\left( \Sphyclass \right)}{\mu_{tot}}, \\
         L_{\textrm{syn}} &= L_{tot} \frac{\mu_{\textrm{syn}}}{\mu_{tot}}.
     \end{align}
-    From the SFS and the number of sites $L$ for the both synonymous and for the class of non-synonymous, polyDFE estimates parameters of the DFE $\phi \left( \Spop; \Spop_d , b, p_b, \Spop_b \right)$ using maximum likelihood.
+    From the SFS and the number of sites $L$ for both the synonymous and non-synonymous classes, polyDFE estimated the parameters of the DFE $\phi \left( \Spop; \Spop_d , b, p_b, \Spop_b \right)$ using maximum likelihood.
 
-    The fraction of non-adaptive advantageous mutations $R(p_+)$ is computed the fraction of advantageous mutations ($p_+$) that is due to maintenance positive selection, where $p_+$ is compared to the estimated divergence when we removed the restoring substitutions $p_+(\Sphy < 0)$.
+    The fraction of non-adaptive advantageous mutations $R(p_+)$ was computed as the ratio between the difference in the numbers of advantageous mutations ($p_+$), which were due to maintenance positive selection, and the estimated divergence when we removed the restoring substitutions $p_+(\Sphy < 0)$, over $p_+$.
     \begin{equation}
         R(p_+)=\dfrac{p_+ - p_+(\Sphy < 0)}{p_+}
     \end{equation}
 
     \subsection*{Substitution mapping in the terminal branch}
     \label{subsec:substitution-mapping-in-the-terminal-branch}
-    For each population with polymorphism data available, the polarized SNPs (ancestral and derived alleles) are used to correct the DNA reference sequence such as to contain only substitutions and no segregating polymorphisms.
-    If a SNP is still segregating in the population, the ancestral version of the SNP is used.
-    However, if the derived allele is shared by all individuals in the population, the allele is considered fixed and the derived allele of the SNP is used instead.
+    For each gene and for each population with polymorphism data available, the ancestral DNA sequence was reconstructed from ancestral and fixed polymorphism (see previous section).
     Then, using this ancestral DNA reference and the $3$ closest outgroups found in the OrthoMam alignment, we reconstructed the ancestral protein-coding DNA sequences for each node of the 4-leaves tree with the yang M5 codon model (gamma site rate variation) in FastML.v3.11\cite{ashkenazy_fastml_2012}.
-    All polarized codon substitutions are then obtained by comparing the ancestral protein-coding DNA sequences before the split to the sister species (closest outgroup) to the corrected DNA reference for the population of interest.
+    All polarized codon substitutions are then obtained by comparing the ancestral protein-coding DNA sequences before the split to the sister species (closest outgroup) to the ancestral DNA reference for the population of interest (without segregating polymorphism).
     We considered \textit{Ceratotherium simum simum} as \textit{Equus caballus} sister species; \textit{Bison bison bison} as \textit{Bos taurus} sister species; \textit{Pantholops hodgsonii} as \textit{Ovis aries} sister species; \textit{Pantholops hodgsonii} as \textit{Capra Hircus} sister species; \textit{Macaca mulatta} as \textit{Chlorocebus sabaeus} sister species and finally we considered \textit{Pan troglodytes} as \textit{Homo sapiens} sister species.
     The selection coefficient ($\Sphy$) of each substitution is then obtained by comparing the difference in amino-acid fitnesses for each polarized non-synonymous codon substitution, by referring to the site-specific fitness profile obtained in the phylogeny-based method (see~\ref{subsec:s-phylogeny-method}).
     Finally, the rate of non-synonymous over synonymous substitution for a given class of selection coefficient ($\Sphyclass$) is computed as:
