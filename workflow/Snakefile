@@ -166,7 +166,7 @@ rule mapping:
     params:
         folder=f"{FOLDER}/data_processed/ancestral_reconstruction/" + '{species}.{popu}',
     shell:
-        'python3 {input.script} --threshold 1e-6 --opp {input.opp} --species {wildcards.species} --bins {bins} --windows {windows} --bounds {input.bounds} --exp_folder {input.exp_folder} --ancestral {params.folder} --output {output.tsv}'
+        'python3 {input.script} --threshold 0.0 --opp {input.opp} --species {wildcards.species} --bins {bins} --windows {windows} --bounds {input.bounds} --exp_folder {input.exp_folder} --ancestral {params.folder} --output {output.tsv}'
 
 checkpoint sfs:
     input:
