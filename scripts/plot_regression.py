@@ -41,10 +41,11 @@ def open_tsv(filepath, cat_snps, method):
 
 
 def discard_col(col, df):
-    return (col not in df) or (df.dtypes[col] == np.object) or (not np.all(np.isfinite(df[col])))
+    return (col not in df) or (df.dtypes[col] == object) or (not np.all(np.isfinite(df[col])))
 
 
 def generate_xy_plot(cat_snps):
+    pr = "\\mathbb{P}"
     xy_dico = defaultdict(list)
     dico_label = {'pop': "Population", "species": "Species", "watterson": "Watterson $\\theta_W$",
                   "proba": "$\\mathbb{P}$", "logL": "logL"}
@@ -61,15 +62,17 @@ def generate_xy_plot(cat_snps):
         if cat != "all":
             s = cat_snps.label(cat).replace("$", "")
 
-        dico_label[cat] = "$\\mathbb{P}_{mut}" + f"[{s}]$"
-        dico_label[f"{cat}_snps"] = "$\\mathbb{P}_{poly}" + f"[{s}]$"
-        dico_label[f"proba_{cat}_div"] = "$\\mathbb{P}_{div}" + f"[{s}]$"
+        dico_label[cat] = f"${pr}[{s}]$"
+        dico_label[f"{cat}_snps"] = f"${pr}_{{poly}}[{s}]$"
+        dico_label[f"proba_{cat}_div"] = f"${pr}_{{div}}[{s}]$"
 
         for cat_poly, beta_tex in polydfe_cat_dico.items():
             beta = beta_tex[beta_tex.find("[") + 1:beta_tex.rfind("]")]
-            s_given_beta_key = f'{cat_poly}_P-{cat}'
-            dico_label[s_given_beta_key] = "$\\mathbb{P}" + f"[ {s} | {beta}]$"
-
+            dico_label[f'bayes_{cat_poly}_P-{cat}'] = f"${pr}[{s}|{beta}]$"
+            dico_label[f'mut_sum_{cat_poly}'] = f"${pr}_{{mut}}[{beta}]$"
+            dico_label[f'frac_{cat}_{cat_poly}'] = f"$\\frac{{{pr}[{s}]}}{{{pr}[{beta}]}}$"
+        dico_label[f'bayes_p_b_P-{cat}'] = f"${pr}[{s}|\\beta>0]$"
+        dico_label[f'frac_{cat}_p_b'] = f"$\\frac{{{pr}[{s}]}}{{{pr}[\\beta>0]}}$"
         if cat != "all":
             s = f" | {s}"
 
@@ -81,19 +84,20 @@ def generate_xy_plot(cat_snps):
                          ('S', "S"), ('S+', "S^+"), ('S-', "S^-"), ('pnpsT', "\\pi_T"),
                          ('pnpsF', "\\pi_F"), ('pnpsW', "\\pi_W"), ('div', "d")]:
             dico_label[f'{cat}_{p}'] = f"${param} {s}$"
+        dico_label[f'{cat}_p_b'] = f"${pr} [\\beta > 0 {s}]$"
 
         y_dico.update({f'{cat}_{cat_poly}': v.replace(']', f'{s}]') for cat_poly, v in polydfe_cat_dico.items()})
         for cat_beta in cat_snps.non_syn_list + ['all']:
             beta = cat_snps.label(cat_beta).replace('S', '\\beta').replace("$", "")
-            beta_given_s_key = f'{cat}_P-{cat_beta}'
-            y_dico[beta_given_s_key] = "$\\mathbb{P}" + f"[{beta} {s}]$"
+            y_dico[f'bayes_{cat}_P-{cat_beta}'] = f"{pr}[{beta} {s}]$"
 
     for y, y_label in y_dico.items():
         xy_dico["x"].append("watterson")
         xy_dico["y"].append(y)
 
     xy_list = [("pos_snps", "all_P-Ssup0"), ("pos_snps", "pos_P-Ssup0"), ("pos_snps", "pos")]
-    xy_list += [("watterson", "all_p_b"), ("watterson", "ratio_neg_P-Ssup0"), ("watterson", "ratio_neg_omega_div")]
+    xy_list += [("watterson", "all_p_b"), ("watterson", "ratio_neg_omega_div")]
+    xy_list += [("watterson", "ratio_neg_P-Ssup0"), ("watterson", "bayes_P-Ssup0_P-pos")]
     xy_list += [("pos", "all_P-Ssup0"), ("pos", "pos_P-Ssup0")]
     xy_list += [("all_P-Seq0", "weak_P-Seq0"), ("all_P-Seq0", "pos-weak_P-Seq0"), ("all_P-Seq0", "neg-weak_P-Seq0")]
     xy_list += [("all_P-neg-weak", "neg-weak_P-neg-weak"), ("all_P-pos-weak", "pos-weak_P-pos-weak")]
@@ -135,11 +139,18 @@ def main(args):
             assert s_list.all()
 
         for cat_poly in polydfe_cat_dico:
-            given_cat = cat_poly.replace("P-", '')
             for cat in cat_snps.non_syn_list:
-                assert f'{given_cat}_P-{cat}' not in df
-                df[f'{given_cat}_P-{cat}'] = df[cat] * df[f'{cat}_P-{given_cat}'] / df[f'all_P-{given_cat}']
+                assert f'{cat_poly}_P-{cat}' not in df
+                df[f'frac_{cat}_{cat_poly}'] = df[cat] / df[f'all_{cat_poly}']
+                df[f'bayes_{cat_poly}_P-{cat}'] = df[f'{cat}_{cat_poly}'] * df[f'frac_{cat}_{cat_poly}']
             # print(np.sum([df[f'{given_cat}_P-{cat}'] for cat in cat_snps.non_syn_list], axis=0))
+
+            df[f'mut_sum_{cat_poly}'] = np.sum(
+                [df[f"{cat}"] * df[f"{cat}_{cat_poly}"] for cat in cat_snps.non_syn_list], axis=0)
+
+    for cat in cat_snps.non_syn_list:
+        df[f'frac_{cat}_p_b'] = df[cat] / df[f'all_p_b']
+        df[f'bayes_p_b_P-{cat}'] = df[f'{cat}_p_b'] * df[f'frac_{cat}_p_b']
 
     species = {k: None for k in df["species"]}
     cm = get_cmap('tab10')
@@ -174,6 +185,8 @@ def main(args):
             df[f"ratio_{cat}_P-Ssup0"] = 100 * (df["all_P-Ssup0"] - df[f"{cat}_P-Ssup0"]) / df["all_P-Ssup0"]
             dico_label[f"ratio_{cat}_P-Ssup0"] = f"R({dico_label['all_P-Ssup0']})"
 
+        df = df.copy()  # To obtain a dataframe not fragmented
+
     for (group, col_x, y_group), df_group in df_xy.groupby(["group", "x", "y_group"]):
         if discard_col(col_x, df):
             continue
@@ -189,16 +202,16 @@ def main(args):
             if discard_col(col_y, df):
                 continue
             x, y = df[col_x], df[col_y]
-            if 'P-' in col_y and "ratio" not in col_y:
+            if 'P-' in col_y and ("ratio" not in col_y) and ("bayes" not in col_y):
                 y = logit(y)
-            elif 'P-' in col_x and "ratio" not in col_x:
+            elif 'P-' in col_x and ("ratio" not in col_x) and ("bayes" not in col_x):
                 x = logit(x)
 
             results = sm.OLS(y, sm.add_constant(x)).fit()
             b, a = results.params[0:2]
             pred = a * idf + b
-            label = f'${a:.2f}$ ($r^2={results.rsquared:.2g}$)'
-            label = f'Slope of {label}' if len(df_group) == 1 else f'{dico_label[col_y]}: slope of {label}'
+            label = f'$r^2={results.rsquared:.2g}$' if len(
+                df_group) == 1 else f'{dico_label[col_y]}: slope of ${a:.2f}$ ($r^2={results.rsquared:.2g}$)'
             marker = markers[row_id % len(markers)]
             legend_elements += [Line2D([0], [0], color='black', label=label)]
             plt.plot(idf, pred, '-', color='black', linewidth=2)
@@ -213,11 +226,11 @@ def main(args):
 
         if len(legend_elements) != 0:
             x_label = dico_label[col_x]
-            if 'P-' in col_x and "ratio" not in col_x:
+            if 'P-' in col_x and ("ratio" not in col_x) and ("bayes" not in col_x):
                 x_label = f'logit({x_label})'
             plt.xlabel(x_label)
             y_label = dico_label[y_group]
-            if 'P-' in y_group and "ratio" not in y_group:
+            if 'P-' in y_group and ("ratio" not in y_group) and ("bayes" not in y_group):
                 y_label = f'logit({y_label})'
             plt.ylabel(y_label)
 
@@ -249,10 +262,15 @@ def main(args):
                    ['P-Sinf0'], ['omega_div'], ['omega_dfe'], ['omega_NAdfe'], ['pnpsW'], ['omega_Adfe'],
                    ['omega_Adiv'], ['omega_Amkt'], ['omega_Amkw']]
 
+    cols = [
+        ["tajima", 'pos', 'all_P-Ssup0', 'frac_pos_P-Ssup0', 'pos_P-Ssup0', 'bayes_P-Ssup0_P-pos'],
+        ["tajima", 'proba_pos_div', 'pos_omega_div'],
+        ["tajima", 'pos', 'all_p_b', 'frac_pos_p_b', 'pos_p_b', 'bayes_p_b_P-pos'],
+        ["tajima", 'proba_pos_div', 'all_omega_div', 'neg_omega_div', 'ratio_neg_omega_div'],
+        ["tajima", 'all_P-Ssup0', 'neg_P-Ssup0', 'ratio_neg_P-Ssup0'],
+        ["tajima"] + [f'{prefix}_{cat}' for cat, prefix in product(polydfe_cat_dico, ['all', 'mut_sum'])]
+    ]
     cat_list = ['all'] + cat_snps.non_syn_list
-    cols = [["tajima", "all_P-Ssup0", 'pos', "pos_P-Ssup0", 'proba_pos_div', 'pos_omega_div'],
-            ["tajima", 'proba_pos_div', 'all_omega_div', 'neg_omega_div', 'ratio_neg_omega_div', 'all_P-Ssup0',
-             'neg_P-Ssup0', 'ratio_neg_P-Ssup0']]
     cols.extend([[f'{cat}_{suffix}' for suffix, cat in product(suffix_list, cat_list)] for suffix_list in cols_suffix])
 
     for suf in alpha_suffix:

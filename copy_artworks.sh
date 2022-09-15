@@ -17,5 +17,6 @@
 \cp -rf ./experiments/5bins-polyDFE-mC/regression-MutSel/results.watterson.all_P-Ssup0.scatter.pdf  ./manuscript/artworks/scatter.watterson.allSNPs.P-Ssup0.pdf
 \cp -rf ./experiments/5bins-polyDFE-mC/regression-MutSel/results.watterson.all_P-Sinf0.scatter.pdf  ./manuscript/artworks/scatter.watterson.allSNPs.P-Sinf0.pdf
 \cp -rf ./experiments/5bins-polyDFE-mC/regression-MutSel/results.watterson.all_P-Seq0.scatter.pdf  ./manuscript/artworks/scatter.watterson.allSNPs.P-Seq0.pdf
+\cp -rf ./experiments/5bins-polyDFE-mC/regression-MutSel/results.watterson.bayes_P-Ssup0_P-pos.scatter.pdf ./manuscript/artworks/scatter.watterson.Bayes.pdf
 \cp -rf ./experiments/2bins-polyDFE-mC/regression-MutSel/results.watterson.ratio_neg_P-Ssup0.scatter.pdf ./manuscript/artworks/scatter.watterson.R_p+.pdf
 \cp -rf ./experiments/2bins-polyDFE-mC/regression-MutSel/results.watterson.ratio_neg_omega_div.scatter.pdf ./manuscript/artworks/scatter.watterson.R_div.pdf
