@@ -33,7 +33,7 @@ rule all:
         f'{FOLDER}/data_processed/opportunities_{binning}.tsv',
         f'{FOLDER}/data_processed/bounds_{binning}.tsv',
         f'{EXP_FOLDER}/supp-mat.pdf',
-        TSV_LIST
+        # TSV_LIST
 
 rule fixed_snp_by_pop:
     input:

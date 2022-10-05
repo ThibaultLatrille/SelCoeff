@@ -2,6 +2,7 @@
 import os
 import re
 import gzip
+import shutil
 import numpy as np
 import pandas as pd
 from collections import namedtuple, defaultdict
@@ -61,6 +62,15 @@ xlim_dico = {"Omega": (0.0, 2.0), "MutSel": (-10, 10), "SIFT": (0.0, 1.0)}
 rate_dico = {"MutSel": "Scaled selection coefficient (S)",
              "Omega": "Rate of evolution ($\\omega$)",
              "SIFT": "SIFT score"}
+
+
+def zip_file(input_path, output_path=None):
+    if output_path is None:
+        output_path = input_path + ".gz"
+    with open(input_path, 'rb') as f_in:
+        with gzip.open(output_path, 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+    os.remove(input_path)
 
 
 def build_codon_neighbors():

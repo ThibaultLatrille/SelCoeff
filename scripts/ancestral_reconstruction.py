@@ -3,7 +3,7 @@ import argparse
 from ete3 import Tree
 import subprocess
 import numpy as np
-from libraries import open_fasta, write_fasta, codontable
+from libraries import open_fasta, write_fasta, codontable, zip_file
 
 
 def most_common(lst):
@@ -140,6 +140,9 @@ def main(args):
         subprocess.check_output(cmd, shell=True)
         os.remove(f"{o}.marginal.prob")
         os.remove(f"{o}.marginal.fasta")
+        zip_file(s)
+        zip_file(f"{o}.join.prob")
+        zip_file(f"{o}.joint.fasta")
 
 
 if __name__ == '__main__':

@@ -26,20 +26,20 @@ def main(args):
     cds_rates = CdsRates("MutSel", args.exp_folder)
     substitutions = defaultdict(list)
 
-    for anc_file in glob(os.path.join(args.ancestral, "*.joint.fasta")):
+    for anc_file in glob(os.path.join(args.ancestral, "*.joint.fasta.gz")):
         seqs = open_fasta(anc_file)
         ensg = os.path.basename(anc_file).split(".")[0]
         cds_rates.add_ensg(ensg)
         cds_rates.add_mut_ensg(ensg)
 
-        tree_path = anc_file.replace(".joint.fasta", ".newick")
+        tree_path = anc_file.replace(".joint.fasta.gz", ".newick")
         t = Tree(tree_path, format=1)
         ancestor = t.get_leaves_by_name(args.species)[0].up.name
         anc_seq = seqs[ancestor]
         der_seq = seqs[args.species]
         assert len(anc_seq) == len(der_seq)
 
-        proba_path = anc_file.replace(".joint.fasta", ".join.prob")
+        proba_path = anc_file.replace(".joint.fasta.gz", ".join.prob.gz")
         prob_list = open_prob(proba_path)
         assert len(prob_list) == (len(anc_seq) // 3)
 
