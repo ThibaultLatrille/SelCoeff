@@ -18,10 +18,11 @@ binning = (f'bins{bins}' if windows == 0 else f'windows{bins}x{windows}')
 if config["mask_adaptation"]:
     binning += "NonAdaptive"
 pop2sp = {}
-SFS_LIST = []
+SFS_LIST, TSV_LIST = [], []
 
 for row_id, row in pd.read_csv(sample_list,sep='\t').iterrows():
     pop2sp[row['SampleName']] = row['Species']
+    TSV_LIST.append(f"{FOLDER}/TSV/{row['Species']}.{row['SampleName']}.tsv.gz")
     for method in config['METHOD_LIST']:
         SFS_LIST.append(EXP_FOLDER + f"/analysis/{row['Species']}.{row['SampleName']}.{method}")
 
@@ -31,7 +32,8 @@ rule all:
     input:
         f'{FOLDER}/data_processed/opportunities_{binning}.tsv',
         f'{FOLDER}/data_processed/bounds_{binning}.tsv',
-        f'{EXP_FOLDER}/supp-mat.pdf'
+        f'{EXP_FOLDER}/supp-mat.pdf',
+        TSV_LIST
 
 rule fixed_snp_by_pop:
     input:
@@ -167,6 +169,20 @@ rule mapping:
         folder=f"{FOLDER}/data_processed/ancestral_reconstruction/" + '{species}.{popu}',
     shell:
         'python3 {input.script} --threshold 0.0 --opp {input.opp} --species {wildcards.species} --bins {bins} --windows {windows} --bounds {input.bounds} --exp_folder {input.exp_folder} --ancestral {params.folder} --output {output.tsv}'
+
+rule substitutions:
+    input:
+        script=f'{FOLDER}/scripts/substitutions.py',
+        exp_folder=f'{FOLDER}/data_div/Experiments',
+        xml_folder=f'{FOLDER}/data_div/omm_markers',
+        ancestral=rules.ancestral_reconstruction.output,
+    output:
+        tsv=f"{FOLDER}/TSV/{{species}}.{{popu}}.tsv.gz",
+    params:
+        folder=f"{FOLDER}/data_processed/ancestral_reconstruction/{{species}}.{{popu}}",
+    shell:
+        'python3 {input.script} --threshold 0.0 --species {wildcards.species} --exp_folder {input.exp_folder} --xml_folder {input.xml_folder} --ancestral {params.folder} --output {output.tsv}'
+
 
 checkpoint sfs:
     input:

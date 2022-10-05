@@ -87,6 +87,11 @@ def main(args):
             if anc_aa == "X" or anc_aa == "-" or der_aa == "X" or der_aa == "-":
                 continue
 
+            diffs = [s for s in range(len(anc_codon)) if anc_codon[s] != der_codon[s]]
+            assert len(diffs) > 0
+            if len(diffs) != 1:
+                continue
+
             if anc_aa == der_aa:
                 dico_div["div_syn"] += 1
                 continue
