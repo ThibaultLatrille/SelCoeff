@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 \cp -rf ./experiments/50windows-polyDFE-mC-non-adaptive/regression/results.watterson.a.scatter.pdf ./manuscript/artworks/scatter.watterson.slopeSpopSphy.pdf
 \cp -rf ./experiments/50windows-polyDFE-mC-non-adaptive/results/regression.MutSel.SelCoeff.scatter.pdf ./manuscript/artworks/scatter.Sphy.Spop.pdf
-\cp -rf ./experiments/3bins-polyDFE-mC/results/Theta.MutSel.weak.stacked.pdf ./manuscript/artworks/stacked.weakSNPs.pdf
 \cp -rf ./experiments/5bins-polyDFE-mC/results/Theta.MutSel.all.stacked.pdf ./manuscript/artworks/stacked.allSNPs.pdf
 \cp -rf ./experiments/5bins-polyDFE-mC/results/Theta.MutSel.pos-weak.stacked.pdf ./manuscript/artworks/stacked.weak-pos-SNPs.pdf
 \cp -rf ./experiments/5bins-polyDFE-mC/results/Theta.MutSel.neg-weak.stacked.pdf ./manuscript/artworks/stacked.weak-neg-SNPs.pdf

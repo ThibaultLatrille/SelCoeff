@@ -93,38 +93,43 @@
 
     \begin{abstract}
         Positive selection can be the result of adaptive evolution, driven by a change in environment or selective pressure.
-        However, positive selection can also be the result of what we call maintenance positive selection where advantageous mutations are compensating for deleterious substitutions without any change of the environment.
+        However, positive selection can also be the result of what we call maintenance positive selection where advantageous mutations are reverting deleterious substitutions without any change of the environment.
         The evolutionary outcomes of these two positive selections are drastically different.
         While adaptive evolution acts as a diversifying force, maintenance positive selection stabilizes phenotypes and reduces diversity across species.
         By leveraging polymorphism data in 28 populations and divergence data between 94 mammalian species, we estimate that around 25\% of observed substitutions are owed to maintenance positive selection.
-        Our work confirms that deleterious substitutions have accumulated in mammals and are currently being compensated for, resulting in widespread positive selection that is not adaptive evolution.
+        Our work confirms that deleterious substitutions have accumulated in mammals and are currently being eliminated, resulting in widespread positive selection that is not adaptive evolution.
     \end{abstract}
 
     \keywords{Selection \and phylogenetic \and population genetics \and codon models \and adaptation }
 
     %\NS{on devrait plus placer le départ de l'intro dans un contexte historique, pour dire que de connaître si une mutation est avantageuse est la base de la génétique moléculaire (en citant des papiers clés)}
-    We usually say that a mutation is undergoing positive selection when it brings a fitness advantage to its bearer with the consequence of facilitating its own transmission to the next generation.
-    We can distinguish two main scenarios that can lead to such positive selection.
-    In the first scenario, a mutation towards a state which was deleterious is now advantageous because of a change of environment.
-    A change of environment could be a change of temperature, viral exposition but it could also be a change in another part of the species' genome.
-    In the new environment, the mutation allows its bearer to survive and reproduce more than the others and thus will be positively selected.
-    This process is typically referred to as adaptive evolution (fig.~\ref{fig:fitness-landscape}A).
-
-    The second scenario involves a mutation restoring the ancestral allele which corresponded to an optimal fitness for an individual in a constant environment, but has been lost due to the fixation of a deleterious mutation by drift (fig.~\ref{fig:fitness-landscape}B).
+    Adaptation is considered as the main process driving the diversity of forms and functions in the tree of life\cite{darwin_origin_1859}.
+    It allows species to live in new ecological niches, and to evolve in response to a change in environment\cite{darwin_origin_1859, merrell_adaptive_1994}.
+    The notion of adaptation, in its eco-evolutionary sense, is tightly linked to the notion of change, both of the environment (biotic and abiotic), and of the species responding to the latter\cite{merrell_adaptive_1994}.
+    With the discovery of DNA, the main support of heritable information, evolutionary geneticists looked for signatures of adaptation in genomes, such as to quantify it\cite{mcdonald_adaptative_1991, eyre-walker_distribution_2006}.
+    In that context arose the term of rate of adaptive evolution\cite{mcdonald_adaptative_1991, eyre-walker_distribution_2006, galtier_adaptive_2016}.
+    However, in contrast to adaptation in its eco-evolutionary sense, adaptive evolution is merely used as a synonymous of evolution under positive selection\cite{eyre-walker_distribution_2006}.
+    This leads to a misunderstanding on what is adaptation with the loss of the notion of change, and a misinterpretation of the so-called rate of adaptive evolution.
+    Indeed, adaptive evolution is not the only process which can lead to positive selection at the population scale\cite{sella_application_2005, mustonen_fitness_2009}.
+    At mutation-selection-drift equilibrium, a mutation restoring the ancestral allele which corresponded to an optimal fitness in a constant environment, but lost due to the fixation of a deleterious mutation by drift, will also be positively selected (fig.~\ref{fig:fitness-landscape}B).
     In this study, this process will be referred to as maintenance positive selection.
-    At the scale of a population, these two scenarios display different dynamics.
-    While in the case of environmental change, the population as a whole is climbing the fitness landscape along an adaptive walk\cite{tenaillon_utility_2014}, in the case of maintenance positive selection, the population as a whole is at mutation-selection equilibrium and therefore merely stays at the same location in the fitness landscape\cite{sella_application_2005, mustonen_fitness_2009}.
-
-    At the population scale, these two different kinds of selection are indistinguishable and both result in a positive transmission bias of the advantageous allele, but their consequences at a macro-evolutionary scale are fundamentally different.
+    %At the scale of a population, adaptive evolution and maintenance positive selection display different dynamics.
+    %While in the case of environmental change, the population as a whole is climbing the fitness landscape along an adaptive walk\cite{tenaillon_utility_2014}, in the case of maintenance positive selection, the population as a whole is at mutation-selection equilibrium and therefore merely stays at the same location in the fitness landscape\cite{sella_application_2005, mustonen_fitness_2009}.
+    %We can distinguish two main scenarios that can lead to such positive selection.
+    %In the first scenario, a mutation towards a state which was deleterious is now advantageous because of a change of environment.
+    %A change of environment could be a change of temperature, viral exposition but it could also be a change in another part of the species' genome.
+    %In the new environment, the mutation allows its bearer to survive and reproduce more than the others and thus will be positively selected.
+    %This process is typically referred to as adaptive evolution (fig.~\ref{fig:fitness-landscape}A), and meets the eco-evolutionary definition of adaptation.
+    At the population scale, maintenance positive selection and adaptive evolution are indistinguishable and both result in a positive transmission bias of the advantageous allele, but their consequences at a macro-evolutionary scale are fundamentally different.
     While adaptive evolution promotes phenotype diversification (fig.~\ref{fig:fitness-landscape}C), maintenance positive selection promotes phenotype stability and preserves well established biological systems (fig.~\ref{fig:fitness-landscape}D).
     It is thus essential to distinguish these two types of positive selection to understand the long term effects of selection on the diversification of species.
 
-    Positive selection can be quantified by comparing sequence variation inside a population with the sequence divergence from a sister species\cite{mcdonald_adaptative_1991}.
+    At the gene level, positive selection can be quantified by comparing sequence variation inside a population with the sequence divergence from a sister species\cite{mcdonald_adaptative_1991}.
     The basic idea is that advantageous mutations are expected to be observed in substitutions between species but not in polymorphism within a population because they reach fixation too quickly.
     This method has been largely improved to account for possible bias-inducing factors such as the presence of weak positive selection, background selection and demographic fluctuations\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009, galtier_adaptive_2016, tataru_inference_2017}.
     It has been applied across many organisms and enabled the discovery of widespread positive selection\cite{moutinho_variation_2019}.
     However, the exact causes for this widespread occurrence of positive selection have been scarcely investigated\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009, galtier_adaptive_2016} %\NS{is it the case in the conclusion of the previous paper?? would be nice to back it up with references}.
-    As mentioned above, not all advantageous mutations contribute to genetic innovation and diversification and truly adaptive evolution can only be well estimated if maintenance positive selection is taken into account.
+    As mentioned above, not all advantageous mutations contribute to genetic innovation and diversification, and truly adaptive evolution can only be well estimated if maintenance positive selection is taken into account.
     While adaptive evolution is unpredictable because it caused by an unpredictable change in the environment of organisms, the second is predictable because optimal states should be more or less the same for closely related organisms which share most of their environment and physiology.
     A way to thus measure maintenance positive selection is to predict selection coefficients assuming a constant and stable fitness landscape estimated from the alignment of protein-coding genes.
     For each site of the protein alignment, a first approximation would be to consider that the frequency of an amino acid is a proxy for its fitness, since for example a deleterious amino acid will be more likely to be absent in the alignment.
@@ -134,16 +139,16 @@
     Second, SIFT scores is not interpretable as a selection coefficient.
     Contrarily, so-called mutation-selection codon models are rooted within a population genetics formalism\cite{halpern_evolutionary_1998, mccandlish_modeling_2014}.
     These phylogenetic codon models can disentangle processes of mutation at the DNA level and selection at the amino acid level.
-    Such codon models provide a nearly-neutral framework of evolution by estimating the fitness landscape over amino acid sequences for each site of the sequence (fig~\ref{fig:method}A) while taking into account non-adaptive processes impacting codon frequency\cite{halpern_evolutionary_1998, rodrigue_mechanistic_2010, tamuri_estimating_2012}.
+    Such codon models provide a nearly-neutral framework of evolution by estimating the fitness landscape over amino acid sequences for each site of the sequence (fig~\ref{fig:method}A) while taking into account non-adaptive processes impacting codon frequency\cite{halpern_evolutionary_1998, rodrigue_mechanistic_2010, tamuri_estimating_2012, latrille_improved_2022}.
     From the fitness landscape obtained by fitting the model to the data, one can thus compute the scaled selection coefficient ($\Sphy$) of any non-synonymous mutations.
-    Importantly, mutation-selection assume that the underlying fitness landscape is stable along the phylogeny (as in fig.~\ref{fig:fitness-landscape}B), thus a mutation with a positive $\Sphy$ would be driving the current site toward a fitter amino-acid, and such mutation is effectively considered under maintenance positive selection.
+    Importantly, mutation-selection codon models assume that the underlying fitness landscape is stable along the phylogeny (as in fig.~\ref{fig:fitness-landscape}B), thus a mutation with a positive $\Sphy$ would be driving the current site toward a fitter amino-acid, and such mutation is effectively considered under maintenance positive selection.
 
     By integrating datasets at the species and population level, we can predict $\Sphy$ for each mutation currently segregating in a population (fig~\ref{fig:method}B).
     Such a dataset can allow us to address different questions regarding positive selection affecting protein-coding DNA sequences.
     Which proportion of the segregating polymorphisms in population are predicted toward a more optimal amino acid (positive $\Sphy$), thus supposedly under maintenance positive selection?
     Are these polymorphisms effectively under positive selection at the scale of populations?
     Finally, how much of positive selection observed in populations is due to maintenance positive selection?
-    To answer these questions, we estimated the fitness landscape of amino acid for long-term evolution using available multiple sequence alignments between mammalian species\cite{ranwez_orthomam_2007, howe_ensembl_2021}.
+    To answer these questions, we estimated the fitness landscape of amino-acids for long-term evolution using available multiple sequence alignments between mammalian species\cite{ranwez_orthomam_2007, howe_ensembl_2021}.
     We then integrated data at the phylogenetic and population scale to estimate divergence and polymorphism, respectively, across the entire exome for 28 populations from 6 genera (\textit{Equus},  \textit{Bos}, \textit{Capra}, \textit{Ovis}, \textit{Chlorocebus} and \textit{Homo}; fig.~\ref{fig:method}A\&B).
 
     \begin{figure*}[!ht]
@@ -207,8 +212,8 @@
 
     Finally, we reconstructed the substitutions in the terminal branches of the phylogenetic tree to determine the distribution of their selection coefficients.
     For each population with available polymorphism data, we first reconstructed the ancestral sequence (which is different than the reference sequence), then we mapped the substitutions from the last genus split to this reconstructed ancestral sequence.
-    In these populations, we show that out of all polarized substitutions in the branches, between 10 and 17\% of all substitutions have an $\Sphy > 1$ (table S1) and between 22 and 42\% of all substitutions have an $\Sphy > 0$ (table S2).
-    Most importantly, there is clear signal that the substitutions with an $\Sphy > 1$ have been positively selected since their ratio of non-synonymous over synonymous divergence, a ratio called $\dnds$, is between 1.05 and 1.81 in the different populations (table S1), meaning that mutations under maintenance selection with $\Sphy > 1$ reach fixation more frequently that synonymous mutations (supposedly neutral).
+    In these populations, we show that out of all polarized substitutions in the branches, between 10 and 13\% of all substitutions have an $\Sphy > 1$ (table S1) and between 25 and 30\% of all substitutions have an $\Sphy > 0$ (table S3).
+    Most importantly, there is clear signal that the substitutions with an $\Sphy > 1$ have been positively selected since their ratio of non-synonymous over synonymous divergence, a ratio called $\dnds$, is between 1.15 and 1.68 in the different populations (table S1), meaning that mutations under maintenance selection with $\Sphy > 1$ reach fixation more frequently that synonymous mutations (supposedly neutral).
     These observed substitutions are likely to have been positively selected because they restored a more optimal state, not because they are driving innovations to a new environment or a new function.
     %This also means that the ratio $\dnds$ usually used to detect adaptation while relying on substitutions between close species\cite{mcdonald_adaptative_1991, galtier_adaptive_2016} or at the phylogenetic scale\cite{goldman_codonbased_1994, yang_codonsubstitution_2002} is overestimated.
 
@@ -220,7 +225,7 @@
     First, $\mathbb{P} [ \Sphy > 1 ]$ the probability for a mutation away from the ancestral sequence to have $\Sphy > 1$ (red fill of histogram in fig~\ref{fig:homo-afr-results}A and table S2).
     Second, $\mathbb{P} [ \Spop > 1 ]$ is is the part of the DFE estimated at the population-scale greater than 1 when we used all the SNPs available in the population (black fill in fig~\ref{fig:diversity}A and table S2).
     Finally, $\mathbb{P} [ \Spop > 1  \given  \Sphy > 1]$ is the part of the DFE estimated at the population-scale greater than 1, when we restricted our analysis on SNPs that are already predicted by mutation-selection models to have a selection coefficient greater than 1 (black fill for the category $\Sphy > 1$ in fig~\ref{fig:homo-afr-results}D and table S2).
-    Altogether, the probability for a mutation to be restoring the genome given that it is positively selected is obtained for each population, and varies between 4 and 24\% (table S2).
+    Altogether, the probability for a mutation to be restoring the genome given that it is positively selected is obtained for each population, and varies between 10 and 26\% (table S2).
     % Since adaptation does not fit the fitness predictions, the proportion of adaptive mutation is expected to be the same among SNPs which are predicted to be advantageous, and among SNPs which are predicted to be deleterious.
     % Thus the proportion of advantageous mutations among SNPs which are predicted to be deleterious directly correspond to the proportion of all mutations which are adaptive.
     % So if we divide the proportion of mutations which are predicted to be advantageous among supposedly deleterious SNPs by the proportion of mutations which are predicted to be advantageous among all SNPs, we directly get the proportion of mutations which are adaptive among advantageous ones.
@@ -229,7 +234,7 @@
     Focusing on substitutions in the terminal lineages, we can consider that the total $\dnds$ encompasses the rate of evolution for deleterious and advantageous (both adaptive and non-adaptive) substitutions.
     Then, the $\dnds$ computed exclusively on non-synonymous sites with a $\Sphy < 0$ only represent the rate of evolution of solely deleterious and adaptive substitutions, discarding maintenance selection by construction.
     Thus, if we divide the $\dnds$ estimated on all substitutions, by the one estimated only on substitutions predicted to be deleterious, we directly get the proportion of the rate of evolution which is contributed by maintenance selection (see methods).
-    This way, we estimated that between 20 and 25\% of the evolutionary rate is due to maintenance positive selection (fig~\ref{fig:diversity}C \& table S3).
+    This way, we estimated that between 22 and 27\% of the evolutionary rate is due to maintenance positive selection (fig~\ref{fig:diversity}C \& table S3).
 
     Interestingly, the proportion of maintenance selection among advantageous ones and the proportion of the rate of evolution explained by maintenance positive selection do not show a clear relationship with the synonymous diversity within a population (Watterson $\theta_w$), a proxy for the effective population size (fig.~\ref{fig:diversity}B and C).
     Indeed, the relationship between $\Ne$ and the proportion of maintenance selection is not trivial and should highly depend on time scales.
@@ -316,13 +321,15 @@
     It would also be interesting to have access to more shallow but wider phylogenies to increase the resolution of our predictions.
 
     From a structural biology perspective, we have found that proteins are not optimal for their fitness, which has been proved for their kinetics and thermodynamics\cite{taverna_why_2002, goldstein_evolution_2011}.
-    Philosophically, our distinction between maintenance selection and adaptation can appear to be rather far-fetched and not biologically motivated, and one can argue that maintenance selection is adaptation to its own deteriorating genome.
-    However, we argue that this distinction is important when we seek to detect adaptation, and is actually not an encumbrance but rather a strength.
-    Indeed, mutation-selection models are genuinely take into account the tug-of-war between scarce advantageous mutations likely to reach fixation and a bulk of deleterious mutations eventually reaching fixation due to their sheer mass.
+    Philosophically, our distinction between maintenance selection and adaptation can appear to be far-fetched, and one can argue that maintenance selection is adaptation to its own deteriorating genome.
+    However, there is a difference between adapting to a mutation, for instance by the mean of a compensatory mutation elsewhere, and cancelling the mutation, by the mean of a substitution on the misfit amino-acid.
+    The first still implies changes in the genetic sequence and thus genetic diversification, while the second reduces the diversity.
+    We also argue that this distinction is important when we seek to detect adaptation, and is actually not an encumbrance but rather a strength.
+    Indeed, mutation-selection models are genuinely taking into account the tug-of-war between scarce advantageous mutations likely to reach fixation and a bulk of deleterious mutations eventually reaching fixation due to their sheer mass.
     These models can thus be used as a null model to predict the expected rate of evolution of proteins\cite{spielman_relationship_2015, dosreis_how_2015} under a stable fitness landscape.
     A departure from this model indicates that proteins are evolving under a changing fitness landscape\cite{rodrigue_detecting_2017, tamuri_mutationselection_2021} and is a signal of pervasive adaptive evolution\cite{rodrigue_bayesian_2021} or of pervasive epistasis\cite{rodrigue_detecting_2017}.
-    As such, a stable fitness landscape as a null model is thus statistically more powerful than assuming that the null model is neutral.
-    Altogether, mutation-selection models is a mandatory tool in evolutionary biology to detect and quantify adaptation, as it lowers the bar to detect adaptation.
+    As such, a stable fitness landscape as a null model is thus statistically more powerful to detect adaptation than assuming that the null model is neutral evolution.
+    Altogether, mutation-selection models are a mandatory tool in evolutionary biology to detect and quantify adaptation at the phylogenetic scale.
 
     \section*{Acknowledgments}
     \label{sec:acknowledgment}
@@ -338,7 +345,8 @@
     Code: T.L.;
     Data analyses: T.L.\ and J.J.;
     Interpretation: T.L., J.J.\ and N.S.;
-    First draft, editing and revisions: T.L., J.J.\ and N.S.;
+    First draft: T.L.\ and J.J.;
+    Editing and revisions: T.L., J.J.\ and N.S.
     Project management and funding: N.S\@.
     \textbf{Competing interests:}
     The authors declare no conflicts of interest.
