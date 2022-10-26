@@ -18,6 +18,9 @@
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{naturalnames}{hyperref}
 
+\usepackage[backend=biber,eprint=false,isbn=false,url=false,intitle=true,style=nature,date=year]{biblatex}
+\addbibresource{codon_models.bib}
+
 \usepackage[margin=50pt]{geometry}
 \usepackage{amssymb,amsfonts,amsmath,amsthm,mathtools}
 \usepackage{lmodern}
@@ -507,5 +510,8 @@
         \item Bottom-right panel:For each class of selection (and for the set of all non-synonymous mutations), information from the SFS and the expected total mutation rate are combined at the population-genetic scale to estimate the proportion of advantageous mutations $\PpolyAdv$, of nearly-neutral mutations $\PpolyNeutral$ and of deleterious mutations $\PpolyDel$.
     \end{itemize}
     \input{include-SIFT-non-adaptive}
+
+    \section*{References}
+    \printbibliography
 
 \end{document}
