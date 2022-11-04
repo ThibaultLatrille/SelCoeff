@@ -52,14 +52,14 @@ codontable.update({
 confidence_interval = namedtuple('confidence_interval', ['low', 'mean', 'up'])
 sfs_weight = {"watterson": lambda i, n: 1.0 / i, "tajima": lambda i, n: n - i, "fay_wu": lambda i, n: i}
 polydfe_cat_dico = {
-    "P-Ssup0": "$\\mathbb{P} [ \\beta > 1 ]$",
-    "P-Seq0": "$\\mathbb{P} [ -1<\\beta<1 ]$",
-    "P-Sinf0": "$\\mathbb{P} [ \\beta<-1 ]$",
+    "P-Ssup0": "$\\mathbb{P} [ S > 1 ]$",
+    "P-Seq0": "$\\mathbb{P} [ -1< S <1 ]$",
+    "P-Sinf0": "$\\mathbb{P} [ S <-1 ]$",
 }
 alpha_sup_limits = [0, 1, 3, 5]
 polydfe_cat_list = list(polydfe_cat_dico.keys())
 xlim_dico = {"Omega": (0.0, 2.0), "MutSel": (-10, 10), "SIFT": (0.0, 1.0)}
-rate_dico = {"MutSel": "Scaled selection coefficient (S)",
+rate_dico = {"MutSel": "Scaled selection coefficient ($S_0$)",
              "Omega": "Rate of evolution ($\\omega$)",
              "SIFT": "SIFT score"}
 
@@ -470,27 +470,27 @@ class CategorySNP(list):
             if self.bins == 2:
                 self.inner_bound = [0]
                 self.dico = {
-                    "neg": P("$S<0$", BLUE, -np.float("infinity"), 0),
+                    "neg": P("$S_0 < 0$", BLUE, -np.float("infinity"), 0),
                     "syn": P("$Synonymous$", 'black', None, None),
-                    "pos": P("$S>0$", RED, 0, np.float("infinity"))
+                    "pos": P("$S_0 >0$", RED, 0, np.float("infinity"))
                 }
             elif self.bins == 3:
                 self.inner_bound = [-1, 1]
                 self.dico = {
-                    "neg": P("$S<-1$", BLUE, -np.float("infinity"), -1),
-                    "weak": P("$-1<S<1$", LIGHTGREEN, -1, 1),
-                    "pos": P("$S>1$", RED, 1, np.float("infinity")),
+                    "neg": P("$S_0 < -1$", BLUE, -np.float("infinity"), -1),
+                    "weak": P("$-1 < S_0 < 1$", LIGHTGREEN, -1, 1),
+                    "pos": P("$S_0 > 1$", RED, 1, np.float("infinity")),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
             else:
                 self.inner_bound = [-3, -1, 0, 1]
                 self.dico = {
-                    "neg-strong": P("$S<-3$", BLUE, -np.float("infinity"), -3),
-                    "neg": P("$-3<S<-1$", GREEN, -3, -1),
-                    "neg-weak": P("$-1<S<0$", LIGHTGREEN, -1, 0),
+                    "neg-strong": P("$S_0 < -3$", BLUE, -np.float("infinity"), -3),
+                    "neg": P("$-3 < S_0 < -1$", GREEN, -3, -1),
+                    "neg-weak": P("$-1 < S_0 < 0$", LIGHTGREEN, -1, 0),
                     "syn": P("$Synonymous$", 'black', None, None),
-                    "pos-weak": P("$0<S<1$", YELLOW, 0, 1),
-                    "pos": P("$S>1$", RED, 1, np.float("infinity"))
+                    "pos-weak": P("$0 < S_0 < 1$", YELLOW, 0, 1),
+                    "pos": P("$S_0 >1$", RED, 1, np.float("infinity"))
                 }
             self.update()
 

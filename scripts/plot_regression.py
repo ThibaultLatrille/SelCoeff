@@ -52,8 +52,8 @@ def generate_xy_plot(cat_snps):
 
     y_dico = {"tajima": "Tajima $\\theta_{\\pi}$ ",
               "flowPos": "$\\Psi_{+}$", "flowNeg": "$\\Psi_{-}$", "flowRatio": "$\\Psi_{+} / \\Psi_{-}$",
-              "logFitness": "Mean log-fitness", "SMean": "$\\overline{S}$",
-              "betaS_ratio": "Slope of $\\overline{\\beta}(\\overline{S})$ at $\\overline{S}=0$",
+              "logFitness": "Mean log-fitness", "SMean": "$\\overline{S_0}$",
+              "betaS_ratio": "Slope of $\\overline{S}(\\overline{S_0})$ at $\\overline{S_0}=0$",
               "fay_wu": "Fay and Wu $\\theta_{H}$", "D_tajima": "Tajima's $D$", "H_fay_wu": "Fay and Wu's $H$"}
     y_dico.update({f'all_{cat_poly}': v for cat_poly, v in polydfe_cat_dico.items()})
 
@@ -71,8 +71,8 @@ def generate_xy_plot(cat_snps):
             dico_label[f'bayes_{cat_poly}_P-{cat}'] = f"${pr}[{s}|{beta}]$"
             dico_label[f'mut_sum_{cat_poly}'] = f"${pr}_{{mut}}[{beta}]$"
             dico_label[f'frac_{cat}_{cat_poly}'] = f"$\\frac{{{pr}[{s}]}}{{{pr}[{beta}]}}$"
-        dico_label[f'bayes_p_b_P-{cat}'] = f"${pr}[{s}|\\beta>0]$"
-        dico_label[f'frac_{cat}_p_b'] = f"$\\frac{{{pr}[{s}]}}{{{pr}[\\beta>0]}}$"
+        dico_label[f'bayes_p_b_P-{cat}'] = f"${pr}[{s}|S>0]$"
+        dico_label[f'frac_{cat}_p_b'] = f"$\\frac{{{pr}[{s}]}}{{{pr}[S>0]}}$"
         if cat != "all":
             s = f" | {s}"
 
@@ -81,14 +81,14 @@ def generate_xy_plot(cat_snps):
         for sup in omega_suffix:
             dico_label[f'{cat}_omega{sup}'] = f"$\\omega^{{{str(sup).replace('_', '')}}} {s}$"
         for p, param in [('S_b', "\\beta_b"), ('S_d', "\\beta_d"), ('b', "b"), ('p_b', "p_b"), ('logL', "LnL"),
-                         ('S', "S"), ('S+', "S^+"), ('S-', "S^-"), ('pnpsT', "\\pi_T"),
+                         ('S', "S_0"), ('S+', "S^+_0"), ('S-', "S^-_0"), ('pnpsT', "\\pi_T"),
                          ('pnpsF', "\\pi_F"), ('pnpsW', "\\pi_W"), ('div', "d")]:
             dico_label[f'{cat}_{p}'] = f"${param} {s}$"
-        dico_label[f'{cat}_p_b'] = f"${pr} [\\beta > 0 {s}]$"
+        dico_label[f'{cat}_p_b'] = f"${pr} [S > 0 {s}]$"
 
         y_dico.update({f'{cat}_{cat_poly}': v.replace(']', f'{s}]') for cat_poly, v in polydfe_cat_dico.items()})
         for cat_beta in cat_snps.non_syn_list + ['all']:
-            beta = cat_snps.label(cat_beta).replace('S', '\\beta').replace("$", "")
+            beta = cat_snps.label(cat_beta).replace('S_0', 'S').replace("$", "")
             y_dico[f'bayes_{cat}_P-{cat_beta}'] = f"{pr}[{beta} {s}]$"
 
     for y, y_label in y_dico.items():

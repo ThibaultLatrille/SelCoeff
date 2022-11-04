@@ -1,4 +1,4 @@
-experiment: "5bins-polyDFE-mC"
+experiment: "5bins-all"
 SAMPLE_LIST: "sample_all.tsv"
 subsample: 16
 nbr_replicates: 12

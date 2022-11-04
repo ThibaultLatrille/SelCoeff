@@ -2,7 +2,7 @@
 
 \usepackage{amssymb,amsfonts,amsmath,amsthm,mathtools}
 \usepackage{lmodern}
-\usepackage{xfrac, nicefrac}
+\usepackage{xfrac, nicefrac, bm}
 \usepackage{pgfplots, pgf,tikz}
 \usepackage{enumitem}
 \usepgfplotslibrary{fillbetween}
@@ -46,6 +46,32 @@
 \newcommand{\citoj}{\ci \rightarrow \cj}
 \newcommand{\AtoB}{A \rightarrow B}
 \newcommand{\itoj}{ i \rightarrow j }
+
+\newcommand{\dn}{d_N}
+\newcommand{\ds}{d_S}
+\newcommand{\dnds}{\dn / \ds}
+\newcommand{\Sphy}{S_{0}}
+\newcommand{\Sphyclass}{\mathcal{C}}
+\newcommand{\SphyMean}{\overline{\Sphy}}
+\newcommand{\divStrongDel}{\Sphy < -3}
+\newcommand{\divDel}{-3 < \Sphy < -1}
+\newcommand{\divWeakDel}{-1 < \Sphy < 0}
+\newcommand{\divWeakAdv}{0 < \Sphy < 1}
+\newcommand{\divAdv}{ \Sphy > 1}
+\newcommand{\PdivStrongDel}{\proba \left[ \divStrongDel \right]}
+\newcommand{\PdivDel}{\proba \left[ \divDel \right]}
+\newcommand{\PdivWeakDel}{\proba \left[ \divWeakDel \right]}
+\newcommand{\PdivWeakAdv}{\proba \left[ \divWeakAdv \right]}
+\newcommand{\PdivAdv}{\proba \left[ \divAdv \right]}
+\newcommand{\given}{\mid}
+\newcommand{\Spop}{S}
+\newcommand{\SpopMean}{\overline{\Spop}}
+\newcommand{\polyDel}{\Spop < -1}
+\newcommand{\polyNeutral}{-1 < \Spop < 1}
+\newcommand{\polyAdv}{ \Spop > 1}
+\newcommand{\PpolyDel}{\proba \left[ \polyDel \right]}
+\newcommand{\PpolyNeutral}{\proba \left[ \polyNeutral \right]}
+\newcommand{\PpolyAdv}{\proba \left[ \polyAdv \right]}
 
 \begin{document}
 	\begin{frame}
@@ -197,14 +223,46 @@ denoted $\pfix(s)$ is given by:
 			\item $\beta_i' = \beta_i \times i $ is the scaled $\beta_i$.
 		\end{itemize}
 	\end{frame}
-\begin{frame}
-	\begin{align*}
-		H & = \frac{2}{n(n-1)} \left( \sum_{i=1}^{n-1} \beta_i \times (n-i) \times i   - \sum_{i=1}^{n-1} \beta_i \times i^2 \right)
-	\end{align*}
-	\begin{itemize}[label=$\bullet$]
-		\item $H = 0$:  no evidence of deviation from neutrality. 
-		\item $H > 0$: deficit of SNPs at high frequency (negative selection).
-		\item $H < 0$: excess of SNPs at high frequency (positive selection).
-	\end{itemize}
-\end{frame}
+	\begin{frame}
+		\begin{align*}
+			H & = \frac{2}{n(n-1)} \left( \sum_{i=1}^{n-1} \beta_i \times (n-i) \times i   - \sum_{i=1}^{n-1} \beta_i \times i^2 \right)
+		\end{align*}
+		\begin{itemize}[label=$\bullet$]
+			\item $H = 0$:  no evidence of deviation from neutrality. 
+			\item $H > 0$: deficit of SNPs at high frequency (negative selection).
+			\item $H < 0$: excess of SNPs at high frequency (positive selection).
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+		\begin{align*}
+			\divStrongDel \\
+			\divDel \\
+			\divWeakDel \\
+			\divWeakAdv \\
+			\divAdv \\
+			{\color{BLUE}\bm{\divStrongDel}} \\
+			{\color{GREEN}\bm{\divDel}} \\
+			{\color{LIGHTGREEN}\bm{\divWeakDel}} \\
+			{\color{YELLOW}\bm{\divWeakAdv}} \\
+			{\color{RED}\bm{\divAdv}} \\
+			\PpolyDel \\
+			\PpolyNeutral \\
+			\PpolyAdv \\
+			\proba \left[ \divAdv \given \polyAdv \right] 
+		\end{align*}
+	\end{frame}
+	\begin{frame}
+		\begin{align*}
+			\proba \left[ \Sphy \given \Spop \right] \\
+			\proba \left[ \Spop \given \Sphy \right] \\
+			\proba \left[ \Sphy \right] \\
+			\proba \left[ \Spop \right] \\
+			\proba \left[ \Sphy \given \Spop \right] = \frac{ \proba \left[ \Spop \given \Sphy \right] \proba \left[ \Sphy \right] }{\proba \left[ \Spop \right]} \\
+			\proba \left[ {\color{RED}\bm{\divAdv}} \given \polyAdv \right] \\
+			\proba \left[ \polyAdv \given {\color{RED}\bm{\divAdv}} \right] \\
+			\proba \left[ {\color{RED}\bm{\divAdv}} \right] \\
+			\proba \left[  \polyAdv \right] \\
+			\proba \left[ {\color{RED}\bm{\divAdv}} \given \polyAdv \right] = \frac{ \proba \left[ \polyAdv \given {\color{RED}\bm{\divAdv}} \right] \proba \left[ {\color{RED}\bm{\divAdv}} \right] }{\proba \left[  \polyAdv \right]} 
+		\end{align*}
+	\end{frame}
 \end{document}

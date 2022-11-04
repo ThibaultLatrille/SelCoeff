@@ -44,7 +44,7 @@ def plot_stack_param(list_cat, cat_snps, s_dico, output):
         y = np.array([s_dico[cat][param] for cat in list_cat])
         ax.bar(x_pos, y, bottom=bottom, edgecolor=edgecolors_list[p_i], color=colors_list[p_i], hatch=hatches_list[p_i])
         bottom += y
-    ax.set_xlabel("Category of S at the phylogenetic scale")
+    ax.set_xlabel("Category of $S_0$")
     ax.set_ylabel("Proportion estimated at the population scale")
     ax.set_xticks(x_pos)
     ax.set_ylim((0, 1))

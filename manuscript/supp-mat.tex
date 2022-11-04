@@ -58,7 +58,7 @@
 \newcommand{\dn}{d_N}
 \newcommand{\ds}{d_S}
 \newcommand{\dnds}{\dn / \ds}
-\newcommand{\Sphy}{S}
+\newcommand{\Sphy}{S_{0}}
 \newcommand{\Sphyclass}{\mathcal{C}}
 \newcommand{\SphyMean}{\overline{\Sphy}}
 \newcommand{\divStrongDel}{\Sphy < -3}
@@ -72,7 +72,7 @@
 \newcommand{\PdivWeakAdv}{\proba \left[ \divWeakAdv \right]}
 \newcommand{\PdivAdv}{\proba \left[ \divAdv \right]}
 \newcommand{\given}{\mid}
-\newcommand{\Spop}{\beta}
+\newcommand{\Spop}{S}
 \newcommand{\SpopMean}{\overline{\Spop}}
 \newcommand{\polyDel}{\Spop < -1}
 \newcommand{\polyNeutral}{-1 < \Spop < 1}
@@ -81,14 +81,15 @@
 \newcommand{\PpolyNeutral}{\proba \left[ \polyNeutral \right]}
 \newcommand{\PpolyAdv}{\proba \left[ \polyAdv \right]}
 
-\title{In mammals, an important proportion of advantageous mutations are repairing damaged genomes instead of creating adaptive innovations}
+\title{Up to 25\% of beneficial mutations in protein sequences are not adaptive innovations in mammals}
 
 \author{
     \large
     \textbf{T. {Latrille}$^{1}$, J. {Joseph}$^{2}$, N. {Salamin}$^{1}$}\\
-    \normalsize $^{1}$Université de Lausanne, Lausanne, Switzerland\\
-    \normalsize $^{2}$Université de Lyon, CNRS, LBBE UMR 5558, Villeurbanne, France \\
-    \normalsize \texttt{\href{mailto:thibault.latrille@ens-lyon.org}{thibault.latrille@ens-lyon.org}} \\
+    \normalsize
+    $^{1}$Université de Lausanne, Lausanne, Switzerland\\
+    $^{2}$Université de Lyon, CNRS, LBBE UMR 5558, Villeurbanne, France \\
+    \texttt{\href{mailto:thibault.latrille@ens-lyon.org}{thibault.latrille@ens-lyon.org}} \\
 }
 
 \date{}
@@ -177,67 +178,6 @@
     \begin{center}
         \captionof{table}{~}
         \scriptsize
-        \begin{longtable*}{|l|l|r|r|r|r|r|r|}
-            \toprule
-            Population & Species & Tajima $\theta_{\pi}$ & $\mathbb{P}[\Sphy > 1]$ & $\mathbb{P} [ \Spop > 1 ]$ & $\frac{\mathbb{P}[\Sphy > 1]}{\mathbb{P}[ \Spop > 1 ]}$ & $\mathbb{P} [ \Spop > 1 \given \Sphy > 1]$ & $\mathbb{P}[\Sphy > 1\given \Spop > 1 ]$ \\
-            \midrule
-            \endhead
-            \midrule
-            \multicolumn{8}{r}{{Continued on next page}} \\
-            \midrule
-            \endfoot
-
-            \bottomrule
-            \endlastfoot
-            Equus c. &      Equus caballus &               $ 0.002$ &          $ 0.017$ &                   $ 0.046$ &                                          $ 0.378$ &                         $ 0.678$ &                      $ 0.256$ \\
-            Iran &          Bos taurus &               $ 0.005$ &          $ 0.016$ &                   $ 0.040$ &                                          $ 0.402$ &                         $ 0.525$ &                      $ 0.211$ \\
-            Uganda &          Bos taurus &               $ 0.005$ &          $ 0.016$ &                   $ 0.038$ &                                          $ 0.420$ &                         $ 0.610$ &                      $ 0.256$ \\
-            Australia &        Capra hircus &               $ 0.003$ &          $ 0.017$ &                   $ 0.039$ &                                          $ 0.419$ &                         $ 0.368$ &                      $ 0.154$ \\
-            France &        Capra hircus &               $ 0.003$ &          $ 0.017$ &                   $ 0.038$ &                                          $ 0.440$ &                         $ 0.368$ &                      $ 0.162$ \\
-            Iran (C. aegagrus) &        Capra hircus &               $ 0.003$ &          $ 0.017$ &                   $ 0.040$ &                                          $ 0.418$ &                         $ 0.235$ &                      $ 0.098$ \\
-            Iran &        Capra hircus &               $ 0.004$ &          $ 0.017$ &                   $ 0.033$ &                                          $ 0.500$ &                         $ 0.368$ &                      $ 0.184$ \\
-            Italy &        Capra hircus &               $ 0.003$ &          $ 0.017$ &                   $ 0.035$ &                                          $ 0.466$ &                         $ 0.309$ &                      $ 0.144$ \\
-            Morocco &        Capra hircus &               $ 0.004$ &          $ 0.017$ &                   $ 0.032$ &                                          $ 0.514$ &                         $ 0.368$ &                      $ 0.189$ \\
-            Iran &          Ovis aries &               $ 0.007$ &          $ 0.017$ &                   $ 0.024$ &                                          $ 0.686$ &                         $ 0.174$ &                      $ 0.119$ \\
-            Iran (O. orientalis) &          Ovis aries &               $ 0.009$ &          $ 0.017$ &                   $ 0.027$ &                                          $ 0.612$ &                         $ 0.165$ &                      $ 0.101$ \\
-            Iran (O. vignei) &          Ovis aries &               $ 0.007$ &          $ 0.017$ &                   $ 0.031$ &                                          $ 0.542$ &                         $ 0.228$ &                      $ 0.124$ \\
-            Various &          Ovis aries &               $ 0.009$ &          $ 0.017$ &                   $ 0.026$ &                                          $ 0.641$ &                         $ 0.238$ &                      $ 0.153$ \\
-            Morocco &          Ovis aries &               $ 0.007$ &          $ 0.017$ &                   $ 0.023$ &                                          $ 0.742$ &                         $ 0.192$ &                      $ 0.142$ \\
-            Barbados & Chlorocebus sabaeus &               $ 0.004$ &          $ 0.014$ &                   $ 0.045$ &                                          $ 0.319$ &                         $ 0.595$ &                      $ 0.190$ \\
-            Central Afr. Rep. & Chlorocebus sabaeus &               $ 0.006$ &          $ 0.014$ &                   $ 0.039$ &                                          $ 0.368$ &                         $ 0.497$ &                      $ 0.183$ \\
-            Ethiopia & Chlorocebus sabaeus &               $ 0.005$ &          $ 0.014$ &                   $ 0.044$ &                                          $ 0.322$ &                         $ 0.502$ &                      $ 0.162$ \\
-            Gambia & Chlorocebus sabaeus &               $ 0.005$ &          $ 0.014$ &                   $ 0.034$ &                                          $ 0.415$ &                         $ 0.541$ &                      $ 0.224$ \\
-            Kenya & Chlorocebus sabaeus &               $ 0.005$ &          $ 0.014$ &                   $ 0.039$ &                                          $ 0.363$ &                         $ 0.492$ &                      $ 0.179$ \\
-            Nevis & Chlorocebus sabaeus &               $ 0.003$ &          $ 0.014$ &                   $ 0.041$ &                                          $ 0.345$ &                         $ 0.549$ &                      $ 0.190$ \\
-            South Africa & Chlorocebus sabaeus &               $ 0.006$ &          $ 0.014$ &                   $ 0.039$ &                                          $ 0.367$ &                         $ 0.504$ &                      $ 0.185$ \\
-            Saint Kitts & Chlorocebus sabaeus &               $ 0.004$ &          $ 0.014$ &                   $ 0.043$ &                                          $ 0.326$ &                         $ 0.538$ &                      $ 0.175$ \\
-            Zambia & Chlorocebus sabaeus &               $ 0.006$ &          $ 0.014$ &                   $ 0.043$ &                                          $ 0.332$ &                         $ 0.529$ &                      $ 0.175$ \\
-            African &        Homo sapiens &               $ 0.003$ &          $ 0.014$ &                   $ 0.042$ &                                          $ 0.343$ &                         $ 0.724$ &                      $ 0.249$ \\
-            Admixed American &        Homo sapiens &               $ 0.002$ &          $ 0.014$ &                   $ 0.040$ &                                          $ 0.358$ &                         $ 0.695$ &                      $ 0.249$ \\
-            East Asian &        Homo sapiens &               $ 0.002$ &          $ 0.014$ &                   $ 0.039$ &                                          $ 0.366$ &                         $ 0.652$ &                      $ 0.239$ \\
-            European &        Homo sapiens &               $ 0.002$ &          $ 0.014$ &                   $ 0.039$ &                                          $ 0.373$ &                         $ 0.666$ &                      $ 0.249$ \\
-            South Asian &        Homo sapiens &               $ 0.002$ &          $ 0.014$ &                   $ 0.038$ &                                          $ 0.378$ &                         $ 0.677$ &                      $ 0.256$ \\
-        \end{longtable*}
-    \end{center}
-    \begin{itemize}
-        \item Tajima $\theta$ is the synonymous diversity.
-        \item $\mathbb{P} [ \Sphy > 1 ]$ is the probability for a new mutation to be under maintenance selection.
-        These mutations have a selection coefficient predicted at the phylogenetic-scale larger than 1 ($\Sphy > 1$), thus toward a more fit amino-acid.
-        In other words, this probability is the part of the DFE estimated by mutation-selection models greater than 1.
-        \item $\mathbb{P} [ \Spop > 1 ]$ is the probability for a mutation to be positively selected.
-        These mutations have a selection coefficient at the population-scale larger than 1 ($\Spop > 1$), estimated from all SNPs in the population.
-        In other words, this probability is the part of the DFE estimated by polyDFE greater than 1.
-        \item $\mathbb{P} [ \Spop > 1 \given \Sphy > 1]$ is the probability for a mutation to be positively selected, given it is under maintenance selection.
-        These mutations have a selection coefficient at the population-scale larger than 1 ($\Spop > 1$), estimated by polyDFE on the SNPs with a predicted selection coefficient larger than 1 ($\Sphy > 1$).
-        In other words, this probability is the part of the DFE estimated by polyDFE greater than 1, when we restricted our analysis on SNPs that are already predicted by mutation-selection models to have a selection coefficient greater than 1.
-        \item $\mathbb{P} [ \Sphy > 1 \given \Spop > 1]$ is the probability for a mutation to be under maintenance selection, given it is positively selected.
-        This probability is obtained using Bayes' formula.
-    \end{itemize}
-
-    \newpage
-    \begin{center}
-        \captionof{table}{~}
-        \scriptsize
         \begin{longtable*}{|l|l|r|r|r|r|r|}
             \toprule
             Population & Species & Tajima $\theta_{\pi}$ & $\mathbb{P}_{div}[\Sphy > 0]$ & $\dnds $ & $\dn(\Sphy < 0) / \ds$ & R($\dnds $) \\
@@ -285,12 +225,71 @@
         \item $\mathbb{P}_{div}[\Sphy > 0]$ is the proportion of substitutions in the terminal branch observed with a selection coefficient at the phylogenetic scale larger than 0 ($\Sphy > 0$).
         \item $\dnds$ is the ratio of non-synonymous over synonymous divergence estimated for all the non-synonymous substitutions in the terminal branch.
         \item $\dn(\Sphy < 0) / \ds$ is the ratio of non-synonymous over synonymous divergence estimated for the non-synonymous substitutions in the terminal branch with a selection coefficient lower than 0 ($\Sphy < 0$).
-        This is the estimated divergence when we removed maintenance selection.
-        \item $R(\dnds)=\dfrac{\dnds - \dn(\Sphy < 0) / \ds}{\dnds}$ is the fraction of the divergence ($\dnds$) that is over-estimated, $\dnds$ is compared to the estimated divergence when we removed maintenance selection $\dn(\Sphy < 0) / \ds$.
+        This is the estimated divergence when we removed beneficial back-mutations.
+        \item $R(\dnds)=\dfrac{\dnds - \dn(\Sphy < 0) / \ds}{\dnds}$ is the fraction of the divergence ($\dnds$) that is over-estimated, $\dnds$ is compared to the estimated divergence when we removed beneficial back-mutations $\dn(\Sphy < 0) / \ds$.
     \end{itemize}
+    We estimated that between 20 and 25\% of $\dnds$ is over-estimated ($R(\dnds)$), corresponding to beneficial back-mutation inflating the $\dnds$ statistic.
 
-    We estimated that between 20 and 25\% of $\dnds$ is over-estimated ($R(\dnds)$), corresponding to maintenance positive selection exerted on substitutions.
-    Altogether, in a nearly neutral framework, genomes could be viewed as the arena of a tug-of-war between a large volume of deleterious mutations that eventually reach fixation due to drift, and scarce advantageous mutations that are restoring a more optimal ancestral state.
+    \newpage
+    \begin{center}
+        \captionof{table}{~}
+        \scriptsize
+        \begin{longtable*}{|l|l|r|r|r|r|r|r|}
+            \toprule
+            Population & Species & Tajima $\theta_{\pi}$ & $\mathbb{P}[\Sphy > 1]$ & $\mathbb{P} [ \Spop > 1 ]$ & $\frac{\mathbb{P}[\Sphy > 1]}{\mathbb{P}[ \Spop > 1 ]}$ & $\mathbb{P} [ \Spop > 1 \given \Sphy > 1]$ & $\mathbb{P}[\Sphy > 1\given \Spop > 1 ]$ \\
+            \midrule
+            \endhead
+            \midrule
+            \multicolumn{8}{r}{{Continued on next page}} \\
+            \midrule
+            \endfoot
+
+            \bottomrule
+            \endlastfoot
+            Equus c. &      Equus caballus &               $ 0.002$ &          $ 0.017$ &                   $ 0.046$ &                                          $ 0.378$ &                         $ 0.678$ &                      $ 0.256$ \\
+            Iran &          Bos taurus &               $ 0.005$ &          $ 0.016$ &                   $ 0.040$ &                                          $ 0.402$ &                         $ 0.525$ &                      $ 0.211$ \\
+            Uganda &          Bos taurus &               $ 0.005$ &          $ 0.016$ &                   $ 0.038$ &                                          $ 0.420$ &                         $ 0.610$ &                      $ 0.256$ \\
+            Australia &        Capra hircus &               $ 0.003$ &          $ 0.017$ &                   $ 0.039$ &                                          $ 0.419$ &                         $ 0.368$ &                      $ 0.154$ \\
+            France &        Capra hircus &               $ 0.003$ &          $ 0.017$ &                   $ 0.038$ &                                          $ 0.440$ &                         $ 0.368$ &                      $ 0.162$ \\
+            Iran (C. aegagrus) &        Capra hircus &               $ 0.003$ &          $ 0.017$ &                   $ 0.040$ &                                          $ 0.418$ &                         $ 0.235$ &                      $ 0.098$ \\
+            Iran &        Capra hircus &               $ 0.004$ &          $ 0.017$ &                   $ 0.033$ &                                          $ 0.500$ &                         $ 0.368$ &                      $ 0.184$ \\
+            Italy &        Capra hircus &               $ 0.003$ &          $ 0.017$ &                   $ 0.035$ &                                          $ 0.466$ &                         $ 0.309$ &                      $ 0.144$ \\
+            Morocco &        Capra hircus &               $ 0.004$ &          $ 0.017$ &                   $ 0.032$ &                                          $ 0.514$ &                         $ 0.368$ &                      $ 0.189$ \\
+            Iran &          Ovis aries &               $ 0.007$ &          $ 0.017$ &                   $ 0.024$ &                                          $ 0.686$ &                         $ 0.174$ &                      $ 0.119$ \\
+            Iran (O. orientalis) &          Ovis aries &               $ 0.009$ &          $ 0.017$ &                   $ 0.027$ &                                          $ 0.612$ &                         $ 0.165$ &                      $ 0.101$ \\
+            Iran (O. vignei) &          Ovis aries &               $ 0.007$ &          $ 0.017$ &                   $ 0.031$ &                                          $ 0.542$ &                         $ 0.228$ &                      $ 0.124$ \\
+            Various &          Ovis aries &               $ 0.009$ &          $ 0.017$ &                   $ 0.026$ &                                          $ 0.641$ &                         $ 0.238$ &                      $ 0.153$ \\
+            Morocco &          Ovis aries &               $ 0.007$ &          $ 0.017$ &                   $ 0.023$ &                                          $ 0.742$ &                         $ 0.192$ &                      $ 0.142$ \\
+            Barbados & Chlorocebus sabaeus &               $ 0.004$ &          $ 0.014$ &                   $ 0.045$ &                                          $ 0.319$ &                         $ 0.595$ &                      $ 0.190$ \\
+            Central Afr. Rep. & Chlorocebus sabaeus &               $ 0.006$ &          $ 0.014$ &                   $ 0.039$ &                                          $ 0.368$ &                         $ 0.497$ &                      $ 0.183$ \\
+            Ethiopia & Chlorocebus sabaeus &               $ 0.005$ &          $ 0.014$ &                   $ 0.044$ &                                          $ 0.322$ &                         $ 0.502$ &                      $ 0.162$ \\
+            Gambia & Chlorocebus sabaeus &               $ 0.005$ &          $ 0.014$ &                   $ 0.034$ &                                          $ 0.415$ &                         $ 0.541$ &                      $ 0.224$ \\
+            Kenya & Chlorocebus sabaeus &               $ 0.005$ &          $ 0.014$ &                   $ 0.039$ &                                          $ 0.363$ &                         $ 0.492$ &                      $ 0.179$ \\
+            Nevis & Chlorocebus sabaeus &               $ 0.003$ &          $ 0.014$ &                   $ 0.041$ &                                          $ 0.345$ &                         $ 0.549$ &                      $ 0.190$ \\
+            South Africa & Chlorocebus sabaeus &               $ 0.006$ &          $ 0.014$ &                   $ 0.039$ &                                          $ 0.367$ &                         $ 0.504$ &                      $ 0.185$ \\
+            Saint Kitts & Chlorocebus sabaeus &               $ 0.004$ &          $ 0.014$ &                   $ 0.043$ &                                          $ 0.326$ &                         $ 0.538$ &                      $ 0.175$ \\
+            Zambia & Chlorocebus sabaeus &               $ 0.006$ &          $ 0.014$ &                   $ 0.043$ &                                          $ 0.332$ &                         $ 0.529$ &                      $ 0.175$ \\
+            African &        Homo sapiens &               $ 0.003$ &          $ 0.014$ &                   $ 0.042$ &                                          $ 0.343$ &                         $ 0.724$ &                      $ 0.249$ \\
+            Admixed American &        Homo sapiens &               $ 0.002$ &          $ 0.014$ &                   $ 0.040$ &                                          $ 0.358$ &                         $ 0.695$ &                      $ 0.249$ \\
+            East Asian &        Homo sapiens &               $ 0.002$ &          $ 0.014$ &                   $ 0.039$ &                                          $ 0.366$ &                         $ 0.652$ &                      $ 0.239$ \\
+            European &        Homo sapiens &               $ 0.002$ &          $ 0.014$ &                   $ 0.039$ &                                          $ 0.373$ &                         $ 0.666$ &                      $ 0.249$ \\
+            South Asian &        Homo sapiens &               $ 0.002$ &          $ 0.014$ &                   $ 0.038$ &                                          $ 0.378$ &                         $ 0.677$ &                      $ 0.256$ \\
+        \end{longtable*}
+    \end{center}
+    \begin{itemize}
+        \item Tajima $\theta$ is the synonymous diversity.
+        \item $\mathbb{P} [ \Sphy > 1 ]$ is the probability for a new mutation a beneficial back-mutation.
+        These mutations have a selection coefficient predicted at the phylogenetic-scale larger than 1 ($\Sphy > 1$), thus toward a more fit amino-acid.
+        In other words, this probability is the part of the DFE estimated by mutation-selection models greater than 1.
+        \item $\mathbb{P} [ \Spop > 1 ]$ is the probability for a mutation to be beneficial.
+        These mutations have a selection coefficient at the population-scale larger than 1 ($\Spop > 1$), estimated from all SNPs in the population.
+        In other words, this probability is the part of the DFE estimated by polyDFE greater than 1.
+        \item $\mathbb{P} [ \Spop > 1 \given \Sphy > 1]$ is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a beneficial back-mutation at the phylogenetic scale.
+        These mutations have a selection coefficient at the population scale larger than 1 ($\Spop > 1$), estimated by polyDFE on the SNPs with a predicted selection coefficient at the phylogenetic scale larger than 1 ($\Sphy > 1$).
+        In other words, this probability is the part of the DFE estimated by polyDFE greater than 1, when we restricted our analysis on SNPs that are already predicted by mutation-selection models to have a selection coefficient ($\Sphy$) greater than 1.
+        \item $\mathbb{P} [ \Sphy > 1 \given \Spop > 1]$ is the probability for a mutation to a beneficial back-mutations, given it is beneficial.
+        This probability is obtained using Bayes' formula.
+    \end{itemize}
 
     \newpage
 
@@ -299,13 +298,13 @@
     \subsubsection{Proportion of nearly-neutral mutations ($\polyNeutral$)}\label{subsec:proportion-nearly-neutral-mutations}
     \captionof{figure}{~}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression-MutSel/results.watterson.all_P-Seq0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.all_P-Seq0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression-MutSel/results.watterson.neg-weak_P-Seq0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.neg-weak_P-Seq0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression-MutSel/results.watterson.pos-weak_P-Seq0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.pos-weak_P-Seq0.scatter.pdf}
     \end{minipage}
     \begin{itemize}
         \item $\ \proba [ \polyNeutral ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) between -1 and 1, estimated for the whole genome.
@@ -316,13 +315,13 @@
     \subsubsection{Proportion of deleterious mutations ($\polyDel$)}\label{subsec:proportion-deleterious-mutations}
     \captionof{figure}{~}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression-MutSel/results.watterson.all_P-Sinf0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.all_P-Sinf0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression-MutSel/results.watterson.neg_P-Sinf0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.neg_P-Sinf0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression-MutSel/results.watterson.neg-strong_P-Sinf0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.neg-strong_P-Sinf0.scatter.pdf}
     \end{minipage}
     \begin{itemize}
         \item $\ \proba [ \polyDel ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) lower than -1, estimated for the whole genome.
@@ -330,88 +329,89 @@
         \item $\ \proba [ \polyDel \given \divStrongDel ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) lower than -1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) lower than -3.
     \end{itemize}
 
-    \subsubsection{Proportion of advantageous mutations ($\polyAdv$)}\label{subsec:proportion-advantageous-mutations}
+    \subsubsection{Proportion of beneficial mutations ($\polyAdv$)}\label{subsec:proportion-beneficial-mutations}
     \captionof{figure}{~}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression-MutSel/results.watterson.all_P-Ssup0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.all_P-Ssup0.scatter.pdf}
     \end{minipage}
     \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-polyDFE-mC/regression-MutSel/results.watterson.pos_P-Ssup0.scatter.pdf}
+        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.pos_P-Ssup0.scatter.pdf}
     \end{minipage}
     \begin{itemize}
         \item $ \proba [ \polyAdv ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) greater than 1, estimated for the whole genome.
         \item $\proba [ \polyAdv \given \divAdv] $ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) greater than 1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) greater than 1.
     \end{itemize}
 
-    \subsection{Selection efficacy correlation with diversity}\label{subsec:selection-efficacy-correlation-with-diversity}
-    The mean of the DFE $\SpopMean$ estimated by polyDFE is given by:
-    \begin{align*}
-        \SpopMean & = \int_{-\infty}^{+\infty} \Spop \phi \left( \Spop; \Spop_d , b, p_b, \Spop_b \right) \der \Spop \\
-        & = p_b \Spop_b + \left( 1 - p_b \right) \Spop_d
-    \end{align*}
-
-    To look further into the relation between diversity and selection efficacy, we studied the estimation of the mean $\SpopMean$ as a function of the mean $\SphyMean$ for a subset of SNPs, for which $\SphyMean$ is close to $0$.
-    Indeed, polyDFE is a nearly-neutral model and is not able to reliably compute selection coefficients for only strongly deleterious or only strongly advantageous SNPs.
-    Sliding windows of $5,000$ SNPs are taken with a mean $\SphyMean$ between $-0.5$ and $0.5$.
-    $\SpopMean$ is estimated for each group, with some groups that might have part of same SNPs that overlap.
-    The relationship between $\SpopMean$ and $\SphyMean$ can be described by a second-order polynomial, and the slope of this polynomial at $\SphyMean=0$ gives the ratio $\SpopMean/\SphyMean$ for each population.
-    \captionof{figure}{~}
-    \begin{center}
-        \includegraphics[width=\linewidth, page=1]{artworks/figure.slope-beta-S}
-    \end{center}
-
-    We observe that $\SpopMean/\SphyMean$, representing the efficacy of selection at the short versus long-term is positively correlated with synonymous diversity, a proxy of effective population size.
-    Altogether, populations with a large effective population size are under more efficient selection, confirming the prediction of the nearly-neutral theory of evolution that mutations are less likely to be considered neutral in populations with high diversity (see~\ref{subsec:proportion-nearly-neutral-mutations}, left scatter-plot), especially for mutations predicted already to be nearly-neutral at the phylogenetic scale (see~\ref{subsec:proportion-nearly-neutral-mutations}, middle and right scatter-plot).
-    As a consequence of an increased selection efficiency, mutations in populations with high diversity are mechanistically more likely to be deleterious (see~\ref{subsec:proportion-deleterious-mutations}, left scatter-plot), especially for mutations predicted already to be deleterious at the phylogenetic scale (see~\ref{subsec:proportion-deleterious-mutations}, middle and right scatter-plot).
-    % A decrease in the proportion of neutral mutation did not translate into a mechanical increase in the proportion of advantageous mutations.
-    % Instead, populations with higher diversity have a lower proportion of advantageous mutations, this effect is also more pronounced for mutations predicted to be advantageous at the phylogenetic scale.
-    % This discrepancy can be explained by the fact that populations with larger diversity have already depleted the putatively advantageous mutations, and that only deleterious are remaining possible.
-    % In other words, being on the top of a fixed fitness landscape leaves you with only paths going downhill.
-    % Altogether, populations with increased diversity are showing signature of increased selection efficiency and are also less likely to generate positively selected mutations.
-
     \newpage
+
+%    \subsection{Selection efficacy correlation with diversity}\label{subsec:selection-efficacy-correlation-with-diversity}
+%    The mean of the DFE $\SpopMean$ estimated by polyDFE is given by:
+%    \begin{align*}
+%        \SpopMean & = \int_{-\infty}^{+\infty} \Spop \phi \left( \Spop; \Spop_d , b, p_b, \Spop_b \right) \der \Spop \\
+%        & = p_b \Spop_b + \left( 1 - p_b \right) \Spop_d
+%    \end{align*}
+%
+%    To look further into the relation between diversity and selection efficacy, we studied the estimation of the mean $\SpopMean$ as a function of the mean $\SphyMean$ for a subset of SNPs, for which $\SphyMean$ is close to $0$.
+%    Indeed, polyDFE is a nearly-neutral model and is not able to reliably compute selection coefficients for only strongly deleterious or only strongly beneficial SNPs.
+%    Sliding windows of $5,000$ SNPs are taken with a mean $\SphyMean$ between $-0.5$ and $0.5$.
+%    $\SpopMean$ is estimated for each group, with some groups that might have part of same SNPs that overlap.
+%    The relationship between $\SpopMean$ and $\SphyMean$ can be described by a second-order polynomial, and the slope of this polynomial at $\SphyMean=0$ gives the ratio $\SpopMean/\SphyMean$ for each population.
+%    \captionof{figure}{~}
+%    \begin{center}
+%        \includegraphics[width=\linewidth, page=1]{artworks/figure.slope-beta-S}
+%    \end{center}
+%
+%    We observe that $\SpopMean/\SphyMean$, representing the efficacy of selection at the short versus long-term is positively correlated with synonymous diversity, a proxy of effective population size.
+%    Altogether, populations with a large effective population size are under more efficient selection, confirming the prediction of the nearly-neutral theory of evolution that mutations are less likely to be considered neutral in populations with high diversity (see~\ref{subsec:proportion-nearly-neutral-mutations}, left scatter-plot), especially for mutations predicted already to be nearly-neutral at the phylogenetic scale (see~\ref{subsec:proportion-nearly-neutral-mutations}, middle and right scatter-plot).
+%    As a consequence of an increased selection efficiency, mutations in populations with high diversity are mechanistically more likely to be deleterious (see~\ref{subsec:proportion-deleterious-mutations}, left scatter-plot), especially for mutations predicted already to be deleterious at the phylogenetic scale (see~\ref{subsec:proportion-deleterious-mutations}, middle and right scatter-plot).
+%    A decrease in the proportion of neutral mutation did not translate into a mechanical increase in the proportion of beneficial mutations.
+%    Instead, populations with higher diversity have a lower proportion of beneficial mutations, this effect is also more pronounced for mutations predicted to be beneficial at the phylogenetic scale.
+%    This discrepancy can be explained by the fact that populations with larger diversity have already depleted the putatively beneficial mutations, and that only deleterious are remaining possible.
+%    In other words, being on the top of a fixed fitness landscape leaves you with only paths going downhill.
+%    Altogether, populations with increased diversity are showing signature of increased selection efficiency and are also less likely to generate positively selected mutations.
+%   \newpage
 
     \subsection{Proportion of selected mutations}
 
-    For each population, the proportion of advantageous ($p_+=\PpolyAdv$), nearly-neutral ($\PpolyNeutral$) and of deleterious ($\PpolyDel$) mutations estimated at the population-genetic scale is shown.
+    For each population, the proportion of beneficial ($p_+=\PpolyAdv$), nearly-neutral ($\PpolyNeutral$) and of deleterious ($\PpolyDel$) mutations estimated at the population-genetic scale is shown.
     Estimation is performed with SNPs with different class of selection at the phylogenetic scale: $\Sphyclass \in \{ \divStrongDel, \divDel, \divWeakDel, \divWeakAdv, \divAdv \}$
     Population are sorted for increased synonymous diversity.
 
     \begin{center}
         \captionof{figure}{~}
         \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-polyDFE-mC/results/Theta.MutSel.all.stacked.pdf}
+            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.MutSel.all.stacked.pdf}
         \end{minipage}
         \begin{minipage}{0.09\linewidth}
             \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
         \end{minipage}
         \captionof{figure}{~}
         \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-polyDFE-mC/results/Theta.MutSel.neg-strong.stacked.pdf} \\
+            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.MutSel.neg-strong.stacked.pdf} \\
         \end{minipage}
         \begin{minipage}{0.09\linewidth}
             \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
         \end{minipage}\captionof{figure}{~}
         \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-polyDFE-mC/results/Theta.MutSel.neg.stacked.pdf} \\
+            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.MutSel.neg.stacked.pdf} \\
         \end{minipage}
         \begin{minipage}{0.09\linewidth}
             \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
         \end{minipage}\captionof{figure}{~}
         \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-polyDFE-mC/results/Theta.MutSel.neg-weak.stacked.pdf} \\
+            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.MutSel.neg-weak.stacked.pdf} \\
         \end{minipage}
         \begin{minipage}{0.09\linewidth}
             \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
         \end{minipage}\captionof{figure}{~}
         \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-polyDFE-mC/results/Theta.MutSel.pos-weak.stacked.pdf} \\
+            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.MutSel.pos-weak.stacked.pdf} \\
         \end{minipage}
         \begin{minipage}{0.09\linewidth}
             \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
         \end{minipage}\captionof{figure}{~}
         \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-polyDFE-mC/results/Theta.MutSel.pos.stacked.pdf}
+            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.MutSel.pos.stacked.pdf}
         \end{minipage}
         \begin{minipage}{0.09\linewidth}
             \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
@@ -419,7 +419,7 @@
     \end{center}
     We confirmed that higher synonymous diversity is typically accompanied by a smaller proportion of neutral mutations.
     This result is specially visible when we restricted the analysis to class of mutations that are supposedly nearly-neutral at the phylogenetic scale ($\divWeakDel$ and $\divWeakAdv$).
-    This result suggests that populations with higher diversity (e.g.~\textit{Bos} or \textit{Ovis}) are more likely to discriminate whether mutations are advantageous or deleterious.
+    This result suggests that populations with higher diversity (e.g.~\textit{Bos} or \textit{Ovis}) are more likely to discriminate whether mutations are beneficial or deleterious.
     Alternatively stated, mutations in populations with low diversity (e.g.~\textit{Homo}) are effectively nearly-neutral and behave as would a neutral mutation.
     This result is qualitatively in accordance with the nearly-neutral theory of evolution which argues that mutations are less efficiently selected for in small populations.
 
@@ -428,13 +428,13 @@
     For each population, the same figure is shown.
     \begin{itemize}
         \item Top-left panel: Histogram of predicted selection coefficients ($\Sphy$) for all possible mutations away from the ancestral genome, giving the number of sites ($L$, in y-axis) across the genome with a given $\Sphy$.
-        Mutations are divided into 5 classes: severely deleterious (blue), deleterious (green), weakly deleterious (light green), weakly advantageous (yellow) and advantageous (red).
+        Mutations are divided into 5 classes: severely deleterious (blue), deleterious (green), weakly deleterious (light green), weakly beneficial (yellow) and beneficial (red).
         \item Top-right panel: Histogram of predicted selection coefficients ($\Sphy$) for all observed mutations in a sample of 8 individuals (out of 512 in the original dataset) of African descent.
         If they are less mutations observed than expected, this class is thus undergoing purifying selection.
         \item Bottom-left panel: The site-frequency spectrum (SFS) represents the proportion of mutations (y-axis) with a given number of derived alleles in the population (x-axis).
         SFS are drawn for a random sample of 16 alleles (mean in solid line and standard deviation in filled color) for each class of selection coefficient and for synonymous mutations which are supposedly neutral (black).
         At high frequencies, supposedly severally deleterious mutations are underrepresented.
-        \item Bottom-right panel:For each class of selection (and for the set of all non-synonymous mutations), information from the SFS and the expected total mutation rate are combined at the population-genetic scale to estimate the proportion of advantageous mutations $\PpolyAdv$, of nearly-neutral mutations $\PpolyNeutral$ and of deleterious mutations $\PpolyDel$.
+        \item Bottom-right panel:For each class of selection (and for the set of all non-synonymous mutations), information from the SFS and the expected total mutation rate are combined at the population-genetic scale to estimate the proportion of beneficial mutations $\PpolyAdv$, of nearly-neutral mutations $\PpolyNeutral$ and of deleterious mutations $\PpolyDel$.
     \end{itemize}
 
     \input{include-MutSel-non-adaptive}
@@ -445,45 +445,45 @@
     \section{SIFT scores}\label{sec:sift-scores}
 
     \subsection{Proportion of selected mutations}\label{subsec:proportion-of-selected-mutations}
-    For each population, the proportion of advantageous ($\PpolyAdv$), nearly-neutral ($\PpolyNeutral$) and of deleterious ($\PpolyDel$) mutations estimated at the population-genetic scale is shown.
+    For each population, the proportion of beneficial ($\PpolyAdv$), nearly-neutral ($\PpolyNeutral$) and of deleterious ($\PpolyDel$) mutations estimated at the population-genetic scale is shown.
     Estimation is performed with SNPs with different class of SIFT scores at the phylogenetic scale.
     Population are sorted for increased synonymous diversity.
 
     \begin{center}
         \captionof{figure}{~}
         \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-polyDFE-mC/results/Theta.SIFT.all.stacked.pdf}
+            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.SIFT.all.stacked.pdf}
         \end{minipage}
         \begin{minipage}{0.09\linewidth}
             \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
         \end{minipage}
         \captionof{figure}{~}
         \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-polyDFE-mC/results/Theta.SIFT.neg-strong.stacked.pdf} \\
+            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.SIFT.neg-strong.stacked.pdf} \\
         \end{minipage}
         \begin{minipage}{0.09\linewidth}
             \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
         \end{minipage}\captionof{figure}{~}
         \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-polyDFE-mC/results/Theta.SIFT.neg.stacked.pdf} \\
+            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.SIFT.neg.stacked.pdf} \\
         \end{minipage}
         \begin{minipage}{0.09\linewidth}
             \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
         \end{minipage}\captionof{figure}{~}
         \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-polyDFE-mC/results/Theta.SIFT.neg-weak.stacked.pdf} \\
+            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.SIFT.neg-weak.stacked.pdf} \\
         \end{minipage}
         \begin{minipage}{0.09\linewidth}
             \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
         \end{minipage}\captionof{figure}{~}
         \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-polyDFE-mC/results/Theta.SIFT.pos-weak.stacked.pdf} \\
+            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.SIFT.pos-weak.stacked.pdf} \\
         \end{minipage}
         \begin{minipage}{0.09\linewidth}
             \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
         \end{minipage}\captionof{figure}{~}
         \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-polyDFE-mC/results/Theta.SIFT.pos.stacked.pdf}
+            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.SIFT.pos.stacked.pdf}
         \end{minipage}
         \begin{minipage}{0.09\linewidth}
             \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
@@ -494,22 +494,21 @@
     % The previous section showed that mutations with a higher SIFT score at the phylogenetic scale are more positively selected in the different populations.
     % However, whenever we removed the category of SNPs with the highest SIFT score ($\textrm{SIFT} \geq 0.8$), we expected the estimation of $p_+ (\textrm{SIFT} < 0.8)$ to be lower than $p_+$ (estimated on the all dataset), as we have shown that $p_+ (\Sphy < 0) < p_+$ with mutation-selection codon models.
     % Thus SIFT scores are not providing reliable information on the current selective strength exerted on mutations, at least for high SIFT scores.
-    % Moreover, there is no defined threshold (here we arbitrarily used 0.8) to cut-off between advantageous and deleterious changes.
+    % Moreover, there is no defined threshold (here we arbitrarily used 0.8) to cut-off between beneficial and deleterious changes.
 
-
-    \section{SIFT scores: histograms and SFS for each population}\label{sec:sift-scores:-histograms-and-sfs-for-each-population}
-    For each population, the same figure is shown.
-    \begin{itemize}
-        \item Top-left panel: Histogram of SIFT score for all possible mutations away from the ancestral genome, giving the number of sites ($L$, in y-axis) across the genome with a given SIFT score.
-        Mutations are divided into 5 classes: severely deleterious (blue), deleterious (green), weakly deleterious (light green), weakly advantageous (yellow) and advantageous (red).
-        \item Top-right panel: Histogram of SIFT score for all observed mutations in a sample of 8 individuals (out of 512 in the original dataset) of African descent.
-        If they are less mutations observed than expected, this class is thus undergoing purifying selection.
-        \item Bottom-left panel: The site-frequency spectrum (SFS) represents the proportion of mutations (y-axis) with a given number of derived alleles in the population (x-axis).
-        SFS are drawn for a random sample of 16 alleles (mean in solid line and standard deviation in filled color) for each class of selection coefficient and for synonymous mutations which are supposedly neutral (black).
-        At high frequencies, supposedly severally deleterious mutations are underrepresented.
-        \item Bottom-right panel:For each class of selection (and for the set of all non-synonymous mutations), information from the SFS and the expected total mutation rate are combined at the population-genetic scale to estimate the proportion of advantageous mutations $\PpolyAdv$, of nearly-neutral mutations $\PpolyNeutral$ and of deleterious mutations $\PpolyDel$.
-    \end{itemize}
-    \input{include-SIFT-non-adaptive}
+%    \section{SIFT scores: histograms and SFS for each population}\label{sec:sift-scores:-histograms-and-sfs-for-each-population}
+%    For each population, the same figure is shown.
+%    \begin{itemize}
+%        \item Top-left panel: Histogram of SIFT score for all possible mutations away from the ancestral genome, giving the number of sites ($L$, in y-axis) across the genome with a given SIFT score.
+%        Mutations are divided into 5 classes: severely deleterious (blue), deleterious (green), weakly deleterious (light green), weakly beneficial (yellow) and beneficial (red).
+%        \item Top-right panel: Histogram of SIFT score for all observed mutations in a sample of 8 individuals (out of 512 in the original dataset) of African descent.
+%        If they are less mutations observed than expected, this class is thus undergoing purifying selection.
+%        \item Bottom-left panel: The site-frequency spectrum (SFS) represents the proportion of mutations (y-axis) with a given number of derived alleles in the population (x-axis).
+%        SFS are drawn for a random sample of 16 alleles (mean in solid line and standard deviation in filled color) for each class of selection coefficient and for synonymous mutations which are supposedly neutral (black).
+%        At high frequencies, supposedly severally deleterious mutations are underrepresented.
+%        \item Bottom-right panel:For each class of selection (and for the set of all non-synonymous mutations), information from the SFS and the expected total mutation rate are combined at the population-genetic scale to estimate the proportion of beneficial mutations $\PpolyAdv$, of nearly-neutral mutations $\PpolyNeutral$ and of deleterious mutations $\PpolyDel$.
+%    \end{itemize}
+%    \input{include-SIFT-non-adaptive}
 
     \section*{References}
     \printbibliography
