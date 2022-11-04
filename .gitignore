@@ -13,6 +13,7 @@ __pycache__
 /data_div/
 /data_processed/
 /utils/
+/out/
 .idea/
 *.indd
 *.ai
