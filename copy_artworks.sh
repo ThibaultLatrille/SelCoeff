@@ -19,3 +19,6 @@
 \cp -rf ./experiments/5bins-all/regression-MutSel/results.watterson.bayes_P-Ssup0_P-pos.scatter.pdf ./manuscript/artworks/scatter.watterson.Bayes.pdf
 \cp -rf ./experiments/2bins-all/regression-MutSel/results.watterson.ratio_neg_P-Ssup0.scatter.pdf ./manuscript/artworks/scatter.watterson.R_p+.pdf
 \cp -rf ./experiments/2bins-all/regression-MutSel/results.watterson.ratio_neg_omega_div.scatter.pdf ./manuscript/artworks/scatter.watterson.R_div.pdf
+\cp -rf ./data_processed/opportunities_bins2/DFE.Homo_sapiens.AFR.MutSel.pdf ./manuscript/artworks/2bins.AFR.histogramDFE.pdf
+\cp -rf ./data_processed/experimental_DFE.pdf ./manuscript/artworks/2bins.Yeast.experimentalDFE.pdf
+\cp -rf ./data_processed/population_DFE.pdf ./manuscript/artworks/2bins.AFR.populationDFE.pdf

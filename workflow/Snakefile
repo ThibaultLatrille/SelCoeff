@@ -33,7 +33,27 @@ rule all:
         f'{FOLDER}/data_processed/opportunities_{binning}.tsv',
         f'{FOLDER}/data_processed/bounds_{binning}.tsv',
         f'{EXP_FOLDER}/supp-mat.pdf',
+        f'{FOLDER}/data_processed/experimental_DFE.pdf',
+        f'{FOLDER}/data_processed/population_DFE.pdf'
         # TSV_LIST
+
+rule experimental_DFE:
+    input:
+        script=f'{FOLDER}/scripts/experimental_DFE.py',
+        folder=f'{FOLDER}/data_div/distribution_fitness_effects'
+    output:
+        pdf=f'{FOLDER}/data_processed/experimental_DFE.pdf',
+    shell:
+        'python3 {input.script} --exp_folder {input.folder} --output {output.pdf}'
+
+rule population_DFE:
+    input:
+        script=f'{FOLDER}/scripts/population_DFE.py',
+    output:
+        pdf=f'{FOLDER}/data_processed/population_DFE.pdf',
+    shell:
+        'python3 {input.script} --output {output.pdf}'
+
 
 rule fixed_snp_by_pop:
     input:
