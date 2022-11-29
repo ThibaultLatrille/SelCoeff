@@ -12,18 +12,19 @@ def read_poly_dfe(path, proc_R):
             start = 'Best joint likelihood found '
             if start in line:
                 out_poly_dfe["logL"] = float(line[line.find(start) + len(start):line.rfind(' with gradient')])
-            if "Model: C" in line or "Model: D" in line:
+            if "Model: B" in line or "Model: C" in line or "Model: D" in line:
                 f.readline()
                 f.readline()
                 header = re.sub(' +', ' ', f.readline().replace("S_p-", "S_p -").replace("--", "").strip()).split(" ")
                 values = re.sub(' +', ' ', f.readline().replace("--", "").strip()).split(" ")
-                if "Model: C" in line:
+                if "Model: B" in line or "Model: C" in line:
                     for h_i, h in enumerate(header):
                         out_poly_dfe[h] = float(values[h_i])
 
-                    estimates = proc_R.parseOutput(path)[0]
-                    for lim_left in alpha_sup_limits:
-                        out_poly_dfe[f"alpha{lim_left}"] = proc_R.estimateAlpha(estimates, supLimit=lim_left)[0]
+                    if "Model: C" in line:
+                        estimates = proc_R.parseOutput(path)[0]
+                        for lim_left in alpha_sup_limits:
+                            out_poly_dfe[f"alpha{lim_left}"] = proc_R.estimateAlpha(estimates, supLimit=lim_left)[0]
                 elif "Model: D" in line:
                     for v_i, v in enumerate(values):
                         out_poly_dfe[f"S_{v_i + 1}"] = float(header[v_i * 2 + 1])
@@ -152,12 +153,17 @@ def main(args):
         if "polyDFE_D" in file:
             p_list = np.array([v for k, v in out.items() if "p(s=" in k])
             s_list = np.array([v for k, v in out.items() if "S_" in k])
-            out["S+"] = sum(p_list[3:] * s_list[3:])
-            out["S-"] = sum(p_list[:3] * s_list[:3])
-            out["S"] = sum(p_list * s_list)
-            out[polydfe_cat_list[0]] = sum(p_list[3:])
-            out[polydfe_cat_list[1]] = p_list[2]
-            out[polydfe_cat_list[2]] = sum(p_list[:2])
+            out_list = [f"p(s={s})={p}" for s, p in zip(s_list, p_list)]
+            if cat == "all":
+                print(f"{file} - {cat}:\n{out_list}")
+            assert abs(sum(p_list) - 1.0) < 1e-4
+            out["S+"] = sum([p * s for p, s in zip(p_list, s_list) if s > 0])
+            out["S-"] = sum([p * s for p, s in zip(p_list, s_list) if s < 0])
+            out["S"] = sum([p * s for p, s in zip(p_list, s_list)])
+            out[polydfe_cat_list[0]] = sum([p for p, s in zip(p_list, s_list) if s >= 1])
+            out[polydfe_cat_list[1]] = sum([p for p, s in zip(p_list, s_list) if -1 <= s < 1])
+            out[polydfe_cat_list[2]] = sum([p for p, s in zip(p_list, s_list) if s < -1])
+            out["p_b"] = sum([p for p, s in zip(p_list, s_list) if s >= 0])
             for lim_left in alpha_sup_limits:
                 out[f'alpha{lim_left}'] = alpha_model_D(p_list, s_list, lim_left=lim_left)
 

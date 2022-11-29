@@ -57,6 +57,11 @@ def main(args):
     cds_rates = CdsRates("MutSel", args.exp_folder)
     score_list = []
 
+    masks = []
+    for mask_file in args.mask:
+        assert os.path.isfile(mask_file)
+        masks.append(open_mask(mask_file))
+
     for anc_file in glob(os.path.join(args.ancestral, "*.joint.fasta.gz")):
         seqs = open_fasta(anc_file)
         ensg = os.path.basename(anc_file).split(".")[0]
@@ -91,6 +96,16 @@ def main(args):
             diffs = [s for s in range(len(anc_codon)) if anc_codon[s] != der_codon[s]]
             assert len(diffs) > 0
             if len(diffs) != 1:
+                continue
+
+            masked = False
+            for mask_grouped in masks:
+                if ensg in mask_grouped and c_site in mask_grouped[ensg]:
+                    masked = True
+                    break
+
+            if masked:
+                dico_div["masked"] += 1.0
                 continue
 
             if anc_aa == der_aa:
@@ -136,6 +151,8 @@ if __name__ == '__main__':
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
     parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
     parser.add_argument('--species', required=True, type=str, dest="species", help="The focal species")
+    parser.add_argument('--mask', required=False, default="", nargs="+", type=str, dest="mask",
+                        help="List of input mask file path")
     parser.add_argument('--threshold', required=False, default=0.0, type=float, dest="threshold",
                         help="The threshold for the probability")
     main(parser.parse_args())

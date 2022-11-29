@@ -17,7 +17,7 @@ def open_sift(sift_file):
     return output
 
 
-def read_vcf(vcf, sift_file, mask_grouped, subsample):
+def read_vcf(vcf, sift_file, masks, subsample):
     dict_sift = open_sift(sift_file)
     vcf_file = gzip.open(vcf, 'rt')
     dico_snp = defaultdict(list)
@@ -38,8 +38,13 @@ def read_vcf(vcf, sift_file, mask_grouped, subsample):
         dico_info = {k: v for k, v in [s.split('=') for s in info.split(';') if '=' in s]}
         ensg = dico_info["ENSG"]
         c_site = int(dico_info["ENSG_POS"]) // 3
-        if ensg in mask_grouped and c_site in mask_grouped[ensg]:
-            assert float(dico_info["SITE_OMEGA"]) > float(dico_info["SITE_OMEGA_0"])
+        masked = False
+        for mask_grouped in masks:
+            if ensg in mask_grouped and c_site in mask_grouped[ensg]:
+                masked = True
+                break
+
+        if masked:
             discarded += 1
             continue
 
@@ -215,9 +220,13 @@ def main(args):
     os.makedirs(os.path.dirname(args.output_tsv), exist_ok=True)
     os.makedirs(os.path.dirname(args.output_bounds), exist_ok=True)
 
-    mask_grouped = open_mask(args.mask)
-    dico_snp, discarded = read_vcf(args.vcf, args.sift_file, mask_grouped, args.subsample)
-    print(f'{discarded * 100 / len(dico_snp["snp_type"]):.2f}% of SNPs are discarded because their are adaptive.')
+    masks = []
+    for mask_file in args.mask:
+        assert os.path.isfile(mask_file)
+        masks.append(open_mask(mask_file))
+    dico_snp, discarded = read_vcf(args.vcf, args.sift_file, masks, args.subsample)
+    pct = discarded * 100 / (len(dico_snp["snp_type"]) + discarded)
+    print(f'{pct:.2f}% of SNPs are discarded because their are masked.')
     dico_bounds = defaultdict(list)
 
     for method in ["MutSel", "Omega", "SIFT"]:
@@ -254,7 +263,8 @@ if __name__ == '__main__':
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
     parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
     parser.add_argument('--sift_file', required=False, type=str, default="", dest="sift_file", help="The SIFT file")
-    parser.add_argument('--mask', required=False, default="", type=str, dest="mask", help="Input mask file path")
+    parser.add_argument('--mask', required=False, default="", nargs="+", type=str, dest="mask",
+                        help="List of input mask file path")
     parser.add_argument('--output_tsv', required=False, type=str, dest="output_tsv", help="Output tsv file")
     parser.add_argument('--output_bounds', required=False, type=str, dest="output_bounds", help="Output bounds file")
     parser.add_argument('--subsample', required=False, type=int, default=16, dest="subsample")

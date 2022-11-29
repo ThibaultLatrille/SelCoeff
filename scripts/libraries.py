@@ -89,7 +89,7 @@ def build_codon_neighbors():
 
 
 def translate_cds(seq):
-    return "".join([codontable[seq[codon_pos * 3:codon_pos * 3 + 3]] for codon_pos in range(len(seq) // 3)])
+    return "".join([codontable[seq[i * 3:i * 3 + 3]] for i in range(len(seq) // 3)])
 
 
 def clean_ensg_path(path):
@@ -234,9 +234,12 @@ def theta(sfs_epsilon, daf_n, weight_method):
     return sum(sfs_theta * weights) / sum(weights)
 
 
-def write_sfs(sfs_syn, sfs_non_syn, l_non_syn, l_syn, k, filepath, sp_focal, sp_sister):
+def write_sfs(sfs_syn, sfs_non_syn, l_non_syn, d_non_syn, l_syn, d_syn, k, filepath, sp_focal, sp_sister):
     sfs_syn_str = " ".join([str(int(sfs_syn[i])) for i in range(1, k)]) + f"\t{int(l_syn)}"
     sfs_non_syn_str = " ".join([str(int(sfs_non_syn[i])) for i in range(1, k)]) + f"\t{int(l_non_syn)}"
+    if d_syn is not None and d_non_syn is not None:
+        sfs_syn_str += f"\t{int(d_syn)}\t{int(l_syn)}"
+        sfs_non_syn_str += f"\t{int(d_non_syn)}\t{int(l_non_syn)}"
     sfs_file = open(filepath + ".sfs", 'w')
     sfs_file.write(f"#{sp_focal}+{sp_sister}\n")
     sfs_file.write("1 1 {0}".format(k) + "\n")

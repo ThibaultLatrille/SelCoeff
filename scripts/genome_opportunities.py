@@ -58,7 +58,10 @@ def main(args):
     counts_mu, counts_q = np.histogram([], bins=bins)[0], np.histogram([], bins=bins)[0]
     log_fitness, sel_coeff, flow_pos, flow_neg = Stat(), Stat(), Stat(), Stat()
 
-    mask_grouped = open_mask(args.mask)
+    masks = []
+    for mask_file in args.mask:
+        assert os.path.isfile(mask_file)
+        masks.append(open_mask(mask_file))
     unconserved_grouped = open_mask(args.unconserved)
 
     cds_rates = CdsRates(args.method, args.exp_folder, args.sift_folder)
@@ -77,17 +80,21 @@ def main(args):
         list_rates, list_mu, list_q = [], [], []
 
         for c_site in range(len(seq) // 3):
-            adaptive = ensg in mask_grouped and c_site in mask_grouped[ensg]
             ref_codon = seq[c_site * 3:c_site * 3 + 3]
             ref_aa = codontable[ref_codon]
             if ref_aa == "X" or ref_aa == "-":
                 continue
 
             dico_opp["nTotal"] += 1.0
-            if adaptive:
-                dico_opp["nAdaptive"] += 1.0
+            masked = False
+            for mask_grouped in masks:
+                if ensg in mask_grouped and c_site in mask_grouped[ensg]:
+                    masked = True
+                    break
+            if masked:
+                dico_opp["nMasked"] += 1.0
                 continue
-            dico_opp["nNonAdaptive"] += 1.0
+            dico_opp["nNonMasked"] += 1.0
 
             if args.method == "MutSel":
                 lf = cds_rates.log_fitness(ensg, ref_aa, c_site)
@@ -147,7 +154,7 @@ def main(args):
     dico_opp["Ldn"] = dico_opp["nTotal"] * dico_opp["μNonSyn"] / dico_opp["μTotal"]
 
     print(f'{dico_opp["μOut"] * 100 / dico_opp["μNonSyn"]:.2f}% of opportunities out of bounds')
-    print(f'{dico_opp["nAdaptive"] * 100 / dico_opp["nTotal"]:.2f}% of sites are discarded because their are adaptive.')
+    print(f'{dico_opp["nMasked"] * 100 / dico_opp["nTotal"]:.2f}% of sites are discarded because their are masked.')
 
     if args.method == "MutSel":
         dico_opp["SMean"] = sel_coeff.mean()
@@ -167,7 +174,8 @@ if __name__ == '__main__':
     parser.add_argument('--sift_folder', required=False, default="", type=str, dest="sift_folder", help="SIFT path")
     parser.add_argument('--fasta_pop', required=True, type=str, dest="fasta_pop", help="The fasta path")
     parser.add_argument('--bounds', required=False, default="", type=str, dest="bounds", help="Input bound file path")
-    parser.add_argument('--mask', required=False, default="", type=str, dest="mask", help="Input mask file path")
+    parser.add_argument('--mask', required=False, default="", nargs="+", type=str, dest="mask",
+                        help="List of input mask file path")
     parser.add_argument('--unconserved', required=False, default="", type=str, dest="unconserved",
                         help="Input unconserved file path")
     parser.add_argument('--method', required=True, type=str, dest="method", help="The method (MutSel or Omega)")

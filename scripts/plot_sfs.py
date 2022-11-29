@@ -61,11 +61,23 @@ def plot_sfs(cat_snps, snp_sfs, normed_sfs_syn_mean, max_daf, daf_axis, output, 
     plt.close("all")
 
 
+def omega_div(df_div, cat):
+    if df_div is None:
+        return None, None, None, None
+    div_non_syn = float(df_div[f"div_{cat}"].values[0])
+    l_non_syn = float(df_div[f"L_{cat}"].values[0])
+    div_syn = float(df_div[f"div_syn"].values[0])
+    l_syn = float(df_div[f"L_syn"].values[0])
+    return div_non_syn, l_non_syn, div_syn, l_syn
+
+
 def main(args):
     os.makedirs(os.path.dirname(args.output_tsv), exist_ok=True)
     os.makedirs(os.path.dirname(args.output_pdf), exist_ok=True)
     os.makedirs(args.output_dir, exist_ok=True)
     assert args.method in ["MutSel", "Omega", "SIFT"]
+
+    df_div = pd.read_csv(args.substitutions, sep="\t") if args.substitutions != "" else None
 
     cat_snps = CategorySNP(args.method, args.bounds, bins=args.bins, windows=args.windows)
     opp_results = pd.read_csv(args.opportunities, sep='\t')
@@ -94,7 +106,11 @@ def main(args):
 
     sfs_nonsyn_mean = np.sum([sfs for cat, sfs in snp_sfs_mean.items() if cat != "syn"], axis=0)
     output_all = os.path.join(args.output_dir, 'all')
-    write_sfs(snp_sfs_mean["syn"], sfs_nonsyn_mean, ldn, lds, max_daf, output_all, args.pop, "")
+    dn, ndn, ds, nds = omega_div(df_div, "all")
+    if df_div is not None:
+        assert abs(ndn - ldn) < 1e-3
+        assert abs(nds - lds) < 1e-3
+    write_sfs(snp_sfs_mean["syn"], sfs_nonsyn_mean, ldn, dn, lds, ds, max_daf, output_all, args.pop, "")
     theta_dict = defaultdict(list)
     theta_dict["category"].append('all')
     for theta_method in sfs_weight:
@@ -107,7 +123,11 @@ def main(args):
         else:
             ld_cat = ldn * opp_dico[cat]
             output_cat = os.path.join(args.output_dir, cat)
-            write_sfs(snp_sfs_mean["syn"], mean_sfs, ld_cat, lds, max_daf, output_cat, args.pop, "")
+            dn, ndn, ds, nds = omega_div(df_div, cat)
+            if df_div is not None:
+                assert abs(ndn - ld_cat) < 1e-3
+                assert abs(nds - lds) < 1e-3
+            write_sfs(snp_sfs_mean["syn"], mean_sfs, ld_cat, dn, lds, ds, max_daf, output_cat, args.pop, "")
 
         theta_dict["category"].append(cat)
         for theta_method in sfs_weight:
@@ -126,6 +146,8 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--tsv', required=False, type=str, dest="tsv", help="Input tsv file")
+    parser.add_argument('--substitutions', required=False, default="", type=str, dest="substitutions",
+                        help="Substitutions mapping")
     parser.add_argument('--method', required=False, type=str, dest="method", help="Sel coeff parameter")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
     parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")

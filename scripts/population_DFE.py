@@ -1,4 +1,6 @@
 import argparse
+
+import matplotlib.pyplot as plt
 from scipy.stats import expon, gamma
 from matplotlib.patches import Rectangle
 from libraries import *
@@ -7,8 +9,8 @@ from libraries import *
 def main(output):
     plt.figure(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
     p_b = 0.111
-    b = 0.4
-    S_d = -267.1
+    b = 0.198
+    S_d = -50.1
     S_b = 1.0
     p_pos = p_b
     shape_neg = b
@@ -22,9 +24,10 @@ def main(output):
     plt.plot(x, y, color=BLUE)
     plt.fill_between(x, y, color=BLUE, alpha=0.5)
     d_pos = expon(scale=scale_pos)
-    x = np.linspace(0, 10, 100)
+    x = np.linspace(0, 10, 1000)
     y = [p_pos * d_pos.pdf(s) for s in x]
     plt.plot(x, y, color=RED)
+    plt.ylim((0, 0.2))
     plt.fill_between(x, y, color=RED, alpha=0.5)
     plt.axvline(-1, color="grey", lw=1, ls='--')
     plt.axvline(1, color="grey", lw=1, ls='--')
