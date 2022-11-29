@@ -123,8 +123,9 @@
 
     \subsection{Summary tables}\label{subsec:summary-table-mutsel}
 
+    \subsubsection{$\dnds$ and beneficial back-mutations}
     \begin{center}
-        \captionof{table}{~}
+        \captionof{table}{$\dnds$ of beneficial back-mutations.}
         \scriptsize
         \begin{longtable*}{|l|l|r|r|r|}
             \toprule
@@ -176,7 +177,7 @@
 
     \newpage
     \begin{center}
-        \captionof{table}{~}
+        \captionof{table}{$\dnds$ over-estimation due to beneficial back-mutations.}
         \scriptsize
         \begin{longtable*}{|l|l|r|r|r|r|r|}
             \toprule
@@ -231,8 +232,10 @@
     We estimated that between 20 and 25\% of $\dnds$ is over-estimated ($R(\dnds)$), corresponding to beneficial back-mutation inflating the $\dnds$ statistic.
 
     \newpage
+
+    \subsubsection{Probabilities of beneficial back-mutations}
     \begin{center}
-        \captionof{table}{~}
+        \captionof{table}{Probability of beneficial back-mutations among all beneficial ones with PolyDFE model C.}
         \scriptsize
         \begin{longtable*}{|l|l|r|r|r|r|r|r|}
             \toprule
@@ -290,7 +293,134 @@
         \item $\mathbb{P} [ \Sphy > 1 \given \Spop > 1]$ is the probability for a mutation to a beneficial back-mutations, given it is beneficial.
         This probability is obtained using Bayes' formula.
     \end{itemize}
+    With polyDFE model C, the DFE of non-synonymous mutations is given as a mixture of a $\Gamma$ (negative side) and Exponential (positive side) distributions, see Materials and Methods.
 
+    \newpage
+    \begin{center}
+        \captionof{table}{Probability of beneficial back-mutations among all beneficial ones (including slightly-beneficial mutations) with PolyDFE model C.}
+        \scriptsize
+        \begin{longtable*}{|l|l|r|r|r|r|r|r|}
+            \toprule
+            Population & Species & Tajima $\theta_{\pi}$ & $\mathbb{P}[\Sphy > 0]$ & $\mathbb{P} [ \Spop > 0 ]$ & $\frac{\mathbb{P}[\Sphy > 0]}{\mathbb{P}[ \Spop > 0 ]}$ & $\mathbb{P} [ \Spop > 0 \given \Sphy > 0]$ & $\mathbb{P}[\Sphy > 0\given \Spop > 0 ]$ \\
+            \midrule
+            \endhead
+            \midrule
+            \multicolumn{8}{r}{{Continued on next page}} \\
+            \midrule
+            \endfoot
+
+            \bottomrule
+            \endlastfoot
+            Equus c. &      Equus caballus &               $ 0.002$ &             $ 0.050$ &              $ 0.125$ &                                     $ 0.403$ &                       $ 1.000$ &                 $ 0.403$ \\
+            Iran &          Bos taurus &               $ 0.005$ &             $ 0.050$ &              $ 0.108$ &                                     $ 0.457$ &                       $ 0.640$ &                 $ 0.293$ \\
+            Uganda &          Bos taurus &               $ 0.005$ &             $ 0.050$ &              $ 0.104$ &                                     $ 0.477$ &                       $ 0.708$ &                 $ 0.338$ \\
+            Australia &        Capra hircus &               $ 0.003$ &             $ 0.051$ &              $ 0.107$ &                                     $ 0.471$ &                       $ 0.416$ &                 $ 0.196$ \\
+            France &        Capra hircus &               $ 0.003$ &             $ 0.051$ &              $ 0.102$ &                                     $ 0.495$ &                       $ 0.464$ &                 $ 0.230$ \\
+            Iran (C. aegagrus) &        Capra hircus &               $ 0.003$ &             $ 0.051$ &              $ 0.107$ &                                     $ 0.473$ &                       $ 0.327$ &                 $ 0.155$ \\
+            Iran &        Capra hircus &               $ 0.004$ &             $ 0.051$ &              $ 0.089$ &                                     $ 0.569$ &                       $ 0.384$ &                 $ 0.219$ \\
+            Italy &        Capra hircus &               $ 0.003$ &             $ 0.051$ &              $ 0.096$ &                                     $ 0.525$ &                       $ 0.402$ &                 $ 0.211$ \\
+            Morocco &        Capra hircus &               $ 0.004$ &             $ 0.051$ &              $ 0.088$ &                                     $ 0.571$ &                       $ 0.408$ &                 $ 0.233$ \\
+            Iran &          Ovis aries &               $ 0.007$ &             $ 0.051$ &              $ 0.066$ &                                     $ 0.769$ &                       $ 0.159$ &                 $ 0.122$ \\
+            Iran (O. orientalis) &          Ovis aries &               $ 0.009$ &             $ 0.051$ &              $ 0.074$ &                                     $ 0.686$ &                       $ 0.259$ &                 $ 0.177$ \\
+            Iran (O. vignei) &          Ovis aries &               $ 0.007$ &             $ 0.051$ &              $ 0.084$ &                                     $ 0.605$ &                       $ 0.499$ &                 $ 0.302$ \\
+            Various &          Ovis aries &               $ 0.009$ &             $ 0.051$ &              $ 0.071$ &                                     $ 0.712$ &                       $ 0.253$ &                 $ 0.180$ \\
+            Morocco &          Ovis aries &               $ 0.007$ &             $ 0.051$ &              $ 0.060$ &                                     $ 0.839$ &                       $ 0.155$ &                 $ 0.130$ \\
+            Barbados & Chlorocebus sabaeus &               $ 0.004$ &             $ 0.048$ &              $ 0.121$ &                                     $ 0.392$ &                       $ 0.771$ &                 $ 0.303$ \\
+            Central Afr. Rep. & Chlorocebus sabaeus &               $ 0.006$ &             $ 0.047$ &              $ 0.105$ &                                     $ 0.454$ &                       $ 0.637$ &                 $ 0.289$ \\
+            Ethiopia & Chlorocebus sabaeus &               $ 0.005$ &             $ 0.047$ &              $ 0.120$ &                                     $ 0.395$ &                       $ 0.708$ &                 $ 0.280$ \\
+            Gambia & Chlorocebus sabaeus &               $ 0.005$ &             $ 0.047$ &              $ 0.090$ &                                     $ 0.528$ &                       $ 0.725$ &                 $ 0.383$ \\
+            Kenya & Chlorocebus sabaeus &               $ 0.005$ &             $ 0.047$ &              $ 0.106$ &                                     $ 0.447$ &                       $ 0.627$ &                 $ 0.280$ \\
+            Nevis & Chlorocebus sabaeus &               $ 0.003$ &             $ 0.048$ &              $ 0.111$ &                                     $ 0.429$ &                       $ 0.676$ &                 $ 0.290$ \\
+            South Africa & Chlorocebus sabaeus &               $ 0.006$ &             $ 0.047$ &              $ 0.104$ &                                     $ 0.456$ &                       $ 0.659$ &                 $ 0.301$ \\
+            Saint Kitts & Chlorocebus sabaeus &               $ 0.004$ &             $ 0.047$ &              $ 0.117$ &                                     $ 0.405$ &                       $ 0.723$ &                 $ 0.293$ \\
+            Zambia & Chlorocebus sabaeus &               $ 0.006$ &             $ 0.047$ &              $ 0.116$ &                                     $ 0.409$ &                       $ 0.671$ &                 $ 0.275$ \\
+            African &        Homo sapiens &               $ 0.003$ &             $ 0.048$ &              $ 0.114$ &                                     $ 0.424$ &                       $ 1.000$ &                 $ 0.424$ \\
+            Admixed American &        Homo sapiens &               $ 0.002$ &             $ 0.048$ &              $ 0.110$ &                                     $ 0.437$ &                       $ 1.000$ &                 $ 0.437$ \\
+            East Asian &        Homo sapiens &               $ 0.002$ &             $ 0.048$ &              $ 0.106$ &                                     $ 0.453$ &                       $ 1.000$ &                 $ 0.453$ \\
+            European &        Homo sapiens &               $ 0.002$ &             $ 0.048$ &              $ 0.107$ &                                     $ 0.452$ &                       $ 1.000$ &                 $ 0.452$ \\
+            South Asian &        Homo sapiens &               $ 0.002$ &             $ 0.048$ &              $ 0.106$ &                                     $ 0.454$ &                       $ 1.000$ &                 $ 0.454$ \\
+        \end{longtable*}
+    \end{center}
+    \begin{itemize}
+        \item Tajima $\theta$ is the synonymous diversity.
+        \item $\mathbb{P} [ \Sphy > 0 ]$ is the probability for a new mutation a beneficial back-mutation.
+        These mutations have a selection coefficient predicted at the phylogenetic-scale larger than 0 ($\Sphy > 0$), thus toward a more fit amino-acid.
+        In other words, this probability is the part of the DFE estimated by mutation-selection models greater than 0.
+        \item $\mathbb{P} [ \Spop > 0 ]$ is the probability for a mutation to be beneficial.
+        These mutations have a selection coefficient at the population-scale larger than 0 ($\Spop > 0$), estimated from all SNPs in the population.
+        In other words, this probability is the part of the DFE estimated by polyDFE greater than 0.
+        \item $\mathbb{P} [ \Spop > 0 \given \Sphy > 0]$ is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a beneficial back-mutation at the phylogenetic scale.
+        These mutations have a selection coefficient at the population scale larger than 0 ($\Spop > 0$), estimated by polyDFE on the SNPs with a predicted selection coefficient at the phylogenetic scale larger than 0 ($\Sphy > 0$).
+        In other words, this probability is the part of the DFE estimated by polyDFE greater than 0, when we restricted our analysis on SNPs that are already predicted by mutation-selection models to have a selection coefficient ($\Sphy$) greater than 0.
+        \item $\mathbb{P} [ \Sphy > 0 \given \Spop > 0]$ is the probability for a mutation to a beneficial back-mutations, given it is beneficial.
+        This probability is obtained using Bayes' formula.
+    \end{itemize}
+    With polyDFE model C, the DFE of non-synonymous mutations is given as a mixture of a $\Gamma$ (negative side) and Exponential (positive side) distributions, see Materials and Methods.
+
+    \newpage
+    \begin{center}
+        \captionof{table}{Probability of beneficial back-mutations among all beneficial ones (including slightly-beneficial mutations) with PolyDFE model D.}
+        \scriptsize
+        \begin{longtable*}{|l|l|r|r|r|r|r|r|}
+            \toprule
+            Population & Species & Tajima $\theta_{\pi}$ & $\mathbb{P}[\Sphy \geq 0]$ & $\mathbb{P} [ \Spop \geq 0 ]$ & $\frac{\mathbb{P}[\Sphy \geq 0]}{\mathbb{P}[ \Spop \geq 0 ]}$ & $\mathbb{P} [ \Spop \geq 0 \given \Sphy \geq 0]$ & $\mathbb{P}[\Sphy \geq 0\given \Spop \geq 0 ]$ \\
+            \midrule
+            \endhead
+            \midrule
+            \multicolumn{8}{r}{{Continued on next page}} \\
+            \midrule
+            \endfoot
+
+            \bottomrule
+            \endlastfoot
+            Equus c. &      Equus caballus &               $ 0.002$ &             $ 0.050$ &              $ 0.219$ &                                     $ 0.230$ &                       $ 0.461$ &                 $ 0.106$ \\
+            Iran &          Bos taurus &               $ 0.005$ &             $ 0.050$ &              $ 0.181$ &                                     $ 0.274$ &                       $ 0.407$ &                 $ 0.112$ \\
+            Uganda &          Bos taurus &               $ 0.005$ &             $ 0.050$ &              $ 0.175$ &                                     $ 0.283$ &                       $ 0.470$ &                 $ 0.133$ \\
+            Australia &        Capra hircus &               $ 0.003$ &             $ 0.051$ &              $ 0.182$ &                                     $ 0.277$ &                       $ 0.472$ &                 $ 0.131$ \\
+            France &        Capra hircus &               $ 0.003$ &             $ 0.051$ &              $ 0.177$ &                                     $ 0.286$ &                       $ 0.492$ &                 $ 0.141$ \\
+            Iran (C. aegagrus) &        Capra hircus &               $ 0.003$ &             $ 0.051$ &              $ 0.171$ &                                     $ 0.295$ &                       $ 0.463$ &                 $ 0.137$ \\
+            Iran &        Capra hircus &               $ 0.004$ &             $ 0.051$ &              $ 0.161$ &                                     $ 0.313$ &                       $ 0.450$ &                 $ 0.141$ \\
+            Italy &        Capra hircus &               $ 0.003$ &             $ 0.051$ &              $ 0.174$ &                                     $ 0.291$ &                       $ 0.509$ &                 $ 0.148$ \\
+            Morocco &        Capra hircus &               $ 0.004$ &             $ 0.051$ &              $ 0.170$ &                                     $ 0.298$ &                       $ 0.442$ &                 $ 0.132$ \\
+            Iran &          Ovis aries &               $ 0.007$ &             $ 0.051$ &              $ 0.141$ &                                     $ 0.359$ &                       $ 0.506$ &                 $ 0.182$ \\
+            Iran (O. orientalis) &          Ovis aries &               $ 0.009$ &             $ 0.051$ &              $ 0.139$ &                                     $ 0.365$ &                       $ 0.484$ &                 $ 0.177$ \\
+            Iran (O. vignei) &          Ovis aries &               $ 0.007$ &             $ 0.051$ &              $ 0.134$ &                                     $ 0.379$ &                       $ 0.517$ &                 $ 0.196$ \\
+            Various &          Ovis aries &               $ 0.009$ &             $ 0.051$ &              $ 0.136$ &                                     $ 0.372$ &                       $ 0.513$ &                 $ 0.191$ \\
+            Morocco &          Ovis aries &               $ 0.007$ &             $ 0.051$ &              $ 0.139$ &                                     $ 0.364$ &                       $ 0.477$ &                 $ 0.174$ \\
+            Barbados & Chlorocebus sabaeus &               $ 0.004$ &             $ 0.048$ &              $ 0.205$ &                                     $ 0.232$ &                       $ 0.543$ &                 $ 0.126$ \\
+            Central Afr. Rep. & Chlorocebus sabaeus &               $ 0.006$ &             $ 0.047$ &              $ 0.179$ &                                     $ 0.265$ &                       $ 0.345$ &                 $ 0.091$ \\
+            Ethiopia & Chlorocebus sabaeus &               $ 0.005$ &             $ 0.047$ &              $ 0.203$ &                                     $ 0.234$ &                       $ 0.464$ &                 $ 0.108$ \\
+            Gambia & Chlorocebus sabaeus &               $ 0.005$ &             $ 0.047$ &              $ 0.183$ &                                     $ 0.260$ &                       $ 0.442$ &                 $ 0.115$ \\
+            Kenya & Chlorocebus sabaeus &               $ 0.005$ &             $ 0.047$ &              $ 0.179$ &                                     $ 0.265$ &                       $ 0.478$ &                 $ 0.127$ \\
+            Nevis & Chlorocebus sabaeus &               $ 0.003$ &             $ 0.048$ &              $ 0.203$ &                                     $ 0.234$ &                       $ 0.552$ &                 $ 0.129$ \\
+            South Africa & Chlorocebus sabaeus &               $ 0.006$ &             $ 0.047$ &              $ 0.184$ &                                     $ 0.258$ &                       $ 0.477$ &                 $ 0.123$ \\
+            Saint Kitts & Chlorocebus sabaeus &               $ 0.004$ &             $ 0.047$ &              $ 0.204$ &                                     $ 0.233$ &                       $ 0.527$ &                 $ 0.123$ \\
+            Zambia & Chlorocebus sabaeus &               $ 0.006$ &             $ 0.047$ &              $ 0.187$ &                                     $ 0.253$ &                       $ 0.477$ &                 $ 0.121$ \\
+            African &        Homo sapiens &               $ 0.003$ &             $ 0.048$ &              $ 0.239$ &                                     $ 0.202$ &                       $ 0.158$ &                 $ 0.032$ \\
+            Admixed American &        Homo sapiens &               $ 0.002$ &             $ 0.048$ &              $ 0.252$ &                                     $ 0.192$ &                       $ 0.452$ &                 $ 0.087$ \\
+            East Asian &        Homo sapiens &               $ 0.002$ &             $ 0.048$ &              $ 0.260$ &                                     $ 0.185$ &                       $ 0.440$ &                 $ 0.082$ \\
+            European &        Homo sapiens &               $ 0.002$ &             $ 0.048$ &              $ 0.255$ &                                     $ 0.189$ &                       $ 0.453$ &                 $ 0.086$ \\
+            South Asian &        Homo sapiens &               $ 0.002$ &             $ 0.048$ &              $ 0.248$ &                                     $ 0.194$ &                       $ 0.439$ &                 $ 0.085$ \\
+        \end{longtable*}
+    \end{center}
+    \begin{itemize}
+        \item Tajima $\theta$ is the synonymous diversity.
+        \item $\mathbb{P} [ \Sphy \geq 0 ]$ is the probability for a new mutation a beneficial back-mutation.
+        These mutations have a selection coefficient predicted at the phylogenetic-scale larger than 0 ($\Sphy \geq 0$), thus toward a more fit amino-acid.
+        In other words, this probability is the part of the DFE estimated by mutation-selection models greater than 0.
+        \item $\mathbb{P} [ \Spop \geq 0 ]$ is the probability for a mutation to be beneficial.
+        These mutations have a selection coefficient at the population-scale larger than 0 ($\Spop \geq 0$), estimated from all SNPs in the population.
+        In other words, this probability is the part of the DFE estimated by polyDFE greater than 0.
+        \item $\mathbb{P} [ \Spop \geq 0 \given \Sphy \geq 0]$ is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a beneficial back-mutation at the phylogenetic scale.
+        These mutations have a selection coefficient at the population scale larger than 0 ($\Spop \geq 0$), estimated by polyDFE on the SNPs with a predicted selection coefficient at the phylogenetic scale larger than 0 ($\Sphy \geq 0$).
+        In other words, this probability is the part of the DFE estimated by polyDFE greater than 0, when we restricted our analysis on SNPs that are already predicted by mutation-selection models to have a selection coefficient ($\Sphy$) greater than 0.
+        \item $\mathbb{P} [ \Sphy \geq 0 \given \Spop \geq 0]$ is the probability for a mutation to a beneficial back-mutations, given it is beneficial.
+        This probability is obtained using Bayes' formula.
+    \end{itemize}
+    With polyDFE model D, the DFE of non-synonymous mutations is given as a discrete DFE of $K$ categories, where the selection coefficients of each category $i$ ($1 \leq i \leq K$) are fixed parameters $\Spop_i$, and each value $\Spop_i$ has a probability $p_i$ (estimated), with $\sum_{i=1}^{K} p_i =1$.
+    We used $K=5$ with $\Spop_1 = -400$, $\Spop_2 = -10$, $\Spop_3 = 0$, $\Spop_4 = 1$, $\Spop_5 = 4$.\\
+
+    Altogether, comparing tables S3-S5, we acknowledge that estimating the proportion of beneficial back-mutations among all beneficial ones is dependent on the assumption for the underlying distribution of fitness effects at the population scale and the threshold used to define a beneficial mutation.
     \newpage
 
     \subsection{Correlation with diversity}
@@ -424,11 +554,29 @@
     This result is qualitatively in accordance with the nearly-neutral theory of evolution which argues that mutations are less efficiently selected for in small populations.
 
 
-    \section{Mutation-selection models: histograms and SFS for each population}\label{sec:mutation-selection-models:-histograms-and-sfs-for-each-population}
+    \section{Distribution of fitness effects}
+
+    \captionof{figure}{~}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{artworks/2bins.Yeast.experimentalDFE.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{artworks/2bins.AFR.histogramDFE.pdf}
+    \end{minipage}
+    \begin{itemize}
+        \item Left panel: Distribution of fitness effects experimentally determined in Yeast, data obtained in \textcite{shen_synonymous_2022}.
+        \item Middle panel: Distribution of fitness effects ($\Sphy$) as predicted with mutation-selection codon models, from reconstructed ancestral genome in \textit{Homo sapiens}).
+    \end{itemize}
+    The DFE predicted with mutation-selection codon models has a negative mode, consistently with experimental DFEs, meaning that most mutations are effectively deleterious.
+
+    \newpage
+
+
+    \section{Mutation-selection models: DFE and SFS for each population}\label{sec:mutation-selection-models:-histograms-and-sfs-for-each-population}
     For each population, the same figure is shown.
     \begin{itemize}
-        \item Top-left panel: Histogram of predicted selection coefficients ($\Sphy$) for all possible mutations away from the ancestral genome, giving the number of sites ($L$, in y-axis) across the genome with a given $\Sphy$.
-        Mutations are divided into 5 classes: severely deleterious (blue), deleterious (green), weakly deleterious (light green), weakly beneficial (yellow) and beneficial (red).
+        \item Top-left panel: Distribution of fitness effects ($\Sphy$), predicted for all possible mutations away from the ancestral human genome.
+        Mutations are divided into 5 classes of selection: severely deleterious (blue), deleterious (green), weakly deleterious (light green), weakly beneficial (yellow) and beneficial (red, supposedly beneficial back-mutations).
         \item Top-right panel: Histogram of predicted selection coefficients ($\Sphy$) for all observed mutations in a sample of 8 individuals (out of 512 in the original dataset) of African descent.
         If they are less mutations observed than expected, this class is thus undergoing purifying selection.
         \item Bottom-left panel: The site-frequency spectrum (SFS) represents the proportion of mutations (y-axis) with a given number of derived alleles in the population (x-axis).
