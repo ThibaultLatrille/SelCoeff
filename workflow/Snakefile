@@ -7,7 +7,7 @@ sys.path.append('.')
 configfile: 'config/config.yaml'
 
 pop2sp = {}
-SFS_LIST, TSV_LIST, MASK_LIST = [], [], []
+SFS_LIST, TSV_LIST, VCF_LIST,  MASK_LIST = [], [], [], []
 FOLDER = os.path.abspath('.')
 EXP_FOLDER = f"{FOLDER}/experiments/{config['experiment']}"
 os.makedirs(EXP_FOLDER,exist_ok=True)
@@ -30,6 +30,9 @@ if USE_DIVERGENCE:
 for row_id, row in pd.read_csv(sample_list,sep='\t').iterrows():
     pop2sp[row['SampleName']] = row['Species']
     TSV_LIST.append(f"{FOLDER}/TSV/{row['Species']}.{row['SampleName']}.tsv.gz")
+    vcf = f"{FOLDER}/data_poly/{row['Species']}.{row['SampleName']}.vcf.gz"
+    if os.path.exists(vcf):
+        VCF_LIST.append(vcf)
     for method in config['METHOD_LIST']:
         SFS_LIST.append(EXP_FOLDER + f"/analysis/{row['Species']}.{row['SampleName']}.{method}")
 
@@ -41,8 +44,9 @@ rule all:
         f'{FOLDER}/data_processed/bounds_{binning}.tsv',
         f'{EXP_FOLDER}/supp-mat.pdf',
         f'{FOLDER}/data_processed/experimental_DFE.pdf',
-        f'{FOLDER}/data_processed/population_DFE.pdf'
-        # TSV_LIST
+        f'{FOLDER}/data_processed/population_DFE.pdf',
+        f"{FOLDER}/data_processed/upset_plot.pdf",
+        TSV_LIST
 
 rule experimental_DFE:
     input:
@@ -343,3 +347,15 @@ rule latex:
         hist_prefix=f'--hist_prefix {FOLDER}/data_processed/vcf_annotate_{binning}/snps.',
         dfe_prefix=f'--dfe_prefix {FOLDER}/data_processed/opportunities_{binning}/DFE.'
     shell: 'python3 {input.script} {params.hist_prefix} {params.dfe_prefix} --sample_list {input.sample_list} --sfs {input.sfs} --results {input.tsv_dfe} --tex_source {input.tex_source} --tex_target {output.tex_target} --tex_include {output.tex_include}'
+
+rule upset_plot:
+    input:
+        vcf=VCF_LIST,
+        script=f'{FOLDER}/scripts/plot_venn.py',
+        mask=MASK_LIST
+    output:
+        pdf=f"{FOLDER}/data_processed/upset_plot.pdf"
+    params:
+        mask=f"--mask {' '.join(MASK_LIST)}" if len(MASK_LIST) > 0 else ""
+    shell:
+        'python3 {input.script} {params.mask} --vcf {input.vcf} --output {output.pdf}'
