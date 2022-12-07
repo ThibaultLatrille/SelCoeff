@@ -51,6 +51,7 @@ def open_prob(path):
 
 
 def main(args):
+    assert 0 <= args.anc_proba <= 1
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     dico_div = defaultdict(float)
     cat_snps = CategorySNP("MutSel", args.bounds, bins=args.bins, windows=args.windows)
@@ -80,7 +81,7 @@ def main(args):
         assert len(prob_list) == (len(anc_seq) // 3)
 
         for c_site in range(len(anc_seq) // 3):
-            if prob_list[c_site] < args.threshold:
+            if prob_list[c_site] < args.anc_proba:
                 continue
 
             anc_codon = anc_seq[c_site * 3:c_site * 3 + 3]
@@ -144,6 +145,8 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--ancestral', required=True, type=str, dest="ancestral", help="The ancestral folder")
+    parser.add_argument('--anc_proba', required=True, type=float, dest="anc_proba", default=0.5,
+                        help="Mask the substitutions with reconstruction probability lower than this threshold")
     parser.add_argument('--exp_folder', required=True, type=str, dest="exp_folder", help="The experiment folder path")
     parser.add_argument('--opp', required=True, type=str, dest="opp", help="The opportunities file path")
     parser.add_argument('--bounds', required=True, default="", type=str, dest="bounds", help="Input bound file path")
@@ -153,6 +156,4 @@ if __name__ == '__main__':
     parser.add_argument('--species', required=True, type=str, dest="species", help="The focal species")
     parser.add_argument('--mask', required=False, default="", nargs="+", type=str, dest="mask",
                         help="List of input mask file path")
-    parser.add_argument('--threshold', required=False, default=0.0, type=float, dest="threshold",
-                        help="The threshold for the probability")
     main(parser.parse_args())

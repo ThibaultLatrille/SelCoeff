@@ -2,32 +2,35 @@ import os
 import sys
 import pandas as pd
 
-sys.path.append('.')
+sys.path.append(".")
+from scripts.libraries import CategorySNP
 
-configfile: 'config/config.yaml'
-
+configfile: "config/config.yaml"
 pop2sp = {}
-SFS_LIST, TSV_LIST, VCF_LIST,  MASK_LIST = [], [], [], []
-FOLDER = os.path.abspath('.')
+SFS_LIST, TSV_LIST, VCF_LIST, MASK_LIST = [], [], [], []
+FOLDER = os.path.abspath(".")
 EXP_FOLDER = f"{FOLDER}/experiments/{config['experiment']}"
 os.makedirs(EXP_FOLDER,exist_ok=True)
 sample_list = f"{FOLDER}/config/{config['SAMPLE_LIST']}"
-model = config["MODEL"]
+model = config['MODEL']
 assert model in ["grapes", "polyDFE_D", "polyDFE_C", "polyDFE_B"]
-bins = config["bins"]
-windows = config["windows"]
-binning = (f'bins{bins}' if windows == 0 else f'windows{bins}x{windows}')
-if config["mask_adaptation"]:
+bins = config['bins']
+windows = config['windows']
+method_cats = {m: CategorySNP(m,bound_file="",bins=bins,windows=windows).all() for m in config['METHOD_LIST']}
+binning = (f"bins{bins}" if windows == 0 else f"windows{bins}x{windows}")
+if config['mask_adaptation']:
     binning += "NonAdaptive"
     MASK_LIST.append(f"{FOLDER}/data_processed/mask_adaptation.tsv.gz")
-if "mask_identity" in config and config["mask_identity"] > 0.0:
+if "mask_identity" in config and config['mask_identity'] > 0.0:
     binning += f"Mask{config['mask_identity']}"
     MASK_LIST.append(f"{FOLDER}/data_processed/mask_identity.{config['mask_identity']}.tsv.gz")
+if "mask_CpG" in config and config['mask_CpG']:
+    binning += f"MaskCpG"
 
-USE_DIVERGENCE = 'USE_DIVERGENCE' in config and config["USE_DIVERGENCE"]
+USE_DIVERGENCE = "USE_DIVERGENCE" in config and config['USE_DIVERGENCE']
 if USE_DIVERGENCE:
-    assert config["ALPHA"]
-for row_id, row in pd.read_csv(sample_list,sep='\t').iterrows():
+    assert config['ALPHA']
+for row_id, row in pd.read_csv(sample_list,sep="\t").iterrows():
     pop2sp[row['SampleName']] = row['Species']
     TSV_LIST.append(f"{FOLDER}/TSV/{row['Species']}.{row['SampleName']}.tsv.gz")
     vcf = f"{FOLDER}/data_poly/{row['Species']}.{row['SampleName']}.vcf.gz"
@@ -40,322 +43,338 @@ ruleorder: parse_results_DFE > sfs
 
 rule all:
     input:
-        f'{FOLDER}/data_processed/opportunities_{binning}.tsv',
-        f'{FOLDER}/data_processed/bounds_{binning}.tsv',
-        f'{EXP_FOLDER}/supp-mat.pdf',
-        f'{FOLDER}/data_processed/experimental_DFE.pdf',
-        f'{FOLDER}/data_processed/population_DFE.pdf',
+        f"{FOLDER}/data_processed/opportunities_{binning}.tsv",
+        f"{FOLDER}/data_processed/bounds_{binning}.tsv",
+        f"{EXP_FOLDER}/supp-mat.pdf",
+        f"{FOLDER}/data_processed/experimental_DFE.pdf",
+        f"{FOLDER}/data_processed/population_DFE.pdf",
         f"{FOLDER}/data_processed/upset_plot.pdf",
         TSV_LIST
 
 rule experimental_DFE:
     input:
-        script=f'{FOLDER}/scripts/experimental_DFE.py',
-        folder=f'{FOLDER}/data_div/distribution_fitness_effects'
+        script=f"{FOLDER}/scripts/experimental_DFE.py",
+        folder=f"{FOLDER}/data_div/distribution_fitness_effects"
     output:
-        pdf=f'{FOLDER}/data_processed/experimental_DFE.pdf',
+        pdf=f"{FOLDER}/data_processed/experimental_DFE.pdf"
     shell:
-        'python3 {input.script} --exp_folder {input.folder} --output {output.pdf}'
+        "python3 {input.script} --exp_folder {input.folder} --output {output.pdf}"
 
 rule population_DFE:
     input:
-        script=f'{FOLDER}/scripts/population_DFE.py',
+        script=f"{FOLDER}/scripts/population_DFE.py"
     output:
-        pdf=f'{FOLDER}/data_processed/population_DFE.pdf',
+        pdf=f"{FOLDER}/data_processed/population_DFE.pdf"
     shell:
-        'python3 {input.script} --output {output.pdf}'
+        "python3 {input.script} --output {output.pdf}"
 
 
 rule fixed_snp_by_pop:
     input:
-        script=f'{FOLDER}/scripts/fixed_snp_by_pop.py',
-        vcf=FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
-        fasta_folder=f'{FOLDER}/data_div/omm_NT_fasta.v10c_116'
+        script=f"{FOLDER}/scripts/fixed_snp_by_pop.py",
+        vcf=f"{FOLDER}/data_poly/{{species}}.{{popu}}.vcf.gz",
+        fasta_folder=f"{FOLDER}/data_div/omm_NT_fasta.v10c_116"
     output:
-        fasta=FOLDER + '/data_processed/fasta/{species}.{popu}.fasta.gz'
+        fasta=f"{FOLDER}/data_processed/fasta/{{species}}.{{popu}}.fasta.gz"
     shell:
-        'python3 {input.script} --species {wildcards.species} --vcf {input.vcf}  --fasta_folder {input.fasta_folder} --output {output.fasta}'
+        "python3 {input.script} --species {wildcards.species} --vcf {input.vcf}  --fasta_folder {input.fasta_folder} --output {output.fasta}"
 
 rule SIFT_annotate:
     input:
-        script=f'{FOLDER}/scripts/annotate_SIFT.py',
-        fasta_folder=f'{FOLDER}/data_div/omm_NT_fasta.v10c_116',
+        script=f"{FOLDER}/scripts/annotate_SIFT.py",
+        fasta_folder=f"{FOLDER}/data_div/omm_NT_fasta.v10c_116",
         fasta_pop=rules.fixed_snp_by_pop.output.fasta,
         sift_exec=f"{FOLDER}/utils/sift6.2.1/bin/info_on_seqs",
         blimps_dir=f"{FOLDER}/utils/sift6.2.1/blimps"
     output:
-        directory(FOLDER + '/data_processed/sift/{species}.{popu}')
+        directory(f"{FOLDER}/data_processed/sift/{{species}}.{{popu}}")
     shell:
-        'python3 {input.script} --species {wildcards.species} --sift_exec {input.sift_exec} --blimps_dir {input.blimps_dir} --fasta_folder {input.fasta_folder} --fasta_pop {input.fasta_pop} --output {output}'
+        "python3 {input.script} --species {wildcards.species} --sift_exec {input.sift_exec} --blimps_dir {input.blimps_dir} --fasta_folder {input.fasta_folder} --fasta_pop {input.fasta_pop} --output {output}"
 
 rule merge_SIFT:
     input:
-        script=f'{FOLDER}/scripts/merge_SIFT.py',
+        script=f"{FOLDER}/scripts/merge_SIFT.py",
         sift_folder=rules.SIFT_annotate.output,
-        vcf=FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
+        vcf=f"{FOLDER}/data_poly/{{species}}.{{popu}}.vcf.gz"
     output:
-        FOLDER + '/data_processed/sift_snps/{species}.{popu}.tsv'
+        f"{FOLDER}/data_processed/sift_snps/{{species}}.{{popu}}.tsv"
     shell:
-        'python3 {input.script} --species {wildcards.species} --vcf {input.vcf} --sift_folder {input.sift_folder} --output {output}'
+        "python3 {input.script} --species {wildcards.species} --vcf {input.vcf} --sift_folder {input.sift_folder} --output {output}"
 
 rule mask_adaptation:
     input:
-        script=f'{FOLDER}/scripts/mask_adaptation.py',
-        exp_folder=f'{FOLDER}/data_div/Experiments'
+        script=f"{FOLDER}/scripts/mask_adaptation.py",
+        exp_folder=f"{FOLDER}/data_div/Experiments"
     output:
-        tsv=f"{FOLDER}/data_processed/mask_adaptation.tsv.gz",
+        tsv=f"{FOLDER}/data_processed/mask_adaptation.tsv.gz"
     shell:
-        'python3 {input.script} --exp_folder {input.exp_folder} --output {output.tsv}'
+        "python3 {input.script} --exp_folder {input.exp_folder} --output {output.tsv}"
 
 rule mask_identity_pct:
     input:
-        script=f'{FOLDER}/scripts/mask_identity_pct.py',
-        fasta_folder=f'{FOLDER}/data_div/omm_NT_fasta.v10c_116'
+        script=f"{FOLDER}/scripts/mask_identity_pct.py",
+        fasta_folder=f"{FOLDER}/data_div/omm_NT_fasta.v10c_116"
     output:
-        tsv=f"{FOLDER}/data_processed/mask_identity.{{identity}}.tsv.gz",
+        tsv=f"{FOLDER}/data_processed/mask_identity.{{identity}}.tsv.gz"
     shell:
-        'python3 {input.script} --identity {wildcards.identity} --fasta_folder {input.fasta_folder} --output {output.tsv}'
+        "python3 {input.script} --identity {wildcards.identity} --fasta_folder {input.fasta_folder} --output {output.tsv}"
+
+rule mask_CpG:
+    input:
+        script=f"{FOLDER}/scripts/mask_CpG.py",
+        fasta=rules.fixed_snp_by_pop.output.fasta
+    output:
+        tsv=f"{FOLDER}/data_processed/MaskCpG.{{species}}.{{popu}}.tsv.gz"
+    shell:
+        "python3 {input.script} --fasta {input.fasta} --output {output.tsv}"
+
+
+def mask_list(species, popu):
+    if "mask_CpG" in config and config['mask_CpG']:
+        return MASK_LIST + [f"{FOLDER}/data_processed/MaskCpG.{species}.{popu}.tsv.gz"]
+    return MASK_LIST
+
+
+def format_mask_list(m):
+    return f"--mask {' '.join(m)}" if len(m) > 0 else ""
 
 
 rule annotate_vcf:
     input:
-        vcf=FOLDER + '/data_poly/{species}.{popu}.vcf.gz',
-        script=f'{FOLDER}/scripts/annotate_vcf.py',
+        vcf=f"{FOLDER}/data_poly/{{species}}.{{popu}}.vcf.gz",
+        script=f"{FOLDER}/scripts/annotate_vcf.py",
         sift_file=rules.merge_SIFT.output,
-        mask=MASK_LIST
+        mask=lambda wildcards: mask_list(wildcards.species,wildcards.popu)
     output:
-        tsv=f"{FOLDER}/data_processed/vcf_annotate_{binning}" + '/snps.{species}.{popu}.tsv.gz',
-        bounds=f"{FOLDER}/data_processed/vcf_annotate_{binning}" + '/bounds.{species}.{popu}.tsv'
+        tsv=f"{FOLDER}/data_processed/vcf_annotate_{binning}/snps.{{species}}.{{popu}}.tsv.gz",
+        bounds=f"{FOLDER}/data_processed/vcf_annotate_{binning}/bounds.{{species}}.{{popu}}.tsv"
     params:
-        subsample=f'--subsample {config["subsample"]}',
-        mask=f"--mask {' '.join(MASK_LIST)}" if len(MASK_LIST) > 0 else ""
+        subsample=f"--subsample {config['subsample']}",
+        anc_proba=f"--anc_proba {config['mask_anc_proba_SNPS']}",
+        mask=lambda wildcards: format_mask_list(mask_list(wildcards.species,wildcards.popu))
     shell:
-        'python3 {input.script} {params.subsample} {params.mask} --sift_file {input.sift_file} --vcf {input.vcf} --bins {bins} --windows {windows} --output_tsv {output.tsv} --output_bounds {output.bounds}'
+        "python3 {input.script} {params.subsample} {params.mask} {params.anc_proba} --sift_file {input.sift_file} --vcf {input.vcf} --bins {bins} --windows {windows} --output_tsv {output.tsv} --output_bounds {output.bounds}"
 
 rule gather_bounds:
     input:
-        script=f'{FOLDER}/scripts/gather_bounds.py',
-        tsv=[f'{FOLDER}/data_processed/vcf_annotate_{binning}/bounds.{species}.{popu}.tsv' for popu, species in
+        script=f"{FOLDER}/scripts/gather_bounds.py",
+        tsv=[f"{FOLDER}/data_processed/vcf_annotate_{binning}/bounds.{species}.{popu}.tsv" for popu, species in
              pop2sp.items()],
         sample_list=sample_list
     output:
-        tsv=f'{FOLDER}/data_processed/bounds_{binning}.tsv'
+        tsv=f"{FOLDER}/data_processed/bounds_{binning}.tsv"
     shell:
-        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --output {output.tsv}'
+        "python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --output {output.tsv}"
 
 rule mask_unconserved:
     input:
-        script=f'{FOLDER}/scripts/mask_unconserved.py',
-        fasta_folder=f'{FOLDER}/data_div/omm_NT_fasta.v10c_116'
+        script=f"{FOLDER}/scripts/mask_unconserved.py",
+        fasta_folder=f"{FOLDER}/data_div/omm_NT_fasta.v10c_116"
     output:
-        tsv=f"{FOLDER}/data_processed/mask_unconserved.tsv.gz",
+        tsv=f"{FOLDER}/data_processed/mask_unconserved.tsv.gz"
     params:
         species=" ".join(sorted(set(pop2sp.values())))
     shell:
-        'python3 {input.script} --species {params.species}  --fasta_folder {input.fasta_folder} --output {output.tsv}'
+        "python3 {input.script} --species {params.species}  --fasta_folder {input.fasta_folder} --output {output.tsv}"
 
 rule opportunities:
     input:
-        script=f'{FOLDER}/scripts/genome_opportunities.py',
-        exp_folder=f'{FOLDER}/data_div/Experiments',
+        script=f"{FOLDER}/scripts/genome_opportunities.py",
+        exp_folder=f"{FOLDER}/data_div/Experiments",
         sift_folder=rules.SIFT_annotate.output,
         fasta_pop=rules.fixed_snp_by_pop.output.fasta,
         bounds=rules.annotate_vcf.output.bounds,
         unconserved=rules.mask_unconserved.output.tsv,
-        mask=MASK_LIST
+        mask=lambda wildcards: mask_list(wildcards.species,wildcards.popu)
     output:
-        tsv=f"{FOLDER}/data_processed/opportunities_{binning}/DFE.{{species}}.{{popu}}.{{method}}.tsv",
+        tsv=f"{FOLDER}/data_processed/opportunities_{binning}/DFE.{{species}}.{{popu}}.{{method}}.tsv"
     params:
         k=lambda wildcards: f"--subsample_genes {config['subsample_genes']}",
-        mask=f"--mask {' '.join(MASK_LIST)}" if len(MASK_LIST) > 0 else ""
+        mask=lambda wildcards: format_mask_list(mask_list(wildcards.species,wildcards.popu))
     shell:
-        'python3 {input.script} {params.mask} --unconserved {input.unconserved} --bins {bins} --windows {windows} --bounds {input.bounds} {params.k} --method {wildcards.method} --exp_folder {input.exp_folder} --sift_folder {input.sift_folder} --fasta_pop {input.fasta_pop} --output {output.tsv}'
+        "python3 {input.script} {params.mask} --unconserved {input.unconserved} --bins {bins} --windows {windows} --bounds {input.bounds} {params.k} --method {wildcards.method} --exp_folder {input.exp_folder} --sift_folder {input.sift_folder} --fasta_pop {input.fasta_pop} --output {output.tsv}"
 
 rule gather_opportunities:
     input:
-        script=f'{FOLDER}/scripts/gather_opportunities.py',
+        script=f"{FOLDER}/scripts/gather_opportunities.py",
         tsv=[f"{FOLDER}/data_processed/opportunities_{binning}/DFE.{species}.{popu}.MutSel.tsv" for popu, species in
              pop2sp.items()],
         sample_list=sample_list
     output:
-        tsv=f'{FOLDER}/data_processed/opportunities_{binning}.tsv'
+        tsv=f"{FOLDER}/data_processed/opportunities_{binning}.tsv"
     shell:
-        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --output {output.tsv}'
+        "python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --output {output.tsv}"
 
 rule ancestral_reconstruction:
     input:
-        script=f'{FOLDER}/scripts/ancestral_reconstruction.py',
-        fasta_folder=f'{FOLDER}/data_div/omm_NT_fasta.v10c_116',
-        tree_folder=f'{FOLDER}/data_div/omm_RooTree.v10b_116',
+        script=f"{FOLDER}/scripts/ancestral_reconstruction.py",
+        fasta_folder=f"{FOLDER}/data_div/omm_NT_fasta.v10c_116",
+        tree_folder=f"{FOLDER}/data_div/omm_RooTree.v10b_116",
         fasta_pop=rules.fixed_snp_by_pop.output.fasta,
-        exec=f'{FOLDER}/utils/FastML.v3.11/programs/fastml/fastml'
+        exec=f"{FOLDER}/utils/FastML.v3.11/programs/fastml/fastml"
     output:
-        touch(f"{FOLDER}/data_processed/ancestral_reconstruction/{{species}}.{{popu}}.touch"),
+        touch(f"{FOLDER}/data_processed/ancestral_reconstruction/{{species}}.{{popu}}.touch")
     params:
         folder=f"{FOLDER}/data_processed/ancestral_reconstruction/{{species}}.{{popu}}",
-        k=lambda wildcards: f"--subsample_genes {config['subsample_genes_ancestral']}",
+        k=lambda wildcards: f"--subsample_genes {config['subsample_genes_ancestral']}"
     shell:
-        'python3 {input.script} --exec {input.exec} {params.k} --species {wildcards.species} --fasta_folder {input.fasta_folder} --tree_folder {input.tree_folder} --fasta_pop {input.fasta_pop} --output {params.folder}'
+        "python3 {input.script} --exec {input.exec} {params.k} --species {wildcards.species} --fasta_folder {input.fasta_folder} --tree_folder {input.tree_folder} --fasta_pop {input.fasta_pop} --output {params.folder}"
 
 rule mapping:
     input:
-        script=f'{FOLDER}/scripts/substitutions_mapping.py',
-        exp_folder=f'{FOLDER}/data_div/Experiments',
+        script=f"{FOLDER}/scripts/substitutions_mapping.py",
+        exp_folder=f"{FOLDER}/data_div/Experiments",
         ancestral=rules.ancestral_reconstruction.output,
         bounds=rules.annotate_vcf.output.bounds,
-        mask=MASK_LIST,
-        opp=f"{FOLDER}/data_processed/opportunities_{binning}/DFE.{{species}}.{{popu}}.MutSel.tsv",
+        mask=lambda wildcards: mask_list(wildcards.species,wildcards.popu),
+        opp=f"{FOLDER}/data_processed/opportunities_{binning}/DFE.{{species}}.{{popu}}.MutSel.tsv"
     output:
-        tsv=f"{FOLDER}/data_processed/ancestral_{binning}/{{species}}.{{popu}}.tsv",
+        tsv=f"{FOLDER}/data_processed/ancestral_{binning}/{{species}}.{{popu}}.tsv"
     params:
         folder=f"{FOLDER}/data_processed/ancestral_reconstruction/{{species}}.{{popu}}",
-        mask=f"--mask {' '.join(MASK_LIST)}" if len(MASK_LIST) > 0 else ""
+        anc_proba=f"--anc_proba {config['mask_anc_proba_substitutions']}",
+        mask=lambda wildcards: format_mask_list(mask_list(wildcards.species,wildcards.popu))
     shell:
-        'python3 {input.script} {params.mask} --threshold 0.0 --opp {input.opp} --species {wildcards.species} --bins {bins} --windows {windows} --bounds {input.bounds} --exp_folder {input.exp_folder} --ancestral {params.folder} --output {output.tsv}'
+        "python3 {input.script} {params.mask} {params.anc_proba} --opp {input.opp} --species {wildcards.species} --bins {bins} --windows {windows} --bounds {input.bounds} --exp_folder {input.exp_folder} --ancestral {params.folder} --output {output.tsv}"
 
 rule substitutions:
     input:
-        script=f'{FOLDER}/scripts/substitutions.py',
-        exp_folder=f'{FOLDER}/data_div/Experiments',
-        xml_folder=f'{FOLDER}/data_div/omm_markers',
-        ancestral=rules.ancestral_reconstruction.output,
+        script=f"{FOLDER}/scripts/substitutions.py",
+        exp_folder=f"{FOLDER}/data_div/Experiments",
+        xml_folder=f"{FOLDER}/data_div/omm_markers",
+        ancestral=rules.ancestral_reconstruction.output
     output:
-        tsv=f"{FOLDER}/TSV/{{species}}.{{popu}}.tsv.gz",
+        tsv=f"{FOLDER}/TSV/{{species}}.{{popu}}.tsv.gz"
     params:
-        folder=f"{FOLDER}/data_processed/ancestral_reconstruction/{{species}}.{{popu}}",
+        folder=f"{FOLDER}/data_processed/ancestral_reconstruction/{{species}}.{{popu}}"
     shell:
-        'python3 {input.script} --threshold 0.0 --species {wildcards.species} --exp_folder {input.exp_folder} --xml_folder {input.xml_folder} --ancestral {params.folder} --output {output.tsv}'
+        "python3 {input.script} --threshold 0.0 --species {wildcards.species} --exp_folder {input.exp_folder} --xml_folder {input.xml_folder} --ancestral {params.folder} --output {output.tsv}"
 
 
-checkpoint sfs:
+def reconstruct_substitutions(wildcards):
+    return config['ALPHA'] and wildcards.method == "MutSel"
+
+
+rule sfs:
     input:
-        script=f'{FOLDER}/scripts/plot_sfs.py',
+        script=f"{FOLDER}/scripts/plot_sfs.py",
         tsv=rules.annotate_vcf.output.tsv,
         opportunities=rules.opportunities.output.tsv,
         bounds=rules.annotate_vcf.output.bounds,
-        subs=lambda wildcards: rules.mapping.output.tsv if (config["ALPHA"] and wildcards.method == "MutSel") else [],
+        subs=lambda wildcards: rules.mapping.output.tsv if reconstruct_substitutions(wildcards) else []
     output:
-        dir=directory(EXP_FOLDER + '/analysis/{species}.{popu}.{method}'),
-        pdf=EXP_FOLDER + '/analysis/{species}.{popu}.{method}-sfs.pdf',
-        tsv=EXP_FOLDER + '/analysis/{species}.{popu}.{method}-sfs-summary-stats.tsv'
+        dir=directory(f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}"),
+        pdf=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}-sfs.pdf",
+        tsv=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}-sfs-summary-stats.tsv"
     params:
-        config=f'--nbr_replicates {config["nbr_replicates"]} --subsample {config["subsample"]}',
-        substitutions=lambda wildcards, input, output: f"--substitutions {input.subs}" if len(input.subs) > 0 else ""
+        config=f"--nbr_replicates {config['nbr_replicates']} --subsample {config['subsample']}",
+        substitutions=lambda wildcards, input, output: f"--substitutions {input.subs}" if reconstruct_substitutions(wildcards) else ""
     shell:
-        'python3 {input.script} {params.substitutions} --bins {bins} --windows {windows} --bounds {input.bounds} {params.config} --tsv {input.tsv} --pop {wildcards.popu} --method {wildcards.method} --opportunities {input.opportunities} --output_tsv {output.tsv} --output_pdf {output.pdf} --output_dir {output.dir}'
+        "python3 {input.script} {params.substitutions} --bins {bins} --windows {windows} --bounds {input.bounds} {params.config} --tsv {input.tsv} --pop {wildcards.popu} --method {wildcards.method} --opportunities {input.opportunities} --output_tsv {output.tsv} --output_pdf {output.pdf} --output_dir {output.dir}"
 
 
 def polyDFE_model(wildcards):
-    if wildcards.model == 'polyDFE_B':
+    if wildcards.model == "polyDFE_B":
         out = "-m B"
-    elif wildcards.model == 'polyDFE_C':
+    elif wildcards.model == "polyDFE_C":
         out = "-m C"
     else:
-        assert wildcards.model == 'polyDFE_D'
+        assert wildcards.model == "polyDFE_D"
         out = "-m D 5"
     return out + ("" if USE_DIVERGENCE else " -w ")
 
 
 rule polyDFE:
     input:
-        sfs=os.path.join(rules.sfs.output.dir,'{cat}.sfs'),
-        polyDFE=f'{FOLDER}/utils/polyDFE/polyDFE-2.0-linux-64-bit',
-        init_file=FOLDER + '/config/{model}_init.tsv',
-        range_file=FOLDER + '/config/{model}_range.tsv'
+        sfs=os.path.join(rules.sfs.output.dir,"{cat}.sfs"),
+        polyDFE=f"{FOLDER}/utils/polyDFE/polyDFE-2.0-linux-64-bit",
+        init_file=f"{FOLDER}/config/{{model}}_init.tsv",
+        range_file=f"{FOLDER}/config/{{model}}_range.tsv"
     output:
-        out=EXP_FOLDER + '/analysis/{species}.{popu}.{method}/{cat}.{model}.out',
-        stderr=EXP_FOLDER + '/analysis/{species}.{popu}.{method}/{cat}.{model}.stderr'
+        out=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}/{{cat}}.{{model}}.out",
+        stderr=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}/{{cat}}.{{model}}.stderr"
     params:
         model=polyDFE_model
     shell:
-        '{input.polyDFE} -d {input.sfs} -i {input.init_file} 1 -r {input.range_file} 1 {params.model} 1> {output.out} 2> {output.stderr}'
-
-
-def gather_model_results(wildcards):
-    dir = checkpoints.sfs.get(**wildcards).output.dir
-    out_list = expand(rules.polyDFE.output.out,
-        species=wildcards.species,
-        popu=wildcards.popu,
-        method=wildcards.method,
-        model=wildcards.model,
-        cat=glob_wildcards(os.path.join(dir,'{cat}.sfs')).cat)
-    return out_list
+        "{input.polyDFE} -d {input.sfs} -i {input.init_file} 1 -r {input.range_file} 1 {params.model} 1> {output.out} 2> {output.stderr}"
 
 
 rule parse_results_DFE:
     input:
-        script=f'{FOLDER}/scripts/parse_results_DFE.py',
-        postprocessing=f'{FOLDER}/scripts/postprocessing.R',
-        modelfile=gather_model_results,
-        subs=lambda wildcards: rules.mapping.output.tsv if (config["ALPHA"] and wildcards.method == "MutSel") else [],
+        script=f"{FOLDER}/scripts/parse_results_DFE.py",
+        postprocessing=f"{FOLDER}/scripts/postprocessing.R",
+        modelfile=lambda wildcards: expand(rules.polyDFE.output.out,
+            species=wildcards.species,popu=wildcards.popu,method=wildcards.method,
+            model=wildcards.model,cat=method_cats[wildcards.method]),
+        subs=lambda wildcards: rules.mapping.output.tsv if reconstruct_substitutions(wildcards) else [],
         bounds=rules.annotate_vcf.output.bounds
     output:
-        pdf=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{model}.pdf',
-        tsv=EXP_FOLDER + '/analysis/{species}.{popu}.{method}.{model}.tsv'
+        pdf=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}.{{model}}.pdf",
+        tsv=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}.{{model}}.tsv"
     params:
-        substitutions=lambda wildcards, input, output: f"--substitutions {input.subs}" if len(input.subs) > 0 else ""
+        substitutions=lambda wildcards, input, output: f"--substitutions {input.subs}" if reconstruct_substitutions(wildcards) else ""
     shell:
-        'python3 {input.script} --postprocessing {input.postprocessing} {params.substitutions} --bins {bins} --windows {windows} --bounds {input.bounds} --input {input.modelfile} --method {wildcards.method} --output {output.pdf}'
+        "python3 {input.script} --postprocessing {input.postprocessing} {params.substitutions} --bins {bins} --windows {windows} --bounds {input.bounds} --input {input.modelfile} --method {wildcards.method} --output {output.pdf}"
 
 rule plot_dfe_heatmap:
     input:
-        script=f'{FOLDER}/scripts/plot_heatmap.py',
+        script=f"{FOLDER}/scripts/plot_heatmap.py",
         tsv_theta=map(lambda p: f"{p}-sfs-summary-stats.tsv",SFS_LIST),
         tsv_dfe=map(lambda p: f"{p}.{model}.tsv",SFS_LIST),
         sample_list=sample_list
     output:
-        tsv=f'{EXP_FOLDER}/results/Theta.results.tsv'
+        tsv=f"{EXP_FOLDER}/results/Theta.results.tsv"
     shell:
-        'python3 {input.script} --tsv_theta {input.tsv_theta} --tsv_dfe {input.tsv_dfe} --sample_list {input.sample_list} --bins {bins} --windows {windows} --output {output.tsv}'
+        "python3 {input.script} --tsv_theta {input.tsv_theta} --tsv_dfe {input.tsv_dfe} --sample_list {input.sample_list} --bins {bins} --windows {windows} --output {output.tsv}"
 
 rule plot_multiple_regression:
     input:
-        script=f'{FOLDER}/scripts/plot_multiple_regression.py',
+        script=f"{FOLDER}/scripts/plot_multiple_regression.py",
         tsv=map(lambda p: f"{p}.{model}.tsv",SFS_LIST),
         sample_list=sample_list
     output:
-        tsv=f'{EXP_FOLDER}/results/regression.results.tsv'
+        tsv=f"{EXP_FOLDER}/results/regression.results.tsv"
     shell:
-        'python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --output {output.tsv}'
+        "python3 {input.script} --tsv {input.tsv} --sample_list {input.sample_list} --output {output.tsv}"
 
 rule plot_regression:
     input:
-        script=f'{FOLDER}/scripts/plot_regression.py',
+        script=f"{FOLDER}/scripts/plot_regression.py",
         tsv=[rules.gather_opportunities.output.tsv, rules.gather_bounds.output.tsv] + (
             [rules.plot_multiple_regression.output.tsv] if (bins > 10 and windows != 0) else [
                 rules.plot_dfe_heatmap.output.tsv]),
         sample_list=sample_list
     output:
-        tsv=f'{EXP_FOLDER}/regression-{{method}}/results.tsv'
+        tsv=f"{EXP_FOLDER}/regression-{{method}}/results.tsv"
     shell:
-        'python3 {input.script} --tsv {input.tsv} --method {wildcards.method} --sample_list {input.sample_list} --bins {bins} --windows {windows} --output {output.tsv}'
+        "python3 {input.script} --tsv {input.tsv} --method {wildcards.method} --sample_list {input.sample_list} --bins {bins} --windows {windows} --output {output.tsv}"
 
 
 rule latex:
     input:
-        script=f'{FOLDER}/scripts/tex_sfs.py',
+        script=f"{FOLDER}/scripts/tex_sfs.py",
         sfs=map(lambda p: f"{p}-sfs.pdf",SFS_LIST),
-        tex_source=f'{FOLDER}/scripts/supp-mat.tex',
+        tex_source=f"{FOLDER}/scripts/supp-mat.tex",
         tsv_dfe=rules.plot_dfe_heatmap.output.tsv,
         tsv_reg=expand(rules.plot_regression.output.tsv,method=config['METHOD_LIST']),
         sample_list=sample_list
     output:
-        tex_include=f'{EXP_FOLDER}/include-figures.tex',
-        tex_target=f'{EXP_FOLDER}/supp-mat.tex',
-        pdf=f'{EXP_FOLDER}/supp-mat.pdf'
+        tex_include=f"{EXP_FOLDER}/include-figures.tex",
+        tex_target=f"{EXP_FOLDER}/supp-mat.tex",
+        pdf=f"{EXP_FOLDER}/supp-mat.pdf"
     params:
-        hist_prefix=f'--hist_prefix {FOLDER}/data_processed/vcf_annotate_{binning}/snps.',
-        dfe_prefix=f'--dfe_prefix {FOLDER}/data_processed/opportunities_{binning}/DFE.'
-    shell: 'python3 {input.script} {params.hist_prefix} {params.dfe_prefix} --sample_list {input.sample_list} --sfs {input.sfs} --results {input.tsv_dfe} --tex_source {input.tex_source} --tex_target {output.tex_target} --tex_include {output.tex_include}'
+        hist_prefix=f"--hist_prefix {FOLDER}/data_processed/vcf_annotate_{binning}/snps.",
+        dfe_prefix=f"--dfe_prefix {FOLDER}/data_processed/opportunities_{binning}/DFE."
+    shell: "python3 {input.script} {params.hist_prefix} {params.dfe_prefix} --sample_list {input.sample_list} --sfs {input.sfs} --results {input.tsv_dfe} --tex_source {input.tex_source} --tex_target {output.tex_target} --tex_include {output.tex_include}"
 
 rule upset_plot:
     input:
         vcf=VCF_LIST,
-        script=f'{FOLDER}/scripts/plot_venn.py',
+        script=f"{FOLDER}/scripts/plot_venn.py",
         mask=MASK_LIST
     output:
         pdf=f"{FOLDER}/data_processed/upset_plot.pdf"
     params:
-        mask=f"--mask {' '.join(MASK_LIST)}" if len(MASK_LIST) > 0 else ""
+        mask=lambda wildcards: format_mask_list(MASK_LIST)
     shell:
-        'python3 {input.script} {params.mask} --vcf {input.vcf} --output {output.pdf}'
+        "python3 {input.script} {params.mask} --vcf {input.vcf} --output {output.pdf}"

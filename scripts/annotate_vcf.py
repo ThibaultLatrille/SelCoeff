@@ -17,11 +17,11 @@ def open_sift(sift_file):
     return output
 
 
-def read_vcf(vcf, sift_file, masks, subsample):
+def read_vcf(vcf, sift_file, masks, subsample, anc_proba):
     dict_sift = open_sift(sift_file)
     vcf_file = gzip.open(vcf, 'rt')
     dico_snp = defaultdict(list)
-    discarded = 0
+    discarded, filtered = 0, 0
     header = {}
     for vcf_line in vcf_file:
         if vcf_line[0] == '#':
@@ -48,7 +48,8 @@ def read_vcf(vcf, sift_file, masks, subsample):
             discarded += 1
             continue
 
-        if float(dico_info["ANC_PROBA"]) < 0.95:
+        if float(dico_info["ANC_PROBA"]) < anc_proba:
+            filtered += 1
             continue
 
         sample_size = int(dico_info["SAMPLE_SIZE"])
@@ -75,7 +76,7 @@ def read_vcf(vcf, sift_file, masks, subsample):
         dico_snp["Omega"].append(omega)
     vcf_file.close()
 
-    return dico_snp, discarded
+    return dico_snp, discarded, filtered
 
 
 def classify_snps(dico_snp, method, cat_snps):
@@ -217,6 +218,7 @@ def plot_histogram(score_list, cat_snps, method, file):
 
 
 def main(args):
+    assert 0 <= args.anc_proba <= 1
     os.makedirs(os.path.dirname(args.output_tsv), exist_ok=True)
     os.makedirs(os.path.dirname(args.output_bounds), exist_ok=True)
 
@@ -224,9 +226,11 @@ def main(args):
     for mask_file in args.mask:
         assert os.path.isfile(mask_file)
         masks.append(open_mask(mask_file))
-    dico_snp, discarded = read_vcf(args.vcf, args.sift_file, masks, args.subsample)
-    pct = discarded * 100 / (len(dico_snp["snp_type"]) + discarded)
-    print(f'{pct:.2f}% of SNPs are discarded because their are masked.')
+    dico_snp, discarded, filtered = read_vcf(args.vcf, args.sift_file, masks, args.subsample, args.anc_proba)
+    total = len(dico_snp["snp_type"]) + discarded + filtered
+    print(f'{discarded * 100 / total:.2f}% of SNPs are discarded because their are masked.')
+    print(f'{filtered * 100 / total:.2f}% of SNPs are discarded because they are filtered.')
+    print(f'{len(dico_snp["snp_type"])} SNPs are kept ({len(dico_snp["snp_type"]) * 100 / total:.2f}%).')
     dico_bounds = defaultdict(list)
 
     for method in ["MutSel", "Omega", "SIFT"]:
@@ -260,6 +264,8 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--vcf', required=False, type=str, dest="vcf", help="Input vcf file")
+    parser.add_argument('--anc_proba', required=True, type=float, dest="anc_proba", default=0.5,
+                        help="Mask the substitutions with reconstruction probability lower than this threshold")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
     parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
     parser.add_argument('--sift_file', required=False, type=str, default="", dest="sift_file", help="The SIFT file")

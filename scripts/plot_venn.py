@@ -47,7 +47,7 @@ def read_vcf(vcf, masks):
             continue
 
         sample_sizes.add(sample_size)
-        set_snp.add((ensg, c_site))
+        set_snp.add((ensg, int(dico_info["ENSG_POS"]), dico_info["AA_ANC"], dico_info["AA_ALT"]))
     vcf_file.close()
     assert len(sample_sizes) == 1
     return set_snp, sample_sizes.pop()
