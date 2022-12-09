@@ -13,7 +13,13 @@ EXP_FOLDER = f"{FOLDER}/experiments/{config['experiment']}"
 os.makedirs(EXP_FOLDER,exist_ok=True)
 sample_list = f"{FOLDER}/config/{config['SAMPLE_LIST']}"
 model = config['MODEL']
-assert model in ["grapes", "polyDFE_D", "polyDFE_C", "polyDFE_B"]
+assert model in ["polyDFE_D", "polyDFE_C", "polyDFE_B"]
+USE_DIVERGENCE = "USE_DIVERGENCE" in config and config['USE_DIVERGENCE']
+if USE_DIVERGENCE:
+    assert config['ALPHA']
+polyDFE_param = f"-m {model.split('_')[-1]}"
+polyDFE_param += " 5" if model == "polyDFE_D" else ""
+polyDFE_param += " -w" if USE_DIVERGENCE else ""
 bins = config['bins']
 windows = config['windows']
 method_cats = {m: CategorySNP(m,bound_file="",bins=bins,windows=windows).all() for m in config['METHOD_LIST']}
@@ -26,10 +32,6 @@ if "mask_identity" in config and config['mask_identity'] > 0.0:
     MASK_LIST.append(f"{FOLDER}/data_processed/mask_identity.{config['mask_identity']}.tsv.gz")
 if "mask_CpG" in config and config['mask_CpG']:
     binning += f"MaskCpG"
-
-USE_DIVERGENCE = "USE_DIVERGENCE" in config and config['USE_DIVERGENCE']
-if USE_DIVERGENCE:
-    assert config['ALPHA']
 for row_id, row in pd.read_csv(sample_list,sep="\t").iterrows():
     pop2sp[row['SampleName']] = row['Species']
     TSV_LIST.append(f"{FOLDER}/TSV/{row['Species']}.{row['SampleName']}.tsv.gz")
@@ -37,9 +39,7 @@ for row_id, row in pd.read_csv(sample_list,sep="\t").iterrows():
     if os.path.exists(vcf):
         VCF_LIST.append(vcf)
     for method in config['METHOD_LIST']:
-        SFS_LIST.append(EXP_FOLDER + f"/analysis/{row['Species']}.{row['SampleName']}.{method}")
-
-ruleorder: parse_results_DFE > sfs
+        SFS_LIST.append(f"{EXP_FOLDER}/analysis/{row['Species']}.{row['SampleName']}.{method}")
 
 rule all:
     input:
@@ -273,44 +273,32 @@ rule sfs:
         "python3 {input.script} {params.substitutions} --bins {bins} --windows {windows} --bounds {input.bounds} {params.config} --tsv {input.tsv} --pop {wildcards.popu} --method {wildcards.method} --opportunities {input.opportunities} --output_tsv {output.tsv} --output_pdf {output.pdf} --output_dir {output.dir}"
 
 
-def polyDFE_model(wildcards):
-    if wildcards.model == "polyDFE_B":
-        out = "-m B"
-    elif wildcards.model == "polyDFE_C":
-        out = "-m C"
-    else:
-        assert wildcards.model == "polyDFE_D"
-        out = "-m D 5"
-    return out + ("" if USE_DIVERGENCE else " -w ")
-
-
 rule polyDFE:
     input:
-        sfs=os.path.join(rules.sfs.output.dir,"{cat}.sfs"),
+        sfs=rules.sfs.output.dir,
         polyDFE=f"{FOLDER}/utils/polyDFE/polyDFE-2.0-linux-64-bit",
-        init_file=f"{FOLDER}/config/{{model}}_init.tsv",
-        range_file=f"{FOLDER}/config/{{model}}_range.tsv"
+        init_file=f"{FOLDER}/config/{model}_init.tsv",
+        range_file=f"{FOLDER}/config/{model}_range.tsv"
     output:
-        out=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}/{{cat}}.{{model}}.out",
-        stderr=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}/{{cat}}.{{model}}.stderr"
+        out=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}/{{cat}}.{model}.out",
+        stderr=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}/{{cat}}.{model}.stderr"
     params:
-        model=polyDFE_model
+        sfs=lambda wildcards, input, output: os.path.join(input.sfs,f"{wildcards.cat}.sfs"),
     shell:
-        "{input.polyDFE} -d {input.sfs} -i {input.init_file} 1 -r {input.range_file} 1 {params.model} 1> {output.out} 2> {output.stderr}"
+        "{input.polyDFE} -d {params.sfs} -i {input.init_file} 1 -r {input.range_file} 1 {polyDFE_param} 1> {output.out} 2> {output.stderr}"
 
 
 rule parse_results_DFE:
     input:
         script=f"{FOLDER}/scripts/parse_results_DFE.py",
         postprocessing=f"{FOLDER}/scripts/postprocessing.R",
-        modelfile=lambda wildcards: expand(rules.polyDFE.output.out,
-            species=wildcards.species,popu=wildcards.popu,method=wildcards.method,
-            model=wildcards.model,cat=method_cats[wildcards.method]),
+        modelfile=lambda wildcards: expand(rules.polyDFE.output.out,species=wildcards.species,popu=wildcards.popu,
+            method=wildcards.method,cat=method_cats[wildcards.method]),
         subs=lambda wildcards: rules.mapping.output.tsv if reconstruct_substitutions(wildcards) else [],
         bounds=rules.annotate_vcf.output.bounds
     output:
-        pdf=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}.{{model}}.pdf",
-        tsv=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}.{{model}}.tsv"
+        pdf=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}.{model}.pdf",
+        tsv=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}.{model}.tsv"
     params:
         substitutions=lambda wildcards, input, output: f"--substitutions {input.subs}" if reconstruct_substitutions(wildcards) else ""
     shell:

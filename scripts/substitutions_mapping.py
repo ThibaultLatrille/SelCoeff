@@ -47,7 +47,7 @@ def open_prob(path):
         for line in f:
             prob = line.strip().split(",")[1]
             prob_list.append(float(prob))
-    return prob_list
+    return np.array(prob_list) / max(prob_list)
 
 
 def main(args):
