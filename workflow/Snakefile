@@ -49,6 +49,7 @@ rule all:
         f"{FOLDER}/data_processed/experimental_DFE.pdf",
         f"{FOLDER}/data_processed/population_DFE.pdf",
         f"{FOLDER}/data_processed/upset_plot.pdf",
+        f"{FOLDER}/data_processed/SNP_effect.tsv",
         TSV_LIST
 
 rule experimental_DFE:
@@ -68,6 +69,16 @@ rule population_DFE:
     shell:
         "python3 {input.script} --output {output.pdf}"
 
+rule SNP_effect:
+    input:
+        script=f"{FOLDER}/scripts/SNP_effect.py",
+        tex=f"{FOLDER}/scripts/main-table.tex",
+        vcf=f"{FOLDER}/data_poly/Homo_sapiens.AFR.vcf.gz",
+        effect=f"{FOLDER}/data_phenotype/v92/homo_sapiens_phenotype_associated.vcf.gz"
+    output:
+        pdf=f"{FOLDER}/data_processed/SNP_effect.tsv"
+    shell:
+        "python3 {input.script} --tex {input.tex} --vcf {input.vcf} --effect {input.effect} --output {output.pdf}"
 
 rule fixed_snp_by_pop:
     input:
