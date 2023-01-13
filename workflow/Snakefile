@@ -161,7 +161,7 @@ rule annotate_vcf:
         bounds=f"{FOLDER}/data_processed/vcf_annotate_{binning}/bounds.{{species}}.{{popu}}.tsv"
     params:
         subsample=f"--subsample {config['subsample']}",
-        anc_proba=f"--anc_proba {config['mask_anc_proba_SNPS']}",
+        anc_proba=f"--anc_proba {config['mask_anc_proba_SNPS'] if 'mask_anc_proba_SNPS' in config else 0.0}",
         mask=lambda wildcards: format_mask_list(mask_list(wildcards.species,wildcards.popu))
     shell:
         "python3 {input.script} {params.subsample} {params.mask} {params.anc_proba} --sift_file {input.sift_file} --vcf {input.vcf} --bins {bins} --windows {windows} --output_tsv {output.tsv} --output_bounds {output.bounds}"
@@ -243,7 +243,7 @@ rule mapping:
         tsv=f"{FOLDER}/data_processed/ancestral_{binning}/{{species}}.{{popu}}.tsv"
     params:
         folder=f"{FOLDER}/data_processed/ancestral_reconstruction/{{species}}.{{popu}}",
-        anc_proba=f"--anc_proba {config['mask_anc_proba_substitutions']}",
+        anc_proba=f"--anc_proba {config['mask_anc_proba_substitutions'] if 'mask_anc_proba_substitutions' in config else 0.0}",
         mask=lambda wildcards: format_mask_list(mask_list(wildcards.species,wildcards.popu))
     shell:
         "python3 {input.script} {params.mask} {params.anc_proba} --opp {input.opp} --species {wildcards.species} --bins {bins} --windows {windows} --bounds {input.bounds} --exp_folder {input.exp_folder} --ancestral {params.folder} --output {output.tsv}"
