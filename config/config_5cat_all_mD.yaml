@@ -1,4 +1,4 @@
-experiment: "5bins-mC"
+experiment: "5bins-mD"
 SAMPLE_LIST: "sample_all.tsv"
 subsample: 16
 nbr_replicates: 12
@@ -9,7 +9,7 @@ windows: 0 # The number of SNPs for each bin in the sliding windows, 0 if not sl
 mask_adaptation: false # Mask the sites with omega > omega_0
 mask_CpG: false # Mask the CpG sites
 mask_identity: .95 # Mask the sites with identity < mask_identity
-METHOD_LIST: [ "MutSel", "SIFT" ]
-MODEL: "polyDFE_C"
+METHOD_LIST: [ "MutSel" ]
+MODEL: "polyDFE_D"
 ALPHA: true # If true, the α parameter is computed (requires to map substitutions in the terminal branch).
 USE_DIVERGENCE: true # If true, the model use divergence (requires ALPHA to be true).
