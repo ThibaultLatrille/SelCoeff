@@ -21,18 +21,18 @@ def main(output):
     print(x[-1])
     y = [(1 - p_pos) * d_neg.pdf(-s) for s in x]
     print(y[-1])
-    plt.plot(x, y, color=BLUE)
-    plt.fill_between(x, y, color=BLUE, alpha=0.5)
+    plt.plot(x, y, color=RED)
+    plt.fill_between(x, y, color=RED, alpha=0.5)
     d_pos = expon(scale=scale_pos)
     x = np.linspace(0, 10, 1000)
     y = [p_pos * d_pos.pdf(s) for s in x]
-    plt.plot(x, y, color=RED)
+    plt.plot(x, y, color=BLUE)
     plt.ylim((0, 0.2))
-    plt.fill_between(x, y, color=RED, alpha=0.5)
+    plt.fill_between(x, y, color=BLUE, alpha=0.5)
     plt.axvline(-1, color="grey", lw=1, ls='--')
     plt.axvline(1, color="grey", lw=1, ls='--')
     plt.axvline(0, color="black", lw=2, ls='--')
-    handles = [Rectangle((0, 0), 1, 1, color=c) for c in [BLUE, RED]]
+    handles = [Rectangle((0, 0), 1, 1, color=c) for c in [RED, BLUE]]
     labels = [f"$S < 0$ ({(1 - p_b) * 100:.2f}% of total)", f"$S > 0$ ({p_b * 100:.2f}% of total)"]
 
     plt.legend(handles, labels)

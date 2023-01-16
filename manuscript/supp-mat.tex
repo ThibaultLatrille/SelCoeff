@@ -474,33 +474,6 @@
 
     \newpage
 
-%    \subsection{Selection efficacy correlation with diversity}\label{subsec:selection-efficacy-correlation-with-diversity}
-%    The mean of the DFE $\SpopMean$ estimated by polyDFE is given by:
-%    \begin{align*}
-%        \SpopMean & = \int_{-\infty}^{+\infty} \Spop \phi \left( \Spop; \Spop_d , b, p_b, \Spop_b \right) \der \Spop \\
-%        & = p_b \Spop_b + \left( 1 - p_b \right) \Spop_d
-%    \end{align*}
-%
-%    To look further into the relation between diversity and selection efficacy, we studied the estimation of the mean $\SpopMean$ as a function of the mean $\SphyMean$ for a subset of SNPs, for which $\SphyMean$ is close to $0$.
-%    Indeed, polyDFE is a nearly-neutral model and is not able to reliably compute selection coefficients for only strongly deleterious or only strongly beneficial SNPs.
-%    Sliding windows of $5,000$ SNPs are taken with a mean $\SphyMean$ between $-0.5$ and $0.5$.
-%    $\SpopMean$ is estimated for each group, with some groups that might have part of same SNPs that overlap.
-%    The relationship between $\SpopMean$ and $\SphyMean$ can be described by a second-order polynomial, and the slope of this polynomial at $\SphyMean=0$ gives the ratio $\SpopMean/\SphyMean$ for each population.
-%    \captionof{figure}{~}
-%    \begin{center}
-%        \includegraphics[width=\linewidth, page=1]{artworks/figure.slope-beta-S}
-%    \end{center}
-%
-%    We observe that $\SpopMean/\SphyMean$, representing the efficacy of selection at the short versus long-term is positively correlated with synonymous diversity, a proxy of effective population size.
-%    Altogether, populations with a large effective population size are under more efficient selection, confirming the prediction of the nearly-neutral theory of evolution that mutations are less likely to be considered neutral in populations with high diversity (see~\ref{subsec:proportion-nearly-neutral-mutations}, left scatter-plot), especially for mutations predicted already to be nearly-neutral at the phylogenetic scale (see~\ref{subsec:proportion-nearly-neutral-mutations}, middle and right scatter-plot).
-%    As a consequence of an increased selection efficiency, mutations in populations with high diversity are mechanistically more likely to be deleterious (see~\ref{subsec:proportion-deleterious-mutations}, left scatter-plot), especially for mutations predicted already to be deleterious at the phylogenetic scale (see~\ref{subsec:proportion-deleterious-mutations}, middle and right scatter-plot).
-%    A decrease in the proportion of neutral mutation did not translate into a mechanical increase in the proportion of beneficial mutations.
-%    Instead, populations with higher diversity have a lower proportion of beneficial mutations, this effect is also more pronounced for mutations predicted to be beneficial at the phylogenetic scale.
-%    This discrepancy can be explained by the fact that populations with larger diversity have already depleted the putatively beneficial mutations, and that only deleterious are remaining possible.
-%    In other words, being on the top of a fixed fitness landscape leaves you with only paths going downhill.
-%    Altogether, populations with increased diversity are showing signature of increased selection efficiency and are also less likely to generate positively selected mutations.
-%   \newpage
-
     \subsection{Proportion of selected mutations}
 
     For each population, the proportion of beneficial ($p_+=\PpolyAdv$), nearly-neutral ($\PpolyNeutral$) and of deleterious ($\PpolyDel$) mutations estimated at the population-genetic scale is shown.
@@ -588,8 +561,6 @@
     \input{include-MutSel-non-adaptive}
 
     \newpage
-
-
     \section{SIFT scores}\label{sec:sift-scores}
 
     \subsection{Proportion of selected mutations}\label{subsec:proportion-of-selected-mutations}
@@ -638,25 +609,6 @@
         \end{minipage}
     \end{center}
     Sites with a higher SIFT score at the phylogenetic scale are more positively selected in the different populations.
-
-    % The previous section showed that mutations with a higher SIFT score at the phylogenetic scale are more positively selected in the different populations.
-    % However, whenever we removed the category of SNPs with the highest SIFT score ($\textrm{SIFT} \geq 0.8$), we expected the estimation of $p_+ (\textrm{SIFT} < 0.8)$ to be lower than $p_+$ (estimated on the all dataset), as we have shown that $p_+ (\Sphy < 0) < p_+$ with mutation-selection codon models.
-    % Thus SIFT scores are not providing reliable information on the current selective strength exerted on mutations, at least for high SIFT scores.
-    % Moreover, there is no defined threshold (here we arbitrarily used 0.8) to cut-off between beneficial and deleterious changes.
-
-%    \section{SIFT scores: histograms and SFS for each population}\label{sec:sift-scores:-histograms-and-sfs-for-each-population}
-%    For each population, the same figure is shown.
-%    \begin{itemize}
-%        \item Top-left panel: Histogram of SIFT score for all possible mutations away from the ancestral genome, giving the number of sites ($L$, in y-axis) across the genome with a given SIFT score.
-%        Mutations are divided into 5 classes: severely deleterious (blue), deleterious (green), weakly deleterious (light green), weakly beneficial (yellow) and beneficial (red).
-%        \item Top-right panel: Histogram of SIFT score for all observed mutations in a sample of 8 individuals (out of 512 in the original dataset) of African descent.
-%        If they are less mutations observed than expected, this class is thus undergoing purifying selection.
-%        \item Bottom-left panel: The site-frequency spectrum (SFS) represents the proportion of mutations (y-axis) with a given number of derived alleles in the population (x-axis).
-%        SFS are drawn for a random sample of 16 alleles (mean in solid line and standard deviation in filled color) for each class of selection coefficient and for synonymous mutations which are supposedly neutral (black).
-%        At high frequencies, supposedly severally deleterious mutations are underrepresented.
-%        \item Bottom-right panel:For each class of selection (and for the set of all non-synonymous mutations), information from the SFS and the expected total mutation rate are combined at the population-genetic scale to estimate the proportion of beneficial mutations $\PpolyAdv$, of nearly-neutral mutations $\PpolyNeutral$ and of deleterious mutations $\PpolyDel$.
-%    \end{itemize}
-%    \input{include-SIFT-non-adaptive}
 
     \section*{References}
     \printbibliography

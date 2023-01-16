@@ -418,26 +418,26 @@ class CategorySNP(list):
             if self.bins == 2:
                 self.inner_bound = [0.8]
                 self.dico = {
-                    "neg": P("$SIFT < 0.8$", BLUE, 0, 0.8),
-                    "pos": P("$SIFT > 0.8$", RED, 0.8, 1.0),
+                    "neg": P("$SIFT < 0.8$", RED, 0, 0.8),
+                    "pos": P("$SIFT > 0.8$", BLUE, 0.8, 1.0),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
             elif self.bins == 3:
                 self.inner_bound = [0.05, 0.8]
                 self.dico = {
-                    "neg-strong": P("$SIFT<0.05$", BLUE, 0, 0.05),
+                    "neg-strong": P("$SIFT<0.05$", RED, 0, 0.05),
                     "weak": P("$0.05<SIFT<0.8$", LIGHTGREEN, 0.05, 0.8),
-                    "pos": P("$SIFT > 0.8$", RED, 0.8, 1.0),
+                    "pos": P("$SIFT > 0.8$", BLUE, 0.8, 1.0),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
             else:
                 self.inner_bound = [0.05, 0.1, 0.3, 0.8]
                 self.dico = {
-                    "neg-strong": P("$SIFT<0.05$", BLUE, 0, 0.05),
-                    "neg": P("$0.05<SIFT<0.1$", GREEN, 0.05, 0.1),
+                    "neg-strong": P("$SIFT<0.05$", RED, 0, 0.05),
+                    "neg": P("$0.05<SIFT<0.1$", YELLOW, 0.05, 0.1),
                     "neg-weak": P("$0.1<SIFT<0.3$", LIGHTGREEN, 0.1, 0.3),
-                    "pos-weak": P("$0.3<SIFT<0.8$", YELLOW, 0.3, 0.8),
-                    "pos": P("$SIFT > 0.8$", RED, 0.8, 1.0),
+                    "pos-weak": P("$0.3<SIFT<0.8$", GREEN, 0.3, 0.8),
+                    "pos": P("$SIFT > 0.8$", BLUE, 0.8, 1.0),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
             self.update()
@@ -445,26 +445,26 @@ class CategorySNP(list):
             if self.bins == 2:
                 self.inner_bound = [1.0]
                 self.dico = {
-                    "neg": P("$\\omega < 1$", BLUE, 0, 1.0),
-                    "pos": P("$\\omega > 1$", RED, 1.0, np.float("infinity")),
+                    "neg": P("$\\omega < 1$", RED, 0, 1.0),
+                    "pos": P("$\\omega > 1$", BLUE, 1.0, np.float("infinity")),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
             elif self.bins == 3:
                 self.inner_bound = [0.05, 1.0]
                 self.dico = {
-                    "neg": P("$\\omega<0.05$", BLUE, 0, 0.05),
+                    "neg": P("$\\omega<0.05$", RED, 0, 0.05),
                     "weak": P("$0.05<\\omega<1.0$", LIGHTGREEN, 0.05, 1.0),
-                    "pos": P("$\\omega > 1$", RED, 1.0, np.float("infinity")),
+                    "pos": P("$\\omega > 1$", BLUE, 1.0, np.float("infinity")),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
             else:
                 self.inner_bound = [0.05, 0.1, 0.3, 1.0]
                 self.dico = {
-                    "neg-strong": P("$\\omega<0.05$", BLUE, 0, 0.05),
-                    "neg": P("$0.05<\\omega<0.1$", GREEN, 0.05, 0.1),
+                    "neg-strong": P("$\\omega<0.05$", RED, 0, 0.05),
+                    "neg": P("$0.05<\\omega<0.1$", YELLOW, 0.05, 0.1),
                     "neg-weak": P("$0.1<\\omega<0.3$", LIGHTGREEN, 0.1, 0.3),
-                    "pos-weak": P("$0.3<\\omega < 1$", YELLOW, 0.3, 1.0),
-                    "pos": P("$\\omega > 1$", RED, 1.0, np.float("infinity")),
+                    "pos-weak": P("$0.3<\\omega < 1$", GREEN, 0.3, 1.0),
+                    "pos": P("$\\omega > 1$", BLUE, 1.0, np.float("infinity")),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
             self.update()
@@ -473,27 +473,27 @@ class CategorySNP(list):
             if self.bins == 2:
                 self.inner_bound = [0]
                 self.dico = {
-                    "neg": P("$S_0 < 0$", BLUE, -np.float("infinity"), 0),
+                    "neg": P("$S_0 < 0$", RED, -np.float("infinity"), 0),
                     "syn": P("$Synonymous$", 'black', None, None),
-                    "pos": P("$S_0 >0$", RED, 0, np.float("infinity"))
+                    "pos": P("$S_0 >0$", BLUE, 0, np.float("infinity"))
                 }
             elif self.bins == 3:
                 self.inner_bound = [-1, 1]
                 self.dico = {
-                    "neg": P("$S_0 < -1$", BLUE, -np.float("infinity"), -1),
+                    "neg": P("$S_0 < -1$", RED, -np.float("infinity"), -1),
                     "weak": P("$-1 < S_0 < 1$", LIGHTGREEN, -1, 1),
-                    "pos": P("$S_0 > 1$", RED, 1, np.float("infinity")),
+                    "pos": P("$S_0 > 1$", BLUE, 1, np.float("infinity")),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
             else:
                 self.inner_bound = [-3, -1, 0, 1]
                 self.dico = {
-                    "neg-strong": P("$S_0 < -3$", BLUE, -np.float("infinity"), -3),
-                    "neg": P("$-3 < S_0 < -1$", GREEN, -3, -1),
+                    "neg-strong": P("$S_0 < -3$", RED, -np.float("infinity"), -3),
+                    "neg": P("$-3 < S_0 < -1$", YELLOW, -3, -1),
                     "neg-weak": P("$-1 < S_0 < 0$", LIGHTGREEN, -1, 0),
                     "syn": P("$Synonymous$", 'black', None, None),
-                    "pos-weak": P("$0 < S_0 < 1$", YELLOW, 0, 1),
-                    "pos": P("$S_0 >1$", RED, 1, np.float("infinity"))
+                    "pos-weak": P("$0 < S_0 < 1$", GREEN, 0, 1),
+                    "pos": P("$S_0 >1$", BLUE, 1, np.float("infinity"))
                 }
             self.update()
 
