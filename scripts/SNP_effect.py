@@ -10,7 +10,7 @@ from libraries import CategorySNP, tex_f
 
 def read_effect_vcf(vcf, set_ids: set):
     print(f"Reading file {vcf}")
-    keywords = ["benign", "pathogenic", "risk"]
+    keywords = ["benign", "pathogenic", "risk", 'protective']
     print("Keywords: {}".format(", ".join(keywords)))
     vcf_file = gzip.open(vcf, 'rt')
     dico_snps, header = defaultdict(set), {}
@@ -111,7 +111,7 @@ def main(input_vcf, input_effect, tex_source, output):
 
     control_cat = "weak"
     dico_ouput = defaultdict(list)
-    for clin_id in ["benign", "likely benign", "risk factor", "likely pathogenic", "pathogenic"]:
+    for clin_id in ['protective', "benign", "likely benign", "risk factor", "likely pathogenic", "pathogenic"]:
         if clin_id not in dico_clin_snps:
             continue
         clin_snps_set = dico_clin_snps[clin_id]

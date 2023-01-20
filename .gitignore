@@ -14,6 +14,7 @@ __pycache__
 /data_processed/
 /utils/
 /out/
+/Zenodo/
 .idea/
 *.indd
 *.ai

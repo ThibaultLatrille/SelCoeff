@@ -73,7 +73,7 @@ rule SNP_effect:
     input:
         script=f"{FOLDER}/scripts/SNP_effect.py",
         tex=f"{FOLDER}/scripts/main-table.tex",
-        vcf=f"{FOLDER}/data_poly/Homo_sapiens.AFR.vcf.gz",
+        vcf=f"{FOLDER}/data_poly/Homo_sapiens.EUR.vcf.gz",
         effect=f"{FOLDER}/data_phenotype/v92/homo_sapiens_phenotype_associated.vcf.gz"
     output:
         pdf=f"{FOLDER}/data_processed/SNP_effect.tsv"

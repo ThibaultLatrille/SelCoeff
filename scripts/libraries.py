@@ -426,7 +426,7 @@ class CategorySNP(list):
                 self.inner_bound = [0.05, 0.8]
                 self.dico = {
                     "neg-strong": P("$SIFT<0.05$", RED, 0, 0.05),
-                    "weak": P("$0.05<SIFT<0.8$", LIGHTGREEN, 0.05, 0.8),
+                    "weak": P("$0.05<SIFT<0.8$", GREEN, 0.05, 0.8),
                     "pos": P("$SIFT > 0.8$", BLUE, 0.8, 1.0),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
@@ -453,7 +453,7 @@ class CategorySNP(list):
                 self.inner_bound = [0.05, 1.0]
                 self.dico = {
                     "neg": P("$\\omega<0.05$", RED, 0, 0.05),
-                    "weak": P("$0.05<\\omega<1.0$", LIGHTGREEN, 0.05, 1.0),
+                    "weak": P("$0.05<\\omega<1.0$", GREEN, 0.05, 1.0),
                     "pos": P("$\\omega > 1$", BLUE, 1.0, np.float("infinity")),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
@@ -481,7 +481,7 @@ class CategorySNP(list):
                 self.inner_bound = [-1, 1]
                 self.dico = {
                     "neg": P("$S_0 < -1$", RED, -np.float("infinity"), -1),
-                    "weak": P("$-1 < S_0 < 1$", LIGHTGREEN, -1, 1),
+                    "weak": P("$-1 < S_0 < 1$", GREEN, -1, 1),
                     "pos": P("$S_0 > 1$", BLUE, 1, np.float("infinity")),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
