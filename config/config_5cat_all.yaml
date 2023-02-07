@@ -4,11 +4,11 @@ subsample: 16
 nbr_replicates: 12
 subsample_genes: -1
 subsample_genes_ancestral: -1
-bins: 5 # The number of bins: 0, 2 or 5 for predetermined bins. Otherwise, bins with equal number of SNPs in each bin.
+bins: 5 # The number of bins: 0, 2, 3 or 5 for predetermined bins. Otherwise, bins with equal number of SNPs in each bin.
 windows: 0 # The number of SNPs for each bin in the sliding windows, 0 if not sliding windows
 mask_adaptation: false # Mask the sites with omega > omega_0
 mask_CpG: false # Mask the CpG sites
-mask_identity: .95 # Mask the sites with identity < mask_identity
+mask_identity: 0.95 # Mask the sites with identity < mask_identity
 METHOD_LIST: [ "MutSel", "SIFT" ]
 MODEL: "polyDFE_C"
 ALPHA: true # If true, the α parameter is computed (requires to map substitutions in the terminal branch).

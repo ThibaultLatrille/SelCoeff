@@ -52,9 +52,9 @@ codontable.update({
 confidence_interval = namedtuple('confidence_interval', ['low', 'mean', 'up'])
 sfs_weight = {"watterson": lambda i, n: 1.0 / i, "tajima": lambda i, n: n - i, "fay_wu": lambda i, n: i}
 polydfe_cat_dico = {
-    "P-Ssup0": "$\\mathbb{P} [ S > 1 ]$",
-    "P-Seq0": "$\\mathbb{P} [ -1< S <1 ]$",
-    "P-Sinf0": "$\\mathbb{P} [ S <-1 ]$",
+    "P-Spos": "$\\mathbb{P} [ S > 1 ]$",
+    "P-Sweak": "$\\mathbb{P} [ -1< S <1 ]$",
+    "P-Sneg": "$\\mathbb{P} [ S <-1 ]$",
 }
 alpha_sup_limits = [0, 1, 3, 5]
 polydfe_cat_list = list(polydfe_cat_dico.keys())
@@ -425,7 +425,7 @@ class CategorySNP(list):
             elif self.bins == 3:
                 self.inner_bound = [0.05, 0.8]
                 self.dico = {
-                    "neg-strong": P("$SIFT<0.05$", RED, 0, 0.05),
+                    "neg": P("$SIFT<0.05$", RED, 0, 0.05),
                     "weak": P("$0.05<SIFT<0.8$", GREEN, 0.05, 0.8),
                     "pos": P("$SIFT > 0.8$", BLUE, 0.8, 1.0),
                     "syn": P("$Synonymous$", 'black', None, None)
@@ -486,10 +486,10 @@ class CategorySNP(list):
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
             else:
-                self.inner_bound = [-3, -1, 0, 1]
+                self.inner_bound = [-5, -1, 0, 1]
                 self.dico = {
-                    "neg-strong": P("$S_0 < -3$", RED, -np.float("infinity"), -3),
-                    "neg": P("$-3 < S_0 < -1$", YELLOW, -3, -1),
+                    "neg-strong": P("$S_0 < -5$", RED, -np.float("infinity"), -5),
+                    "neg": P("$-5 < S_0 < -1$", YELLOW, -5, -1),
                     "neg-weak": P("$-1 < S_0 < 0$", LIGHTGREEN, -1, 0),
                     "syn": P("$Synonymous$", 'black', None, None),
                     "pos-weak": P("$0 < S_0 < 1$", GREEN, 0, 1),

@@ -1,14 +1,14 @@
-experiment: "5bins-mD-conserved"
+experiment: "3bins-mD-conserved"
 SAMPLE_LIST: "sample_all.tsv"
 subsample: 16
 nbr_replicates: 12
 subsample_genes: -1
 subsample_genes_ancestral: -1
-bins: 5 # The number of bins: 0, 2 or 5 for predetermined bins. Otherwise, bins with equal number of SNPs in each bin.
+bins: 3 # The number of bins: 0, 2, 3 or 5 for predetermined bins. Otherwise, bins with equal number of SNPs in each bin.
 windows: 0 # The number of SNPs for each bin in the sliding windows, 0 if not sliding windows
 mask_adaptation: true # Mask the sites with omega > omega_0
 mask_CpG: true # Mask the CpG sites
-mask_identity: .95 # Mask the sites with identity < mask_identity
+mask_identity: 0.95 # Mask the sites with identity < mask_identity
 mask_anc_proba_SNPS: 0.99 # Mask the SNPs with ancestral reconstruction probability (given by est-sfs) < mask_anc_proba_SNPS
 mask_anc_proba_substitutions: 0.0 # Mask the substitutions with ancestral reconstruction probability (given by FastML) < mask_anc_proba_substitutions
 METHOD_LIST: [ "MutSel" ]

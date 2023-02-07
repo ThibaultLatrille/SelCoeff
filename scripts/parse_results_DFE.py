@@ -137,6 +137,7 @@ def alpha_model_D(p_list, s_list, lim_left=0.0):
     return sum([q for s, q in zip(s_list, q_linspace) if lim_left < s]) / sum(q_linspace)
 
 
+
 def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     string = ''.join(open(args.postprocessing, "r").readlines())
