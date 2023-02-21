@@ -23,11 +23,13 @@ RED = "#EB6231"
 YELLOW = "#E29D26"
 BLUE = "#5D80B4"
 LIGHTGREEN = "#6ABD9B"
+LIGHTYELLOW = "#FFFCBF"
 RED_RGB = to_rgb(RED)
 BLUE_RGB = to_rgb(BLUE)
 GREEN_RGB = to_rgb(GREEN)
 GREY_RGB = to_rgb("grey")
 BLACK_RGB = to_rgb("black")
+LIGHTYELLOW_RGB = to_rgb(LIGHTYELLOW)
 
 complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
 nucleotides = list(sorted(complement.keys()))
@@ -53,8 +55,8 @@ confidence_interval = namedtuple('confidence_interval', ['low', 'mean', 'up'])
 sfs_weight = {"watterson": lambda i, n: 1.0 / i, "tajima": lambda i, n: n - i, "fay_wu": lambda i, n: i}
 polydfe_cat_dico = {
     "P-Spos": "$\\mathbb{P} [ S > 1 ]$",
-    "P-Sweak": "$\\mathbb{P} [ -1< S <1 ]$",
-    "P-Sneg": "$\\mathbb{P} [ S <-1 ]$",
+    "P-Sweak": "$\\mathbb{P} [ -1 < S < 1 ]$",
+    "P-Sneg": "$\\mathbb{P} [ S < -1 ]$",
 }
 alpha_sup_limits = [0, 1, 3, 5]
 polydfe_cat_list = list(polydfe_cat_dico.keys())

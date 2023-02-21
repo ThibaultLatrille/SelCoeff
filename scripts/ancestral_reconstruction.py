@@ -19,7 +19,7 @@ def clean_sequence(seq):
     return "".join(codon_list)
 
 
-def SubsetMostCommon(alignment, specie, tree_path, fasta_pop):
+def SubsetMostCommon(alignment, specie, tree_path, fasta_pop, depth=4):
     if not os.path.exists(tree_path):
         tree_path = tree_path.replace("_null_", "__")
     t = Tree(tree_path)
@@ -28,7 +28,7 @@ def SubsetMostCommon(alignment, specie, tree_path, fasta_pop):
     node = leaves[0]
 
     subali = {specie: clean_sequence(fasta_pop)}
-    while len(subali) < 4:
+    while len(subali) < depth:
         if node is None:
             break
 
@@ -52,7 +52,7 @@ def SubsetMostCommon(alignment, specie, tree_path, fasta_pop):
         node = node.up
     tree = (t if node is None else node)
     tree.prune(subali.keys())
-    print(subali.keys())
+    # print(subali.keys())
     return subali, tree
 
 

@@ -9,6 +9,7 @@ windows: 0 # The number of SNPs for each bin in the sliding windows, 0 if not sl
 mask_adaptation: false # Mask the sites with omega > omega_0
 mask_CpG: false # Mask the CpG sites
 mask_identity: 0.9 # Mask the sites with identity < mask_identity
+mask_anc_proba_SNPS: 0.99 # Mask the SNPs with ancestral reconstruction probability (given by est-sfs) < mask_anc_proba_SNPS
 METHOD_LIST: [ "MutSel" ]
 MODEL: "polyDFE_C"
 ALPHA: true # If true, the α parameter is computed (requires to map substitutions in the terminal branch).

@@ -37,8 +37,7 @@ def plot_stack_param(list_cat, cat_snps, s_dico, output):
     fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
     x_pos = range(len(list_cat))
     hatches_list = ['', '', '//']
-    colors = [cat_snps.color(cat) for cat in list_cat]
-    colors_list = ["black", "silver", "white"]
+    colors_list = [LIGHTYELLOW_RGB, "silver", "white"]
     edgecolors_list = ["black", "black", "black"]
     bottom = np.array([0.0] * len(list_cat))
     for p_i, param in enumerate(polydfe_cat_dico):
@@ -50,6 +49,7 @@ def plot_stack_param(list_cat, cat_snps, s_dico, output):
     ax.set_xticks(x_pos)
     ax.set_ylim((0, 1))
     ax.set_xticklabels([cat_snps.label(cat) for cat in list_cat])
+    colors = [cat_snps.color(cat) for cat in list_cat]
     for ticklabel, tickcolor in zip(plt.gca().get_xticklabels(), colors):
         ticklabel.set_color(tickcolor)
     plt.tight_layout()

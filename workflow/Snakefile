@@ -30,16 +30,22 @@ if config['mask_adaptation']:
 if "mask_identity" in config and config['mask_identity'] > 0.0:
     binning += f"Mask{config['mask_identity']}"
     MASK_LIST.append(f"{FOLDER}/data_processed/mask_identity.{config['mask_identity']}.tsv.gz")
+if "mask_unaligned_flanks" in config and config['mask_unaligned_flanks'] > 0:
+    binning += f"MaskFlanks{config['mask_unaligned_flanks']}"
 if "mask_CpG" in config and config['mask_CpG']:
-    binning += f"MaskCpG"
+    binning += "MaskCpG"
 for row_id, row in pd.read_csv(sample_list,sep="\t").iterrows():
     pop2sp[row['SampleName']] = row['Species']
-    TSV_LIST.append(f"{FOLDER}/TSV/{row['Species']}.{row['SampleName']}.tsv.gz")
+    TSV_LIST.append(f"{FOLDER}/TSV/{row['Species']}.{row['SampleName']}.{binning}.pdf")
     vcf = f"{FOLDER}/data_poly/{row['Species']}.{row['SampleName']}.vcf.gz"
     if os.path.exists(vcf):
         VCF_LIST.append(vcf)
     for method in config['METHOD_LIST']:
         SFS_LIST.append(f"{EXP_FOLDER}/analysis/{row['Species']}.{row['SampleName']}.{method}")
+
+wildcard_constraints:
+    # constrain to only alphanumeric characters and underscore
+    popu=r"[a-zA-Z_]+", species=r"[a-zA-Z_]+", method=r"[a-zA-Z]+", cat=r"[a-zA-Z]+"
 
 rule all:
     input:
@@ -140,10 +146,25 @@ rule mask_CpG:
         "python3 {input.script} --fasta {input.fasta} --output {output.tsv}"
 
 
+rule mask_unaligned_flanks:
+    input:
+        script=f"{FOLDER}/scripts/mask_unaligned_flanks.py",
+        fasta_folder=f"{FOLDER}/data_div/omm_NT_fasta.v10c_116",
+        tree_folder=f"{FOLDER}/data_div/omm_RooTree.v10b_116",
+        fasta=rules.fixed_snp_by_pop.output.fasta
+    output:
+        tsv=f"{FOLDER}/data_processed/MaskFlanks{{flank}}.{{species}}.{{popu}}.tsv.gz"
+    shell:
+        "python3 {input.script} --flank {wildcards.flank} --species {wildcards.species} --tree_folder {input.tree_folder} --fasta {input.fasta} --fasta_folder {input.fasta_folder} --output {output.tsv}"
+
+
 def mask_list(species, popu):
+    out = MASK_LIST
     if "mask_CpG" in config and config['mask_CpG']:
-        return MASK_LIST + [f"{FOLDER}/data_processed/MaskCpG.{species}.{popu}.tsv.gz"]
-    return MASK_LIST
+        out += [f"{FOLDER}/data_processed/MaskCpG.{species}.{popu}.tsv.gz"]
+    if ("mask_unaligned_flanks" in config) and (config['mask_unaligned_flanks'] > 0):
+        out += [f"{FOLDER}/data_processed/MaskFlanks{config['mask_unaligned_flanks']}.{species}.{popu}.tsv.gz"]
+    return out
 
 
 def format_mask_list(m):
@@ -260,6 +281,21 @@ rule substitutions:
         folder=f"{FOLDER}/data_processed/ancestral_reconstruction/{{species}}.{{popu}}"
     shell:
         "python3 {input.script} --threshold 0.0 --species {wildcards.species} --exp_folder {input.exp_folder} --xml_folder {input.xml_folder} --ancestral {params.folder} --output {output.tsv}"
+
+
+rule plot_substitutions:
+    input:
+        script=f"{FOLDER}/scripts/substitutions_plot.py",
+        tsv=f"{FOLDER}/TSV/{{species}}.{{popu}}.tsv.gz",
+        mask=lambda wildcards: mask_list(wildcards.species,wildcards.popu),
+        bounds=rules.annotate_vcf.output.bounds,
+        opp=f"{FOLDER}/data_processed/opportunities_{binning}/DFE.{{species}}.{{popu}}.MutSel.tsv"
+    output:
+        pdf=f"{FOLDER}/TSV/{{species}}.{{popu}}.{binning}.pdf",
+    params:
+        mask=lambda wildcards: format_mask_list(mask_list(wildcards.species,wildcards.popu))
+    shell:
+        "python3 {input.script} {params.mask} --input {input.tsv} --output {output.pdf} --bins {bins} --windows {windows} --bounds {input.bounds} --opp {input.opp}"
 
 
 def reconstruct_substitutions(wildcards):

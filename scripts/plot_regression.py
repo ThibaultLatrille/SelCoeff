@@ -65,7 +65,7 @@ def generate_xy_plot(cat_snps):
         for cat_S, s_tex in polydfe_cat_dico.items():
             s = s_tex[s_tex.find("[") + 1:s_tex.rfind("]")]
             dico_label[f'bayes_{cat_S}_P-{cat_S0}'] = f"${pr}[{s0}|{s}]$"
-            dico_label[f'mut_sum_{cat_S}'] = f"${pr}_{{mut}}[{s}]$"
+            dico_label[f'mut_sum_{cat_S}'] = f"${pr}[{s}]$"
             dico_label[f'frac_{cat_S0}_{cat_S}'] = f"$\\frac{{{pr}[{s0}]}}{{{pr}[{s}]}}$"
         dico_label[f'bayes_p_b_P-{cat_S0}'] = f"${pr}[{s0}|S>0]$"
         dico_label[f'frac_{cat_S0}_p_b'] = f"$\\frac{{{pr}[{s0}]}}{{{pr}[S>0]}}$"
@@ -79,8 +79,8 @@ def generate_xy_plot(cat_snps):
                          ('pnpsF', "\\pi_F"), ('pnpsW', "\\pi_W"), ('div', "d")]:
             dico_label[f'{cat_S0}_{p}'] = f"${param} {given_s0}$"
         dico_label[f'{cat_S0}_p_b'] = f"${pr} [S > 0 {given_s0}]$"
-        dico_label[f'sensitivity_{cat_S0}'] = f"TPR {bracket_s0}$"
-        dico_label[f'precision_{cat_S0}'] = f"PPV {bracket_s0}$"
+        dico_label[f'sensitivity_{cat_S0}'] = f"TPR ${bracket_s0}$"
+        dico_label[f'precision_{cat_S0}'] = f"PPV ${bracket_s0}$"
         y_dico.update(
             {f'{cat_S0}_{cat_poly}': v.replace(']', f'{given_s0}]') for cat_poly, v in polydfe_cat_dico.items()})
         for cat_beta in cat_snps.non_syn_list + ['all']:
@@ -244,7 +244,7 @@ def main(args):
                    ['omega_Adiv']]
 
     cols = [
-        ["tajima", 'pos', 'all_P-Spos', 'frac_pos_P-Spos', 'pos_P-Spos', 'bayes_P-Spos_P-pos'],
+        ["tajima", 'pos', 'mut_sum_P-Spos', 'frac_pos_P-Spos', 'pos_P-Spos', 'bayes_P-Spos_P-pos'],
         ["tajima"] + [f'{prefix}_{cat}' for cat, prefix in product(cat_snps.non_syn_list, ['precision', 'sensitivity'])]
     ]
     if len(cat_snps.non_syn_list) == 2:
