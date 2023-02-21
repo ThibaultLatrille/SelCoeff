@@ -45,7 +45,7 @@ for row_id, row in pd.read_csv(sample_list,sep="\t").iterrows():
 
 wildcard_constraints:
     # constrain to only alphanumeric characters and underscore
-    popu=r"[a-zA-Z_]+", species=r"[a-zA-Z_]+", method=r"[a-zA-Z]+", cat=r"[a-zA-Z]+"
+    popu=r"[a-zA-Z_]+", species=r"[a-zA-Z_]+", method=r"[a-zA-Z]+"
 
 rule all:
     input:
