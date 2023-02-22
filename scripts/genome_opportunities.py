@@ -58,10 +58,7 @@ def main(args):
     counts_mu, counts_q = np.histogram([], bins=bins)[0], np.histogram([], bins=bins)[0]
     log_fitness, sel_coeff, flow_pos, flow_neg = Stat(), Stat(), Stat(), Stat()
 
-    masks = []
-    for mask_file in args.mask:
-        assert os.path.isfile(mask_file)
-        masks.append(open_mask(mask_file))
+    mask_grouped = merge_mask_list(args.mask)
     unconserved_grouped = open_mask(args.unconserved)
 
     cds_rates = CdsRates(args.method, args.exp_folder, args.sift_folder)
@@ -86,12 +83,8 @@ def main(args):
                 continue
 
             dico_opp["nTotal"] += 1.0
-            masked = False
-            for mask_grouped in masks:
-                if ensg in mask_grouped and c_site in mask_grouped[ensg]:
-                    masked = True
-                    break
-            if masked:
+
+            if ensg in mask_grouped and c_site in mask_grouped[ensg]:
                 dico_opp["nMasked"] += 1.0
                 continue
             dico_opp["nNonMasked"] += 1.0

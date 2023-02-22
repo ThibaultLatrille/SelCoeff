@@ -2,11 +2,11 @@ import os
 import gzip
 import argparse
 from collections import defaultdict
-from libraries import open_mask, plt, my_dpi, format_pop
+from libraries import merge_mask_list, plt, my_dpi, format_pop
 from upsetplot import UpSet, from_contents
 
 
-def read_vcf(vcf, masks):
+def read_vcf(vcf, mask_grouped):
     vcf_file = gzip.open(vcf, 'rt')
     set_snp, sample_sizes = set(), set()
     discarded, filtered = 0, 0
@@ -24,17 +24,12 @@ def read_vcf(vcf, masks):
         dico_info = {k: v for k, v in [s.split('=') for s in info.split(';') if '=' in s]}
         ensg = dico_info["ENSG"]
         c_site = int(dico_info["ENSG_POS"]) // 3
-        masked = False
-        for mask_grouped in masks:
-            if ensg in mask_grouped and c_site in mask_grouped[ensg]:
-                masked = True
-                break
 
-        if masked:
+        if ensg in mask_grouped and c_site in mask_grouped[ensg]:
             discarded += 1
             continue
 
-        if float(dico_info["ANC_PROBA"]) < 0.95:
+        if float(dico_info["ANC_PROBA"]) < 0.99:
             filtered += 1
             continue
 
@@ -65,17 +60,13 @@ def plot_upset(dico_snps, output):
 
 def main(vcf_list, mask_list, output):
     os.makedirs(os.path.dirname(output), exist_ok=True)
-
-    masks = []
-    for mask_file in mask_list:
-        assert os.path.isfile(mask_file)
-        masks.append(open_mask(mask_file))
+    mask_grouped = merge_mask_list(mask_list)
 
     dico_pop, dico_sp = defaultdict(dict), defaultdict(set)
     for vcf_file in sorted(vcf_list):
         sp, pop = os.path.basename(vcf_file).replace("_", " ").replace(".vcf.gz", "").split(".")
         print(sp, pop)
-        set_snps, sample_size = read_vcf(vcf_file, masks)
+        set_snps, sample_size = read_vcf(vcf_file, mask_grouped)
         dico_pop[sp][f"{format_pop(pop)} (k={sample_size})"] = set_snps
         dico_sp[sp].update(set_snps)
 

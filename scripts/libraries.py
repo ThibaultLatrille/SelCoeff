@@ -118,14 +118,28 @@ def write_fasta(dico_fasta, output):
     outfile.close()
 
 
-def open_mask(file):
-    mask_grouped = {}
+def open_mask(file: str):
     if file != "" and os.path.isfile(file):
         df_mask = pd.read_csv(file, sep="\t", dtype={"ensg": 'string', "pos": int})
-        mask_grouped = {ensg: df["pos"].values for ensg, df in df_mask.groupby("ensg")}
+        return {ensg: set(df["pos"].values) for ensg, df in df_mask.groupby("ensg")}
     else:
-        print(f"No mask found: {file}.")
-    return mask_grouped
+        print(f"No mask found at: {file}.")
+        return {}
+
+
+def merge_mask_list(mask_list_path: list):
+    if len(mask_list_path) == 0:
+        print(f"No mask provided.")
+        return {}
+    elif len(mask_list_path) == 1:
+        return open_mask(mask_list_path[0])
+    else:
+        mask_merged = defaultdict(set)
+        for mask_path in mask_list_path:
+            mask = open_mask(mask_path)
+            for ensg, pos in mask.items():
+                mask_merged[ensg] = mask_merged[ensg].union(pos)
+        return mask_merged
 
 
 class CdsRates(dict):

@@ -6,7 +6,7 @@ import pandas as pd
 import scipy.stats as sps
 from collections import defaultdict
 from matplotlib.patches import Rectangle
-from libraries import open_mask, BOUND, CategorySNP, xlim_dico, rate_dico, plt, my_dpi, multiline
+from libraries import merge_mask_list, BOUND, CategorySNP, xlim_dico, rate_dico, plt, my_dpi, multiline
 
 
 def open_sift(sift_file):
@@ -17,7 +17,7 @@ def open_sift(sift_file):
     return output
 
 
-def read_vcf(vcf, sift_file, masks, subsample, anc_proba):
+def read_vcf(vcf, sift_file, mask_grouped, subsample, anc_proba):
     dict_sift = open_sift(sift_file)
     vcf_file = gzip.open(vcf, 'rt')
     dico_snp = defaultdict(list)
@@ -38,13 +38,8 @@ def read_vcf(vcf, sift_file, masks, subsample, anc_proba):
         dico_info = {k: v for k, v in [s.split('=') for s in info.split(';') if '=' in s]}
         ensg = dico_info["ENSG"]
         c_site = int(dico_info["ENSG_POS"]) // 3
-        masked = False
-        for mask_grouped in masks:
-            if ensg in mask_grouped and c_site in mask_grouped[ensg]:
-                masked = True
-                break
 
-        if masked:
+        if ensg in mask_grouped and c_site in mask_grouped[ensg]:
             discarded += 1
             continue
 
@@ -222,11 +217,8 @@ def main(args):
     os.makedirs(os.path.dirname(args.output_tsv), exist_ok=True)
     os.makedirs(os.path.dirname(args.output_bounds), exist_ok=True)
 
-    masks = []
-    for mask_file in args.mask:
-        assert os.path.isfile(mask_file)
-        masks.append(open_mask(mask_file))
-    dico_snp, discarded, filtered = read_vcf(args.vcf, args.sift_file, masks, args.subsample, args.anc_proba)
+    mask_grouped = merge_mask_list(args.mask)
+    dico_snp, discarded, filtered = read_vcf(args.vcf, args.sift_file, mask_grouped, args.subsample, args.anc_proba)
     total = len(dico_snp["snp_type"]) + discarded + filtered
     print(f'{discarded * 100 / total:.2f}% of SNPs are discarded because their are masked.')
     print(f'{filtered * 100 / total:.2f}% of SNPs are discarded because they are filtered.')

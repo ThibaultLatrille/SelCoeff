@@ -54,8 +54,8 @@ rule all:
         f"{EXP_FOLDER}/supp-mat.pdf",
         f"{FOLDER}/data_processed/experimental_DFE.pdf",
         f"{FOLDER}/data_processed/population_DFE.pdf",
-        f"{FOLDER}/data_processed/upset_plot.pdf",
-        f"{FOLDER}/data_processed/SNP_effect.tsv",
+        f"{FOLDER}/data_processed/upset_plot_{binning}.pdf",
+        f"{FOLDER}/data_processed/SNP_effect/{binning}/output.tsv",
         TSV_LIST
 
 rule experimental_DFE:
@@ -74,17 +74,6 @@ rule population_DFE:
         pdf=f"{FOLDER}/data_processed/population_DFE.pdf"
     shell:
         "python3 {input.script} --output {output.pdf}"
-
-rule SNP_effect:
-    input:
-        script=f"{FOLDER}/scripts/SNP_effect.py",
-        tex=f"{FOLDER}/scripts/main-table.tex",
-        vcf=f"{FOLDER}/data_poly/Homo_sapiens.EUR.vcf.gz",
-        effect=f"{FOLDER}/data_phenotype/v92/homo_sapiens_phenotype_associated.vcf.gz"
-    output:
-        pdf=f"{FOLDER}/data_processed/SNP_effect.tsv"
-    shell:
-        "python3 {input.script} --tex {input.tex} --vcf {input.vcf} --effect {input.effect} --output {output.pdf}"
 
 rule fixed_snp_by_pop:
     input:
@@ -408,8 +397,22 @@ rule upset_plot:
         script=f"{FOLDER}/scripts/plot_venn.py",
         mask=MASK_LIST
     output:
-        pdf=f"{FOLDER}/data_processed/upset_plot.pdf"
+        pdf=f"{FOLDER}/data_processed/upset_plot_{binning}.pdf"
     params:
         mask=lambda wildcards: format_mask_list(MASK_LIST)
     shell:
         "python3 {input.script} {params.mask} --vcf {input.vcf} --output {output.pdf}"
+
+rule SNP_effect:
+    input:
+        script=f"{FOLDER}/scripts/SNP_effect.py",
+        tex=f"{FOLDER}/scripts/main-table.tex",
+        vcf=f"{FOLDER}/data_poly/Homo_sapiens.EUR.vcf.gz",
+        effect=f"{FOLDER}/data_phenotype/v92/homo_sapiens_clinically_associated.vcf.gz",
+        mask=mask_list("Homo_sapiens","EUR")
+    output:
+        pdf=f"{FOLDER}/data_processed/SNP_effect/{binning}/output.tsv"
+    params:
+        mask=format_mask_list(mask_list("Homo_sapiens","EUR"))
+    shell:
+        "python3 {input.script} {params.mask} --tex {input.tex} --vcf {input.vcf} --effect {input.effect} --output {output.pdf}"

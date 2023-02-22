@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import scipy.stats as st
 from collections import defaultdict
-from libraries import CategorySNP, tex_f
+from libraries import CategorySNP, tex_f, merge_mask_list
 
 
 def read_effect_vcf(vcf, set_ids: set):
@@ -28,6 +28,7 @@ def read_effect_vcf(vcf, set_ids: set):
             continue
 
         info = str(split_line[header["INFO"]])
+        print(info)
         if "CLIN_" not in info:
             continue
 
@@ -42,7 +43,7 @@ def read_effect_vcf(vcf, set_ids: set):
     return dico_snps
 
 
-def read_vcf(vcf, cat_snps: CategorySNP):
+def read_vcf(vcf, cat_snps: CategorySNP, mask_grouped):
     print(f"Reading file {vcf}")
     vcf_file = gzip.open(vcf, 'rt')
     dico_snps, header = defaultdict(set), {}
@@ -58,7 +59,12 @@ def read_vcf(vcf, cat_snps: CategorySNP):
         info = str(split_line[header["INFO"]])
         dico_info = {k: v for k, v in [s.split('=') for s in info.split(';') if '=' in s]}
 
-        if float(dico_info["ANC_PROBA"]) < 0.95:
+        ensg = dico_info["ENSG"]
+        c_site = int(dico_info["ENSG_POS"]) // 3
+        if ensg in mask_grouped and c_site in mask_grouped[ensg]:
+            continue
+
+        if float(dico_info["ANC_PROBA"]) < 0.99:
             continue
 
         k = int(dico_info["COUNT_POLARIZED"])
@@ -103,9 +109,11 @@ def adjusted_holm_pval(d, prefix="", alpha=0.05, format_p=True):
     return d
 
 
-def main(input_vcf, input_effect, tex_source, output):
+def main(input_vcf, input_effect, tex_source, output, mask_list):
+    mask_grouped = merge_mask_list(mask_list)
+
     cat_snps = CategorySNP("MutSel", bins=3)
-    dico_cat_snps = read_vcf(input_vcf, cat_snps)
+    dico_cat_snps = read_vcf(input_vcf, cat_snps, mask_grouped)
     set_ids = set().union(*dico_cat_snps.values())
     dico_clin_snps = read_effect_vcf(input_effect, set_ids)
 
@@ -168,5 +176,7 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--vcf', required=True, type=str, dest="vcf", help="Vcf file")
     parser.add_argument('-e', '--effect', required=True, type=str, dest="effect", help="The effect vcf file")
     parser.add_argument('-o', '--output', required=True, type=str, dest="output", help="Output path")
+    parser.add_argument('--mask', required=False, default="", nargs="+", type=str, dest="mask",
+                        help="List of input mask file path")
     args = parser.parse_args()
-    main(args.vcf, args.effect, args.tex, args.output)
+    main(args.vcf, args.effect, args.tex, args.output, args.mask)

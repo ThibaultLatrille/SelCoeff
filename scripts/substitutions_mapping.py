@@ -58,10 +58,7 @@ def main(args):
     cds_rates = CdsRates("MutSel", args.exp_folder)
     score_list = []
 
-    masks = []
-    for mask_file in args.mask:
-        assert os.path.isfile(mask_file)
-        masks.append(open_mask(mask_file))
+    mask_grouped = merge_mask_list(args.mask)
 
     for anc_file in glob(os.path.join(args.ancestral, "*.joint.fasta.gz")):
         seqs = open_fasta(anc_file)
@@ -99,13 +96,7 @@ def main(args):
             if len(diffs) != 1:
                 continue
 
-            masked = False
-            for mask_grouped in masks:
-                if ensg in mask_grouped and c_site in mask_grouped[ensg]:
-                    masked = True
-                    break
-
-            if masked:
+            if ensg in mask_grouped and c_site in mask_grouped[ensg]:
                 dico_div["masked"] += 1.0
                 continue
 

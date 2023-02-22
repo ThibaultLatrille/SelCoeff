@@ -3,27 +3,20 @@ import argparse
 import pandas as pd
 from collections import defaultdict
 from matplotlib.patches import Rectangle
-from libraries import open_mask, plt, my_dpi, CategorySNP
+from libraries import merge_mask_list, plt, my_dpi, CategorySNP
 
 
 def main(input_path, mask_list, output, bins, windows, bounds, opp):
     os.makedirs(os.path.dirname(output), exist_ok=True)
     cat_snps = CategorySNP("MutSel", bounds, bins=bins, windows=windows)
-
-    masks = []
-    for mask_file in mask_list:
-        assert os.path.isfile(mask_file)
-        masks.append(open_mask(mask_file))
+    mask_grouped = merge_mask_list(mask_list)
 
     df = pd.read_csv(input_path, sep='\t')
     dico_hist, dico_hist_not_masked = defaultdict(int), defaultdict(int)
     dico_div, dico_div_not_masked = defaultdict(float), defaultdict(float)
 
     def masked_sub(row):
-        for mask_grouped in masks:
-            if row.ENSG in mask_grouped and row.CODON_SITE in mask_grouped[row.ENSG]:
-                return True
-        return False
+        return row.ENSG in mask_grouped and row.CODON_SITE in mask_grouped[row.ENSG]
 
     def cat_sub(row):
         if row.SUB_TYPE == "Syn":
