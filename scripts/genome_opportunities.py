@@ -143,8 +143,8 @@ def main(args):
         if args.method == "MutSel":
             dico_flow[cat] = dico_flow[cat] / (flow_neg.total + flow_pos.total)
 
-    dico_opp["Lds"] = dico_opp["nTotal"] * dico_opp["μSyn"] / dico_opp["μTotal"]
-    dico_opp["Ldn"] = dico_opp["nTotal"] * dico_opp["μNonSyn"] / dico_opp["μTotal"]
+    dico_opp["Lds"] = dico_opp["nNonMasked"] * dico_opp["μSyn"] / dico_opp["μTotal"]
+    dico_opp["Ldn"] = dico_opp["nNonMasked"] * dico_opp["μNonSyn"] / dico_opp["μTotal"]
 
     print(f'{dico_opp["μOut"] * 100 / dico_opp["μNonSyn"]:.2f}% of opportunities out of bounds')
     print(f'{dico_opp["nMasked"] * 100 / dico_opp["nTotal"]:.2f}% of sites are discarded because their are masked.')
