@@ -19,7 +19,7 @@ if USE_DIVERGENCE:
     assert config['ALPHA']
 polyDFE_param = f"-m {model.split('_')[-1]}"
 polyDFE_param += " 5" if model == "polyDFE_D" else ""
-polyDFE_param += " -w" if USE_DIVERGENCE else ""
+polyDFE_param += " -w" if not USE_DIVERGENCE else ""
 bins = config['bins']
 windows = config['windows']
 method_cats = {m: CategorySNP(m,bound_file="",bins=bins,windows=windows).all() for m in config['METHOD_LIST']}
