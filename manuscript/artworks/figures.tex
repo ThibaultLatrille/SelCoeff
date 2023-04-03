@@ -265,4 +265,26 @@ denoted $\pfix(s)$ is given by:
 			\proba \left[ {\color{BLUE}\bm{\divAdv}} \given \polyAdv \right] = \frac{ \proba \left[ \polyAdv \given {\color{BLUE}\bm{\divAdv}} \right] \proba \left[ {\color{BLUE}\bm{\divAdv}} \right] }{\proba \left[  \polyAdv \right]}
 		\end{align*}
 	\end{frame}
+	\begin{frame}
+		\begin{align*}
+			\Spop^{d} \coloneqq \Spop <-1 \\
+			\Spop^{n} \coloneqq -1 <\Spop <1 \\
+			\Spop^{b} \coloneqq \Spop > 1 \\
+			{\color{RED}\Sphy^{d}} \coloneqq \Sphy <-1 \\
+			{\color{GREEN}\Sphy^{n}} \coloneqq -1 <\Sphy <1 \\
+			{\color{BLUE}\Sphy^{b}} \coloneqq \Sphy > 1 \\
+			\text{Precision} =\frac{\text{True Positive}}{\text{Predicted Positive}} \\
+			 \frac{ \proba \left[ \Spop^{b} \cap {\color{BLUE}\Sphy^{b}} \right] }{\proba \left[  {\color{BLUE}\Sphy^{b}} \right]} = \proba \left[ \Spop^{b} \given {\color{BLUE}\Sphy^{b}} \right] \\
+			\text{Recall}=\frac{\text{True Positive}}{\text{Positive}} \\
+			\frac{ \proba \left[ \Spop^{b} \cap {\color{BLUE}\Sphy^{b}} \right] }{\proba \left[  \Spop^{b} \right]} = \proba \left[  {\color{BLUE}\Sphy^{b}} \given  \Spop^{b}  \right] 
+		\end{align*}
+	\end{frame}
+	\begin{frame}
+		\begin{align*}
+			\text{Precision} =\frac{\text{TP}}{\text{TP + FP}} \\
+			\frac{ \proba \left[ \polyAdv \cap {\color{BLUE}\bm{\divAdv}} \right] }{\proba \left[   {\color{BLUE}\bm{\divAdv}} \right]} = \proba \left[ \polyAdv \given {\color{BLUE}\bm{\divAdv}} \right] \\
+			\text{Recall}=\frac{\text{TP}}{\text{TP + FN}} \\
+			\frac{ \proba \left[ \polyAdv \cap {\color{BLUE}\bm{\divAdv}} \right] }{\proba \left[  \polyAdv \right]} = \proba \left[  {\color{BLUE}\bm{\divAdv}} \given  \polyAdv  \right] 
+		\end{align*}
+	\end{frame}
 \end{document}

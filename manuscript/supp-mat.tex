@@ -61,36 +61,32 @@
 \newcommand{\Sphy}{S_{0}}
 \newcommand{\Sphyclass}{\mathcal{C}}
 \newcommand{\SphyMean}{\overline{\Sphy}}
-\newcommand{\divStrongDel}{\Sphy < -3}
-\newcommand{\divDel}{-3 < \Sphy < -1}
-\newcommand{\divWeakDel}{-1 < \Sphy < 0}
-\newcommand{\divWeakAdv}{0 < \Sphy < 1}
-\newcommand{\divAdv}{ \Sphy > 1}
-\newcommand{\PdivStrongDel}{\proba \left[ \divStrongDel \right]}
+\newcommand{\divDel}{\Sphy^{\text{d}}}
+\newcommand{\divWeak}{\Sphy^{\text{n}}}
+\newcommand{\divAdv}{\Sphy^{\text{b}}}
 \newcommand{\PdivDel}{\proba \left[ \divDel \right]}
-\newcommand{\PdivWeakDel}{\proba \left[ \divWeakDel \right]}
-\newcommand{\PdivWeakAdv}{\proba \left[ \divWeakAdv \right]}
+\newcommand{\PdivWeak}{\proba \left[ \divWeak \right]}
 \newcommand{\PdivAdv}{\proba \left[ \divAdv \right]}
 \newcommand{\given}{\mid}
 \newcommand{\Spop}{S}
 \newcommand{\SpopMean}{\overline{\Spop}}
-\newcommand{\polyDel}{\Spop < -1}
-\newcommand{\polyNeutral}{-1 < \Spop < 1}
-\newcommand{\polyAdv}{ \Spop > 1}
+\newcommand{\polyDel}{\Spop^{\text{d}}}
+\newcommand{\polyNeutral}{\Spop^{\text{n}}}
+\newcommand{\polyAdv}{\Spop^{\text{b}}}
 \newcommand{\PpolyDel}{\proba \left[ \polyDel \right]}
 \newcommand{\PpolyNeutral}{\proba \left[ \polyNeutral \right]}
 \newcommand{\PpolyAdv}{\proba \left[ \polyAdv \right]}
 
-\title{Up to 25\% of beneficial mutations in protein sequences are not adaptive innovations in mammals}
+\title{\textbf{Empirical evidence for beneficial mutations that are not adaptive innovations in mammals}}
 
 \author{
     \large
-    \textbf{T. {Latrille}$^{1}$, J. {Joseph}$^{2}$, N. {Salamin}$^{1}$}\\
-    \normalsize
-    $^{1}$Université de Lausanne, Lausanne, Switzerland\\
-    $^{2}$Université de Lyon, CNRS, LBBE UMR 5558, Villeurbanne, France \\
+    \textbf{T. {Latrille}$^{1}$, J. {Joseph}$^{2}$, D.~A. {Hartasánchez}$^{1}$, N. {Salamin}$^{1}$}\\
+    \scriptsize $^{1}$Department of Computational Biology, Université de Lausanne, Lausanne, Switzerland\\
+    \scriptsize $^{2}$Université de Lyon, Université Lyon 1, CNRS, VetAgro Sup, Laboratoire de Biométrie et Biologie Evolutive, UMR5558, Villeurbanne, France \\
     \texttt{\href{mailto:thibault.latrille@ens-lyon.org}{thibault.latrille@ens-lyon.org}} \\
 }
+
 
 \date{}
 
@@ -99,7 +95,6 @@
     \part*{Supplementary materials}
     \tableofcontents
     \clearpage
-
 
     \section{Mutation-selection codon models}\label{sec:site-specific-mutation-selection-codon-models}
     In BayesCode (\url{https://github.com/ThibaultLatrille/bayescode}), mutation-selection codon models are obtained by running \textit{mutselomega} for 2000 points of MCMC with the options:
@@ -114,7 +109,7 @@
  readmutselomega --every 1 --until 2000 --burnin 1000 --ss my_genename
         \end{verbatim}
     \end{scriptsize}
-    The gene-specific mutation matrix ($\UniDimArray{\mu}$) is also obtained by running \textit{readmutselomega}, reading 1000 points of MCMC (first 1000 are considered as burn-in) with the options:
+    The gene-specific $4 \times 4$ nucleotide mutation rate matrix ($\UniDimArray{\mu}$) is also obtained by running \textit{readmutselomega}, reading 1000 points of MCMC (first 1000 are considered as burn-in) with the options:
     \begin{scriptsize}
         \begin{verbatim}
  readmutselomega --every 1 --until 2000 --burnin 1000 --nuc my_genename
@@ -127,51 +122,58 @@
     \begin{center}
         \captionof{table}{$\dnds$ of beneficial back-mutations.}
         \scriptsize
-        \begin{longtable*}{|l|l|r|r|r|}
+        \begin{longtable*}{|l|l|r|r|r|r|r|r|}
             \toprule
-            Population & Species & Tajima $\theta_{\pi}$ & $\mathbb{P}_{div}[\Sphy > 1]$ & $\dn(\Sphy > 1) / \ds$ \\
+            Population &             Species & Tajima $\theta_{\pi}$  & $\mathbb{P}_{div}[ S_0^{b} ]$ & $\omega $ & $\omega ( S_0^{d} )$ & $\omega ( S_0^{n} )$ & $\omega ( S_0^{b} )$ \\
+            \midrule
+            \endfirsthead
+
+            \toprule
+            Population &             Species & Tajima $\theta_{\pi}$  & $\mathbb{P}_{div}[ S_0^{b} ]$ & $\omega $ & $\omega ( S_0^{d} )$ & $\omega ( S_0^{n} )$ & $\omega ( S_0^{b} )$ \\
             \midrule
             \endhead
             \midrule
-            \multicolumn{5}{r}{{Continued on next page}} \\
+            \multicolumn{8}{r}{{Continued on next page}} \\
             \midrule
             \endfoot
 
             \bottomrule
             \endlastfoot
-            Equus c. &      Equus caballus &               $ 0.002$ &                $ 0.116$ &              $ 1.214$ \\
-            Iran &          Bos taurus &               $ 0.005$ &                $ 0.128$ &              $ 1.309$ \\
-            Uganda &          Bos taurus &               $ 0.005$ &                $ 0.130$ &              $ 1.352$ \\
-            Australia &        Capra hircus &               $ 0.003$ &                $ 0.121$ &              $ 1.147$ \\
-            France &        Capra hircus &               $ 0.003$ &                $ 0.121$ &              $ 1.154$ \\
-            Iran (C. aegagrus) &        Capra hircus &               $ 0.003$ &                $ 0.121$ &              $ 1.154$ \\
-            Iran &        Capra hircus &               $ 0.004$ &                $ 0.122$ &              $ 1.164$ \\
-            Italy &        Capra hircus &               $ 0.003$ &                $ 0.120$ &              $ 1.148$ \\
-            Morocco &        Capra hircus &               $ 0.004$ &                $ 0.123$ &              $ 1.170$ \\
-            Iran &          Ovis aries &               $ 0.007$ &                $ 0.113$ &              $ 1.210$ \\
-            Iran (O. orientalis) &          Ovis aries &               $ 0.009$ &                $ 0.112$ &              $ 1.214$ \\
-            Iran (O. vignei) &          Ovis aries &               $ 0.007$ &                $ 0.113$ &              $ 1.200$ \\
-            Various &          Ovis aries &               $ 0.009$ &                $ 0.112$ &              $ 1.207$ \\
-            Morocco &          Ovis aries &               $ 0.007$ &                $ 0.113$ &              $ 1.215$ \\
-            Barbados & Chlorocebus sabaeus &               $ 0.004$ &                $ 0.122$ &              $ 1.477$ \\
-            Central Afr. Rep. & Chlorocebus sabaeus &               $ 0.006$ &                $ 0.123$ &              $ 1.501$ \\
-            Ethiopia & Chlorocebus sabaeus &               $ 0.005$ &                $ 0.123$ &              $ 1.494$ \\
-            Gambia & Chlorocebus sabaeus &               $ 0.005$ &                $ 0.123$ &              $ 1.491$ \\
-            Kenya & Chlorocebus sabaeus &               $ 0.005$ &                $ 0.123$ &              $ 1.503$ \\
-            Nevis & Chlorocebus sabaeus &               $ 0.003$ &                $ 0.123$ &              $ 1.484$ \\
-            South Africa & Chlorocebus sabaeus &               $ 0.006$ &                $ 0.125$ &              $ 1.528$ \\
-            Saint Kitts & Chlorocebus sabaeus &               $ 0.004$ &                $ 0.123$ &              $ 1.495$ \\
-            Zambia & Chlorocebus sabaeus &               $ 0.006$ &                $ 0.123$ &              $ 1.493$ \\
-            African &        Homo sapiens &               $ 0.003$ &                $ 0.102$ &              $ 1.676$ \\
-            Admixed American &        Homo sapiens &               $ 0.002$ &                $ 0.102$ &              $ 1.669$ \\
-            East Asian &        Homo sapiens &               $ 0.002$ &                $ 0.102$ &              $ 1.682$ \\
-            European &        Homo sapiens &               $ 0.002$ &                $ 0.101$ &              $ 1.659$ \\
-            South Asian &        Homo sapiens &               $ 0.002$ &                $ 0.102$ &              $ 1.676$ \\
+            Equus c. &      Equus caballus &               $ 0.002$ &                      $ 0.118$ &  $ 0.147$ &             $ 0.075$ &             $ 0.823$ &             $ 1.203$ \\
+            Iran &          Bos taurus &               $ 0.002$ &                      $ 0.123$ &  $ 0.131$ &             $ 0.074$ &             $ 0.627$ &             $ 1.206$ \\
+            Uganda &          Bos taurus &               $ 0.005$ &                      $ 0.125$ &  $ 0.134$ &             $ 0.075$ &             $ 0.637$ &             $ 1.252$ \\
+            Australia &        Capra hircus &               $ 0.003$ &                      $ 0.121$ &  $ 0.125$ &             $ 0.068$ &             $ 0.629$ &             $ 1.099$ \\
+            France &        Capra hircus &               $ 0.004$ &                      $ 0.120$ &  $ 0.126$ &             $ 0.068$ &             $ 0.633$ &             $ 1.102$ \\
+            Iran (C. aegagrus) &        Capra hircus &               $ 0.004$ &                      $ 0.120$ &  $ 0.125$ &             $ 0.068$ &             $ 0.630$ &             $ 1.100$ \\
+            Iran &        Capra hircus &               $ 0.004$ &                      $ 0.121$ &  $ 0.125$ &             $ 0.067$ &             $ 0.630$ &             $ 1.108$ \\
+            Italy &        Capra hircus &               $ 0.004$ &                      $ 0.120$ &  $ 0.126$ &             $ 0.068$ &             $ 0.634$ &             $ 1.102$ \\
+            Morocco &        Capra hircus &               $ 0.004$ &                      $ 0.122$ &  $ 0.125$ &             $ 0.067$ &             $ 0.631$ &             $ 1.112$ \\
+            Iran &          Ovis aries &               $ 0.007$ &                      $ 0.109$ &  $ 0.146$ &             $ 0.091$ &             $ 0.616$ &             $ 1.148$ \\
+            Iran (O. orientalis) &          Ovis aries &               $ 0.009$ &                      $ 0.108$ &  $ 0.148$ &             $ 0.093$ &             $ 0.617$ &             $ 1.145$ \\
+            Iran (O. vignei) &          Ovis aries &               $ 0.007$ &                      $ 0.109$ &  $ 0.146$ &             $ 0.091$ &             $ 0.617$ &             $ 1.134$ \\
+            Various &          Ovis aries &               $ 0.008$ &                      $ 0.107$ &  $ 0.148$ &             $ 0.093$ &             $ 0.617$ &             $ 1.134$ \\
+            Morocco &          Ovis aries &               $ 0.008$ &                      $ 0.108$ &  $ 0.148$ &             $ 0.093$ &             $ 0.619$ &             $ 1.149$ \\
+            Barbados & Chlorocebus sabaeus &               $ 0.004$ &                      $ 0.122$ &  $ 0.133$ &             $ 0.071$ &             $ 0.696$ &             $ 1.397$ \\
+            Central Afr. Rep. & Chlorocebus sabaeus &               $ 0.006$ &                      $ 0.124$ &  $ 0.134$ &             $ 0.071$ &             $ 0.701$ &             $ 1.431$ \\
+            Ethiopia & Chlorocebus sabaeus &               $ 0.005$ &                      $ 0.124$ &  $ 0.134$ &             $ 0.071$ &             $ 0.699$ &             $ 1.422$ \\
+            Gambia & Chlorocebus sabaeus &               $ 0.005$ &                      $ 0.123$ &  $ 0.134$ &             $ 0.071$ &             $ 0.703$ &             $ 1.411$ \\
+            Kenya & Chlorocebus sabaeus &               $ 0.005$ &                      $ 0.123$ &  $ 0.134$ &             $ 0.071$ &             $ 0.699$ &             $ 1.419$ \\
+            Nevis & Chlorocebus sabaeus &               $ 0.003$ &                      $ 0.123$ &  $ 0.133$ &             $ 0.071$ &             $ 0.699$ &             $ 1.407$ \\
+            South Africa & Chlorocebus sabaeus &               $ 0.006$ &                      $ 0.125$ &  $ 0.134$ &             $ 0.070$ &             $ 0.704$ &             $ 1.447$ \\
+            Saint Kitts & Chlorocebus sabaeus &               $ 0.004$ &                      $ 0.123$ &  $ 0.133$ &             $ 0.070$ &             $ 0.699$ &             $ 1.413$ \\
+            Zambia & Chlorocebus sabaeus &               $ 0.006$ &                      $ 0.123$ &  $ 0.134$ &             $ 0.071$ &             $ 0.699$ &             $ 1.410$ \\
+            African &        Homo sapiens &               $ 0.002$ &                      $ 0.099$ &  $ 0.192$ &             $ 0.118$ &             $ 0.865$ &             $ 1.609$ \\
+            Admixed American &        Homo sapiens &               $ 0.002$ &                      $ 0.099$ &  $ 0.192$ &             $ 0.118$ &             $ 0.865$ &             $ 1.607$ \\
+            East Asian &        Homo sapiens &               $ 0.002$ &                      $ 0.098$ &  $ 0.192$ &             $ 0.118$ &             $ 0.869$ &             $ 1.607$ \\
+            European &        Homo sapiens &               $ 0.002$ &                      $ 0.098$ &  $ 0.192$ &             $ 0.118$ &             $ 0.865$ &             $ 1.598$ \\
+            South Asian &        Homo sapiens &               $ 0.002$ &                      $ 0.099$ &  $ 0.192$ &             $ 0.118$ &             $ 0.867$ &             $ 1.610$ \\
         \end{longtable*}
     \end{center}
     \begin{itemize}
         \item Tajima $\theta$ is the synonymous diversity.
         \item $\mathbb{P}_{div}[\Sphy > 1]$ is the proportion of substitutions in the terminal branch observed with a selection coefficient at the phylogenetic scale larger than 1 ($\Sphy > 1$).
+        \item $\dn(\Sphy > 1) / \ds$ is the ratio of non-synonymous over synonymous divergence (also called $\dnds$) estimated for the non-synonymous substitutions in the terminal branch with a selection coefficient larger than 1 ($\Sphy > 1$).
+        \item $\dn(\Sphy > 1) / \ds$ is the ratio of non-synonymous over synonymous divergence (also called $\dnds$) estimated for the non-synonymous substitutions in the terminal branch with a selection coefficient larger than 1 ($\Sphy > 1$).
         \item $\dn(\Sphy > 1) / \ds$ is the ratio of non-synonymous over synonymous divergence (also called $\dnds$) estimated for the non-synonymous substitutions in the terminal branch with a selection coefficient larger than 1 ($\Sphy > 1$).
     \end{itemize}
 
@@ -424,48 +426,47 @@
     \newpage
 
     \subsection{Correlation with diversity}
+    For each population, the proportion of beneficial ($\PpolyAdv$), nearly-neutral ($\PpolyNeutral$) and of deleterious ($\PpolyDel$) mutations estimated at the population-genetic scale is shown as function of Watterson's diversity ($\Theta_w$).
 
     \subsubsection{Proportion of nearly-neutral mutations ($\polyNeutral$)}\label{subsec:proportion-nearly-neutral-mutations}
     \captionof{figure}{~}
-    \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.all_P-Seq0.scatter.pdf}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{../experiments/3bins-mC-masked/regression-MutSel/results.watterson.all_P-Sweak.scatter.pdf}
     \end{minipage}
-    \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.neg-weak_P-Seq0.scatter.pdf}
-    \end{minipage}
-    \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.pos-weak_P-Seq0.scatter.pdf}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{../experiments/3bins-mC-masked/regression-MutSel/results.watterson.weak_P-Sweak.scatter.pdf}
     \end{minipage}
     \begin{itemize}
         \item $\ \proba [ \polyNeutral ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) between -1 and 1, estimated for the whole genome.
-        \item $\ \proba [ \polyNeutral \given \divWeakDel]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) between -1 and 1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) between -1 and 0.
-        \item $\ \proba [ \polyNeutral \given \divWeakAdv ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) between -1 and 1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) between 0 and 1.
+        \item $\ \proba [ \polyNeutral \given \divWeak ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) between -1 and 1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) between -1 and 1.
     \end{itemize}
+
+    We confirmed that higher synonymous diversity is typically accompanied by a smaller proportion of neutral mutations.
+    This result is specially visible when we restricted the analysis to class of mutations that are supposedly nearly-neutral at the phylogenetic scale ($\divWeak$).
+    This result suggests that populations with higher diversity (e.g.~\textit{Bos} or \textit{Ovis}) are more likely to discriminate whether mutations are beneficial or deleterious.
+    Alternatively stated, mutations in populations with low diversity (e.g.~\textit{Homo}) are effectively nearly-neutral and behave as would a neutral mutation.
+    This result is qualitatively in accordance with the nearly-neutral theory of evolution which argues that mutations are less efficiently selected for in small populations.
 
     \subsubsection{Proportion of deleterious mutations ($\polyDel$)}\label{subsec:proportion-deleterious-mutations}
     \captionof{figure}{~}
-    \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.all_P-Sinf0.scatter.pdf}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{../experiments/3bins-mC-masked/regression-MutSel/results.watterson.all_P-Sneg.scatter.pdf}
     \end{minipage}
-    \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.neg_P-Sinf0.scatter.pdf}
-    \end{minipage}
-    \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.neg-strong_P-Sinf0.scatter.pdf}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{../experiments/3bins-mC-masked/regression-MutSel/results.watterson.neg_P-Sneg.scatter.pdf}
     \end{minipage}
     \begin{itemize}
         \item $\ \proba [ \polyDel ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) lower than -1, estimated for the whole genome.
-        \item $\ \proba [ \polyDel \given \divDel]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) lower than -1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) between -3 and -3.
-        \item $\ \proba [ \polyDel \given \divStrongDel ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) lower than -1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) lower than -3.
+        \item $\ \proba [ \polyDel \given \divDel]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) lower than -1, estimated of SNPs observed with a selection coefficient at the phylogenetic scale ($\Sphy$) lower than -1.
     \end{itemize}
 
     \subsubsection{Proportion of beneficial mutations ($\polyAdv$)}\label{subsec:proportion-beneficial-mutations}
     \captionof{figure}{~}
-    \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.all_P-Ssup0.scatter.pdf}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{../experiments/3bins-mC-masked/regression-MutSel/results.watterson.all_P-Spos.scatter.pdf}
     \end{minipage}
-    \begin{minipage}{0.32\linewidth}
-        \includegraphics[width=\linewidth, page=1]{../experiments/5bins-all/regression-MutSel/results.watterson.pos_P-Ssup0.scatter.pdf}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{../experiments/3bins-mC-masked/regression-MutSel/results.watterson.pos_P-Spos.scatter.pdf}
     \end{minipage}
     \begin{itemize}
         \item $ \proba [ \polyAdv ]$ is the proportion of DFE with a selection coefficient at the population-genetic scale ($\Spop$) greater than 1, estimated for the whole genome.
@@ -474,61 +475,51 @@
 
     \newpage
 
-    \subsection{Proportion of selected mutations}
-
-    For each population, the proportion of beneficial ($p_+=\PpolyAdv$), nearly-neutral ($\PpolyNeutral$) and of deleterious ($\PpolyDel$) mutations estimated at the population-genetic scale is shown.
-    Estimation is performed with SNPs with different class of selection at the phylogenetic scale: $\Sphyclass \in \{ \divStrongDel, \divDel, \divWeakDel, \divWeakAdv, \divAdv \}$
-    Population are sorted for increased synonymous diversity.
+    \section{Clinically related terms for non-synonymous mutations}
 
     \begin{center}
-        \captionof{figure}{~}
-        \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.MutSel.all.stacked.pdf}
-        \end{minipage}
-        \begin{minipage}{0.09\linewidth}
-            \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-        \end{minipage}
-        \captionof{figure}{~}
-        \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.MutSel.neg-strong.stacked.pdf} \\
-        \end{minipage}
-        \begin{minipage}{0.09\linewidth}
-            \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-        \end{minipage}\captionof{figure}{~}
-        \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.MutSel.neg.stacked.pdf} \\
-        \end{minipage}
-        \begin{minipage}{0.09\linewidth}
-            \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-        \end{minipage}\captionof{figure}{~}
-        \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.MutSel.neg-weak.stacked.pdf} \\
-        \end{minipage}
-        \begin{minipage}{0.09\linewidth}
-            \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-        \end{minipage}\captionof{figure}{~}
-        \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.MutSel.pos-weak.stacked.pdf} \\
-        \end{minipage}
-        \begin{minipage}{0.09\linewidth}
-            \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-        \end{minipage}\captionof{figure}{~}
-        \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.MutSel.pos.stacked.pdf}
-        \end{minipage}
-        \begin{minipage}{0.09\linewidth}
-            \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-        \end{minipage}
+        \captionof{table}{Clinically related terms for $\Sphy < -1$}
+        \begin{tabular}{|l|r|r|r|r|r|}
+            \toprule
+            SNP clinical ontology & $n_{\mathrm{Observed}}$ & $n_{\mathrm{Expected}}$ & Odds ratio & $p_{\mathrm{v}}$ & $p_{\mathrm{v-adjusted}}$ \\
+            \midrule
+            Benign                & 2969                    & $4043.0$                & $ 0.734$   & $ 1.000$             & $ 1.000~~$                    \\
+            Likely benign         & 2994                    & $3399.8$                & $ 0.881$   & $ 0.999$             & $ 1.000~~$                    \\
+            Risk factor           & 102                     & $ 118.2$                & $ 0.863$   & $ 0.798$             & $ 1.000~~$                    \\
+            Likely pathogenic     & 221                     & $  68.5$                  & $ 3.226$   & $1.7\times 10^{-8}$  & $\bm{6.7\times 10^{-8}{^*}}$  \\
+            Pathogenic            & 560                     & $ 193.6$                & $ 2.893$   & $4.2\times 10^{-17}$ & $\bm{2.1\times 10^{-16}{^*}}$ \\
+            \bottomrule
+        \end{tabular}
     \end{center}
-    We confirmed that higher synonymous diversity is typically accompanied by a smaller proportion of neutral mutations.
-    This result is specially visible when we restricted the analysis to class of mutations that are supposedly nearly-neutral at the phylogenetic scale ($\divWeakDel$ and $\divWeakAdv$).
-    This result suggests that populations with higher diversity (e.g.~\textit{Bos} or \textit{Ovis}) are more likely to discriminate whether mutations are beneficial or deleterious.
-    Alternatively stated, mutations in populations with low diversity (e.g.~\textit{Homo}) are effectively nearly-neutral and behave as would a neutral mutation.
-    This result is qualitatively in accordance with the nearly-neutral theory of evolution which argues that mutations are less efficiently selected for in small populations.
+    In humans, non-synonymous SNPs in the test group (deleterious mutations with $\Sphy < -1$) are contrasted to SNPs in the control group (nearly-neutral mutations with $-1 < \Sphy < 1$).
+    For each clinical term, a 2x2 contingency tables is built by counting the number of SNPs based on their selection coefficient and their clinical terms (whether they have this specific term or not).
+    Fisher's exact tests are then performed for these 2x2 contingency tables.
+    $^*$ signify that the$p_{\mathrm{v}}^{\mathrm{adj}}$ corrected for multiple comparison (Holm–Bonferroni correction) is lower than the risk $\alpha=0.05$.
+    SNPs predicted with $\Sphy < -1$ are statistically associated to clinical terms such as \textit{Likely Pathogenic} and \textit{Pathogenic}.
 
+    \begin{center}
+        \captionof{table}{Clinically related terms for $\Sphy > 1$}
+        \begin{tabular}{|l|r|r|r|r|r|}
+            \toprule
+            SNP clinical ontology & $n_{\mathrm{Observed}}$ & $n_{\mathrm{Expected}}$ & Odds ratio & $p_{\mathrm{v}}$ & $p_{\mathrm{v-adjusted}}$ \\
+            \midrule
+            Benign                & 319                     & $ 261.7$                & $ 1.219$   & $ 0.002$         & $\bm{ 0.009{^*}}$         \\
+            Likely benign         & 263                     & $ 222.7$                & $ 1.181$   & $ 0.012$         & $\bm{ 0.049{^*}}$         \\
+            Risk factor           & 5                       & $ 7.847$                & $ 0.637$   & $ 0.879$         & $ 0.879~~$                \\
+            Likely pathogenic     & 7                       & $ 4.552$                & $ 1.538$   & $ 0.227$         & $ 0.682~~$                \\
+            Pathogenic            & 16                      & $  12.9$                  & $ 1.241$   & $ 0.268$         & $ 0.682~~$                \\
+            \bottomrule
+        \end{tabular}
+    \end{center}
+    In humans, non-synonymous SNPs in the test group (beneficial back-mutations with $\Sphy > 1$) are contrasted to SNPs in the control group (nearly-neutral mutations with $-1 < \Sphy < 1$).
+    For each clinical term, a 2x2 contingency tables is built by counting the number of SNPs based on their selection coefficient and their clinical terms (whether they have this specific term or not).
+    Fisher's exact tests are then performed for these 2x2 contingency tables.
+    $^*$ signify that the$p_{\mathrm{v}}^{\mathrm{adj}}$ corrected for multiple comparison (Holm–Bonferroni correction) is lower than the risk $\alpha=0.05$.
+    Beneficial back-mutations $\Sphy > 1$ are associated with clinical terms such as \textit{Benign} and \textit{Likely Benign}.
+
+    \newpage
 
     \section{Distribution of fitness effects}
-
     \captionof{figure}{~}
     \begin{minipage}{0.49\linewidth}
         \includegraphics[width=\linewidth, page=1]{artworks/2bins.Yeast.experimentalDFE.pdf}
@@ -536,14 +527,11 @@
     \begin{minipage}{0.49\linewidth}
         \includegraphics[width=\linewidth, page=1]{artworks/2bins.AFR.histogramDFE.pdf}
     \end{minipage}
-    \begin{itemize}
-        \item Left panel: Distribution of fitness effects experimentally determined in Yeast, data obtained in \textcite{shen_synonymous_2022}.
-        \item Middle panel: Distribution of fitness effects ($\Sphy$) as predicted with mutation-selection codon models, from reconstructed ancestral genome in \textit{Homo sapiens}).
-    \end{itemize}
+    Left panel: distribution of fitness effects experimentally determined in Yeast, data obtained in \textcite{shen_synonymous_2022}.
+    Right panel:  distribution of fitness effects ($\Sphy$) as predicted with mutation-selection codon models, from reconstructed ancestral genome in \textit{Homo sapiens}.
     The DFE predicted with mutation-selection codon models has a negative mode, consistently with experimental DFEs, meaning that most mutations are effectively deleterious.
 
     \newpage
-
 
     \section{Mutation-selection models: DFE and SFS for each population}\label{sec:mutation-selection-models:-histograms-and-sfs-for-each-population}
     For each population, the same figure is shown.
@@ -561,56 +549,7 @@
     \input{include-MutSel-non-adaptive}
 
     \newpage
-    \section{SIFT scores}\label{sec:sift-scores}
-
-    \subsection{Proportion of selected mutations}\label{subsec:proportion-of-selected-mutations}
-    For each population, the proportion of beneficial ($\PpolyAdv$), nearly-neutral ($\PpolyNeutral$) and of deleterious ($\PpolyDel$) mutations estimated at the population-genetic scale is shown.
-    Estimation is performed with SNPs with different class of SIFT scores at the phylogenetic scale.
-    Population are sorted for increased synonymous diversity.
-
-    \begin{center}
-        \captionof{figure}{~}
-        \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.SIFT.all.stacked.pdf}
-        \end{minipage}
-        \begin{minipage}{0.09\linewidth}
-            \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-        \end{minipage}
-        \captionof{figure}{~}
-        \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.SIFT.neg-strong.stacked.pdf} \\
-        \end{minipage}
-        \begin{minipage}{0.09\linewidth}
-            \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-        \end{minipage}\captionof{figure}{~}
-        \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.SIFT.neg.stacked.pdf} \\
-        \end{minipage}
-        \begin{minipage}{0.09\linewidth}
-            \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-        \end{minipage}\captionof{figure}{~}
-        \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.SIFT.neg-weak.stacked.pdf} \\
-        \end{minipage}
-        \begin{minipage}{0.09\linewidth}
-            \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-        \end{minipage}\captionof{figure}{~}
-        \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.SIFT.pos-weak.stacked.pdf} \\
-        \end{minipage}
-        \begin{minipage}{0.09\linewidth}
-            \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-        \end{minipage}\captionof{figure}{~}
-        \begin{minipage}{0.9\linewidth}
-            \includegraphics[width=0.95\linewidth, page=1]{../experiments/5bins-all/results/Theta.SIFT.pos.stacked.pdf}
-        \end{minipage}
-        \begin{minipage}{0.09\linewidth}
-            \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-        \end{minipage}
-    \end{center}
-    Sites with a higher SIFT score at the phylogenetic scale are more positively selected in the different populations.
-
-    \section*{References}
-    \printbibliography
+    \section{References}
+    \printbibliography[heading=none]
 
 \end{document}
