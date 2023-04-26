@@ -235,24 +235,6 @@ denoted $\pfix(s)$ is given by:
 	\end{frame}
 	\begin{frame}
 		\begin{align*}
-			\divStrongDel \\
-			\divDel \\
-			\divWeakDel \\
-			\divWeakAdv \\
-			\divAdv \\
-			{\color{RED}\bm{\divStrongDel}} \\
-			{\color{YELLOW}\bm{\divDel}} \\
-			{\color{LIGHTGREEN}\bm{\divWeakDel}} \\
-			{\color{GREEN}\bm{\divWeakAdv}} \\
-			{\color{BLUE}\bm{\divAdv}} \\
-			\PpolyDel \\
-			\PpolyNeutral \\
-			\PpolyAdv \\
-			\proba \left[ \divAdv \given \polyAdv \right] 
-		\end{align*}
-	\end{frame}
-	\begin{frame}
-		\begin{align*}
 			\proba \left[ \Sphy \given \Spop \right] \\
 			\proba \left[ \Spop \given \Sphy \right] \\
 			\proba \left[ \Sphy \right] \\
@@ -267,16 +249,19 @@ denoted $\pfix(s)$ is given by:
 	\end{frame}
 	\begin{frame}
 		\begin{align*}
-			\Spop^{d} \coloneqq \Spop <-1 \\
-			\Spop^{n} \coloneqq -1 <\Spop <1 \\
-			\Spop^{b} \coloneqq \Spop > 1 \\
-			{\color{RED}\Sphy^{d}} \coloneqq \Sphy <-1 \\
-			{\color{GREEN}\Sphy^{n}} \coloneqq -1 <\Sphy <1 \\
-			{\color{BLUE}\Sphy^{b}} \coloneqq \Sphy > 1 \\
+			\mathcal{D} \coloneqq \Spop <-1 \\
+			\mathcal{N} \coloneqq -1 <\Spop <1 \\
+			\mathcal{B} \coloneqq \Spop > 1 \\
+			\proba \left[ \mathcal{D}\right] \\
+			\proba \left[ \mathcal{N}\right] \\
+			\proba \left[ \mathcal{B}\right] \\
+			{\color{RED}\mathcal{D}_0} \coloneqq \Sphy <-1 \\
+			{\color{GREEN}\mathcal{N}_0} \coloneqq -1 <\Sphy <1 \\
+			{\color{BLUE}\mathcal{B}_0} \coloneqq \Sphy > 1 \\
 			\text{Precision} =\frac{\text{True Positive}}{\text{Predicted Positive}} \\
-			 \frac{ \proba \left[ \Spop^{b} \cap {\color{BLUE}\Sphy^{b}} \right] }{\proba \left[  {\color{BLUE}\Sphy^{b}} \right]} = \proba \left[ \Spop^{b} \given {\color{BLUE}\Sphy^{b}} \right] \\
+			 \frac{ \proba \left[ \mathcal{B} \cap {\color{BLUE}\mathcal{B}_0} \right] }{\proba \left[  {\color{BLUE}\mathcal{B}_0} \right]} = \proba \left[ \mathcal{B} \given {\color{BLUE}\mathcal{B}_0} \right] \\
 			\text{Recall}=\frac{\text{True Positive}}{\text{Positive}} \\
-			\frac{ \proba \left[ \Spop^{b} \cap {\color{BLUE}\Sphy^{b}} \right] }{\proba \left[  \Spop^{b} \right]} = \proba \left[  {\color{BLUE}\Sphy^{b}} \given  \Spop^{b}  \right] 
+			\frac{ \proba \left[ \mathcal{B} \cap {\color{BLUE}\mathcal{B}_0} \right] }{\proba \left[  \mathcal{B} \right]} = \proba \left[  {\color{BLUE}\mathcal{B}_0} \given  \mathcal{B}  \right] 
 		\end{align*}
 	\end{frame}
 	\begin{frame}
