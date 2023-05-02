@@ -1,3 +1,8 @@
+**Mammalian protein-coding genes exhibit widespread beneficial mutations that are not adaptive**\
+Thibault Latrille, Julien Joseph, Diego Hartasánchez, Nicolas Salamin\
+
+**Compiled binaries and instructions for BayesCode are available at https://github.com/ThibaultLatrille/bayescode**
+
 # SelCoeff
 
 This repository is meant to provide the necessary scripts and data to reproduce the figures shown in the manuscript.
@@ -24,6 +29,9 @@ sudo apt install -qq -y python3-dev python3-pip
 pip3 install snakemake scipy numpy matplotlib pandas ete3 bio statsmodels --user
 ```
 
+### Datasets
+The datasets required to run the snakemake pipeline can be downloaded at https://doi.org/10.5281/zenodo.7878954.
+
 ### Run global analysis contrasting polymorphism and divergence
 
 
@@ -35,7 +43,7 @@ snakemake -j 32 -k
 ## 3. Add features or debug in the python scripts
 You made modifications to one of the python script, a notebook, this README.md, or you added new features.
 You wish this work benefits to all (futur) users of this repository?
-Please, feel free to open a [pull-request](https://github.com/ThibaultLatrille/SelCoeff/pulls)
+Please, feel free to open a [pull-request](https://github.com/ThibaultLatrille8/SelCoeff/pulls)
 
 ## Licence
 

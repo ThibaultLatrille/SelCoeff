@@ -15,7 +15,7 @@ def plot_stack_param(list_pops, df_all, pop_colors, title, output):
     fig, ax = plt.subplots(figsize=(1920 / my_dpi, 780 / my_dpi), dpi=my_dpi)
     x_pos = range(len(list_pops))
     hatches_list = ['', '', '//']
-    colors_list = ["black", "silver", "white"]
+    colors_list = [LIGHTYELLOW_RGB, "silver", "white"]
     edgecolors_list = ["black", "black", "black"]
     bottom = np.array([0.0] * len(list_pops))
     for p_i, param in enumerate(polydfe_cat_dico):

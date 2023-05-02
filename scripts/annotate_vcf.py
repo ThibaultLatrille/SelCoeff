@@ -77,7 +77,7 @@ def read_vcf(vcf, sift_file, mask_grouped, subsample, anc_proba):
 def classify_snps(dico_snp, method, cat_snps):
     s_list = dico_snp[method]
     type_list = dico_snp["snp_type"]
-    sampled = dico_snp["snp_type"]
+    sampled = dico_snp["sampled"]
     cat_list, intervals, dico_cat = list(), list(), defaultdict(list)
 
     if cat_snps.bins > 10:

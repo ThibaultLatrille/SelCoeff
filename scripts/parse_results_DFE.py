@@ -137,7 +137,6 @@ def alpha_model_D(p_list, s_list, lim_left=0.0):
     return sum([q for s, q in zip(s_list, q_linspace) if lim_left < s]) / sum(q_linspace)
 
 
-
 def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     string = ''.join(open(args.postprocessing, "r").readlines())
@@ -155,14 +154,13 @@ def main(args):
             p_list = np.array([v for k, v in out.items() if "p(s=" in k])
             s_list = np.array([v for k, v in out.items() if "S_" in k])
             out_list = [f"p(s={s})={p}" for s, p in zip(s_list, p_list)]
-            if cat == "all":
-                print(f"{file} - {cat}:\n{out_list}")
+            print(f"{file} - {cat}:\n{out_list}")
             assert abs(sum(p_list) - 1.0) < 1e-4
             out["S+"] = sum([p * s for p, s in zip(p_list, s_list) if s > 0])
             out["S-"] = sum([p * s for p, s in zip(p_list, s_list) if s < 0])
             out["S"] = sum([p * s for p, s in zip(p_list, s_list)])
-            out[polydfe_cat_list[0]] = sum([p for p, s in zip(p_list, s_list) if s >= 1])
-            out[polydfe_cat_list[1]] = sum([p for p, s in zip(p_list, s_list) if -1 <= s < 1])
+            out[polydfe_cat_list[0]] = sum([p for p, s in zip(p_list, s_list) if s > 1])
+            out[polydfe_cat_list[1]] = sum([p for p, s in zip(p_list, s_list) if -1 <= s <= 1])
             out[polydfe_cat_list[2]] = sum([p for p, s in zip(p_list, s_list) if s < -1])
             out["p_b"] = sum([p for p, s in zip(p_list, s_list) if s >= 0])
             for lim_left in alpha_sup_limits:

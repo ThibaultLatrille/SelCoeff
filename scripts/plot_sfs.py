@@ -35,9 +35,12 @@ def plot_sfs(cat_snps, snp_sfs, normed_sfs_syn_mean, max_daf, daf_axis, output, 
 
         mean_sfs = np.mean(sfs, axis=0)
         std_sfs = np.std(sfs, axis=0)
-        plt.scatter(daf_axis, mean_sfs, color=cat_snps.color(cat))
-        plt.plot(daf_axis, mean_sfs, label=cat_snps.label(cat), color=cat_snps.color(cat), linewidth=1.0)
-        plt.fill_between(daf_axis, mean_sfs - std_sfs, mean_sfs + std_sfs, linewidth=1.0,
+        # Filter out daf=0 and non-finite values
+        f_sfs = ((mean_sfs > 0) & np.isfinite(mean_sfs))
+        plt.scatter(daf_axis[f_sfs], mean_sfs[f_sfs], color=cat_snps.color(cat), s=1.0)
+        plt.plot(daf_axis[f_sfs], mean_sfs[f_sfs], label=cat_snps.label(cat), color=cat_snps.color(cat), linewidth=1.0)
+        if len(sfs) > 1:
+            plt.fill_between(daf_axis, mean_sfs - std_sfs, mean_sfs + std_sfs, linewidth=1.0,
                          color=cat_snps.color(cat), alpha=0.2)
     if max_daf < 32:
         ax.xaxis.set_major_locator(plt.MultipleLocator(1))
@@ -116,7 +119,7 @@ def main(args):
     for theta_method in sfs_weight:
         theta_dict[theta_method].append(theta(sfs_nonsyn_mean[1:] / ldn, max_daf, theta_method))
 
-    daf_axis = range(1, max_daf)
+    daf_axis = np.array(range(1, max_daf))
     for cat, mean_sfs in snp_sfs_mean.items():
         if cat == "syn":
             ld_cat = lds

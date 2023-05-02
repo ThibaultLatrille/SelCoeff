@@ -43,7 +43,7 @@ def discard_col(col, df):
 def generate_xy_plot(cat_snps):
     pr = "\\mathbb{P}"
     xy_dico = defaultdict(list)
-    dico_label = {'pop': "Population", "species": "Species", "watterson": "Watterson $\\theta_W$",
+    dico_label = {'pop': "Population", "species": "Species", "watterson": "Watterson $\\theta_S$",
                   "proba": "$\\mathbb{P}$", "logL": "logL"}
 
     y_dico = {"tajima": "Tajima $\\theta_{\\pi}$ ",
@@ -52,6 +52,7 @@ def generate_xy_plot(cat_snps):
               "betaS_ratio": "Slope of $\\overline{S}(\\overline{S_0})$ at $\\overline{S_0}=0$",
               "fay_wu": "Fay and Wu $\\theta_{H}$", "D_tajima": "Tajima's $D$", "H_fay_wu": "Fay and Wu's $H$"}
     y_dico.update({f'all_{cat_poly}': v for cat_poly, v in polydfe_cat_dico.items()})
+    y_dico.update({f'mut_sum_{cat_poly}': v for cat_poly, v in polydfe_cat_dico.items()})
 
     for cat_S0 in cat_snps.non_syn_list + ['all']:
         s0 = ""
@@ -86,7 +87,6 @@ def generate_xy_plot(cat_snps):
         for cat_beta in cat_snps.non_syn_list + ['all']:
             s = cat_snps.label(cat_beta).replace('S_0', 'S').replace("$", "")
             y_dico[f'bayes_{cat_S0}_P-{cat_beta}'] = f"{pr}[{s} {given_s0}]$"
-
     for y, y_label in y_dico.items():
         xy_dico["x"].append("watterson")
         xy_dico["y"].append(y)
@@ -112,10 +112,6 @@ def generate_xy_plot(cat_snps):
 
 def column_format(size):
     return "|" + "|".join(["l"] * 2 + ["r"] * (size - 2)) + "|"
-
-
-def logit(x):
-    return np.log(x / (1 - x))
 
 
 def main(args):
@@ -187,10 +183,6 @@ def main(args):
             if discard_col(col_y, df):
                 continue
             x, y = df[col_x], df[col_y]
-            if 'P-' in col_y and ("ratio" not in col_y) and ("bayes" not in col_y):
-                y = logit(y)
-            elif 'P-' in col_x and ("ratio" not in col_x) and ("bayes" not in col_x):
-                x = logit(x)
 
             results = sm.OLS(y, sm.add_constant(x)).fit()
             b, a = results.params[0:2]
@@ -210,15 +202,8 @@ def main(args):
             out_dict['rsquared'].append(results.rsquared)
 
         if len(legend_elements) != 0:
-            x_label = dico_label[col_x]
-            if 'P-' in col_x and ("ratio" not in col_x) and ("bayes" not in col_x):
-                x_label = f'logit({x_label})'
-            plt.xlabel(x_label)
-            y_label = dico_label[y_group]
-            if 'P-' in y_group and ("ratio" not in y_group) and ("bayes" not in y_group):
-                y_label = f'logit({y_label})'
-            plt.ylabel(y_label)
-
+            plt.xlabel(dico_label[col_x], fontsize=14)
+            plt.ylabel(dico_label[y_group], fontsize=14)
             legend_elements += [Line2D([0], [0], marker='o', color='w', markerfacecolor=color_dict[sp],
                                        label=f'{sp.replace("_", " ")}') for sp in species]
             plt.legend(handles=legend_elements)

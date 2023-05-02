@@ -487,11 +487,11 @@ class CategorySNP(list):
         else:
             assert method == "MutSel"
             if self.bins == 2:
-                self.inner_bound = [0]
+                self.inner_bound = [1]
                 self.dico = {
-                    "neg": P("$S_0 < 0$", RED, -np.float("infinity"), 0),
+                    "neg": P("$S_0 < 1$", RED, -np.float("infinity"), 1),
                     "syn": P("$Synonymous$", 'black', None, None),
-                    "pos": P("$S_0 >0$", BLUE, 0, np.float("infinity"))
+                    "pos": P("$S_0 > 1$", BLUE, 1, np.float("infinity"))
                 }
             elif self.bins == 3:
                 self.inner_bound = [-1, 1]

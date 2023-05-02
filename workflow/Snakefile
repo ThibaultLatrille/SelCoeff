@@ -18,7 +18,7 @@ USE_DIVERGENCE = "USE_DIVERGENCE" in config and config['USE_DIVERGENCE']
 if USE_DIVERGENCE:
     assert config['ALPHA']
 polyDFE_param = f"-m {model.split('_')[-1]}"
-polyDFE_param += " 5" if model == "polyDFE_D" else ""
+polyDFE_param += " 6" if model == "polyDFE_D" else ""
 polyDFE_param += " -w" if not USE_DIVERGENCE else ""
 bins = config['bins']
 windows = config['windows']
@@ -56,7 +56,7 @@ rule all:
         f"{FOLDER}/data_processed/population_DFE.pdf",
         f"{FOLDER}/data_processed/upset_plot_{binning}.pdf",
         f"{FOLDER}/data_processed/SNP_effect/{binning}/output.tsv",
-        TSV_LIST
+        # TSV_LIST
 
 rule experimental_DFE:
     input:
@@ -387,7 +387,7 @@ rule latex:
         tex_target=f"{EXP_FOLDER}/supp-mat.tex",
         pdf=f"{EXP_FOLDER}/supp-mat.pdf"
     params:
-        hist_prefix=f"--hist_prefix {FOLDER}/data_processed/vcf_annotate_{binning}/snps.",
+        hist_prefix=f"--hist_prefix {FOLDER}/data_processed/ancestral_{binning}/",
         dfe_prefix=f"--dfe_prefix {FOLDER}/data_processed/opportunities_{binning}/DFE."
     shell: "python3 {input.script} {params.hist_prefix} {params.dfe_prefix} --sample_list {input.sample_list} --sfs {input.sfs} --results {input.tsv_dfe} --tex_source {input.tex_source} --tex_target {output.tex_target} --tex_include {output.tex_include}"
 
