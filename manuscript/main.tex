@@ -144,7 +144,7 @@
     The placental mammals represent an excellent study system to perform such analysis.
     Having originated $\sim$102 million years ago, they diversified quickly~\cite{foley_genomic_2023}.
     Additionally, polymorphism data are available for many species~\cite{howe_ensembl_2021}, as are high quality protein-coding DNA alignments across the genome~\cite{ranwez_orthomam_2007, scornavacca_orthomam_2019}.
-    By performing our analysis on 14,509 protein-coding orthologous genes across 87 species, we focus on sequences under functional constraints across mammals.
+    By performing our analysis on 14,509 orthologous protein-coding genes across 87 species, we focus on sequences under functional constraints across mammals.
     For each gene, fitting the mutation-selection model to the multi-species sequence alignment, assuming that the underlying fitness landscape is stable along the phylogenetic tree, allows us to obtain relative fitnesses for all amino acids for each site of the alignment (fig.~\ref{fig:method}A).
     From the fitness landscape, we can calculate the scaled selection coefficient ($\Sphy$) for any possible amino acid change at each position.
     According to its $\Sphy$ value, we can classify any mutation as either a deleterious mutation toward a less fit amino acid ($\SphyDel \coloneqq \Sphy < -1$), a nearly-neutral mutation ($\SphyNeu \coloneqq -1 < \Sphy <1$) or a beneficial back-mutation toward a known fitter amino acid ($\SphyBen \coloneqq \Sphy > 1$).
@@ -221,18 +221,18 @@
     Conversely, a \textit{recall} in the range of 95--100\% implies that mutations found to be deleterious at the population scale were most likely also predicted to be deleterious at the phylogenetic scale (table~\ref{table:proba}).
     Altogether, purifying selection is largely predictable and amino acids with negative fitness across mammals have been effectively purged away in each population.
 
-    Mutations predicted as $\SphyNeu$ were effectively composed of a mix of neutral and selected mutations with varying \textit{precision} (36--73\%) and \textit{recall} (30--45\%) across the different populations (table~\ref{table:proba}, fig.~\ref{fig:homo-afr-results}D for Humans).
+    Mutations predicted as $\SphyNeu$ were effectively composed of a mix of neutral and selected mutations with varying \textit{precision} (36--73\%) and \textit{recall} (30--45\%) across the different populations (table~\ref{table:proba}, fig.~\ref{fig:homo-afr-results}D for humans).
     The variable proportions between populations can be explained by the effective number of individuals in the population ($\Ne$), a major driver of selection efficacy.
     Since $\Ne$ is not directly measurable, we used Watterson's $\thetaSyn$ as a proxy to order populations by their levels of synonymous diversity.
     Higher synonymous diversity was associated with a smaller proportion of nearly-neutral mutations (fig.~\ref{fig:diversity}A).
     This result follows the prediction of the nearly-neutral theory and suggests that in populations with higher diversity (e.g.,~\textit{Bos} or \textit{Ovis}), discrimination between beneficial and deleterious mutations is more likely to occur (figs.~S1-S6).
     Conversely, many more mutations are effectively neutral in populations with lower diversity (e.g.,~\textit{Homo}).
 
-    Finally, mutations predicted to be beneficial back-mutations based on the selection coefficients at the phylogenetic scale ($\SphyBen$) were indeed beneficial for individuals bearing them, with a \textit{precision} (fig.~\ref{fig:method}F) in the range of 15--86\% (table~\ref{table:proba} and fig.~\ref{fig:homo-afr-results}D for humans).
+    Finally, mutations predicted to be beneficial back-mutations based on the selection coefficients at the phylogenetic scale ($\SphyBen$) were indeed beneficial for individuals bearing them, with a \textit{precision} (fig.~\ref{fig:method}F) in the range of 13--86\% (table~\ref{table:proba} and fig.~\ref{fig:homo-afr-results}D for humans).
     This result confirms that selection towards amino acids restoring existing functions is ongoing in these populations.
     Importantly, the \textit{recall} value in this case, computed as $\proba [ \SphyBen  \given  \SpopBen]$, is the probability for a beneficial mutation at the population scale to be a beneficial back-mutation, i.e., going toward a fitter amino acid (fig.~\ref{fig:method}G).
     In other words, the \textit{recall} value quantifies the number of beneficial mutations restoring damaged genomes instead of creating adaptive innovations.
-    Across the 28 populations, this proportion is in the range of 13--80\% (table~\ref{table:proba}).
+    Across the 28 populations, this proportion is in the range of 11--81\% (table~\ref{table:proba}).
 
     \begin{figure*}[!ht]
         \centering
@@ -323,7 +323,8 @@
     However – contrary to SIFT scores – our mutation-selection model is parameterized by a fitness function such that changes are directly interpretable as fitness effects.
     In this regard, an interesting prediction of our model is that back-mutations are beneficial because they revert previous deleterious changes.
     We have tested this hypothesis and found that these back-mutations ($\SphyBen \coloneqq \Sphy > 1 $) are indeed beneficial in extant populations.
-    We estimated that between 13 and 80\% of all beneficial mutations in mammalian populations have not been driven by adaptation but instead have reversed deleterious substitutions which have accumulated along the phylogeny.
+    We estimated that between 11 and 81\% of all beneficial mutations in mammalian populations have not been driven by adaptation but instead have reversed deleterious substitutions which have accumulated along the phylogeny.
+    More specifically, in three out of four populations analyzed, the percentage of beneficial mutations estimated to be back-mutations falls between 20 and 40\%.
     These results suggest that many beneficial mutations are non-adaptive but rather restore ancestral states of higher fitness.
     Hence, we can correctly estimate the extent of adaptive evolution only if we account for the number of beneficial back-mutations~\cite{keightley_what_2010, rice_evolutionarily_2015}.
     Altogether, we argue that we should dissociate positive selection from adaptive evolution and limit the use of adaptive mutations to those that are associated with adaptation to environmental change as such~\cite{charlesworth_other_2007, mustonen_fitness_2009}.
@@ -348,6 +349,7 @@
     The exact estimation of the contribution of beneficial back-mutations to positive selection relies on some hypotheses at both the phylogenetic and population scales and is sensitive to methodological limitations.
     Indeed, to be conservative, we considered that any mutation under positive selection at the population scale ($\SpopBen$) but not predicted as such at the phylogenetic scale (not $\SphyBen$) is potentially an adaptation.
     However, adaptation is not the only factor hindering the detection of beneficial back-mutations; data quality and potentially inadequate modeling choices of both the fitness landscape and the DFE might also lead to missed predictions.
+    Given that our amino-acid fitness landscapes are site-specific and also independent of one another, missed prediction can be also due to epistasis where the fitness landscape at a given site depends on the residue present at other sites~\cite{starr_epistasis_2016, park_epistatic_2022}.
     Moreover, a mutation inferred as nearly-neutral at the phylogenetic scale ($\SphyNeu$) but positively selected at the population scale ($\SpopBen$) will also be considered a missed prediction, even if this discrepancy could just be due to a population size expansion~\cite{lanfear_population_2014, jones_shifting_2017, platt_protein_2018}.
     Given this inflation of missed predictions, our estimated proportion of adaptive mutations among beneficial ones is likely to be an overestimation.
     In practice, advantageous mutations can be depleted in the $\SphyNeu$ and $\SphyDel$ class in some species but pervasive in others, depending on the model used to infer the DFE at the population scale (tables~S6-9).
@@ -384,7 +386,7 @@
 
     \subsection*{Detecting adaptation above the nearly-neutral background}
 
-    A long-standing debate in molecular evolution is whether the variations we observe between species in protein-coding genes are primarily due to nearly-neutral mutations reaching fixation by drift or primarily due to adaptation~\cite{kimura_evolutionary_1968,kern_neutral_2018,jensen_importance_2019,gillespie_substitution_1994,Ohta1992}.
+    A long-standing debate in molecular evolution is whether the variations we observe between species in protein-coding genes are primarily due to nearly-neutral mutations reaching fixation by drift or primarily due to adaptation~\cite{kimura_evolutionary_1968,jensen_importance_2019,gillespie_substitution_1994,Ohta1992}.
     Here we provide evidence that in mammalian orthologs, many substitutions occur through fixation of both deleterious mutations and beneficial back-mutations.
     However, detecting adaptation above this background of nearly-neutral substitutions remains a central question~\cite{kimura_evolutionary_1968,ohta_development_1996}.
 
@@ -493,19 +495,18 @@
     Finally, the mutational opportunities for synonymous mutations were computed as the total number of sites across the genome ($L_{\text{tot}}$) weighted by the proportion of synonymous mutations among all possible mutations as:
 
     \begin{equation}
-        L_{\text{syn}} = L_{\text{tot}} \frac{\mu_{\text{syn}}}{\mu_{\text{tot}}}.\label{eq:mutation-opp}
+        L_{\text{syn}} = L_{\text{tot}} \frac{\mu_{\text{syn}}}{\mu_{\text{tot}}}.
     \end{equation}
 
     Similarly, for non-synonymous mutations, the total mutation rate for each class of selection $\Sphyclass \in \{\SphyDel, \SphyNeu, \SphyBen \}$, called $\mu\left( \Sphyclass \right)$, was estimated as the sum across all non-synonymous mutations if their selection coefficient at the phylogenetic scale is in the class $\Sphy \in \Sphyclass$.
     Accordingly, the mutational opportunities ($L \left( \Sphyclass \right)$) for each class of selection coefficient ($\Sphyclass$) was finally computed as the total number of sites across the genome ($L_{\text{tot}}$) weighted by the ratio of the aggregated mutations rates falling in the class $\mu\left( \Sphyclass \right)$:
     \begin{equation}
-        L \left( \Sphyclass \right) = L_{\text{tot}} \frac{\mu\left( \Sphyclass \right)}{\mu_{\text{tot}}}.
+        L \left( \Sphyclass \right) = L_{\text{tot}} \frac{\mu\left( \Sphyclass \right)}{\mu_{\text{tot}}}.\label{eq:mutation-opp}
     \end{equation}
 
     Finally, $\proba [ \Sphyclass ]$ is the probability for a non-synonymous mutation to be in the class $\Sphyclass$, thus computed as:
     \begin{equation}
-        \proba[\Sphyclass] = \frac{L\left( \Sphyclass \right)}{\sum_{\SphyclassAlt\in \{\SphyDel, \SphyNeu, \SphyBen \} } L\left(\SphyclassAlt \right)}.
-        \label{eq:proba-dfe-mutsel}
+        \proba[\Sphyclass] = \frac{L\left( \Sphyclass \right)}{\sum_{\SphyclassAlt\in \{\SphyDel, \SphyNeu, \SphyBen \} } L\left(\SphyclassAlt \right)}.\label{eq:proba-dfe-mutsel}
     \end{equation}
 
     \subsection{Substitution mapping and $\dnds$ in the terminal branch}
