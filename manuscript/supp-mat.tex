@@ -41,6 +41,7 @@
 \AtBeginEnvironment{tabu}{\footnotesize}
 \usepackage{booktabs}
 \usepackage{makecell}
+\usepackage{orcidlink}
 \usepackage{graphicx}
 \pdfinclusioncopyfonts=1
 
@@ -79,7 +80,7 @@
 
 \author{
     \large
-    \textbf{T. {Latrille}$^{1\dag}$, J. {Joseph}$^{2\dag}$, D.~A. {Hartasánchez}$^{1}$, N. {Salamin}$^{1}$}\\
+    \textbf{T. {Latrille}$^{1\dag}$\orcidlink{0000-0002-9643-4668}, J. {Joseph}$^{2\dag}$\orcidlink{0009-0002-1312-9930}, D.~A. {Hartasánchez}$^{1}$\orcidlink{0000-0003-2596-6883}, N. {Salamin}$^{1}$\orcidlink{0000-0002-3963-4954}}\\
     \scriptsize $^{1}$Department of Computational Biology, Université de Lausanne, Lausanne, Switzerland\\
     \scriptsize $^{2}$Laboratoire de Biométrie et Biologie Evolutive, UMR5558, Université Lyon 1, Villeurbanne, France \\
     \scriptsize $^{\dag}$These authors contributed equally to this work\\
@@ -100,7 +101,7 @@
 
     \subsection{Mutation-selection codon models}
     \label{sec:site-specific-mutation-selection-codon-models}
-    In BayesCode (\url{https://github.com/ThibaultLatrille/bayescode}), mutation-selection codon models are obtained by running \textit{mutselomega} for 2000 points of MCMC with the options:
+    In \textit{BayesCode} (\url{https://github.com/ThibaultLatrille/bayescode}), we ran the mutation-selection codon models \textit{mutselomega} for 2000 points of MCMC with the options:
     \begin{scriptsize}
         \begin{verbatim}
  mutselomega ---omegashift 0.0 --ncat 30 -a my_alignment.phy -t my_tree.newick -u 2000 my_genename
@@ -283,12 +284,12 @@
     \end{center}
     \begin{itemize}
         \item Watterson's $\thetaSyn$ is the observed genetic diversity calculated for synonymous changes.
-        \item $\proba [ \SphyBen ]$ (eq.~5) is the probability for a new mutation a beneficial back-mutation.
+        \item $\proba [ \SphyBen ]$ (eq.~5) is the probability for a new mutation to be a beneficial back-mutation.
         These mutations have a selection coefficient predicted at the phylogenetic-scale larger than 1, thus toward a more fit amino-acid.
         \item $\proba [ \SpopBen ]$ (eq.~15) is the probability for a mutation to be beneficial.
         These mutations have a selection coefficient at the population-scale larger than 1.
         \item $\proba [ \SpopBen \given \SphyBen]$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a beneficial back-mutation at the phylogenetic scale (the \textit{precision}).
-        \item $\proba [ \SphyBen \given \SpopBen]$ (eq.~14) is the probability for a mutation to a beneficial back-mutations, given it is beneficial (the \textit{recall}).
+        \item $\proba [ \SphyBen \given \SpopBen]$ (eq.~14) is the probability for a mutation to a beneficial back-mutations, given it is beneficial at the population scale (the \textit{recall}).
         This probability is obtained using Bayes' formula.
     \end{itemize}
     \newpage
@@ -339,9 +340,9 @@
         \item $\proba [ \SpopDel \given \SphyDel ]$ (eq.~12) is the probability for a mutation to be deleterious at the population scale, given it is predicted to be a deleterious at the phylogenetic scale.
     \end{itemize}
 
-    We confirmed that higher synonymous diversity ($\thetaSyn$) is typically accompanied by a smaller proportion of deleterious mutations at the population scale ($\proba [ \SpopDel ]$).
+    We can see that higher synonymous diversity ($\thetaSyn$) is typically accompanied by a higher proportion of effectively deleterious mutations at the population scale ($\proba [ \SpopDel ]$).
     This trend is also confirmed when we restricted the analysis to class of mutations that are supposedly deleterious at the phylogenetic scale ($\SphyDel$).
-    This result is qualitatively in accordance with the nearly-neutral theory of evolution which argues that mutations are more efficiently purified in large populations.
+    This result is qualitatively in accordance with the nearly-neutral theory of evolution which argues that very slightly deleterious mutations are more efficiently purified in large populations.
 
     \subsubsection{Proportion of nearly-neutral mutations ($\SpopNeu$)}\label{subsec:proportion-nearly-neutral-mutations}
     \captionof{figure}{Proportion of nearly-neutral mutations ($\SpopNeu$)}
@@ -378,8 +379,15 @@
         These mutations have a selection coefficient at the population-scale larger than 1.
         \item $\proba [ \SpopBen \given \SphyBen]$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a beneficial back-mutation at the phylogenetic scale (the \textit{precision}).
     \end{itemize}
-    Higher synonymous diversity ($\thetaSyn$) is typically accompanied by a smaller proportion of beneficial mutations at the population scale ($\proba [ \SpopBen ]$).
+    Higher synonymous diversity ($\thetaSyn$) is accompanied by a smaller proportion of beneficial mutations at the population scale ($\proba [ \SpopBen ]$).
     This trend is also confirmed when we restricted the analysis to class of mutations that are supposedly beneficial back-mutations at the phylogenetic scale ($\SphyBen$).
+    This result is much more difficult to interpret.
+    The fraction of beneficial back mutations is supposed to depend on long term demographic history, which is not directly accessible.
+    If the long term effective population size is relatively similar to the short term one, we expect little opportunity for beneficial back-mutations.
+    And thus, counter-intuitively we expect a diminution of positively selected mutations.
+    However, we can see that the proportion of beneficial back-mutations among advantageous one does not decrease with synonymous diversity.
+    This means that somehow adaptive mutations also decrease with synonymous diversity for a reason we fail to explain.
+
     \newpage
 
     \section{Clinically related terms for mutations}
@@ -551,8 +559,8 @@
         \item \textit{Recall} for beneficial mutations ($\proba [\SphyBen \given \SpopBen]$) is thus the proportion of beneficial back-mutations among all beneficial mutations.
     \end{itemize}
 
-    Altogether, comparing to tables 1 and S3, we acknowledge that estimating the exact proportion of beneficial back-mutations among all beneficial ones is dependent whether we included or not substitutions in the terminal lineage for the estimation of $\Spop$.
-    However, we argue that mammalian protein-coding genes exhibit widespread beneficial mutations that are not adaptive, and this result is not sensitive to inclusion of substitutions in the terminal lineage.
+    Altogether, comparing this table to tables 1 and S3, we acknowledge that the exact proportion of beneficial back-mutations among all beneficial ones is different whether we included or not substitutions in the terminal lineage for the estimation of $\Spop$.
+    However, we can still see that beneficial back-mutations are positively selected compared to neutral and deleterious ones, and this result is not sensitive to inclusion of substitutions in the terminal lineage.
 
     \newpage
     \section{Discrete distribution of $\Spop$ at the population scale}
@@ -685,8 +693,8 @@
         \item \textit{Recall} for beneficial mutations ($\proba [\SphyBen \given \SpopBen]$) is thus the proportion of beneficial back-mutations among all beneficial mutations.
     \end{itemize}
 
-    Altogether, comparing to tables 1 and S3, we acknowledge that estimating the exact proportion of beneficial back-mutations among all beneficial ones is dependent whether we included or not substitutions in the terminal lineage for the estimation of $\Spop$.
-    However, we argue that mammalian protein-coding genes exhibit widespread beneficial mutations that are not adaptive, and this result is not sensitive to the underlying distribution of fitness effects at the population scale.
+    Altogether, comparing this table to tables 1 and S3, we acknowledge that the exact proportion of beneficial back-mutations among all beneficial ones is dependent on the model used to estimate the DFE.
+    However, we can still see that beneficial back-mutations are positively selected compared to neutral and deleterious ones, and this result is not sensitive to the underlying DFE at the population scale.
 
     %\section{References}
     %\printbibliography[heading=none]
