@@ -1,8 +1,8 @@
 **Mammalian protein-coding genes exhibit widespread beneficial mutations that are not adaptive**\
 Thibault Latrille, Julien Joseph, Diego Hartasánchez, Nicolas Salamin\
-_bioRxiv_, doi: [10.1101/2023.05.03.538864](https://doi.org/10.1101/2023.05.03.538864)
+_bioRxiv_, [doi.org/10.1101/2023.05.03.538864](https://doi.org/10.1101/2023.05.03.538864)
 
-**Compiled binaries and instructions for BayesCode are available at [ThibaultLatrille/bayescode](https://github.com/ThibaultLatrille/bayescode)**
+**Compiled binaries and instructions for BayesCode are available at [github.com/ThibaultLatrille/bayescode](https://github.com/ThibaultLatrille/bayescode)**
 
 # SelCoeff
 
@@ -31,7 +31,7 @@ pip3 install snakemake scipy numpy matplotlib pandas ete3 bio statsmodels --user
 ```
 
 ### Datasets
-The datasets required to run the snakemake pipeline can be downloaded at: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7878954.svg)](https://doi.org/10.5281/zenodo.7878954)
+The datasets required to run the snakemake pipeline can be downloaded on Zenodo ([![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7878954.svg)](https://doi.org/10.5281/zenodo.7878954))
 
 ### Run global analysis contrasting polymorphism and divergence
 
