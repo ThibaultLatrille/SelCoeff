@@ -9,6 +9,7 @@
 __pycache__
 .snakemake/
 /experiments/
+/submitted/
 /data_poly/
 /data_div/
 /data_processed/
