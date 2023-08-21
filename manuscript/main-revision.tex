@@ -92,6 +92,8 @@
 
 % The submission checklist is available at:
 % https://docs.google.com/document/d/1SScaqEAgZGpeaXxpWPDh1NOLaDDLLmkGOYgaGvbY-4o/edit#
+% Response to reviewers at:
+% https://docs.google.com/document/d/1kzt4uf6GgmuAVHx6-LQyzFuee9biyaWoMV6RNO6lSzI/edit?usp=sharing
 
 \begin{document}
     \maketitle
@@ -139,12 +141,7 @@
     Theoretically, we can thus use large-scale genomic data to assess whether the fitness estimated at the phylogenetic scale predict the fitness effect at the population scale for both deleterious and beneficial back-mutations.
     The placental mammals represent an excellent study system to perform such analysis.
     Having originated $\sim$102 million years ago, they diversified quickly~\cite{foley_genomic_2023}.
-    Additionally, polymorphism data are available for many species~\cite{howe_ensembl_2021}, as are high quality protein-coding DNA alignments across the genome~\cite{ranwez_orthomam_2007, scornavacca_orthomam_2019}.Mutations can be beneficial by bringing innovation to their bearer, allowing them to adapt to environmental change.
-        However, mutations can also be beneficial because they are reverting previous deleterious changes, simply restoring pre-existing functions.
-        By integrating phylogenomic and population data in mammals, we estimated the contribution of beneficial back-mutations to molecular evolution, which had remained widely overlooked so far.
-        Applying a mutation-selection model, we estimated amino acid fitness landscapes for mammalian protein-coding genes.
-        Assuming these fitness landscapes do not change, any beneficial mutation is necessarily a back-mutation.
-        We confirmed that these beneficial back-mutations are positively selected in extant populations and demonstrated that a substantial part of ongoing positive selection is not driven by adaptation to environmental change.
+    Additionally, polymorphism data are available for many species~\cite{howe_ensembl_2021}, as are high quality protein-coding DNA alignments across the genome~\cite{ranwez_orthomam_2007, scornavacca_orthomam_2019}.
     By performing our analysis on 14,509 orthologous protein-coding genes across 87 species, we focus on sequences under functional constraints across mammals.
     For each gene, fitting the mutation-selection model to the multi-species sequence alignment, assuming that the underlying fitness landscape is stable along the phylogenetic tree, allows us to obtain relative fitnesses for all amino acids for each site of the alignment (fig.~\ref{fig:method}A).
     From the fitness landscape, we can calculate the scaled selection coefficient ($\Sphy$) for any possible amino acid change at each position.
@@ -238,7 +235,12 @@
     The exact estimation of the contribution of beneficial back-mutations to positive selection relies on some hypotheses at both the phylogenetic and population scales and is sensitive to methodological limitations.
     Indeed, to be conservative, we considered that any mutation under positive selection at the population scale ($\SpopBen$) but not predicted as such at the phylogenetic scale (not $\SphyBen$) is potentially an adaptation.
     However, adaptation is not the only factor hindering the detection of beneficial back-mutations; data quality and potentially inadequate modeling choices of both the fitness landscape and the DFE might also lead to missed predictions.
-    Given that our amino-acid fitness landscapes are site-specific and also independent of one another, missed prediction can be also due to epistasis where the fitness landscape at a given site depends on the residue present at other sites~\cite{starr_epistasis_2016, park_epistatic_2022}.
+    Our model assumes that amino-acid fitness landscapes are site-specific and also independent of one another, whereas under epistasis, the fitness effect of a mutation at a particular site depends on the amino-acids present at other sites~\cite{starr_epistasis_2016, park_epistatic_2022}.
+    Epistasis therefore allows for compensatory mutations, which restore fitness through mutations at loci different from where deleterious mutations take place, and this process also leaves signals interpretable as non-adaptive beneficial mutations~\cite{hartl_compensatory_1996, pollock_strong_2014, starr_epistasis_2016}.
+    Also, epistasis has been shown to play a role in the evolution of protein-coding genes, with amino-acid residues in contact within a protein or between proteins tending to co-evolve~\cite{breen_epistasis_2012, starr_epistasis_2016}.
+    Particularly, the residues in contact co-evolve to become more compatible with each other generating an entrenchment, making empirical evidence for beneficial back-mutations harder to find since restoring mutations becomes less and less likely to occur over time~\cite{goldstein_nonadaptive_2015, goldstein_sequence_2017, park_epistatic_2022}.
+    Nevertheless, the fact that we observe such a high proportion of beneficial back-mutations suggests that the underlying assumptions of our model, namely site-independence, implying no epistasis, and a static fitness landscape, are a reasonable approximation for the underlying fitness landscape of proteins.
+    Our results imply that the fitness effects of new mutations are mostly conserved across mammalian orthologs, in agreement with other studies showing that for conserved orthologs with similar structures and functions, models without epistasis provide a reasonable estimate of fitness effects in protein coding genes~\cite{ashenberg_mutational_2013, youssef_consequences_2020}.
     Moreover, a mutation inferred as nearly-neutral at the phylogenetic scale ($\SphyNeu$) but positively selected at the population scale ($\SpopBen$) will also be considered a missed prediction, even if this discrepancy could just be due to a population size expansion~\cite{lanfear_population_2014, jones_shifting_2017, platt_protein_2018}.
     Given this inflation of missed predictions, our estimated proportion of adaptive mutations among beneficial ones is likely to be an overestimation.
     In practice, advantageous mutations can be depleted in the $\SphyNeu$ and $\SphyDel$ class in some species but pervasive in others, depending on the model used to infer the DFE at the population scale (tables~S6-9).

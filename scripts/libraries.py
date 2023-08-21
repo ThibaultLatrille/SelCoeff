@@ -54,9 +54,9 @@ codontable.update({
 confidence_interval = namedtuple('confidence_interval', ['low', 'mean', 'up'])
 sfs_weight = {"watterson": lambda i, n: 1.0 / i, "tajima": lambda i, n: n - i, "fay_wu": lambda i, n: i}
 polydfe_cat_dico = {
-    "P-Spos": "$\\mathbb{P} [ S > 1 ]$",
-    "P-Sweak": "$\\mathbb{P} [ -1 < S < 1 ]$",
-    "P-Sneg": "$\\mathbb{P} [ S < -1 ]$",
+    "P-Spos": "$\\mathbb{P} [ \\mathcal{B} ]$",
+    "P-Sweak": "$\\mathbb{P} [ \\mathcal{N} ]$",
+    "P-Sneg": "$\\mathbb{P} [ \\mathcal{D} ]$",
 }
 alpha_sup_limits = [0, 1, 3, 5]
 polydfe_cat_list = list(polydfe_cat_dico.keys())
@@ -218,7 +218,7 @@ class CdsRates(dict):
                 self.add_ensg(ensg)
             return np.log(self[ensg][ref_aa][c_site])
         else:
-            return np.float("infinity")
+            return float("infinity")
 
     def rate(self, ensg, ref_aa, alt_aa, c_site):
         if ensg not in self:
@@ -462,7 +462,7 @@ class CategorySNP(list):
                 self.inner_bound = [1.0]
                 self.dico = {
                     "neg": P("$\\omega < 1$", RED, 0, 1.0),
-                    "pos": P("$\\omega > 1$", BLUE, 1.0, np.float("infinity")),
+                    "pos": P("$\\omega > 1$", BLUE, 1.0, float("infinity")),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
             elif self.bins == 3:
@@ -470,7 +470,7 @@ class CategorySNP(list):
                 self.dico = {
                     "neg": P("$\\omega<0.05$", RED, 0, 0.05),
                     "weak": P("$0.05<\\omega<1.0$", GREEN, 0.05, 1.0),
-                    "pos": P("$\\omega > 1$", BLUE, 1.0, np.float("infinity")),
+                    "pos": P("$\\omega > 1$", BLUE, 1.0, float("infinity")),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
             else:
@@ -480,7 +480,7 @@ class CategorySNP(list):
                     "neg": P("$0.05<\\omega<0.1$", YELLOW, 0.05, 0.1),
                     "neg-weak": P("$0.1<\\omega<0.3$", LIGHTGREEN, 0.1, 0.3),
                     "pos-weak": P("$0.3<\\omega < 1$", GREEN, 0.3, 1.0),
-                    "pos": P("$\\omega > 1$", BLUE, 1.0, np.float("infinity")),
+                    "pos": P("$\\omega > 1$", BLUE, 1.0, float("infinity")),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
             self.update()
@@ -489,27 +489,27 @@ class CategorySNP(list):
             if self.bins == 2:
                 self.inner_bound = [1]
                 self.dico = {
-                    "neg": P("$S_0 < 1$", RED, -np.float("infinity"), 1),
+                    "neg": P("$S_0 < 1$", RED, -float("infinity"), 1),
                     "syn": P("$Synonymous$", 'black', None, None),
-                    "pos": P("$S_0 > 1$", BLUE, 1, np.float("infinity"))
+                    "pos": P("$S_0 > 1$", BLUE, 1, float("infinity"))
                 }
             elif self.bins == 3:
                 self.inner_bound = [-1, 1]
                 self.dico = {
-                    "neg": P("$S_0 < -1$", RED, -np.float("infinity"), -1),
-                    "weak": P("$-1 < S_0 < 1$", GREEN, -1, 1),
-                    "pos": P("$S_0 > 1$", BLUE, 1, np.float("infinity")),
+                    "neg": P("$\\mathcal{D}_0$", RED, -float("infinity"), -1),
+                    "weak": P("$\\mathcal{N}_0$", GREEN, -1, 1),
+                    "pos": P("$\\mathcal{B}_0$", BLUE, 1, float("infinity")),
                     "syn": P("$Synonymous$", 'black', None, None)
                 }
             else:
                 self.inner_bound = [-5, -1, 0, 1]
                 self.dico = {
-                    "neg-strong": P("$S_0 < -5$", RED, -np.float("infinity"), -5),
+                    "neg-strong": P("$S_0 < -5$", RED, -float("infinity"), -5),
                     "neg": P("$-5 < S_0 < -1$", YELLOW, -5, -1),
                     "neg-weak": P("$-1 < S_0 < 0$", LIGHTGREEN, -1, 0),
                     "syn": P("$Synonymous$", 'black', None, None),
                     "pos-weak": P("$0 < S_0 < 1$", GREEN, 0, 1),
-                    "pos": P("$S_0 >1$", BLUE, 1, np.float("infinity"))
+                    "pos": P("$S_0 >1$", BLUE, 1, float("infinity"))
                 }
             self.update()
 

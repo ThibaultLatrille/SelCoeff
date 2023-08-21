@@ -17,7 +17,7 @@ def main(args):
         path_omega = f"{f_path}/siteomega_1.run.ci0.025.tsv"
         omega_lower = pd.read_csv(path_omega, sep="\t")["omega_lower"].values[1:]
 
-        adaptation = np.argwhere(omega_lower > mutsel_upper)
+        adaptation = np.argwhere(omega_lower < mutsel_upper)
         output_dict["ensg"].extend([ensg.replace('__', '_null_').replace('_NT', '')] * len(adaptation))
         output_dict["pos"].extend([i[0] for i in adaptation])
 

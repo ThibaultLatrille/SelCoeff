@@ -19,12 +19,12 @@ def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     df_merge = pd.concat([open_tsv(filepath.replace(".tsv", ".scatter.tsv")) for filepath in sorted(args.tsv)])
     df_merge = df_merge.iloc[df_merge.apply(lambda r: sp_sorted(format_pop(r["pop"]), r["species"]), axis=1).argsort()]
-    sp2pop = {sp: list(set(df["pop"])) for sp, df in df_merge.groupby(["species"], sort=False)}
+    sp2pop = {sp: list(set(df["pop"])) for sp, df in df_merge.groupby("species", sort=False)}
     df_merge = df_merge.iloc[::-1]
     merge_out = []
     cm = get_cmap('tab10')
     colors = {sp: cm((i + 1) / len(sp2pop)) for i, sp in enumerate(sp2pop)}
-    for method, df_filter in df_merge.groupby(["method"]):
+    for method, df_filter in df_merge.groupby("method"):
         plt.figure(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
         plt.xlim((-0.5, 0.5))
         idf = np.linspace(min(df_filter["S_phy"]), max(df_filter["S_phy"]), 30)
@@ -55,7 +55,7 @@ def main(args):
         df_out["method"] = method
         merge_out.append(df_out)
 
-        sp_slopes = {sp: (f"[{min(df['betaS_ratio']):.2f}, {max(df['betaS_ratio']):.2f}]" if len(df) > 1 else f"{df['betaS_ratio'].values[0]:.2f}") for sp, df in df_out.groupby(["species"])}
+        sp_slopes = {sp: (f"[{min(df['betaS_ratio']):.2f}, {max(df['betaS_ratio']):.2f}]" if len(df) > 1 else f"{df['betaS_ratio'].values[0]:.2f}") for sp, df in df_out.groupby("species")}
         legend_elements = [Line2D([0], [0], color=colors[sp],
                                   label=f'{sp.replace("_", " ")}: f\'(0)={sp_slopes[sp]}') for sp in sp2pop]
         plt.legend(handles=legend_elements)

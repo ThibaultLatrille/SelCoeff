@@ -16,6 +16,7 @@ __pycache__
 /utils/
 /out/
 /Zenodo/
+.DS_Store
 .idea/
 *.indd
 *.ai
@@ -35,3 +36,5 @@ __pycache__
 *.snm
 *.nav
 *.svg
+.Rhistory
+*.vcf
