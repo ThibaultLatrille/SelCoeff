@@ -1,41 +1,53 @@
-library(ape)
-library(geiger)
-library(nlme)
-library(phytools)
+library("argparse")
+library("geiger")
+library("caper")
 
-setwd("~/Documents/SelCoeff")
+# create parser object
+parser <- ArgumentParser()
+parser$add_argument("--input_tsv", help = "Input tsv file")
+parser$add_argument("--input_tree", help = "Input tree file")
+parser$add_argument("--output_tsv", help = "Output tsv file")
 
-mamData <- read.csv("experiments/3bins-mC-OntoRegTrans/regression-MutSel/results.tsv", row.names = 1)
-mamTree <- read.tree("data_processed/trimmed_tree_sample_all.tsv.tree")
-plot(mamTree)
+args <- parser$parse_args()
+mamData <- read.csv(args$input_tsv, row.names = 1, sep = "\t", check.names = FALSE)
+mamData$Names <- rownames(mamData)
 
+mamTree <- read.tree(args$input_tree)
 name.check(mamTree, mamData)
 
-y_label <- "mut_sum_P.Sweak"
-y_label <- "bayes_P.Spos_P.pos"
-plot(mamData[, c("pop_size", y_label)])
+x_label <- "pop_size"
+table_output <- data.frame()
+for (y_label in colnames(mamData)) {
+    if ((y_label == "pop_size") || (y_label == "Names") || (y_label == "species")) {
+        next
+    }
+    # Extract columns
+    print(y_label)
+    mamData$y <- mamData[, y_label]
 
-# Extract columns
-x <- mamData[, "pop_size"]
-y <- mamData[, y_label]
-# Give them names
-names(y) <- names(x) <- rownames(mamData)
+    # test if y contains only floats otherwise skip
+    if (any(is.na(as.numeric(mamData$y)))) {
+        next
+    }
+    # test if y contains only the same value otherwise skip
+    if (length(unique(as.numeric(mamData$y))) == 1) {
+        next
+    }
+    cdat <- comparative.data(data = mamData, phy = mamTree, names.col = "Names")
+    m <- pgls(y ~ pop_size, data = cdat, lambda = 1.0)
+    s <- summary(m)
+    
+    t <- s$coefficients
+    # Add column with y_label and x_label
+    t <- cbind(t, y_label)
+    t <- cbind(t, x_label)
+    r2 <- c(s$adj.r.squared, s$r.squared)
+    t <- cbind(t, r2)
 
-# pgls model
-pglsModel <- gls(y ~ x, correlation = corBrownian(phy = mamTree),
-                 data = mamData, method = "ML")
-summary(pglsModel)
-t <- summary(pglsModel)$tTable
+    regression <- c('intercept', 'slope')
+    t <- cbind(t, regression)
+    # Add to table the first row
+    table_output <- rbind(table_output, t)
+}
 
-# Calculate PICs
-yPic <- pic(y, mamTree)
-xPic <- pic(x, mamTree)
-# Make a model
-picModel <- lm(yPic ~ xPic - 1)
-# Yes, significant
-summary(picModel)
-
-# plot yPic
-plot(yPic ~ xPic)
-abline(a = 0, b = coef(picModel))
-
+write.table(table_output, file = args$output_tsv, sep = "\t", quote = FALSE, row.names = FALSE)

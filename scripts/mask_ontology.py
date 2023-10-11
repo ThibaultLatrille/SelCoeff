@@ -21,10 +21,10 @@ def main(args):
     for fasta_file in files:
         ensg = fasta_file.replace("__", "_null_").replace("_NT.fasta", "")
         if ensg in ensg_list:
+            print(f"Masking {ensg}")
+        else:
             print(f"Not masking {ensg}")
             continue
-        else:
-            print(f"Masking {ensg}")
         fasta_dict = open_fasta(f"{args.fasta_folder}/{fasta_file}")
         first_key = next(iter(fasta_dict))
         nbr_sites = len(fasta_dict[first_key])

@@ -1,5 +1,4 @@
 import argparse
-from matplotlib import cm
 import seaborn as sns
 from libraries import *
 
@@ -66,7 +65,7 @@ def main(args):
     pop2theta = {pop: d["pop_size"].values[0] for pop, d in df_merge[df_merge["category"] == "syn"].groupby("pop")}
 
     species = {k: None for k in df_merge["species"]}
-    cmtab10 = get_cmap('tab10')
+    cmtab10 = colormaps['tab10']
     colors = {sp: cmtab10((t_i + 1) / len(species)) for t_i, sp in enumerate(species)}
 
     sample_dico = sample_list_dico(args.sample_list)
@@ -99,7 +98,7 @@ def main(args):
             start, end = np.nanmin(matrix), np.nanmax(matrix)
             if d.startswith("P-"):
                 start, end = 0.0, 1.0
-            rd_bu = cm.get_cmap('viridis_r')
+            rd_bu = colormaps['viridis_r']
             if start != 0.0 and np.sign(start) != np.sign(end):
                 midpoint = - start / (np.nanmax(matrix) - start)
                 rd_bu = shiftedColorMap(rd_bu, midpoint=midpoint, name='shifted')

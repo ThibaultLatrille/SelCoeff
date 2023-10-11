@@ -110,6 +110,7 @@ def adjusted_holm_pval(d, prefix="", alpha=0.05, format_p=True):
 
 
 def main(input_vcf, input_effect, tex_source, output, mask_list):
+    os.makedirs(os.path.dirname(output), exist_ok=True)
     mask_grouped = merge_mask_list(mask_list)
 
     cat_snps = CategorySNP("MutSel", bins=3)
@@ -158,8 +159,10 @@ def main(input_vcf, input_effect, tex_source, output, mask_list):
             o.write(f"{cat_snps.dico[cat].label}\\\\\n")
             df_sub = adjusted_holm_pval(df_sub, alpha=0.05, format_p=False)
             df_sub = format_pval_df(df_sub, alpha=0.05)
-            tex = df_sub.to_latex(index=False, escape=False, float_format=tex_f, header=header,
-                                  columns=[c for c in df_sub if c != "cat"], column_format="|l|r|r|r|r|r|")
+            columns = [c for c in df_sub if c != "cat"]
+            df_out = df_sub[columns]
+            df_out = df_out.rename(columns={k: v for k, v in zip(columns, header)})
+            tex = df_out.to_latex(index=False, escape=False, float_format=tex_f, column_format="|l|r|r|r|r|r|")
             o.write(tex)
             o.write("\\end{center}\n")
 

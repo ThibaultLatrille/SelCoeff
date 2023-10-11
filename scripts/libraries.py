@@ -8,12 +8,11 @@ import pandas as pd
 from collections import namedtuple, defaultdict
 import matplotlib
 
-matplotlib.rcParams["font.family"] = ["Latin Modern Sans"]
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import to_rgb
-from matplotlib.cm import get_cmap
+from matplotlib import colormaps
 
 fontsize = 16
 fontsize_legend = 14
@@ -321,14 +320,6 @@ def sp_sorted(pop, sp):
         return out
 
 
-def extend_pop(p, sample):
-    fp = format_pop(p)
-    if sample[p] == fp:
-        return p
-    else:
-        return f"{sample[p]} ({fp})"
-
-
 def sample_list_dico(sample_list_path):
     df = pd.read_csv(sample_list_path, sep='\t')
     df["pop"] = df.apply(lambda r: format_pop(r["SampleName"].replace("_", " ")), axis=1)
@@ -341,6 +332,15 @@ def sort_df(df, sample_list_path):
     df["species"] = df.apply(lambda r: r["species"].replace("_", " "), axis=1)
     dico_sample = sample_list_dico(sample_list_path)
     df["pop"] = df.apply(lambda r: dico_sample[r["pop"]], axis=1)
+    return df
+
+
+def row_color(df):
+    species_list = df["species"].unique()
+    # Add "\rowcolor{LIGHTGREY}" for populations, skip 1 species out of 2
+    species_grey = {s for i, s in enumerate(species_list) if i % 2 == 0}
+    color_tag = "\\rowcolor{LIGHTGREY} "
+    df["pop"] = df.apply(lambda r: color_tag + r["pop"] if (r["species"] in species_grey) else r["pop"], axis=1)
     return df
 
 
@@ -518,7 +518,7 @@ class CategorySNP(list):
         self.non_syn_list = [i for i in self if i != "syn"]
 
     def add_intervals(self, intervals):
-        cmap = get_cmap('viridis_r')
+        cmap = colormaps['viridis_r']
         self.dico = {"syn": P("Synonymous", 'black', None, None)}
         for bound in intervals:
             b = int(bound.cat.split("_")[-1])

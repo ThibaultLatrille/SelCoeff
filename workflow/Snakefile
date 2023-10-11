@@ -60,11 +60,12 @@ rule all:
         f"{FOLDER}/data_processed/merged_bounds/{binning}.tsv",
         f"{EXP_FOLDER}/supp-mat.pdf",
         f"{FOLDER}/data_processed/trimmed_tree_{config['SAMPLE_LIST']}.tree",
-    #f"{FOLDER}/data_processed/experimental_DFE.pdf",
-    #f"{FOLDER}/data_processed/population_DFE.pdf",
-    #f"{FOLDER}/data_processed/upset_plot/{binning}.pdf",
-    #expand(f"{FOLDER}/data_processed/SNP_effect/{binning}_{{trait}}/output.tsv", trait=["phenotype", "clinically"])
-    #TSV_LIST
+        # expand(f"{FOLDER}/data_processed/SNP_effect/{binning}_{{trait}}/output.tsv", trait=["phenotype"]),
+        # TSV_LIST
+        #f"{FOLDER}/data_processed/experimental_DFE.pdf",
+        #f"{FOLDER}/data_processed/population_DFE.pdf",
+        #f"{FOLDER}/data_processed/upset_plot/{binning}.pdf",
+
 
 rule trimmed_tree:
     input:
@@ -186,7 +187,7 @@ rule mask_unaligned_flanks:
 
 
 def mask_list(species, popu):
-    out = MASK_LIST
+    out = MASK_LIST.copy()
     if "mask_CpG" in config and config['mask_CpG']:
         out += [f"{FOLDER}/data_processed/Mask/CpG.{species}.{popu}.tsv.gz"]
     if ("mask_unaligned_flanks" in config) and (config['mask_unaligned_flanks'] > 0):
@@ -350,7 +351,7 @@ rule sfs:
 rule polyDFE:
     input:
         sfs=rules.sfs.output.dir,
-        polyDFE=f"{FOLDER}/utils/polyDFE/polyDFE-2.0-linux-64-bit",
+        polyDFE=f"{FOLDER}/utils/polyDFE/polyDFE-2.0-macOS-64-bit",
         init_file=f"{FOLDER}/config/{model}_init.tsv",
         range_file=f"{FOLDER}/config/{model}_range.tsv"
     output:
@@ -403,14 +404,17 @@ rule plot_multiple_regression:
 rule plot_regression:
     input:
         script=f"{FOLDER}/scripts/plot_regression.py",
+        pgls_script=f"{FOLDER}/scripts/PGLS.R",
+        pgls_tree=f"{FOLDER}/data_processed/trimmed_tree_{config['SAMPLE_LIST']}.tree",
         tsv=[rules.gather_opportunities.output.tsv, rules.gather_bounds.output.tsv] + (
             [rules.plot_multiple_regression.output.tsv] if (bins > 10 and windows != 0) else [
                 rules.plot_dfe_heatmap.output.tsv]),
         sample_list=sample_list
     output:
-        tsv=f"{EXP_FOLDER}/regression-{{method}}/results.tsv"
+        tsv=f"{EXP_FOLDER}/regression-{{method}}/results.tsv",
+        pgls_tsv=f"{EXP_FOLDER}/regression-{{method}}/PGLS.results.tsv"
     shell:
-        "python3 {input.script} --tsv {input.tsv} --method {wildcards.method} --sample_list {input.sample_list} --bins {bins} --windows {windows} --output {output.tsv}"
+        "python3 {input.script} --tsv {input.tsv} --method {wildcards.method} --sample_list {input.sample_list} --bins {bins} --windows {windows} --output {output.tsv} --pgls_script {input.pgls_script} --pgls_tree {input.pgls_tree} --pgls_output {output.pgls_tsv}"
 
 
 rule latex:

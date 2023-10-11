@@ -43,20 +43,19 @@ def main(args):
         o.write("\\end{center}\n")
 
         for sp, nested_dict_2 in nested_dict_1.items():
-            o.write("\\subsection{" + (sp.split(" ")[0] if sp in ["Capra hircus", "Ovis aries"] else sp) + "} \n \n")
+            o.write("\\section{" + (sp.split(" ")[0] if sp in ["Capra hircus", "Ovis aries"] else sp) + "} \n \n")
             for pop, sfs in nested_dict_2.items():
                 if len(nested_dict_2) > 1:
-                    o.write("\\subsubsection{" + sample_dico[format_pop(pop)] + "} \n \n")
+                    o.write("\\subsection{" + sample_dico[format_pop(pop)] + "} \n \n")
 
                 dfe_suffix = f"{sp}.{pop}.{method}.pdf".replace(' ', '_')
                 dfe_path = f"{args.dfe_prefix}{dfe_suffix}"
-                o.write(minipage(0.49, dfe_path))
-
                 hist_suffix = f"{sp}.{pop}.pdf".replace(' ', '_')
                 hist_path = f"{args.hist_prefix}{hist_suffix}"
+                o.write(minipage(0.49, dfe_path))
                 o.write(minipage(0.49, hist_path))
                 o.write("\\\\ \n")
-                o.write(minipage(0.49, sfs))
+                o.write(minipage(0.49, sfs.replace("-sfs.pdf", "-sfs.normalize.pdf")))
                 for model in ["C", "D"]:
                     polyDFE = sfs.replace("-sfs.pdf", f".polyDFE_{model}.pdf")
                     if os.path.exists(polyDFE):

@@ -3,9 +3,10 @@ import argparse
 import numpy as np
 import pandas as pd
 from functools import reduce
+from collections import defaultdict
 from itertools import product
-from matplotlib.cm import get_cmap
-from libraries import my_dpi, plt, polydfe_cat_dico, tex_f, sort_df, sp_sorted, format_pop, CategorySNP
+from matplotlib import colormaps
+from libraries import my_dpi, plt, polydfe_cat_dico, tex_f, sort_df, sp_sorted, format_pop, CategorySNP, row_color
 
 
 def open_tsv(filepath, cat_snps, method):
@@ -35,7 +36,7 @@ def discard_col(col, df):
 
 
 def generate_dico_labels(cat_snps: CategorySNP):
-    dico_label = {'pop': "Population", "species": "Species", "pop_size": "Effective population size $N_e$"}
+    dico_label = {'pop': "Population", "species": "Species", "pop_size": "Effective population size $N_e$ (x1000)"}
 
     pr = "\\mathbb{P}"
     y_dico = {f'all_{cat_S}': v for cat_S, v in polydfe_cat_dico.items()}
@@ -51,13 +52,13 @@ def generate_dico_labels(cat_snps: CategorySNP):
         dico_label[cat_S0] = f"${pr}[{s0}]$"
         dico_label[f'{cat_S0}_omega_div'] = f"$\\omega {bracket_s0}$"
         dico_label[f"proba_{cat_S0}_div"] = f"${pr}_{{div}}[{s0}]$"
-        dico_label[f'sensitivity_{cat_S0}'] = f"TPR ${bracket_s0}$"
+        dico_label[f'recall_{cat_S0}'] = f"TPR ${bracket_s0}$"
         dico_label[f'precision_{cat_S0}'] = f"PPV ${bracket_s0}$"
 
         for cat_S, s_tex in polydfe_cat_dico.items():
             s = s_tex[s_tex.find("[") + 1:s_tex.rfind("]")]
-            dico_label[f'{cat_S0}_{cat_S}'] = f"${pr}[{s} {given_s0}]$"
-            dico_label[f'frac_{cat_S0}_{cat_S}'] = f"$\\frac{{{pr}[{s0}]}}{{{pr}[{s}]}}$"
+            y_dico[f'{cat_S0}_{cat_S}'] = f"${pr}[{s} {given_s0}]$"
+            y_dico[f'frac_{cat_S0}_{cat_S}'] = f"$\\frac{{{pr}[{s0}]}}{{{pr}[{s}]}}$"
             y_dico[f'bayes_{cat_S}_P-{cat_S0}'] = f"${pr}[{s0}|{s}]$"
     dico_label |= y_dico
 
@@ -95,7 +96,7 @@ def main(args):
                 # print(np.sum([df[f'{given_cat}_P-{cat}'] for cat in cat_snps.non_syn_list], axis=0))
 
                 if cat_S == f"P-S{cat_S0}":
-                    df[f'sensitivity_{cat_S0}'] = df[f'bayes_{cat_S}_P-{cat_S0}']
+                    df[f'recall_{cat_S0}'] = df[f'bayes_{cat_S}_P-{cat_S0}']
                     df[f'precision_{cat_S0}'] = df[f'{cat_S0}_{cat_S}']
 
     cat_list = ['all'] + cat_snps.non_syn_list
@@ -110,7 +111,29 @@ def main(args):
         df = df.copy()  # To obtain a dataframe not fragmented
 
     species = {k: None for k in df["species"]}
-    cm = get_cmap('tab10')
+
+    columns = [c for c in dico_label if c in df]
+    df.to_csv(args.output, sep="\t", index=False, columns=columns)
+    df["pop_size"] = df["pop_size"] // 1000
+    # Run the following command to get the pgls results:
+    # Rscript scripts/pgls.R --tsv <output> --output <output>.pgls.tsv
+    stdout = args.pgls_output.replace(".tsv", ".log")
+    cmd = f"Rscript {args.pgls_script} --input_tsv {args.output} --input_tree {args.pgls_tree} --output_tsv {args.pgls_output} > {stdout}"
+    print(cmd)
+    os.system(cmd)
+
+    pgls_dict = defaultdict(dict)
+    if os.path.exists(args.pgls_output) and open(args.pgls_output).read().strip() != "":
+        pgls_df = pd.read_csv(args.pgls_output, sep="\t")
+        for _, row in pgls_df.iterrows():
+            if row["regression"] != "slope":
+                continue
+            y_label = row["y_label"]
+            assert y_label in df.columns
+            corr = "Positive correlation" if row["Estimate"] > 0 else "Negative correlation"
+            pgls_dict[row["x_label"]][row["y_label"]] = f"{corr} ($r^2$={row['r2']:.2f}, p={tex_f(row['Pr(>|t|)'])})"
+
+    cm = colormaps['tab10']
     color_dict = {sp: cm((i + 1) / len(species)) for i, sp in enumerate(species)}
     for col_y in y_list:
         if discard_col(col_y, df):
@@ -119,21 +142,22 @@ def main(args):
 
         plt.xlabel(dico_label["pop_size"], fontsize=14)
         plt.ylabel(dico_label[col_y], fontsize=14)
-
+        if col_y in pgls_dict['pop_size']:
+            plt.title(pgls_dict["pop_size"][col_y], fontsize=14)
         df_sub = df[["species", "pop_size", col_y]].copy()
         # group by species and compute mean
         for sp, df_sp in df_sub.groupby("species"):
             x_mean = df_sp["pop_size"].mean()
             y_mean = df_sp[col_y].mean()
-            plt.scatter(x_mean, y_mean, s=160.0, edgecolors="black", linewidths=0.5, marker='o', color=color_dict[sp],
-                        zorder=5, label=f'{sp.replace("_", " ")}')
+            plt.scatter(x_mean, y_mean, s=25.0, edgecolors="black", linewidths=1.5, marker="s", color=color_dict[sp],
+                        zorder=5, alpha=0.5)
             # Draw line between mean and each point
             for _, row in df_sp.iterrows():
                 plt.plot([x_mean, row["pop_size"]], [y_mean, row[col_y]], '-', linewidth=0.5, color=color_dict[sp],
                          alpha=0.5, zorder=0)
 
             plt.scatter(df_sp["pop_size"], df_sp[col_y], s=60.0, color=color_dict[sp], edgecolors="dimgrey",
-                        linewidths=0.25, zorder=10, alpha=0.5)
+                        linewidths=0.25, zorder=10, marker="o", label=f'{sp.replace("_", " ")}')
 
         plt.xlim((min(df_sub["pop_size"]) * 0.95, max(df_sub["pop_size"]) * 1.05))
         plt.legend(fontsize=14)
@@ -142,11 +166,14 @@ def main(args):
         plt.clf()
         plt.close("all")
 
-    columns = [c for c in dico_label if c in df]
-    df.to_csv(args.output, sep="\t", index=False, columns=columns)
+    # Print number of populations for which the recall is between in 0.2 and 0.4
+    print(df["recall_pos"])
+    low_bound = 0.15
+    high_bound = 0.45
+    print(f"{np.sum((df[f'recall_pos'] > low_bound) & (df[f'recall_pos'] < high_bound))} out of {len(df)} with {low_bound} < recall < {high_bound}")
+
     df = sort_df(df, args.sample_list)
-    # sub_header = [dico_label[i] if i in dico_label else i for i in columns]
-    # df.to_csv(args.output, sep="\t", index=False, header=sub_header, columns=columns)
+    df = row_color(df)
 
     o = open(args.output.replace(".tsv", ".tex"), 'w')
     o.write("\\section{Table} \n")
@@ -154,7 +181,7 @@ def main(args):
 
     cols = [
         ["pop_size", 'pos', 'mut_sum_P-Spos', 'frac_pos_P-Spos', 'pos_P-Spos', 'bayes_P-Spos_P-pos'],
-        ["pop_size"] + [f'{p}_{c}' for c, p in product(cat_snps.non_syn_list, ['precision', 'sensitivity'])],
+        ["pop_size"] + [f'{p}_{c}' for c, p in product(cat_snps.non_syn_list, ['precision', 'recall'])],
         cat_snps.non_syn_list + [f'proba_{c}_div' for c in cat_snps.non_syn_list]
     ]
 
@@ -184,6 +211,9 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--tsv', required=False, type=str, nargs="+", dest="tsv", help="Input tsv file")
+    parser.add_argument('--pgls_script', required=True, type=str, dest="pgls_script", help="PGLS script")
+    parser.add_argument('--pgls_tree', required=True, type=str, dest="pgls_tree", help="PGLS tree")
+    parser.add_argument('--pgls_output', required=True, type=str, dest="pgls_output", help="PGLS output")
     parser.add_argument('--tex_source', required=False, type=str, default="scripts/main-table.tex", dest="tex_source",
                         help="Main document source file")
     parser.add_argument('--method', required=False, type=str, dest="method", help="Sel coeff parameter")

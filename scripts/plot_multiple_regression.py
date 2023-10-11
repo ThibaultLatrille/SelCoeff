@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 import pandas as pd
 from collections import defaultdict
-from matplotlib.cm import get_cmap
+from matplotlib import colormaps
 from matplotlib.lines import Line2D
 from libraries import my_dpi, format_pop, plt, sp_sorted
 
@@ -22,7 +22,7 @@ def main(args):
     sp2pop = {sp: list(set(df["pop"])) for sp, df in df_merge.groupby("species", sort=False)}
     df_merge = df_merge.iloc[::-1]
     merge_out = []
-    cm = get_cmap('tab10')
+    cm = colormaps['tab10']
     colors = {sp: cm((i + 1) / len(sp2pop)) for i, sp in enumerate(sp2pop)}
     for method, df_filter in df_merge.groupby("method"):
         plt.figure(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
