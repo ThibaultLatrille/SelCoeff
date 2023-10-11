@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
-for FILE in config/config_3cat_Onto*.yaml;
+for FILE in config/config_*.yaml;
 do
+  echo "Running ${FILE}"
   cp -f "${FILE}" config/config.yaml
   snakemake --unlock
-  snakemake -j 8 -k --rerun-incomplete
+  snakemake -j 10 -k --rerun-incomplete
 done

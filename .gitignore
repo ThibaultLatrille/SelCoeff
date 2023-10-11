@@ -8,8 +8,11 @@
 /manuscript/papers
 __pycache__
 .snakemake/
+*.Legacy
 /experiments/
-/submitted/
+/manuscript/submitted/
+/manuscript/slides
+/manuscript/artworks.Legacy
 /data_poly/
 /data_div/
 /data_processed/
