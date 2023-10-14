@@ -1,0 +1,550 @@
+%TC:ignore
+\documentclass{article}
+
+\usepackage{xcolor, colortbl}
+\definecolor{BLUELINK}{HTML}{0645AD}
+\definecolor{DARKBLUELINK}{HTML}{0B0080}
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[colorlinks=false]{hyperref}
+% for linking between references, figures, TOC, etc in the pdf document
+\hypersetup{colorlinks,
+    linkcolor=DARKBLUELINK,
+    anchorcolor=DARKBLUELINK,
+    citecolor=DARKBLUELINK,
+    filecolor=DARKBLUELINK,
+    menucolor=DARKBLUELINK,
+    urlcolor=BLUELINK
+} % Color citation links in purple
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{naturalnames}{hyperref}
+
+\usepackage[margin=60pt]{geometry}
+\usepackage{amssymb,amsfonts,amsmath,amsthm,mathtools}
+\usepackage{lmodern}
+\usepackage{bm,bbold}
+\usepackage{verbatim}
+\usepackage{float}
+\usepackage{listings, enumerate, enumitem}
+\usepackage[export]{adjustbox}
+\usepackage{tabu}
+\usepackage{longtable}
+\tabulinesep=0.6mm
+\newcommand\cellwidth{\TX@col@width}
+\usepackage{hhline}
+\setlength{\arrayrulewidth}{1.2pt}
+\usepackage{multicol,multirow,array}
+\usepackage{etoolbox}
+\AtBeginEnvironment{tabu}{\footnotesize}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\pdfinclusioncopyfonts=1
+
+\newcommand{\UniDimArray}[1]{\bm{#1}}
+\newcommand{\der}{\text{d}}
+\newcommand{\e}{\text{e}}
+\newcommand{\Ne}{N_{\text{e}}}
+\newcommand{\proba}{\mathbb{P}}
+\newcommand{\pfix}{\proba_{\text{fix}}}
+\newcommand{\dn}{d_N}
+\newcommand{\ds}{d_S}
+\newcommand{\dnds}{\dn / \ds}
+\newcommand{\Sphy}{S_{0}}
+\newcommand{\SphyDel}{\mathcal{D}_0}
+\newcommand{\SphyNeu}{\mathcal{N}_0}
+\newcommand{\SphyBen}{\mathcal{B}_0}
+\newcommand{\Sphyclass}{x}
+\newcommand{\SphyclassAlt}{y}
+\newcommand{\given}{\mid}
+\newcommand{\Spop}{S}
+\newcommand{\SpopDel}{\mathcal{D}}
+\newcommand{\SpopNeu}{\mathcal{N}}
+\newcommand{\SpopBen}{\mathcal{B}}
+\newcommand{\ProbaPopDel}{\proba [ \SpopDel]}
+\newcommand{\ProbaPopNeu}{\proba [ \SpopNeu ]}
+\newcommand{\ProbaPopBen}{\proba [ \SpopBen ]}
+\newcommand{\AdvMean}{\beta_b}
+\newcommand{\DelMean}{\beta_d}
+\newcommand{\thetaSyn}{\theta_{\text{S}}}
+
+\title{Replicability of figure 3 across populations}
+\date{~}
+\author{~}
+
+\begin{document}
+    \maketitle
+    \tableofcontents
+
+    \newpage
+
+    (Top-left) Distribution of scaled selection coefficients ($\Sphy$), predicted for all possible non-synonymous DNA mutations away from the ancestral exome.
+    Mutations are divided into three classes of selection: deleterious ($\SphyDel$), nearly-neutral ($\SphyNeu$) and beneficial ($\SphyBen$, supposedly beneficial back-mutations)
+
+    (Top-right) Distribution of scaled selection coefficients ($\Sphy$) for all observed substitutions along the terminal branch of the tree.
+    If there are fewer substitutions than expected, this class is thus undergoing purifying selection, as is the case for $\SphyDel$.
+
+    (Bottom-left) The site-frequency spectrum (SFS) for a random sample of 16 alleles (means in solid lines and standard deviations in color shades) for each class of selection and for synonymous mutations, supposedly neutral (black).
+    The SFS represents the proportion of mutations (y-axis) with a given number of derived alleles in the population (x-axis).
+    At high frequencies, deleterious mutations are underrepresented.
+
+    (Bottom-right) Proportion of beneficial $\ProbaPopDel$, nearly-neutral $\ProbaPopNeu$, and deleterious mutations $\ProbaPopBen$ estimated at the population scale for each class of selection at the phylogenetic scale.
+    Proportions depicted here are not weighted by their mutational opportunities.
+    \section{Bos taurus}
+
+    \subsection{Iran}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Bos_taurus.IRBT.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Bos_taurus.IRBT.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Bos_taurus.IRBT.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Bos_taurus.IRBT.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Uganda}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Bos_taurus.UGBT.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Bos_taurus.UGBT.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Bos_taurus.UGBT.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Bos_taurus.UGBT.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \section{Capra}
+
+    \subsection{Australia}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Capra_hircus.AUCH.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Capra_hircus.AUCH.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Capra_hircus.AUCH.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Capra_hircus.AUCH.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{France}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Capra_hircus.FRCH.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Capra_hircus.FRCH.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Capra_hircus.FRCH.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Capra_hircus.FRCH.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Iran (C. aegagrus)}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Capra_hircus.IRCA.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Capra_hircus.IRCA.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Capra_hircus.IRCA.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Capra_hircus.IRCA.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Iran}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Capra_hircus.IRCH.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Capra_hircus.IRCH.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Capra_hircus.IRCH.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Capra_hircus.IRCH.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Italy}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Capra_hircus.ITCH.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Capra_hircus.ITCH.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Capra_hircus.ITCH.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Capra_hircus.ITCH.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Morocco}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Capra_hircus.MOCH.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Capra_hircus.MOCH.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Capra_hircus.MOCH.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Capra_hircus.MOCH.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \section{Chlorocebus sabaeus}
+
+    \subsection{Barbados}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Chlorocebus_sabaeus.Barbados.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Chlorocebus_sabaeus.Barbados.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Barbados.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Barbados.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Central Afr. Rep.}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Chlorocebus_sabaeus.Central_African_Republic.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Chlorocebus_sabaeus.Central_African_Republic.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Central_African_Republic.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Central_African_Republic.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Ethiopia}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Chlorocebus_sabaeus.Ethiopia.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Chlorocebus_sabaeus.Ethiopia.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Ethiopia.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Ethiopia.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Gambia}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Chlorocebus_sabaeus.Gambia.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Chlorocebus_sabaeus.Gambia.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Gambia.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Gambia.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Kenya}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Chlorocebus_sabaeus.Kenya.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Chlorocebus_sabaeus.Kenya.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Kenya.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Kenya.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Nevis}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Chlorocebus_sabaeus.Nevis.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Chlorocebus_sabaeus.Nevis.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Nevis.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Nevis.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Saint Kitts}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Chlorocebus_sabaeus.Saint_Kitts.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Chlorocebus_sabaeus.Saint_Kitts.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Saint_Kitts.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Saint_Kitts.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{South Africa}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Chlorocebus_sabaeus.South_Africa.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Chlorocebus_sabaeus.South_Africa.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.South_Africa.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.South_Africa.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Zambia}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Chlorocebus_sabaeus.Zambia.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Chlorocebus_sabaeus.Zambia.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Zambia.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Chlorocebus_sabaeus.Zambia.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \section{Equus caballus}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Equus_caballus.up.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Equus_caballus.up.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Equus_caballus.up.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Equus_caballus.up.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \section{Homo sapiens}
+
+    \subsection{African}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Homo_sapiens.AFR.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Homo_sapiens.AFR.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Homo_sapiens.AFR.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Homo_sapiens.AFR.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Admixed American}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Homo_sapiens.AMR.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Homo_sapiens.AMR.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Homo_sapiens.AMR.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Homo_sapiens.AMR.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{East Asian}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Homo_sapiens.EAS.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Homo_sapiens.EAS.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Homo_sapiens.EAS.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Homo_sapiens.EAS.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{European}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Homo_sapiens.EUR.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Homo_sapiens.EUR.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Homo_sapiens.EUR.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Homo_sapiens.EUR.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{South Asian}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Homo_sapiens.SAS.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Homo_sapiens.SAS.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Homo_sapiens.SAS.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Homo_sapiens.SAS.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \section{Ovis}
+
+    \subsection{Iran}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Ovis_aries.IROA.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Ovis_aries.IROA.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Ovis_aries.IROA.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Ovis_aries.IROA.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Iran (O. orientalis)}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Ovis_aries.IROO.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Ovis_aries.IROO.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Ovis_aries.IROO.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Ovis_aries.IROO.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Iran (O. vignei)}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Ovis_aries.IROV.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Ovis_aries.IROV.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Ovis_aries.IROV.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Ovis_aries.IROV.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Various}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Ovis_aries.ISGC.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Ovis_aries.ISGC.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Ovis_aries.ISGC.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Ovis_aries.ISGC.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+    \subsection{Morocco}
+
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/opportunities_bins3Mask0.9/DFE.Ovis_aries.MOOA.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/data_processed/ancestral_bins3Mask0.9/Ovis_aries.MOOA.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Ovis_aries.MOOA.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.49\linewidth}
+        \includegraphics[width=\linewidth, page=1]{/Users/tlatrille/Documents/SelCoeff/experiments/3bins-mC-nodiv/analysis/Ovis_aries.MOOA.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+    \\
+
+\end{document}
