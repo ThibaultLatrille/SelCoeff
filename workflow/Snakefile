@@ -369,15 +369,13 @@ rule parse_results_DFE:
         postprocessing=f"{FOLDER}/scripts/postprocessing.R",
         modelfile=lambda wildcards: expand(rules.polyDFE.output.out,species=wildcards.species,popu=wildcards.popu,
             method=wildcards.method,cat=method_cats[wildcards.method]),
-        subs=lambda wildcards: rules.substitutions_mapping.output.tsv if reconstruct_substitutions(wildcards) else [],
+        substitutions=rules.substitutions_mapping.output.tsv,
         bounds=rules.annotate_vcf.output.bounds
     output:
         pdf=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}.{model}.pdf",
         tsv=f"{EXP_FOLDER}/analysis/{{species}}.{{popu}}.{{method}}.{model}.tsv"
-    params:
-        substitutions=lambda wildcards, input, output: f"--substitutions {input.subs}" if reconstruct_substitutions(wildcards) else ""
     shell:
-        "python3 {input.script} --postprocessing {input.postprocessing} {params.substitutions} --bins {bins} --windows {windows} --bounds {input.bounds} --input {input.modelfile} --method {wildcards.method} --output {output.pdf}"
+        "python3 {input.script} --postprocessing {input.postprocessing} --substitutions {input.substitutions} --bins {bins} --windows {windows} --bounds {input.bounds} --input {input.modelfile} --method {wildcards.method} --output {output.pdf}"
 
 rule plot_dfe_heatmap:
     input:

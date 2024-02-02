@@ -17,7 +17,7 @@ def open_tsv(filepath, cat_snps, method):
         df_theta = df_theta.drop(["method", "species", "category"], axis=1)
         df_dfe = ddf[(ddf["method"] == method) & (ddf["category"] != "syn")]
         cols = list(polydfe_cat_dico) + [f"P-{cat}" for cat in cat_snps.non_syn_list]
-        cols += ['pop_size', 'div', "omega_div"]
+        cols += ['pop_size', 'div', "omega_div", "dN", "dS"]
         m_list = []
         for col in cols:
             if col in df_dfe:
@@ -36,7 +36,8 @@ def discard_col(col, df):
 
 
 def generate_dico_labels(cat_snps: CategorySNP):
-    dico_label = {'pop': "Population", "species": "Species", "pop_size": "Effective population size $N_e$ (x1000)"}
+    dico_label = {'pop': "Population", "species": "Species", "pop_size": "Effective population size $N_e$ (x1000)",
+                  "all_dS": "Total $dS$"}
 
     pr = "\\mathbb{P}"
     y_dico = {f'all_{cat_S}': v for cat_S, v in polydfe_cat_dico.items()}
@@ -67,6 +68,38 @@ def generate_dico_labels(cat_snps: CategorySNP):
 
 def column_format(size):
     return "|" + "|".join(["l"] * 2 + ["r"] * (size - 2)) + "|"
+
+
+def plot_scatter(df, col_x, col_y, dico_label, pgls_dict, color_dict, output, xscale="linear"):
+    plt.figure(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
+
+    plt.xlabel(dico_label[col_x], fontsize=14)
+    plt.ylabel(dico_label[col_y], fontsize=14)
+    if col_y in pgls_dict['pop_size']:
+        plt.title(pgls_dict[col_x][col_y], fontsize=14)
+    df_sub = df[["species", col_x, col_y]].copy()
+    # group by species and compute mean
+    for sp, df_sp in df_sub.groupby("species"):
+        x_mean = df_sp[col_x].mean()
+        y_mean = df_sp[col_y].mean()
+        plt.scatter(x_mean, y_mean, s=25.0, edgecolors="black", linewidths=1.5, marker="s", color=color_dict[sp],
+                    zorder=5, alpha=0.5)
+        # Draw line between mean and each point
+        for _, row in df_sp.iterrows():
+            plt.plot([x_mean, row[col_x]], [y_mean, row[col_y]], '-', linewidth=0.5, color=color_dict[sp],
+                     alpha=0.5, zorder=0)
+
+        plt.scatter(df_sp[col_x], df_sp[col_y], s=60.0, color=color_dict[sp], edgecolors="dimgrey",
+                    linewidths=0.25, zorder=10, marker="o", label=f'{sp.replace("_", " ")}')
+
+    plt.xlim((min(df_sub[col_x]) * 0.95, max(df_sub[col_x]) * 1.05))
+    if xscale == "log":
+        plt.xscale("log")
+    plt.legend(fontsize=14)
+    plt.tight_layout()
+    plt.savefig(output, format="pdf")
+    plt.clf()
+    plt.close("all")
 
 
 def main(args):
@@ -138,39 +171,18 @@ def main(args):
     for col_y in y_list:
         if discard_col(col_y, df):
             continue
-        plt.figure(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
+        output = args.output.replace('.tsv', f'.pop_size.{col_y}.scatter.pdf')
+        plot_scatter(df, "pop_size", col_y, dico_label, pgls_dict, color_dict, output)
 
-        plt.xlabel(dico_label["pop_size"], fontsize=14)
-        plt.ylabel(dico_label[col_y], fontsize=14)
-        if col_y in pgls_dict['pop_size']:
-            plt.title(pgls_dict["pop_size"][col_y], fontsize=14)
-        df_sub = df[["species", "pop_size", col_y]].copy()
-        # group by species and compute mean
-        for sp, df_sp in df_sub.groupby("species"):
-            x_mean = df_sp["pop_size"].mean()
-            y_mean = df_sp[col_y].mean()
-            plt.scatter(x_mean, y_mean, s=25.0, edgecolors="black", linewidths=1.5, marker="s", color=color_dict[sp],
-                        zorder=5, alpha=0.5)
-            # Draw line between mean and each point
-            for _, row in df_sp.iterrows():
-                plt.plot([x_mean, row["pop_size"]], [y_mean, row[col_y]], '-', linewidth=0.5, color=color_dict[sp],
-                         alpha=0.5, zorder=0)
-
-            plt.scatter(df_sp["pop_size"], df_sp[col_y], s=60.0, color=color_dict[sp], edgecolors="dimgrey",
-                        linewidths=0.25, zorder=10, marker="o", label=f'{sp.replace("_", " ")}')
-
-        plt.xlim((min(df_sub["pop_size"]) * 0.95, max(df_sub["pop_size"]) * 1.05))
-        plt.legend(fontsize=14)
-        plt.tight_layout()
-        plt.savefig(args.output.replace('.tsv', f'.pop_size.{col_y}.scatter.pdf'), format="pdf")
-        plt.clf()
-        plt.close("all")
+    output = args.output.replace('.tsv', f'.distance.recall_pos.scatter.pdf')
+    plot_scatter(df, "all_dS", "recall_pos", dico_label, pgls_dict, color_dict, output, xscale="log")
 
     # Print number of populations for which the recall is between in 0.2 and 0.4
     print(df["recall_pos"])
     low_bound = 0.15
     high_bound = 0.45
-    print(f"{np.sum((df[f'recall_pos'] > low_bound) & (df[f'recall_pos'] < high_bound))} out of {len(df)} with {low_bound} < recall < {high_bound}")
+    total = np.sum((df[f'recall_pos'] > low_bound) & (df[f'recall_pos'] < high_bound))
+    print(f"{total} out of {len(df)} with {low_bound} < recall < {high_bound}")
 
     df = sort_df(df, args.sample_list)
     df = row_color(df)

@@ -5,7 +5,6 @@ from libraries import *
 from rpy2.robjects.packages import SignatureTranslatedAnonymousPackage
 
 
-
 def read_poly_dfe(path, proc_R):
     out_poly_dfe = {}
     with open(path, 'r') as f:
@@ -105,9 +104,11 @@ def pfix(s):
 def omega_div(df_div, cat):
     div_non_syn = float(df_div[f"div_{cat}"].values[0])
     l_non_syn = float(df_div[f"L_{cat}"].values[0])
+    d_non_syn = div_non_syn / l_non_syn
     div_syn = float(df_div[f"div_syn"].values[0])
     l_syn = float(df_div[f"L_syn"].values[0])
-    return (div_non_syn / div_syn) * (l_syn / l_non_syn)
+    d_syn = div_syn / l_syn
+    return d_non_syn, d_syn, d_non_syn / d_syn
 
 
 def omega_model_C(p_pos, d_neg, d_pos, min_s, max_s):
@@ -125,11 +126,11 @@ def omega_model_D(p_list, s_list, min_s, max_s):
 
 def omega_dico(df_div, cat, omega_dfe, omega_na_dfe, omega_a_dfe):
     out = {f'omega_dfe': omega_dfe, f'omega_NAdfe': omega_na_dfe, f'omega_Adfe': omega_a_dfe}
-    if df_div is not None:
-        omega = omega_div(df_div, cat)
-        div = float(df_div[f"div_{cat}"].values[0])
-        out |= {f"div": div, f'omega_div': omega, f'omega_Adiv': omega - omega_na_dfe,
-                f'alpha_div': (omega - omega_na_dfe) / omega}
+
+    dn, ds, omega = omega_div(df_div, cat)
+    div = float(df_div[f"div_{cat}"].values[0])
+    out |= {"div": div, 'omega_div': omega, 'omega_Adiv': omega - omega_na_dfe,
+            'alpha_div': (omega - omega_na_dfe) / omega, 'dN': dn, 'dS': ds}
     return out
 
 
@@ -143,7 +144,7 @@ def main(args):
     string = ''.join(open(args.postprocessing, "r").readlines())
     proc_R = SignatureTranslatedAnonymousPackage(string, "postprocessing")
 
-    df_div = pd.read_csv(args.substitutions, sep="\t") if args.substitutions != "" else None
+    df_div = pd.read_csv(args.substitutions, sep="\t")
     cat_snps = CategorySNP(args.method, args.bounds, bins=args.bins, windows=args.windows)
     cat_poly_snps = CategorySNP("MutSel", bins=0, windows=0)
     list_cat = cat_snps.all()
@@ -223,8 +224,7 @@ if __name__ == '__main__':
     parser.add_argument('--sample_list', required=False, type=str, dest="sample_list", help="Sample list file")
     parser.add_argument('--method', required=False, type=str, dest="method", help="Sel coeff parameter")
     parser.add_argument('--postprocessing', required=True, type=str, dest="postprocessing", help="polyDFE processing")
-    parser.add_argument('--substitutions', required=False, default="", type=str, dest="substitutions",
-                        help="Substitutions mapping")
+    parser.add_argument('--substitutions', required=True, type=str, dest="substitutions", help="Substitutions mapping")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
     parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
     parser.add_argument('--bounds', required=False, default="", type=str, dest="bounds", help="Input bound file path")
