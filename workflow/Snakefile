@@ -9,6 +9,8 @@ configfile: "config/config.yaml"
 pop2sp = {}
 SFS_LIST, TSV_LIST, VCF_LIST, MASK_LIST = [], [], [], []
 FOLDER = os.path.abspath(".")
+FASTA_FOLDER = f"{FOLDER}/data_div/omm_NT_fasta.v10c_116"
+TREE_FOLDER = f"{FOLDER}/data_div/omm_RooTree.v10b_116"
 EXP_FOLDER = f"{FOLDER}/experiments/{config['experiment']}"
 os.makedirs(EXP_FOLDER,exist_ok=True)
 sample_list = f"{FOLDER}/config/{config['SAMPLE_LIST']}"
@@ -42,7 +44,8 @@ if "mask_CpG" in config and config['mask_CpG']:
 
 for row_id, row in pd.read_csv(sample_list,sep="\t").iterrows():
     pop2sp[row['SampleName']] = row['Species']
-    TSV_LIST.append(f"{FOLDER}/TSV/{row['Species']}.{row['SampleName']}.{binning}.pdf")
+    TSV_LIST.append(f"{FOLDER}/TSV/subs.{row['Species']}.{row['SampleName']}.{binning}.pdf")
+    TSV_LIST.append(f"{FOLDER}/TSV/poly.{row['Species']}.{row['SampleName']}.{binning}.pdf")
     vcf = f"{FOLDER}/data_poly/{row['Species']}.{row['SampleName']}.vcf.gz"
     if os.path.exists(vcf):
         VCF_LIST.append(vcf)
@@ -60,8 +63,8 @@ rule all:
         f"{FOLDER}/data_processed/merged_bounds/{binning}.tsv",
         f"{EXP_FOLDER}/supp-mat.pdf",
         f"{FOLDER}/data_processed/trimmed_tree_{config['SAMPLE_LIST']}.tree",
+        TSV_LIST,
         # expand(f"{FOLDER}/data_processed/SNP_effect/{binning}_{{trait}}/output.tsv", trait=["phenotype"]),
-        # TSV_LIST
         #f"{FOLDER}/data_processed/experimental_DFE.pdf",
         #f"{FOLDER}/data_processed/population_DFE.pdf",
         #f"{FOLDER}/data_processed/upset_plot/{binning}.pdf",
@@ -98,7 +101,7 @@ rule fixed_snp_by_pop:
     input:
         script=f"{FOLDER}/scripts/fixed_snp_by_pop.py",
         vcf=f"{FOLDER}/data_poly/{{species}}.{{popu}}.vcf.gz",
-        fasta_folder=f"{FOLDER}/data_div/omm_NT_fasta.v10c_116"
+        fasta_folder=FASTA_FOLDER
     output:
         fasta=f"{FOLDER}/data_processed/fasta/{{species}}.{{popu}}.fasta.gz"
     shell:
@@ -107,7 +110,7 @@ rule fixed_snp_by_pop:
 rule SIFT_annotate:
     input:
         script=f"{FOLDER}/scripts/annotate_SIFT.py",
-        fasta_folder=f"{FOLDER}/data_div/omm_NT_fasta.v10c_116",
+        fasta_folder=FASTA_FOLDER,
         fasta_pop=rules.fixed_snp_by_pop.output.fasta,
         sift_exec=f"{FOLDER}/utils/sift6.2.1/bin/info_on_seqs",
         blimps_dir=f"{FOLDER}/utils/sift6.2.1/blimps"
@@ -140,7 +143,7 @@ rule mask_ontology:
     input:
         script=f"{FOLDER}/scripts/mask_ontology.py",
         tsv=rules.table_ontology.output.tsv,
-        fasta_folder=f"{FOLDER}/data_div/omm_NT_fasta.v10c_116"
+        fasta_folder=FASTA_FOLDER
     output:
         tsv=f"{FOLDER}/data_processed/Mask/Ontology-{ontology_subset}.tsv.gz"
     shell:
@@ -158,7 +161,7 @@ rule mask_adaptation:
 rule mask_identity_pct:
     input:
         script=f"{FOLDER}/scripts/mask_identity_pct.py",
-        fasta_folder=f"{FOLDER}/data_div/omm_NT_fasta.v10c_116"
+        fasta_folder=FASTA_FOLDER
     output:
         tsv=f"{FOLDER}/data_processed/Mask/identity.{{identity}}.tsv.gz"
     shell:
@@ -177,8 +180,8 @@ rule mask_CpG:
 rule mask_unaligned_flanks:
     input:
         script=f"{FOLDER}/scripts/mask_unaligned_flanks.py",
-        fasta_folder=f"{FOLDER}/data_div/omm_NT_fasta.v10c_116",
-        tree_folder=f"{FOLDER}/data_div/omm_RooTree.v10b_116",
+        fasta_folder=FASTA_FOLDER,
+        tree_folder=TREE_FOLDER,
         fasta=rules.fixed_snp_by_pop.output.fasta
     output:
         tsv=f"{FOLDER}/data_processed/Mask/Flanks{{flank}}.{{species}}.{{popu}}.tsv.gz"
@@ -215,6 +218,7 @@ rule annotate_vcf:
     shell:
         "python3 {input.script} {params.subsample} {params.mask} {params.anc_proba} --sift_file {input.sift_file} --vcf {input.vcf} --bins {bins} --windows {windows} --output_tsv {output.tsv} --output_bounds {output.bounds}"
 
+
 rule gather_bounds:
     input:
         script=f"{FOLDER}/scripts/gather_bounds.py",
@@ -229,7 +233,7 @@ rule gather_bounds:
 rule mask_unconserved:
     input:
         script=f"{FOLDER}/scripts/mask_unconserved.py",
-        fasta_folder=f"{FOLDER}/data_div/omm_NT_fasta.v10c_116"
+        fasta_folder=FASTA_FOLDER
     output:
         tsv=f"{FOLDER}/data_processed/Mask/unconserved.tsv.gz"
     params:
@@ -268,8 +272,8 @@ rule gather_opportunities:
 rule ancestral_reconstruction:
     input:
         script=f"{FOLDER}/scripts/ancestral_reconstruction.py",
-        fasta_folder=f"{FOLDER}/data_div/omm_NT_fasta.v10c_116",
-        tree_folder=f"{FOLDER}/data_div/omm_RooTree.v10b_116",
+        fasta_folder=FASTA_FOLDER,
+        tree_folder=TREE_FOLDER,
         fasta_pop=rules.fixed_snp_by_pop.output.fasta,
         exec=f"{FOLDER}/utils/FastML.v3.11/programs/fastml/fastml"
     output:
@@ -304,26 +308,40 @@ rule substitutions:
         xml_folder=f"{FOLDER}/data_div/omm_markers",
         ancestral=rules.ancestral_reconstruction.output
     output:
-        tsv=f"{FOLDER}/TSV/{{species}}.{{popu}}.tsv.gz"
+        tsv=f"{FOLDER}/TSV/subs.{{species}}.{{popu}}.tsv.gz"
     params:
         folder=f"{FOLDER}/data_processed/ancestral_reconstruction/{{species}}.{{popu}}"
     shell:
         "python3 {input.script} --threshold 0.0 --species {wildcards.species} --exp_folder {input.exp_folder} --xml_folder {input.xml_folder} --ancestral {params.folder} --output {output.tsv}"
 
 
-rule plot_substitutions:
+rule polymorphism:
+    input:
+        script=f"{FOLDER}/scripts/polymorphism.py",
+        xml_folder=f"{FOLDER}/data_div/omm_markers",
+        vcf=f"{FOLDER}/data_poly/{{species}}.{{popu}}.vcf.gz"
+    output:
+        tsv=f"{FOLDER}/TSV/poly.{{species}}.{{popu}}.tsv.gz"
+    params:
+        anc_proba=f"--anc_proba {config['mask_anc_proba_SNPS'] if 'mask_anc_proba_SNPS' in config else 0.0}"
+    shell:
+        "python3 {input.script} --species {wildcards.species} --xml_folder {input.xml_folder} {params.anc_proba} --vcf {input.vcf} --output_tsv {output.tsv}"
+
+
+rule plot_variations:
     input:
         script=f"{FOLDER}/scripts/substitutions_plot.py",
-        tsv=f"{FOLDER}/TSV/{{species}}.{{popu}}.tsv.gz",
+        tsv=f"{FOLDER}/TSV/{{variations}}.{{species}}.{{popu}}.tsv.gz",
+        tree=f"{FOLDER}/data_div/mammals_species.nwk",
+        fasta_folder=FASTA_FOLDER,
         mask=lambda wildcards: mask_list(wildcards.species,wildcards.popu),
-        bounds=rules.annotate_vcf.output.bounds,
-        opp=f"{FOLDER}/data_processed/opportunities_{binning}/DFE.{{species}}.{{popu}}.MutSel.tsv"
+        bounds=rules.annotate_vcf.output.bounds
     output:
-        pdf=f"{FOLDER}/TSV/{{species}}.{{popu}}.{binning}.pdf"
+        pdf=f"{FOLDER}/TSV/{{variations}}.{{species}}.{{popu}}.{binning}.pdf"
     params:
         mask=lambda wildcards: format_mask_list(mask_list(wildcards.species,wildcards.popu))
     shell:
-        "python3 {input.script} {params.mask} --input {input.tsv} --output {output.pdf} --bins {bins} --windows {windows} --bounds {input.bounds} --opp {input.opp}"
+        "python3 {input.script} {params.mask} --species {wildcards.species} --tree {input.tree} --fasta_folder {input.fasta_folder} --input {input.tsv} --output {output.pdf} --bins {bins} --windows {windows} --bounds {input.bounds}"
 
 
 def reconstruct_substitutions(wildcards):

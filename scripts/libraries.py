@@ -98,7 +98,7 @@ def clean_ensg_path(path):
         path = path.replace("_null_", "__")
         if not os.path.isfile(path):
             path = path.replace("__", "_null_")
-            assert os.path.isfile(path)
+            assert os.path.isfile(path), f"File not found: {path}"
     return path
 
 
@@ -111,9 +111,13 @@ def open_fasta(path):
     return outfile
 
 
+def fasta_txt(dico_fasta):
+    return "\n".join([f">{seq_id}\n{seq}" for seq_id, seq in dico_fasta.items()])
+
+
 def write_fasta(dico_fasta, output):
     outfile = gzip.open(output, 'wt') if output.endswith(".gz") else open(output, 'w')
-    outfile.write("\n".join([f">{seq_id}\n{seq}" for seq_id, seq in dico_fasta.items()]))
+    outfile.write(fasta_txt(dico_fasta))
     outfile.close()
 
 

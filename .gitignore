@@ -15,10 +15,13 @@ __pycache__
 /manuscript/artworks.Legacy
 /data_poly/
 /data_div/
+/data_poly
+/data_div
 /data_processed/
 /utils/
 /out/
 /Zenodo/
+/TSV
 .DS_Store
 .idea/
 *.indd
