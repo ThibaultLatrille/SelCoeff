@@ -1,12 +1,13 @@
 import os
 import gzip
 import argparse
+import numpy as np
 import pandas as pd
 from collections import defaultdict
 from substitutions import build_dict_trID
 
 
-def read_vcf(vcf, anc_proba, trid):
+def read_vcf(vcf, anc_proba, subsample, trid):
     vcf_file = gzip.open(vcf, 'rt')
     dico_snp = defaultdict(list)
     filtered = 0
@@ -31,8 +32,11 @@ def read_vcf(vcf, anc_proba, trid):
 
         sample_size = int(dico_info["SAMPLE_SIZE"])
         k = int(dico_info["COUNT_POLARIZED"])
-        if k == 0 or k == sample_size:
+        max_daf = min(sample_size, subsample)
+        sampled_k = np.random.hypergeometric(k, sample_size - k, max_daf)
+        if sampled_k == 0 or k == max_daf:
             continue
+
         s_mutsel = float(dico_info["SEL_COEFF"]) if "SEL_COEFF" in dico_info else 0.0
 
         dico_snp["ENSG"].append(ensg)
@@ -46,9 +50,9 @@ def read_vcf(vcf, anc_proba, trid):
         dico_snp["AA_ANC"].append(dico_info["AA_ANC"])
         dico_snp["AA_DER"].append(dico_info["AA_DER"])
         dico_snp["SUB_TYPE"].append(dico_info["SNP_TYPE"])
-        dico_snp["SAMPLE_SIZE"].append(sample_size)
-        dico_snp["COUNT"].append(k)
-        dico_snp["FREQ"].append(k / sample_size)
+        dico_snp["SAMPLED_COUNT"].append(sampled_k)
+        dico_snp["SAMPLED_SIZE"].append(max_daf)
+        dico_snp["FREQ_POP"].append(k / sample_size)
         dico_snp["SEL_COEFF"].append(s_mutsel)
     vcf_file.close()
     return dico_snp, filtered
@@ -59,7 +63,7 @@ def main(args):
     os.makedirs(os.path.dirname(args.output_tsv), exist_ok=True)
     trid = build_dict_trID(args.xml_folder, args.species)
 
-    dico_snp, filtered = read_vcf(args.vcf, args.anc_proba, trid)
+    dico_snp, filtered = read_vcf(args.vcf, args.anc_proba, args.subsample, trid)
     total = len(dico_snp["SUB_TYPE"]) + filtered
     print(f'{filtered * 100 / total:.2f}% of SNPs are discarded because they are filtered.')
     print(f'{len(dico_snp["SUB_TYPE"])} SNPs are kept ({len(dico_snp["SUB_TYPE"]) * 100 / total:.2f}%).')
@@ -72,6 +76,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--vcf', required=False, type=str, dest="vcf", help="Input vcf file")
     parser.add_argument('--xml_folder', required=True, type=str, dest="xml_folder", help="The xml folder path")
+    parser.add_argument('--subsample', required=False, type=int, default=16, dest="subsample")
     parser.add_argument('--anc_proba', required=True, type=float, dest="anc_proba", default=0.5,
                         help="Mask the dico_snp with reconstruction probability lower than this threshold")
     parser.add_argument('--species', required=True, type=str, dest="species", help="The focal species")

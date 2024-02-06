@@ -15,3 +15,4 @@ METHOD_LIST: [ "MutSel" ]
 MODEL: "polyDFE_C"
 ALPHA: true # If true, the α parameter is computed (requires to map substitutions in the terminal branch).
 USE_DIVERGENCE: true # If true, the model use divergence (requires ALPHA to be true).
+OUTPUT_SUPP: true # If true, the output is also a tsv file per pop.

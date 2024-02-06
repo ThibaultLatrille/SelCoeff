@@ -14,8 +14,7 @@ def cat_sub(row, cat_snps):
 
 
 def plot_histogram(score_list, cat_snps, file):
-    plt.figure(figsize=(1920 / my_dpi, 1080 / my_dpi), dpi=my_dpi)
-    ax = plt.subplot(1, 2, 1)
+    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
     xmin, xmax = xlim_dico["MutSel"][0], xlim_dico["MutSel"][1]
     n, bins, patches = plt.hist([s for s in score_list if np.isfinite(s)], bins=np.linspace(xmin, xmax, 61),
                                 range=(xmin, xmax), edgecolor="black", linewidth=1.0)
@@ -39,7 +38,12 @@ def plot_histogram(score_list, cat_snps, file):
         ax.xaxis.set_major_locator(plt.MultipleLocator(1))
     plt.axvline(0, color="black", lw=2)
     plt.xlim((xmin, xmax))
-    plt.subplot(1, 2, 2)
+    plt.tight_layout()
+    plt.savefig(file, format="pdf")
+    plt.clf()
+    plt.close("all")
+
+    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
     plt.xlabel(rate_dico["MutSel"])
     plt.ylabel("$\\frac{ \\mathbb{P} [ S_0 ]}{\\mathbb{P} [ -S_0 ]}$")
     # plot x against -x
@@ -59,7 +63,7 @@ def plot_histogram(score_list, cat_snps, file):
         y_axis.append(plus_p / minus_p)
     plt.scatter(x_axis, y_axis, color="black")
     plt.tight_layout()
-    plt.savefig(file, format="pdf")
+    plt.savefig(file.replace(".pdf", ".folded_ratio.pdf"), format="pdf")
     plt.clf()
     plt.close("all")
 
@@ -110,7 +114,10 @@ def main(input_path, mask_list, output, bins, windows, bounds, fasta_folder, tre
     # whole_tree = Tree(tree_file, format=1)
     # groups of 50 sites
     n_sites, flanks, sep = 10, 2, "|"
-    for i_row in range(0, len(df_pos), n_sites):
+    max_plots = 5
+    max_sites = min(max_plots * n_sites, len(df_pos))
+    print(f"Plotting {max_sites} sites out of {len(df_pos)}.")
+    for i_row in range(0, max_sites, n_sites):
         pt = PhyloTree(tree_file, quoted_node_names=True, format=1)
         all_species = pt.get_leaf_names()
         sub_df = df_pos.iloc[i_row: i_row + n_sites]
@@ -155,7 +162,7 @@ def main(input_path, mask_list, output, bins, windows, bounds, fasta_folder, tre
         ts.draw_guiding_lines = False
         ts.layout_fn = lambda node: custom_layout(node, focal_species, light_cols)
         pt.render(f"{plot_folder}/{n_block}.pdf", tree_style=ts, w=1200, units="mm")
-        print(f"{len(clean_subset)} species in the {n_block}th block")
+        print(f"{n_block}th block out of {max_sites // n_sites} done.")
 
 
 if __name__ == '__main__':
