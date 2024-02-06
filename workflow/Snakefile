@@ -330,7 +330,7 @@ rule polymorphism:
 
 rule plot_variations:
     input:
-        script=f"{FOLDER}/scripts/substitutions_plot.py",
+        script=f"{FOLDER}/scripts/plot_variations.py",
         tsv=f"{FOLDER}/TSV/{{variations}}.{{species}}.{{popu}}.tsv.gz",
         tree=f"{FOLDER}/data_div/mammals_species.nwk",
         fasta_folder=FASTA_FOLDER,
