@@ -102,6 +102,25 @@ def plot_scatter(df, col_x, col_y, dico_label, pgls_dict, color_dict, output, xs
     plt.close("all")
 
 
+def collapse_table_by_species(df):
+    # Get the min and the max across populations for each species
+    dico_df = defaultdict(list)
+    df = df.drop("pop", axis=1)
+    gb = df.groupby("species")
+    for sp, df_sp in gb:
+        dico_df["species"].append(sp)
+        for column in df_sp.columns:
+            if column == "species":
+                continue
+            min_val = tex_f(df_sp[column].min())
+            if len(df_sp) == 1:
+                dico_df[column].append(min_val)
+            else:
+                max_val = tex_f(df_sp[column].max())
+                dico_df[column].append(f"[{min_val}, {max_val}]")
+    return pd.DataFrame(dico_df)
+
+
 def main(args):
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     cat_snps = CategorySNP(args.method, bins=args.bins, windows=args.windows)
@@ -207,6 +226,8 @@ def main(args):
         if len(columns) == 2:
             continue
         data = df[columns]
+        if "all_omega_div" in c:
+            data = collapse_table_by_species(data)
         data = data.rename(columns={i: (dico_label[i] if i in dico_label else i) for i in columns})
         o.write(data.to_latex(index=False, escape=False, longtable=True, float_format=tex_f,
                               column_format=column_format(len(columns))))
