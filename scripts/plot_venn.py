@@ -81,6 +81,9 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--vcf', required=False, type=str, nargs="+", dest="vcf")
     parser.add_argument('--mask', required=False, default="", nargs="+", type=str, dest="mask",
                         help="List of input mask file path")
+    parser.add_argument('--mask_CpG', required=False, default=False, action="store_true", dest="mask_CpG",
+                        help="Mask CpG opportunities")
     parser.add_argument('-o', '--output', required=False, type=str, dest="output", help="Output pdf")
     args = parser.parse_args()
+    assert args.mask_CpG is False, "Mask CpG is not implemented for this script."
     main(args.vcf, args.mask, args.output)

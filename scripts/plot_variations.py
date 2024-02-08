@@ -114,7 +114,7 @@ def main(input_path, mask_list, output, bins, windows, bounds, fasta_folder, tre
     # whole_tree = Tree(tree_file, format=1)
     # groups of 50 sites
     n_sites, flanks, sep = 10, 2, "|"
-    max_plots = 5
+    max_plots = 100000
     max_sites = min(max_plots * n_sites, len(df_pos))
     print(f"Plotting {max_sites} sites out of {len(df_pos)}.")
     for i_row in range(0, max_sites, n_sites):
@@ -169,6 +169,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-i', '--input', required=True, type=str, dest="input", help="Input vcf")
     parser.add_argument('--mask', required=False, default="", nargs="+", type=str, dest="mask")
+    parser.add_argument('--mask_CpG', required=False, default=False, action="store_true", dest="mask_CpG",
+                        help="Mask CpG opportunities")
     parser.add_argument('--bounds', required=True, default="", type=str, dest="bounds", help="Input bound file path")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
     parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
@@ -177,5 +179,6 @@ if __name__ == '__main__':
     parser.add_argument('--tree', required=True, type=str, dest="tree", help="The tree path")
     parser.add_argument('--species', required=True, type=str, dest="species", help="The focal species")
     args = parser.parse_args()
+    assert args.mask_CpG is False, "Mask CpG is not implemented for this script."
     main(args.input, args.mask, args.output, args.bins, args.windows, args.bounds, args.fasta_folder,
          args.tree, args.species)

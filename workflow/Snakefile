@@ -171,15 +171,6 @@ rule mask_identity_pct:
     shell:
         "python3 {input.script} --identity {wildcards.identity} --fasta_folder {input.fasta_folder} --output {output.tsv}"
 
-rule mask_CpG:
-    input:
-        script=f"{FOLDER}/scripts/mask_CpG.py",
-        fasta=rules.fixed_snp_by_pop.output.fasta
-    output:
-        tsv=f"{FOLDER}/data_processed/Mask/CpG.{{species}}.{{popu}}.tsv.gz"
-    shell:
-        "python3 {input.script} --fasta {input.fasta} --output {output.tsv}"
-
 
 rule mask_unaligned_flanks:
     input:
@@ -195,15 +186,14 @@ rule mask_unaligned_flanks:
 
 def mask_list(species, popu):
     out = MASK_LIST.copy()
-    if "mask_CpG" in config and config['mask_CpG']:
-        out += [f"{FOLDER}/data_processed/Mask/CpG.{species}.{popu}.tsv.gz"]
     if ("mask_unaligned_flanks" in config) and (config['mask_unaligned_flanks'] > 0):
         out += [f"{FOLDER}/data_processed/Mask/Flanks{config['mask_unaligned_flanks']}.{species}.{popu}.tsv.gz"]
     return out
 
 
 def format_mask_list(m):
-    return f"--mask {' '.join(m)}" if len(m) > 0 else ""
+    fmt_str = f"--mask_CpG " if ("mask_CpG" in config and config['mask_CpG']) else ""
+    return fmt_str + f"--mask {' '.join(m)}" if len(m) > 0 else ""
 
 
 rule annotate_vcf:
@@ -211,7 +201,8 @@ rule annotate_vcf:
         vcf=f"{FOLDER}/data_poly/{{species}}.{{popu}}.vcf.gz",
         script=f"{FOLDER}/scripts/annotate_vcf.py",
         sift_file=rules.merge_SIFT.output,
-        mask=lambda wildcards: mask_list(wildcards.species,wildcards.popu)
+        mask=lambda wildcards: mask_list(wildcards.species,wildcards.popu),
+        fasta_pop=rules.fixed_snp_by_pop.output.fasta,
     output:
         tsv=f"{FOLDER}/data_processed/vcf_annotate_{binning}/snps.{{species}}.{{popu}}.tsv.gz",
         bounds=f"{FOLDER}/data_processed/vcf_annotate_{binning}/bounds.{{species}}.{{popu}}.tsv"
@@ -220,7 +211,7 @@ rule annotate_vcf:
         anc_proba=f"--anc_proba {config['mask_anc_proba_SNPS'] if 'mask_anc_proba_SNPS' in config else 0.0}",
         mask=lambda wildcards: format_mask_list(mask_list(wildcards.species,wildcards.popu))
     shell:
-        "python3 {input.script} {params.subsample} {params.mask} {params.anc_proba} --sift_file {input.sift_file} --vcf {input.vcf} --bins {bins} --windows {windows} --output_tsv {output.tsv} --output_bounds {output.bounds}"
+        "python3 {input.script} {params.subsample} {params.mask} {params.anc_proba} --sift_file {input.sift_file} --vcf {input.vcf} --bins {bins} --windows {windows} --output_tsv {output.tsv} --fasta_pop {input.fasta_pop} --output_bounds {output.bounds}"
 
 
 rule gather_bounds:

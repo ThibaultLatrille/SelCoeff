@@ -1,12 +1,7 @@
-import os
 import argparse
-import numpy as np
-import pandas as pd
 from functools import reduce
-from collections import defaultdict
 from itertools import product
-from matplotlib import colormaps
-from libraries import my_dpi, plt, polydfe_cat_dico, tex_f, sort_df, sp_sorted, format_pop, CategorySNP, row_color
+from libraries import *
 
 
 def open_tsv(filepath, cat_snps, method):

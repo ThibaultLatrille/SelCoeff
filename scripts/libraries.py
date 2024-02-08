@@ -85,7 +85,7 @@ def build_codon_neighbors():
                 alt_aa = codontable[alt_codon]
                 if alt_aa != 'X':
                     syn = alt_aa == ref_aa
-                    codon_neighbors[ref_codon].append((syn, ref_nuc, alt_nuc, alt_codon, alt_aa))
+                    codon_neighbors[ref_codon].append((syn, ref_nuc, alt_nuc, alt_codon, alt_aa, frame))
     return codon_neighbors
 
 

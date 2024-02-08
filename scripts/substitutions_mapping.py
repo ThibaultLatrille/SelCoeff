@@ -104,6 +104,22 @@ def main(args):
                 dico_div["div_syn"] += 1
                 continue
 
+            if args.mask_CpG:
+                diff_pos = diffs[0]
+                anc_nuc = anc_codon[diff_pos]
+                der_nuc = der_codon[diff_pos]
+                pos = c_site * 3 + diff_pos
+                if pos == 0 or pos == len(anc_seq) - 1:
+                    continue
+                anc_context = anc_seq[pos - 1:pos + 2]
+                der_context = anc_context[0] + der_nuc + anc_context[-1]
+                assert anc_context[1] == anc_nuc
+                assert len(anc_context) == 3
+                assert len(der_context) == 3
+                if "CG" in anc_context or "CG" in der_context:
+                    dico_div["masked"] += 1.0
+                    continue
+
             rate = cds_rates.rate(ensg, anc_aa, der_aa, c_site)
             if not np.isfinite(rate):
                 dico_div["div_NotFinite"] += 1.0
@@ -147,4 +163,6 @@ if __name__ == '__main__':
     parser.add_argument('--species', required=True, type=str, dest="species", help="The focal species")
     parser.add_argument('--mask', required=False, default="", nargs="+", type=str, dest="mask",
                         help="List of input mask file path")
+    parser.add_argument('--mask_CpG', required=False, default=False, action="store_true", dest="mask_CpG",
+                        help="Mask CpG opportunities")
     main(parser.parse_args())

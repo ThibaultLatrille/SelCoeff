@@ -1,12 +1,7 @@
-import os
-import gzip
 import argparse
-import numpy as np
-import pandas as pd
 import scipy.stats as sps
-from collections import defaultdict
 from matplotlib.patches import Rectangle
-from libraries import merge_mask_list, BOUND, CategorySNP, xlim_dico, rate_dico, plt, my_dpi, multiline
+from libraries import *
 
 
 def open_sift(sift_file):
@@ -17,7 +12,7 @@ def open_sift(sift_file):
     return output
 
 
-def read_vcf(vcf, sift_file, mask_grouped, subsample, anc_proba):
+def read_vcf(vcf, sift_file, mask_grouped, subsample, anc_proba, mask_CpG, seqs):
     dict_sift = open_sift(sift_file)
     vcf_file = gzip.open(vcf, 'rt')
     dico_snp = defaultdict(list)
@@ -51,6 +46,23 @@ def read_vcf(vcf, sift_file, mask_grouped, subsample, anc_proba):
         k = int(dico_info["COUNT_POLARIZED"])
         if k == 0 or k == sample_size:
             continue
+
+        if mask_CpG:
+            der_nuc = dico_info["NUC_DER"]
+            anc_nuc = dico_info["NUC_ANC"]
+            pos = int(dico_info["ENSG_POS"])
+            seq = seqs[ensg]
+            if pos == 0 or pos == len(seq) - 1:
+                continue
+            anc_context = seq[pos - 1:pos + 2]
+            der_context = anc_context[0] + der_nuc + anc_context[-1]
+            assert anc_context[1] == anc_nuc
+            assert der_context[1] == der_nuc
+            assert len(anc_context) == 3
+            assert len(der_context) == 3
+            if "CG" in anc_context or "CG" in der_context:
+                discarded += 1
+                continue
 
         s_sift, s_mutsel, omega = np.nan, np.nan, np.nan
         if dico_info["SNP_TYPE"] == "NonSyn":
@@ -218,7 +230,9 @@ def main(args):
     os.makedirs(os.path.dirname(args.output_bounds), exist_ok=True)
 
     mask_grouped = merge_mask_list(args.mask)
-    dico_snp, discarded, filtered = read_vcf(args.vcf, args.sift_file, mask_grouped, args.subsample, args.anc_proba)
+    seqs = open_fasta(args.fasta_pop)
+    dico_snp, discarded, filtered = read_vcf(args.vcf, args.sift_file, mask_grouped, args.subsample,
+                                             args.anc_proba, args.mask_CpG, seqs)
     total = len(dico_snp["snp_type"]) + discarded + filtered
     print(f'{discarded * 100 / total:.2f}% of SNPs are discarded because their are masked.')
     print(f'{filtered * 100 / total:.2f}% of SNPs are discarded because they are filtered.')
@@ -256,6 +270,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--vcf', required=False, type=str, dest="vcf", help="Input vcf file")
+    parser.add_argument('--fasta_pop', required=True, type=str, dest="fasta_pop", help="The fasta path")
     parser.add_argument('--anc_proba', required=True, type=float, dest="anc_proba", default=0.5,
                         help="Mask the substitutions with reconstruction probability lower than this threshold")
     parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
@@ -263,6 +278,8 @@ if __name__ == '__main__':
     parser.add_argument('--sift_file', required=False, type=str, default="", dest="sift_file", help="The SIFT file")
     parser.add_argument('--mask', required=False, default="", nargs="+", type=str, dest="mask",
                         help="List of input mask file path")
+    parser.add_argument('--mask_CpG', required=False, default=False, action="store_true", dest="mask_CpG",
+                        help="Mask CpG opportunities")
     parser.add_argument('--output_tsv', required=False, type=str, dest="output_tsv", help="Output tsv file")
     parser.add_argument('--output_bounds', required=False, type=str, dest="output_bounds", help="Output bounds file")
     parser.add_argument('--subsample', required=False, type=int, default=16, dest="subsample")

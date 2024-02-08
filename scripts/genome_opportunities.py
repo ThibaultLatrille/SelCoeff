@@ -87,6 +87,7 @@ def main(args):
             if ensg in mask_grouped and c_site in mask_grouped[ensg]:
                 dico_opp["nMasked"] += 1.0
                 continue
+
             dico_opp["nNonMasked"] += 1.0
 
             if args.method == "MutSel":
@@ -94,8 +95,21 @@ def main(args):
                 if (ensg not in unconserved_grouped) or (c_site not in unconserved_grouped[ensg]):
                     log_fitness.add(lf)
 
-            for (syn, ref_nuc, alt_nuc, alt_codon, alt_aa) in codon_neighbors[ref_codon]:
-                mutation_rate = cds_rates.mutation_rate(ensg, ref_nuc, alt_nuc)
+            for (syn, anc_nuc, der_nuc, alt_codon, alt_aa, diff_pos) in codon_neighbors[ref_codon]:
+                if args.mask_CpG:
+                    pos = c_site * 3 + diff_pos
+                    if pos == 0 or pos == len(seq) - 1:
+                        continue
+                    anc_context = seq[pos - 1:pos + 2]
+                    der_context = anc_context[0] + der_nuc + anc_context[-1]
+                    assert anc_context[1] == anc_nuc
+                    assert len(anc_context) == 3
+                    assert len(der_context) == 3
+                    if "CG" in anc_context or "CG" in der_context:
+                        dico_opp["nMasked"] += 1.0 / len(codon_neighbors[ref_codon])
+                        continue
+
+                mutation_rate = cds_rates.mutation_rate(ensg, anc_nuc, der_nuc)
                 assert np.isfinite(mutation_rate)
                 dico_opp["μTotal"] += mutation_rate
 
@@ -169,6 +183,8 @@ if __name__ == '__main__':
     parser.add_argument('--bounds', required=False, default="", type=str, dest="bounds", help="Input bound file path")
     parser.add_argument('--mask', required=False, default="", nargs="+", type=str, dest="mask",
                         help="List of input mask file path")
+    parser.add_argument('--mask_CpG', required=False, default=False, action="store_true", dest="mask_CpG",
+                        help="Mask CpG opportunities")
     parser.add_argument('--unconserved', required=False, default="", type=str, dest="unconserved",
                         help="Input unconserved file path")
     parser.add_argument('--method', required=True, type=str, dest="method", help="The method (MutSel or Omega)")
