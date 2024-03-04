@@ -1,184 +1,163 @@
+import os
+import gzip
 import argparse
+from collections import defaultdict
 from ete3 import PhyloTree, TreeStyle
-from matplotlib.patches import Rectangle
-from libraries import *
 import ete3_custom_faces as faces
 
-
-def masked_sub(row, mask_grouped):
-    return (row.ENSG in mask_grouped) and (row.CODON_SITE in mask_grouped[row.ENSG])
-
-
-def cat_sub(row, cat_snps):
-    return cat_snps.rate2cats(row.SEL_COEFF)[0] if (row.SUB_TYPE != "Syn") else "syn"
-
-
-def plot_histogram(score_list, cat_snps, file):
-    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
-    xmin, xmax = xlim_dico["MutSel"][0], xlim_dico["MutSel"][1]
-    n, bins, patches = plt.hist([s for s in score_list if np.isfinite(s)], bins=np.linspace(xmin, xmax, 61),
-                                range=(xmin, xmax), edgecolor="black", linewidth=1.0)
-    total_n = sum(n)
-    if cat_snps.bins <= 10:
-        n_cat = defaultdict(float)
-        for i, b in enumerate(bins[1:]):
-            cats = cat_snps.rate2cats(b)
-            assert len(cats) >= 1
-            cat = cats[0]
-            patches[i].set_facecolor(cat_snps.color(cat))
-            n_cat[cat] += n[i] / total_n
-        handles = [Rectangle((0, 0), 1, 1, color=c) for c in [cat_snps.color(cat) for cat in cat_snps.non_syn_list]]
-        labels = [cat_snps.label(cat) + f" ({n_cat[cat] * 100:.2f}% of total)" for cat in cat_snps.non_syn_list]
-        plt.legend(handles, labels)
-    plt.xlabel(rate_dico["MutSel"])
-    plt.ylabel("Density")
-    for x in cat_snps.inner_bound:
-        plt.axvline(x, color="grey", lw=1, ls='--')
-    if xmin < -1.0 and xmax > 1.0:
-        ax.xaxis.set_major_locator(plt.MultipleLocator(1))
-    plt.axvline(0, color="black", lw=2)
-    plt.xlim((xmin, xmax))
-    plt.tight_layout()
-    plt.savefig(file, format="pdf")
-    plt.clf()
-    plt.close("all")
-
-    fig, ax = plt.subplots(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
-    plt.xlabel(rate_dico["MutSel"])
-    plt.ylabel("$\\frac{ \\mathbb{P} [ S_0 ]}{\\mathbb{P} [ -S_0 ]}$")
-    # plot x against -x
-    x_axis, y_axis = list(), list()
-
-    minus_index = len(n) // 2 - 1
-    for i in range(len(n) // 2, len(n)):
-        plus_sel = (bins[i] + bins[i + 1]) / 2
-        plus_p = n[i]
-        minus_sel = (bins[minus_index] + bins[minus_index + 1]) / 2
-        minus_p = n[minus_index]
-        minus_index -= 1
-        assert abs(plus_sel + minus_sel) < 1e-6, f"{plus_sel} and {minus_sel}"
-        if minus_p == 0:
-            continue
-        x_axis.append(plus_sel)
-        y_axis.append(plus_p / minus_p)
-    plt.scatter(x_axis, y_axis, color="black")
-    plt.tight_layout()
-    plt.savefig(file.replace(".pdf", ".folded_ratio.pdf"), format="pdf")
-    plt.clf()
-    plt.close("all")
+codontable = defaultdict(lambda: "-")
+codontable.update({
+    'ATA': 'I', 'ATC': 'I', 'ATT': 'I', 'ATG': 'M',
+    'ACA': 'T', 'ACC': 'T', 'ACG': 'T', 'ACT': 'T',
+    'AAC': 'N', 'AAT': 'N', 'AAA': 'K', 'AAG': 'K',
+    'AGC': 'S', 'AGT': 'S', 'AGA': 'R', 'AGG': 'R',
+    'CTA': 'L', 'CTC': 'L', 'CTG': 'L', 'CTT': 'L',
+    'CCA': 'P', 'CCC': 'P', 'CCG': 'P', 'CCT': 'P',
+    'CAC': 'H', 'CAT': 'H', 'CAA': 'Q', 'CAG': 'Q',
+    'CGA': 'R', 'CGC': 'R', 'CGG': 'R', 'CGT': 'R',
+    'GTA': 'V', 'GTC': 'V', 'GTG': 'V', 'GTT': 'V',
+    'GCA': 'A', 'GCC': 'A', 'GCG': 'A', 'GCT': 'A',
+    'GAC': 'D', 'GAT': 'D', 'GAA': 'E', 'GAG': 'E',
+    'GGA': 'G', 'GGC': 'G', 'GGG': 'G', 'GGT': 'G',
+    'TCA': 'S', 'TCC': 'S', 'TCG': 'S', 'TCT': 'S',
+    'TTC': 'F', 'TTT': 'F', 'TTA': 'L', 'TTG': 'L',
+    'TAC': 'Y', 'TAT': 'Y', 'TAA': 'X', 'TAG': 'X',
+    'TGC': 'C', 'TGT': 'C', 'TGA': 'X', 'TGG': 'W'})
 
 
-def custom_layout(node, focal_species, light_cols):
-    leaf_color, node_size, bold, text_prefix = "#000000", 2, False, ""
+def open_file(path):
+    return gzip.open(path, 'rt') if path.endswith(".gz") else open(path, 'r')
+
+
+def open_fasta(path):
+    outfile = {}
+    ali_file = open_file(path)
+    for seq_id in ali_file:
+        outfile[seq_id.replace('>', '').strip()] = ali_file.readline().strip()
+    return outfile
+
+
+def fasta_txt(dico_fasta):
+    return "\n".join([f">{seq_id}\n{seq}" for seq_id, seq in dico_fasta.items()])
+
+
+outgroup = "Outgroup"
+outgroups = [f"{outgroup}_{i}" for i in range(1, 5)]
+
+
+def custom_layout(node, focal_species, light_cols, aa_cols):
+    leaf_color, node_size, bold, bw, text_prefix = "#000000", 2, False, False, ""
     if node.is_leaf():
         if "name" in node.features and node.name == focal_species:
             leaf_color = "red"
             node_size = 8
             bold = True
             text_prefix = " "
+        elif node.name in outgroups:
+            node_size = 0
+            leaf_color = "#FFFFFF"
+            node.img_style["hz_line_color"] = "#FFFFFF"
+            node.img_style["vt_line_color"] = "#FFFFFF"
+            bw = True
+            bold = True
         node.img_style["shape"] = "square"
         node.img_style["size"] = node_size
         node.img_style["fgcolor"] = leaf_color
         attr_face = faces.AttrFace("name", "Verdana", 11, leaf_color, None, bold=bold, text_prefix=text_prefix)
         faces.add_face_to_node(attr_face, node, 0)
         if hasattr(node, "sequence"):
-            SequenceFace = faces.SequenceFace(node.sequence, "nt", 13, bold=bold, light_cols=light_cols)
+            SequenceFace = faces.SequenceFace(node.sequence, "nt", 13, bold=bold, light_cols=light_cols,
+                                              black_and_white=bw, aa_cols=aa_cols)
             faces.add_face_to_node(SequenceFace, node, 1, aligned=True)
     else:
+        if len(set(outgroups) & set(node.get_leaf_names())) == len(set(outgroups)):
+            node_size = 0
+            node.img_style["hz_line_color"] = "#FFFFFF"
+            node.img_style["vt_line_color"] = "#FFFFFF"
         node.img_style["size"] = node_size
         node.img_style["shape"] = "circle"
 
 
-def clean_seq(seq):
-    nucs = {"A", "C", "G", "T", "-", " "}
-    return "".join([n if n in nucs else "-" for n in seq])
+def translate_codons(sp: str, seq: str) -> str:
+    if sp in outgroups:
+        if sp == outgroups[-1]:
+            suffix = "_" + "".join(["↓" if ("↓" in seq[i:i + 3]) else "_" for i in range(0, len(seq), 3)])
+        elif sp == outgroups[-2]:
+            seq = seq[:-3] + "NUC"
+            suffix = "→" + "AA" + "_" * (len(seq) // 3 - 2)
+        else:
+            suffix = "_" + "_" * (len(seq) // 3)
+    else:
+        suffix = "→" + "".join([codontable[seq[i:i + 3]] for i in range(0, len(seq), 3)])
+    return seq + suffix
 
 
-def main(input_path, mask_list, output, bins, windows, bounds, fasta_folder, tree_file, focal_species):
+def is_aa(seq: str) -> str:
+    return "F" * (len(seq) + 1) + "T" * (len(seq) // 3)
+
+
+def keep_seq(name: str, pos: str, bypass: bool = False) -> bool:
+    if bypass:
+        return True
+    keep_dico = {"TFB1M": {979}, "FMO1": {1240}, "OAS2": {1381}, "SELE": {1722}}
+    # keep_dico = {"THSD7A": {3145}, "LIG3": {645}, "DNAH9": {1614}, "NCAPD2": {309}}
+    name_s = name.replace("_", "").strip()
+    if name_s in keep_dico:
+        pos_i = int(pos.replace("_", "").replace("pos:", "").strip())
+        return pos_i in keep_dico[name_s]
+
+
+def main(fasta_file, tree_file, output, focal_species):
     os.makedirs(os.path.dirname(output), exist_ok=True)
-    cat_snps = CategorySNP("MutSel", bounds, bins=bins, windows=windows)
-    mask_grouped = merge_mask_list(mask_list)
 
-    df = pd.read_csv(input_path, sep='\t')
-    df["MASKED"] = df.apply(lambda row: masked_sub(row, mask_grouped), axis=1)
-    df["CAT"] = df.apply(lambda row: cat_sub(row, cat_snps), axis=1)
-
-    # plot the histogram of counts
-    df_non_syn = df[df.SUB_TYPE != "Syn"]
-    plot_histogram(df_non_syn["SEL_COEFF"].tolist(), cat_snps, output)
-
-    df_pos = df_non_syn[df_non_syn["CAT"] == "pos"]
-    print(f"Number of positive selected sites: {len(df_pos)}")
-    plot_folder = output.replace(".pdf", "")
-    os.makedirs(plot_folder, exist_ok=True)
-    # whole_tree = Tree(tree_file, format=1)
+    input_seqs = open_fasta(fasta_file)
+    if focal_species == "":
+        focal_species = os.path.basename(fasta_file).split(".")[0]
     # groups of 50 sites
-    n_sites, flanks, sep = 10, 2, "|"
-    max_plots = 100000
-    max_sites = min(max_plots * n_sites, len(df_pos))
-    print(f"Plotting {max_sites} sites out of {len(df_pos)}.")
-    for i_row in range(0, max_sites, n_sites):
+    n_sites, max_plots, sep = 10, 10, "|"
+
+    input_splits = {k: v.split("|||")[1:-1] for k, v in input_seqs.items()}
+    iter_out = enumerate(zip(input_splits[outgroups[0]], input_splits[outgroups[1]]))
+    filter_list = [g for g, (seq_0, seq_1) in iter_out if keep_seq(seq_0, seq_1, True)]
+    input_splits = {k: [v[i] for i in filter_list] for k, v in input_splits.items()}
+    outgroup_split = input_splits[outgroups[-1]]
+    fasta_n_sites = len(outgroup_split)
+    max_sites = min(max_plots * n_sites, fasta_n_sites)
+    print(f"Plotting {max_sites} sites out of {fasta_n_sites}.")
+
+    for i_block in range(0, max_sites, n_sites):
+        n_block = i_block // n_sites
         pt = PhyloTree(tree_file, quoted_node_names=True, format=1)
-        all_species = pt.get_leaf_names()
-        sub_df = df_pos.iloc[i_row: i_row + n_sites]
-        # group the substitutions by gene
-        # Use ete3 to plot the tree and the substitutions
-        subset_fasta = {species: "" for species in all_species}
-        light_cols = []
-        nuc_pos = 1
-        for ensg, ensg_df in sub_df.groupby("ENSG"):
-            fasta_path = clean_ensg_path(os.path.join(fasta_folder, f"{ensg}_NT.fasta"))
+        subset_fasta = {}
 
-            fasta = open_fasta(fasta_path)
-            assert focal_species in fasta, f"{focal_species} not in {fasta_path}"
+        for k, v in input_splits.items():
+            tr = [translate_codons(k, seq) for seq in v[i_block:i_block + n_sites]]
+            subset_fasta[k] = sep + sep.join(tr) + sep
+        clean_subset = {k: v for k, v in subset_fasta.items() if len(set(v)) > 3 or k in outgroups}
+        pt.prune(clean_subset.keys(), preserve_branch_length=True)
 
-            for index, row in ensg_df.iterrows():
-                # Take the two sites before and after the site
-                min_site = max(0, row.CODON_SITE - 2)
-                max_site = min(len(fasta[focal_species]) // 3, row.CODON_SITE + 2)
-                for species in all_species:
-                    if focal_species == species:
-                        left = fasta[species][min_site * 3: row.CODON_SITE * 3]
-                        right = fasta[species][(row.CODON_SITE + 1) * 3: (max_site + 1) * 3]
-                        subset_fasta[species] += left + row.CODON_DER + right + sep
-                        light_cols.extend([nuc_pos + i for i in range(len(left))])
-                        nuc_pos += len(left) + 3
-                        light_cols.extend([nuc_pos + i for i in range(len(right))])
-                        nuc_pos += len(right) + 1
-                    elif species in fasta:
-                        subset_fasta[species] += fasta[species][min_site * 3: (max_site + 1) * 3] + sep
-                    else:
-                        subset_fasta[species] += "-" * (max_site - min_site + 1) * 3 + sep
+        light_cols = set([p for p, nuc in enumerate(clean_subset[outgroups[-1]]) if nuc == "_"])
 
-        clean_subset = {k: sep + v for k, v in subset_fasta.items() if len(set(v)) > 2}
-        pos_fasta = fasta_txt(clean_subset)
-        pt.prune(clean_subset.keys())
-        assert len(pt.get_leaf_names()) == len(clean_subset)
-        n_block = i_row // n_sites
+        is_aa_str = sep + sep.join([is_aa(seq) for seq in input_splits[focal_species][i_block:i_block + n_sites]]) + sep
+        foc_seq_len = len(clean_subset[focal_species])
+        assert len(is_aa_str) == foc_seq_len, f"{len(is_aa_str)} != {foc_seq_len}"
+        aa_cols = set([p for p, c in enumerate(is_aa_str) if c == "T"])
 
-        pt.link_to_alignment(alignment=pos_fasta, alg_format="fasta")
+        tmp_fasta = fasta_txt(clean_subset)
+        pt.link_to_alignment(alignment=tmp_fasta, alg_format="fasta")
         ts = TreeStyle()
         ts.show_leaf_name = False
         ts.draw_guiding_lines = False
-        ts.layout_fn = lambda node: custom_layout(node, focal_species, light_cols)
-        pt.render(f"{plot_folder}/{n_block}.pdf", tree_style=ts, w=1200, units="mm")
+        ts.layout_fn = lambda node: custom_layout(node, focal_species, light_cols, aa_cols)
+        pt.render(output.replace("-0.pdf", f"-{n_block}.pdf"), tree_style=ts, w=1200, units="mm")
         print(f"{n_block}th block out of {max_sites // n_sites} done.")
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-i', '--input', required=True, type=str, dest="input", help="Input vcf")
-    parser.add_argument('--mask', required=False, default="", nargs="+", type=str, dest="mask")
-    parser.add_argument('--mask_CpG', required=False, default=False, action="store_true", dest="mask_CpG",
-                        help="Mask CpG opportunities")
-    parser.add_argument('--bounds', required=True, default="", type=str, dest="bounds", help="Input bound file path")
-    parser.add_argument('--bins', required=False, default=0, type=int, dest="bins", help="Number of bins")
-    parser.add_argument('--windows', required=False, default=0, type=int, dest="windows", help="Number of windows")
-    parser.add_argument('-o', '--output', required=False, type=str, dest="output", help="Output pdf")
-    parser.add_argument('--fasta_folder', required=True, type=str, dest="fasta_folder", help="The fasta folder path")
+    parser.add_argument('--output', required=True, type=str, dest="output", help="Output pdf")
+    parser.add_argument('--species', required=False, type=str, dest="species", help="The focal species")
+    parser.add_argument('--fasta', required=True, type=str, dest="fasta", help="The fasta path")
     parser.add_argument('--tree', required=True, type=str, dest="tree", help="The tree path")
-    parser.add_argument('--species', required=True, type=str, dest="species", help="The focal species")
     args = parser.parse_args()
-    assert args.mask_CpG is False, "Mask CpG is not implemented for this script."
-    main(args.input, args.mask, args.output, args.bins, args.windows, args.bounds, args.fasta_folder,
-         args.tree, args.species)
+    main(args.fasta, args.tree, args.output, args.species)

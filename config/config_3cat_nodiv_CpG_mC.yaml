@@ -1,4 +1,4 @@
-experiment: "3bins-mC-CpG"
+experiment: "3bins-mC-nodiv-CpG"
 SAMPLE_LIST: "sample_all.tsv"
 subsample: 16
 nbr_replicates: 12
@@ -13,5 +13,5 @@ mask_anc_proba_SNPS: 0.99 # Mask the SNPs with ancestral reconstruction probabil
 mask_unaligned_flanks: 0 # Mask the sites for which the flanked regions are not aligned with the neighboring species (flanks of length mask_unaligned_flanks on each side, 0 to disable)
 METHOD_LIST: [ "MutSel" ]
 MODEL: "polyDFE_C"
-ALPHA: true # If true, the α parameter is computed (requires to map substitutions in the terminal branch).
-USE_DIVERGENCE: true # If true, the model use divergence (requires ALPHA to be true).
+ALPHA: false # If true, the α parameter is computed (requires to map substitutions in the terminal branch).
+USE_DIVERGENCE: false # If true, the model use divergence (requires ALPHA to be true).

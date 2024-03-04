@@ -211,6 +211,7 @@ def main(args):
         cat_snps.non_syn_list + [f'proba_{c}_div' for c in cat_snps.non_syn_list]
     ]
 
+
     if len(cat_snps.non_syn_list) == 2:
         cols.append(['all_omega_div', 'neg_omega_div', 'ratio_neg_omega_div'])
     else:

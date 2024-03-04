@@ -20,6 +20,7 @@ __pycache__
 /data_processed/
 /utils/
 /out/
+/supp/
 /Zenodo/
 /TSV
 .DS_Store

@@ -1,12 +1,13 @@
 import os
 import gzip
 import argparse
+import numpy as np
 from collections import defaultdict
 from libraries import merge_mask_list, plt, my_dpi, format_pop
 from upsetplot import UpSet, from_contents
 
 
-def read_vcf(vcf, mask_grouped):
+def read_vcf(vcf, mask_grouped, anc_proba, subsample):
     vcf_file = gzip.open(vcf, 'rt')
     set_snp, sample_sizes = set(), set()
     discarded, filtered = 0, 0
@@ -29,13 +30,15 @@ def read_vcf(vcf, mask_grouped):
             discarded += 1
             continue
 
-        if float(dico_info["ANC_PROBA"]) < 0.99:
+        if float(dico_info["ANC_PROBA"]) < anc_proba:
             filtered += 1
             continue
 
         sample_size = int(dico_info["SAMPLE_SIZE"])
         k = int(dico_info["COUNT_POLARIZED"])
-        if k == 0 or k == sample_size:
+        max_daf = min(sample_size, subsample)
+        sampled_k = np.random.hypergeometric(k, sample_size - k, max_daf)
+        if sampled_k == 0 or k == max_daf:
             continue
 
         if dico_info["SNP_TYPE"] != "NonSyn" and float(dico_info["SEL_COEFF"]) < 1.0:
@@ -66,7 +69,7 @@ def main(vcf_list, mask_list, output):
     for vcf_file in sorted(vcf_list):
         sp, pop = os.path.basename(vcf_file).replace("_", " ").replace(".vcf.gz", "").split(".")
         print(sp, pop)
-        set_snps, sample_size = read_vcf(vcf_file, mask_grouped)
+        set_snps, sample_size = read_vcf(vcf_file, mask_grouped, args.anc_proba, args.subsample)
         dico_pop[sp][f"{format_pop(pop)} (k={sample_size})"] = set_snps
         dico_sp[sp].update(set_snps)
 
@@ -79,6 +82,9 @@ def main(vcf_list, mask_list, output):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-v', '--vcf', required=False, type=str, nargs="+", dest="vcf")
+    parser.add_argument('--subsample', required=False, type=int, default=16, dest="subsample")
+    parser.add_argument('--anc_proba', required=True, type=float, dest="anc_proba", default=0.5,
+                        help="Mask the dico_snp with reconstruction probability lower than this threshold")
     parser.add_argument('--mask', required=False, default="", nargs="+", type=str, dest="mask",
                         help="List of input mask file path")
     parser.add_argument('--mask_CpG', required=False, default=False, action="store_true", dest="mask_CpG",

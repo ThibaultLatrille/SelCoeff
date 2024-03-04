@@ -166,8 +166,14 @@
     \maketitle
     \part*{Supplementary materials}
     \tableofcontents
-    \clearpage
 
+    \newpage
+    \listoffigures
+
+    \newpage
+    \listoftables
+
+    \clearpage
     \section{Mutation-selection codon models}\label{sec:mutsel}
 
     \subsection{Prior distributions and parameters of the model}\label{subsec:priors}
@@ -177,8 +183,8 @@
     Nodes of the directed acyclic graph are the variables, and edges are the functions.
     Hyper-parameters are depicted in {\color{RED}{red}} circles, random variables in {\color{BLUE}{blue}} circles, and transformed variables in black.
             {\color{BLUE}{Blue}} dashed line denotes a drawing from a random distribution, and black solid lines denote a function.
-    All the nodes pointing toward a given node (upstream) are its dependencies which determines its distribution.
-    The other way around, following the arrows in the DAG (downstream), simple {prior} distributions are combined together to form more complex joint {prior} distribution which ultimately defines the {prior} distribution of the model.
+    All the nodes pointing toward a given node (upstream) are its dependencies which determine its distribution.
+    The other way around, following the arrows in the DAG (downstream), simple {prior} distributions are combined together to form more complex joint {prior} distributions which ultimately define the {prior} distribution of the model.
 
     \begin{center}
         \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=0.6cm and 1.2cm,semithick]
@@ -187,7 +193,7 @@
             \node[state] (P) {$\Probmatrix\branchsiteexp$};
             \node[state] (Q) [below right=of P] {$\Submatrix\branchsiteexp$};
             \node[state] (R) [below right=of Q] {$\Mutmatrix$};
-            \node[state] (BL) [right=of P] {$\branchlength\branchexp$};
+            \node[state] (BL) [BLUE, right=of P] {$\branchlength\branchexp$};
             \node[res] (BLH) [RED, right=of BL] {$ \lambda, \tau $};
             \node[state] (f) [right=of Q] {$\Fit\siteexp $};
             \node[state] (Ex) [BLUE, below right=of R] {$\Exchan$};
@@ -229,16 +235,16 @@
         \begin{blockarray}{ccccc}
             & A & C & G & T \\
             \begin{block}{c(cccc)}
-                A & - & {\exchan_{AC}\mutequi_C} & {\exchan_{AG}\mutequi_G} & {\exchan_{AT}\mutequi_T} \\
-                C & {\exchan_{AC}\mutequi_A} &                        - & {\exchan_{CG}\mutequi_G} & {\exchan_{CT}\mutequi_T} \\
-                G & {\exchan_{AG}\mutequi_A} & {\exchan_{CG}\mutequi_C} &                        - & {\exchan_{GT}\mutequi_T} \\
-                T & {\exchan_{AT}\mutequi_A} & {\exchan_{CT}\mutequi_C} & {\exchan_{GT}\mutequi_G} & - \\
+                A & -\mu_A & {\exchan_{AC}\mutequi_C} & {\exchan_{AG}\mutequi_G} & {\exchan_{AT}\mutequi_T} \\
+                C & {\exchan_{AC}\mutequi_A} &                        -\mu_C & {\exchan_{CG}\mutequi_G} & {\exchan_{CT}\mutequi_T} \\
+                G & {\exchan_{AG}\mutequi_A} & {\exchan_{CG}\mutequi_C} &                        -\mu_G & {\exchan_{GT}\mutequi_T} \\
+                T & {\exchan_{AT}\mutequi_A} & {\exchan_{CT}\mutequi_C} & {\exchan_{GT}\mutequi_G} & -\mu_T\\
             \end{block}
         \end{blockarray}
     \end{equation}
     By definition, the sum of the entries in each row of the nucleotide rate matrix $\Mutmatrix$ is equal to $0$, giving the diagonal entries:
     \begin{equation}
-        \mutmatrix_{a,a} = - \sum\limits_{ b \neq a, b \in \{A, C, G, T\} } \mutmatrix_{a,b}
+        \mu_a = \sum\limits_{ b \neq a, b \in \{A, C, G, T\} } \mutmatrix_{a,b}
     \end{equation}
     The {prior} on the exchangeabilities $\Exchan$ is a uniform Dirichlet distribution of dimension $6$:
     \begin{equation}
@@ -339,7 +345,7 @@
     \end{enumerate}
 
     To implement the mapping-based {MCMC} sampling strategy, we first sample the detailed {substitution} history $\subhistory$ for all sites along the tree.
-    Several methods exist for doing this~\cite{nielsen_mapping_2002,rodrigue_uniformization_2008}, which are used here in combination (first trying the accept-reject method of Nielsen, then switching to the uniformization approach of Rodrigue \textit{et al} if the first round has failed).
+    Several methods exist for doing this~\cite{nielsen_mapping_2002,rodrigue_uniformization_2008}, which are used here in combination (first trying the accept-reject method of \textcite{nielsen_mapping_2002}, then switching to the uniformization approach of \textcite{rodrigue_uniformization_2008} if the first round has failed).
 
     Then, we write down the probability of $\subhistory$ given the parameters, and finally, we collect all factors that depend on some parameter of interest and make some simplifications.
     This ultimately leads to relatively compact sufficient statistics allowing for fast numerical evaluation of the likelihood~\cite{irvahn_phylogenetic_2014,davydov_state_2017}.
@@ -368,7 +374,32 @@
 
     \section{Beneficial mutations in the terminal lineages and populations}\label{sec:beneficial-mutations}
 
-    \subsection{Summary tables}\label{subsec:summary-table-mutsel}
+    \subsection{Example sites}\label{subsec:example-sites}
+
+    We extracted protein-coding DNA alignments across mammals centered around the codon site (two flanking codons in white background) for which the beneficial non-adaptive mutations ($\SphyBen$) have been detected in \textit{Chlorocebus sabaeus}.
+    We also show the translated amino acids of this region.
+    For instance, in DNA alignment of gene SELE shown below, the nucleotide at site 1722 has mutated (from T to C) at the basis of Simiiformes (monkeys and apes), modifying the corresponding amino acid from Serine to Proline, but has been subsequently reverted in the branch of \textit{Chlorocebus sabaeus}.
+    However, other substitutions classified as $\SphyBen$ cannot be clearly interpreted as reversions \textit{sensu stricto} along the terminal branch of \textit{Chlorocebus sabaeus}.
+    Indeed, we acknowledge that on a fixed fitness landscape, a deleterious mutation can be compensated by transitions to other fitter amino-acids, and not necessarily the ancestral one.
+
+    In the figures below, the first line is the name of the gene, the second line the position of the mutation in the OrthoMam protein-coding DNA alignment, and the arrow in the third line corresponds to the nucleotide position of the mutation.
+    Finally, for reproducibility, we generated the fasta alignment for all $\SphyBen$ mutations that we detected, either in the terminal lineage or in segregating polymorphism.
+    These fasta files are available at Zenodo (\url{https://doi.org/10.5281/zenodo.7878953}), across all populations, under the compressed archive \textit{alignment\_focused\_around\_non\_adaptive\_mutations.zip} and we provide a python script to obtain the figures shown below given these alignments.
+
+    \newpage
+    \begin{center}
+        \captionof{figure}{Examples sites of $\SphyBen$ mutations in \textit{Chlorocebus sabaeus} (reversions).}.
+        \includegraphics[width=0.95\linewidth, page=1]{artworks/Alignment.Chlorocebus_sabaeus.Saint_Kitts-0.pdf}
+    \end{center}
+
+    \newpage
+    \begin{center}
+        \captionof{figure}{Examples sites of $\SphyBen$ mutations in \textit{Chlorocebus sabaeus}.}.
+        \includegraphics[width=0.95\linewidth, page=1]{artworks/Alignment.Chlorocebus_sabaeus.Saint_Kitts-1.pdf}
+    \end{center}
+
+    \newpage
+    \subsection{Selection along the terminal branches}\label{subsec:summary-table-mutsel}
 
     \subsubsection{Probability of mutations and substitutions to be $\SphyDel$, $\SphyNeu$ or $\SphyBen$}
     \begin{center}
@@ -421,7 +452,7 @@
         These mutations have a selection coefficient predicted at the phylogenetic-scale lower than -1, thus toward a less fit amino-acid.
         \item $\proba [ \SphyNeu ]$ (eq.~5) is the probability for a new mutation to be a nearly-neutral.
         These mutations have a selection coefficient predicted at the phylogenetic-scale between -1 and 1.
-        \item $\proba [ \SphyBen ]$ (eq.~5) is the probability for a new mutation to be a beneficial back-mutation.
+        \item $\proba [ \SphyBen ]$ (eq.~5) is the probability for a new mutation to be a  non-adaptive beneficial mutation.
         These mutations have a selection coefficient predicted at the phylogenetic-scale larger than 1, thus toward a more fit amino-acid.
         \item $\proba_{div}[\SphyDel]$ is the proportion of substitutions in the terminal branch that are $\SphyDel$.
         \item $\proba_{div}[\SphyNeu]$ is the proportion of substitutions in the terminal branch that are $\SphyNeu$.
@@ -433,46 +464,24 @@
     \begin{center}
         \captionof{table}{$\dnds$ for $\SphyDel$, $\SphyNeu$ or $\SphyBen$.}
         \scriptsize
-        \begin{longtable*}{|l|l|r|r|r|r|r|r|}
+        \begin{longtable*}{|l|r|r|r|r|}
             \toprule
-            Population &             Species & $\dnds $ & $\dn ( \SphyDel ) / \ds$ & $\dn ( \SphyNeu ) / \ds$ & $\dn ( \SphyBen ) / \ds$ \\
+            Species & $\dnds $ & $\dn ( \SphyDel ) / \ds$ & $\dn ( \SphyNeu ) / \ds$ & $\dn ( \SphyBen ) / \ds$ \\
             \midrule
             \endhead
             \midrule
-            \multicolumn{8}{r}{{Continued on next page}} \\
+            \multicolumn{5}{r}{{Continued on next page}} \\
             \midrule
             \endfoot
 
             \bottomrule
             \endlastfoot
-            \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $ 0.129$ & $ 0.065$ & $ 0.832$ & $ 1.267$ \\
-            Iran & Bos taurus & $ 0.114$ & $ 0.063$ & $ 0.629$ & $ 1.280$ \\
-            Uganda & Bos taurus & $ 0.116$ & $ 0.064$ & $ 0.638$ & $ 1.328$ \\
-            \rowcolor{LIGHTGREY} Australia & Capra hircus & $ 0.108$ & $ 0.058$ & $ 0.631$ & $ 1.169$ \\
-            \rowcolor{LIGHTGREY} France & Capra hircus & $ 0.109$ & $ 0.058$ & $ 0.635$ & $ 1.172$ \\
-            \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $ 0.108$ & $ 0.058$ & $ 0.632$ & $ 1.170$ \\
-            \rowcolor{LIGHTGREY} Iran & Capra hircus & $ 0.108$ & $ 0.058$ & $ 0.632$ & $ 1.178$ \\
-            \rowcolor{LIGHTGREY} Italy & Capra hircus & $ 0.109$ & $ 0.058$ & $ 0.636$ & $ 1.171$ \\
-            \rowcolor{LIGHTGREY} Morocco & Capra hircus & $ 0.108$ & $ 0.058$ & $ 0.633$ & $ 1.183$ \\
-            Iran & Ovis aries & $ 0.128$ & $ 0.079$ & $ 0.619$ & $ 1.215$ \\
-            Iran (O. orientalis) & Ovis aries & $ 0.129$ & $ 0.080$ & $ 0.619$ & $ 1.212$ \\
-            Iran (O. vignei) & Ovis aries & $ 0.127$ & $ 0.078$ & $ 0.619$ & $ 1.201$ \\
-            Various & Ovis aries & $ 0.129$ & $ 0.080$ & $ 0.620$ & $ 1.201$ \\
-            Morocco & Ovis aries & $ 0.129$ & $ 0.080$ & $ 0.621$ & $ 1.217$ \\
-            \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $ 0.118$ & $ 0.062$ & $ 0.713$ & $ 1.521$ \\
-            \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $ 0.119$ & $ 0.062$ & $ 0.717$ & $ 1.559$ \\
-            \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $ 0.118$ & $ 0.062$ & $ 0.716$ & $ 1.549$ \\
-            \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $ 0.119$ & $ 0.062$ & $ 0.719$ & $ 1.537$ \\
-            \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $ 0.119$ & $ 0.062$ & $ 0.716$ & $ 1.546$ \\
-            \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 0.118$ & $ 0.062$ & $ 0.715$ & $ 1.532$ \\
-            \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $ 0.119$ & $ 0.062$ & $ 0.720$ & $ 1.577$ \\
-            \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $ 0.118$ & $ 0.062$ & $ 0.715$ & $ 1.539$ \\
-            \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $ 0.118$ & $ 0.062$ & $ 0.716$ & $ 1.537$ \\
-            African & Homo sapiens & $ 0.170$ & $ 0.103$ & $ 0.885$ & $ 1.744$ \\
-            Admixed American & Homo sapiens & $ 0.170$ & $ 0.103$ & $ 0.884$ & $ 1.742$ \\
-            East Asian & Homo sapiens & $ 0.170$ & $ 0.103$ & $ 0.888$ & $ 1.742$ \\
-            European & Homo sapiens & $ 0.170$ & $ 0.103$ & $ 0.884$ & $ 1.733$ \\
-            South Asian & Homo sapiens & $ 0.170$ & $ 0.103$ & $ 0.886$ & $ 1.745$ \\
+            \rowcolor{LIGHTGREY} Equus caballus & $ 0.129$ & $ 0.065$ & $ 0.832$ & $ 1.267$ \\
+            Bos taurus & [$ 0.114$, $ 0.116$] & [$ 0.063$, $ 0.064$] & [$ 0.629$, $ 0.638$] & [$ 1.280$, $ 1.328$] \\
+            \rowcolor{LIGHTGREY} Capra hircus & [$ 0.108$, $ 0.109$] & [$ 0.058$, $ 0.058$] & [$ 0.631$, $ 0.636$] & [$ 1.169$, $ 1.183$] \\
+            Ovis aries & [$ 0.127$, $ 0.129$] & [$ 0.078$, $ 0.080$] & [$ 0.619$, $ 0.621$] & [$ 1.201$, $ 1.217$] \\
+            \rowcolor{LIGHTGREY} Chlorocebus sabaeus & [$ 0.118$, $ 0.119$] & [$ 0.062$, $ 0.062$] & [$ 0.713$, $ 0.720$] & [$ 1.521$, $ 1.577$] \\
+            Homo sapiens & [$ 0.170$, $ 0.170$] & [$ 0.103$, $ 0.103$] & [$ 0.884$, $ 0.888$] & [$ 1.733$, $ 1.745$] \\
         \end{longtable*}
     \end{center}
     \begin{itemize}
@@ -481,69 +490,55 @@
         \item $\dn(\SphyNeu) / \ds$ (eq.~6) is the ratio of non-synonymous over synonymous substitutions, when restricted to non-synonymous substitutions in the terminal branch that are $\SphyNeu$.
         \item $\dn(\SphyBen) / \ds$ (eq.~6) is the ratio of non-synonymous over synonymous substitutions, when restricted to non-synonymous substitutions in the terminal branch that are $\SphyBen$.
     \end{itemize}
+    SNP are considered fixed in the populations if all sampled individuals are homozygous for the derived allele, in which case we consider this SNP not to be segregating but as fixed as a substitution.
+    This effect results in $\dn / \ds$ that can change across populations, denoted as a range per species.
+    $\dn(\SphyBen) / \ds$ values observed are above 1 and are consistent with slightly advantageous mutations.\\
+
+    Theoretically, $\omega = \dn / \ds$ can be related to the underlying scaled selection coefficient ($S$) with the relation $\omega = S /(1-\exp(-S))$ as in \cite[eq. 3]{nielsen_estimating_2003}.
+    In our experiments our observed $\dn(\SphyBen) / \ds$ is on the range $1.169$ (\textit{C. hircus}) to 1.745 (\textit{H. sapiens}), translating into average $S$ of $\approx0.32$ to $\approx1.24$, so indeed only slightly advantageous.\\
+
+    Of note, observing $\dn(\SphyBen) / \ds >1$ is an important check that $\SphyBen$ mutations are indeed positively selected with an increased substitution rate.
+    Since $\dn(\SphyNeu) / \ds$ is close to 1 for the predicted nearly-neutral mutations, this means that the selection coefficients predicted at the mutation-selection balance are good proxies of selection, then observing $\dn(\SphyBen) / \ds > 1$ is evidence of positive selection of predicted non-adaptive beneficial mutations.
 
     \newpage
-
-    \subsubsection{$\dnds$ over-estimation due to beneficial back-mutations}
+    \subsubsection{$\dnds$ over-estimation due to non-adaptive beneficial mutations}
     \begin{center}
-        \captionof{table}{$\dnds$ over-estimation due to beneficial back-mutations.}
+        \captionof{table}{$\dnds$ over-estimation due to non-adaptive beneficial mutations.}
         \scriptsize
-        \begin{longtable*}{|l|l|r|r|r|r|r|}
+        \begin{longtable*}{|l|r|r|r|}
             \toprule
-            Population & Species & $\dnds $ & $\dn(\Sphy < 1) / \ds$ & $\delta(\dnds )$ \\
+            Species & $\dnds $ & $\dn(\Sphy < 1) / \ds$ & $\delta(\dnds )$ \\
             \midrule
             \endhead
             \midrule
-            \multicolumn{7}{r}{{Continued on next page}} \\
+            \multicolumn{4}{r}{{Continued on next page}} \\
             \midrule
             \endfoot
 
             \bottomrule
             \endlastfoot
-            \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $ 0.129$ & $ 0.115$ & $  10.7$ \\
-            Iran & Bos taurus & $ 0.114$ & $ 0.101$ & $  11.3$ \\
-            Uganda & Bos taurus & $ 0.116$ & $ 0.102$ & $  11.5$ \\
-            \rowcolor{LIGHTGREY} Australia & Capra hircus & $ 0.108$ & $ 0.096$ & $  11.1$ \\
-            \rowcolor{LIGHTGREY} France & Capra hircus & $ 0.109$ & $ 0.097$ & $  11.0$ \\
-            \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $ 0.108$ & $ 0.096$ & $  11.1$ \\
-            \rowcolor{LIGHTGREY} Iran & Capra hircus & $ 0.108$ & $ 0.096$ & $  11.2$ \\
-            \rowcolor{LIGHTGREY} Italy & Capra hircus & $ 0.109$ & $ 0.097$ & $  11.0$ \\
-            \rowcolor{LIGHTGREY} Morocco & Capra hircus & $ 0.108$ & $ 0.096$ & $  11.2$ \\
-            Iran & Ovis aries & $ 0.128$ & $ 0.115$ & $ 9.894$ \\
-            Iran (O. orientalis) & Ovis aries & $ 0.129$ & $ 0.117$ & $ 9.740$ \\
-            Iran (O. vignei) & Ovis aries & $ 0.127$ & $ 0.115$ & $ 9.822$ \\
-            Various & Ovis aries & $ 0.129$ & $ 0.116$ & $ 9.663$ \\
-            Morocco & Ovis aries & $ 0.129$ & $ 0.116$ & $ 9.805$ \\
-            \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $ 0.118$ & $ 0.104$ & $  11.4$ \\
-            \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $ 0.119$ & $ 0.105$ & $  11.5$ \\
-            \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $ 0.118$ & $ 0.105$ & $  11.5$ \\
-            \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $ 0.119$ & $ 0.105$ & $  11.4$ \\
-            \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $ 0.119$ & $ 0.105$ & $  11.5$ \\
-            \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 0.118$ & $ 0.105$ & $  11.4$ \\
-            \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $ 0.119$ & $ 0.105$ & $  11.7$ \\
-            \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $ 0.118$ & $ 0.104$ & $  11.5$ \\
-            \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $ 0.118$ & $ 0.105$ & $  11.4$ \\
-            African & Homo sapiens & $ 0.170$ & $ 0.154$ & $ 8.996$ \\
-            Admixed American & Homo sapiens & $ 0.170$ & $ 0.155$ & $ 8.978$ \\
-            East Asian & Homo sapiens & $ 0.170$ & $ 0.155$ & $ 8.966$ \\
-            European & Homo sapiens & $ 0.170$ & $ 0.155$ & $ 8.926$ \\
-            South Asian & Homo sapiens & $ 0.170$ & $ 0.155$ & $ 8.986$ \\
+            \rowcolor{LIGHTGREY} Equus caballus & $ 0.129$ & $ 0.115$ & $  10.7$ \\
+            Bos taurus & [$ 0.114$, $ 0.116$] & [$ 0.101$, $ 0.102$] & [$  11.3$, $  11.5$] \\
+            \rowcolor{LIGHTGREY} Capra hircus & [$ 0.108$, $ 0.109$] & [$ 0.096$, $ 0.097$] & [$  11.0$, $  11.2$] \\
+            Chlorocebus sabaeus & [$ 0.118$, $ 0.119$] & [$ 0.104$, $ 0.105$] & [$  11.4$, $  11.7$] \\
+            \rowcolor{LIGHTGREY} Homo sapiens & [$ 0.170$, $ 0.170$] & [$ 0.154$, $ 0.155$] & [$ 8.926$, $ 8.996$] \\
+            Ovis aries & [$ 0.127$, $ 0.129$] & [$ 0.115$, $ 0.117$] & [$ 9.663$, $ 9.894$] \\
         \end{longtable*}
     \end{center}
     \begin{itemize}
         \item $\dnds$ (eq.~6) is the ratio of non-synonymous over synonymous substitutions estimated for all the non-synonymous substitutions in the terminal branch.
         \item $\dn(\Sphy < 1) / \ds$ (eq.~6) is the ratio of non-synonymous over synonymous substitutions, when restricted to non-synonymous substitutions in the terminal branch that are not $\SphyBen$.
-        This is the estimated divergence when we removed beneficial back-mutations.
-        \item $\delta(\dnds)$ (eq.~7) is the fraction of the divergence ($\dnds$) that is over-estimated, $\dnds$ is compared to the estimated divergence when we removed beneficial back-mutations $\dn(\Sphy < 1) / \ds$.
+        This is the estimated divergence when we removed non-adaptive beneficial mutations.
+        \item $\delta(\dnds)$ (eq.~7) is the fraction of the divergence ($\dnds$) that is over-estimated, $\dnds$ is compared to the estimated divergence when we removed non-adaptive beneficial mutations $\dn(\Sphy < 1) / \ds$.
     \end{itemize}
-    We estimated that between 9 and 11\% of $\dnds$ is over-estimated, corresponding to beneficial back-mutation inflating the $\dnds$ statistic.
+    We estimated that between 9 and 11\% of $\dnds$ is over-estimated, corresponding to non-adaptive beneficial mutations inflating the $\dnds$ statistic.
 
     \newpage
 
     \section{Clinically related terms for mutations}
     \subsection{Terms associated with deleterious mutations $\SphyDel$}
     \begin{center}
-        \captionof{table}{Terms associated with deleterious mutations $\SphyDel$}
+        \captionof{table}{Terms associated with deleterious mutations $\SphyDel$.}
         \begin{tabular}{|l|r|r|r|r|r|}
             \toprule
             SNP clinical ontology & $n_{\mathrm{Observed}}$ & $n_{\mathrm{Expected}}$ & Odds ratio & $p_{\mathrm{v}}$ & $p_{\mathrm{v-adjusted}}$ \\
@@ -562,9 +557,9 @@
     $^*$ for $p_{\mathrm{v}}^{\mathrm{adj}}$ corrected for multiple comparison (Holm–Bonferroni correction) lower than the risk $\alpha=0.05$.
     SNPs predicted with $\SphyDel$ are statistically associated to clinical terms such as \textit{Likely Pathogenic} and \textit{Pathogenic}.
 
-    \subsection{Terms associated with beneficial back-mutations $\SphyBen$}
+    \subsection{Terms associated with non-adaptive beneficial mutations $\SphyBen$}
     \begin{center}
-        \captionof{table}{Terms associated with beneficial back-mutations $\SphyBen$}
+        \captionof{table}{Terms associated with non-adaptive beneficial mutations $\SphyBen$.}
         \begin{tabular}{|l|r|r|r|r|r|}
             \toprule
             SNP clinical ontology & $n_{\mathrm{Observed}}$ & $n_{\mathrm{Expected}}$ & Odds ratio & $p_{\mathrm{v}}$ & $p_{\mathrm{v-adjusted}}$ \\
@@ -581,7 +576,7 @@
     For each clinical term, a 2x2 contingency tables is built by counting the number of SNPs based on their selection coefficient and their clinical terms (whether they have this specific term or not).
     Fisher's exact tests are then performed for these 2x2 contingency tables.
     $^*$ for $p_{\mathrm{v}}^{\mathrm{adj}}$ corrected for multiple comparison (Holm–Bonferroni correction) lower than the risk $\alpha=0.05$.
-    Beneficial back-mutations are associated with clinical terms such as \textit{Benign} and \textit{Likely Benign}.
+    Beneficial non-adaptive mutations are associated with clinical terms such as \textit{Benign} and \textit{Likely Benign}.
     \newpage
 
     \section{Correlation with diversity}
@@ -603,7 +598,7 @@
 
     \newpage
     \subsubsection{Proportion of deleterious mutations ($\SpopDel$)}\label{subsec:proportion-deleterious-mutations}
-    \captionof{figure}{Proportion of deleterious mutations ($\SpopDel$)}
+    \captionof{figure}{Proportion of deleterious mutations ($\SpopDel$).}
     \begin{minipage}{0.49\linewidth}
         \includegraphics[width=\linewidth, page=1]{artworks/results.pop_size.all_P-Sneg.scatter.pdf}
     \end{minipage}
@@ -623,7 +618,7 @@
 
     \newpage
     \subsubsection{Proportion of nearly-neutral mutations ($\SpopNeu$)}\label{subsec:proportion-nearly-neutral-mutations}
-    \captionof{figure}{Proportion of nearly-neutral mutations ($\SpopNeu$)}
+    \captionof{figure}{Proportion of nearly-neutral mutations ($\SpopNeu$).}
     \begin{minipage}{0.49\linewidth}
         \includegraphics[width=\linewidth, page=1]{artworks/results.pop_size.all_P-Sweak.scatter.pdf}
     \end{minipage}
@@ -640,12 +635,12 @@
     We confirmed that higher effective population size ($\Ne$) is typically accompanied by a smaller proportion of neutral mutations at the population scale ($\proba [ \SpopNeu ]$ in the range 0.06-0.18).
     This result is more pronounced ($\proba [ \SpopNeu \given \SphyNeu ]$ in the range 0.36-0.73) when we restricted the analysis to class of mutations that are supposedly nearly-neutral at the phylogenetic scale ($\SphyNeu$).
     This result suggests that populations with higher diversity (e.g.~\textit{Bos} or \textit{Ovis}) are more likely to discriminate whether mutations are beneficial or deleterious.
-    Alternatively stated, mutations in populations with low diversity (e.g.~\textit{Homo}) are effectively nearly-neutral and behave as would a neutral mutation.
+    Alternatively stated, mutations in populations with low diversity (e.g.~\textit{Homo}) are effectively nearly-neutral and behave as a neutral mutation would.
     This result is qualitatively in accordance with the nearly-neutral theory of evolution which argues that mutations are less efficiently selected for in small populations.
 
     \newpage
     \subsubsection{Proportion of beneficial mutations ($\SpopBen$)}\label{subsec:proportion-beneficial-mutations}
-    \captionof{figure}{Proportion of beneficial mutations ($\SpopBen$)}
+    \captionof{figure}{Proportion of beneficial mutations ($\SpopBen$).}
     \begin{minipage}{0.49\linewidth}
         \includegraphics[width=\linewidth, page=1]{artworks/results.pop_size.all_P-Spos.scatter.pdf}
     \end{minipage}
@@ -656,22 +651,18 @@
         \item $\Ne$ is the estimated effective population size.
         \item $\proba [ \SpopBen ]$ (eq.~15) is the probability for a mutation to be beneficial.
         These mutations have a selection coefficient at the population-scale larger than 1.
-        \item $\proba [ \SpopBen \given \SphyBen]$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a beneficial back-mutation at the phylogenetic scale (the \textit{precision}).
+        \item $\proba [ \SpopBen \given \SphyBen]$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a non-adaptive beneficial mutation at the phylogenetic scale (the \textit{precision}).
     \end{itemize}
     Higher effective population size ($\Ne$) is accompanied by a smaller proportion of beneficial mutations at the population scale ($\proba [ \SpopBen ]$).
-    This trend is also confirmed when we restricted the analysis to class of mutations that are supposedly beneficial back-mutations at the phylogenetic scale ($\SphyBen$).
-    This result is much more difficult to interpret.
-    The fraction of beneficial back mutations is supposed to depend on long term demographic history, which is not directly accessible.
-    If the long term effective population size is relatively similar to the short term one, we expect little opportunity for beneficial back-mutations.
-    And thus, counter-intuitively we expect a diminution of positively selected mutations.
-    However, we can see that the proportion of beneficial back-mutations among advantageous one does not decrease with $\Ne$.
-    This means that somehow adaptive mutations also decrease with $\Ne$ for a reason we fail to explain.
+    This trend is also confirmed when we restricted the analysis to class of mutations that are supposedly non-adaptive beneficial mutations at the phylogenetic scale ($\SphyBen$).
 
     \newpage
 
-    \section{Probabilities of beneficial back-mutations among all beneficial ones ($\proba[\SphyBen\given \SpopBen ]$)}
+    \section{Probability for beneficial mutations to be non-adaptive ($\proba[\SphyBen\given \SpopBen ]$)}
+
+    \subsection{Across the different populations}
     \begin{center}
-        \captionof{table}{Probability of beneficial back-mutations among all beneficial ones ($\proba[\SphyBen\given \SpopBen ]$).}
+        \captionof{table}{Probability for beneficial mutations to be non-adaptive ($\proba[\SphyBen\given \SpopBen ]$).}
         \scriptsize
         \begin{longtable*}{|l|l|r|r|r|r|r|r|}
             \toprule
@@ -716,22 +707,51 @@
     \end{center}
     \begin{itemize}
         \item $\Ne$ is the estimated effective population size.
-        \item $\proba [ \SphyBen ]$ (eq.~5) is the probability for a new mutation to be a beneficial back-mutation.
+        \item $\proba [ \SphyBen ]$ (eq.~5) is the probability for a new mutation to be a non-adaptive beneficial mutation.
         These mutations have a selection coefficient predicted at the phylogenetic-scale larger than 1, thus toward a more fit amino-acid.
         \item $\proba [ \SpopBen ]$ (eq.~15) is the probability for a mutation to be beneficial.
         These mutations have a selection coefficient at the population-scale larger than 1.
-        \item $\proba [ \SpopBen \given \SphyBen]$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a beneficial back-mutation at the phylogenetic scale (the \textit{precision}).
-        \item $\proba [ \SphyBen \given \SpopBen]$ (eq.~14) is the probability for a mutation to a beneficial back-mutations, given it is beneficial at the population scale (the \textit{recall}).
+        \item $\proba [ \SpopBen \given \SphyBen]$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given that it is predicted to be a non-adaptive beneficial mutation at the phylogenetic scale (the \textit{precision}).
+        \item $\proba [ \SphyBen \given \SpopBen]$ (eq.~14) is the probability for a mutation to be non-adaptive given that it is beneficial at the population scale (the \textit{recall}).
         This probability is obtained using Bayes' formula.
     \end{itemize}
 
+    \newpage
+    \subsection{Misannotations of ancestral alleles}
+
+    A potential caveat of our method to is that if a deleterious derived allele segregates at low frequency but is wrongly annotated as ancestral, it will result in a SNP that will be both predicted as advantageous and segregating at high frequency, wrongly suggesting that this variant is correctly inferred as beneficial.
+    In this context misannotations of ancestral alleles could inflate our estimation of the proportion of beneficial non-adaptive mutations.
+    However, we show that this problem impacts our estimation in two ways, albeit, only slightly. \\
+
+    First, if misannotation is influencing the recall for $\SphyBen$ ($\proba[\SphyBen\given \SpopBen ]$), then the recall should increase as a function of  divergence to the sister species ($\ds$: number of synonymous substitutions per sites) since divergence would increase the rate of misannotations.
+    Shown below is recall $\proba[\SphyBen\given \SpopBen ]$ as a function of divergence ($\ds$) in which the latter is not an explanatory variable.
+
+    \begin{center}
+        \captionof{figure}{$\proba[\SphyBen\given \SpopBen ]$ as a function of distance to the sister species.}
+        \includegraphics[width=0.75\linewidth, page=1]{artworks/results.distance.recall_pos.scatter.pdf}
+    \end{center}
 
     \newpage
 
-    \section{Excluding genes under adaptation}
+    Second, the distribution of selection coefficients ($\Sphy$) that we observed for segregating mutations and for divergence also suggests that we effectively controlled for misannotations.
+    Under a scenario where beneficial non-adaptive mutations would only be the result of misannotations, one would expect that the positive part of the fitness effects (i.e. $\proba[\Sphy]$) of observed polymorphism currently segregating in the population should reflect the negative one (i.e. $\proba[-\Sphy]$).
+    Indeed, the number of misannotated beneficial mutations should be proportional to the number of deleterious mutations with the same selection coefficient.
+    The ratio between advantageous and deleterious polymorphisms of the same selection coefficient should therefore be a constant that represents the rate of misannotation (typically influenced by the distance to the sister species).
+    However, this is not what we observe in the DFE of polymorphisms (shown below in the African population of \textit{Homo sapiens}) thus giving us the confidence that misannotations are not common.
 
     \begin{center}
-        \captionof{table}{$\proba[\SphyBen\given \SpopBen ]$ for each population when excluding or not genes under adaptation.}
+        \captionof{figure}{Ratio of $\proba[\Sphy]$ over $\proba[-\Sphy]$ for polymorphisms of the African population of \textit{Homo sapiens}.}
+        \includegraphics[width=0.75\linewidth, page=1]{artworks/poly.Homo_sapiens.AFR.folded_ratio.pdf}
+    \end{center}
+
+    Overall, the observed DFE of substitution is much better explained by the expected DFE of new mutations (section S\ref{subsec:expectedDFE} than by mispolarizations).
+
+    \newpage
+    \section{Excluding genes under adaptation}
+
+    \subsection{Probability for beneficial mutations to be non-adaptive}
+    \begin{center}
+        \captionof{table}{$\proba[\SphyBen\given \SpopBen ]$ excluding or not genes under adaptation.}
         \begin{tabular}{|l|l|r|r|}
             \toprule
             Population & Species & Control & Case \\
@@ -767,45 +787,266 @@
             \bottomrule
         \end{tabular}
     \end{center}
-    Genes under adaptation retrieved from~\cite{latrille_genes_2023}.
+    Genes under adaptation retrieved from \textcite{latrille_genes_2023}.
     Comparison of $\proba[\SphyBen\given \SpopBen ]$ for the whole genome (control) and when excluding genes under adaptation (case).
-    The non-parametric Wilcoxon signed-rank test tests the null hypothesis that the distribution of the differences (case versus control) is symmetric about zero.
-    Applied to the paired samples (case and control), Wilcoxon signed-rank test results in $s=80$ with $\pvalue=0.002$. for one-sided test (case higher than control).
-    The proportion of beneficial back-mutations ($\proba[\SphyBen\given \SpopBen ]$) is higher when excluding genes under adaptation, consistent with our expectation that genes with uniformly conserved functions should fit better the back-mutation equilibrium model.
+    The non-parametric Wilcoxon signed-rank test evaluates the null hypothesis that the distribution of the differences (case versus control) is symmetric about zero.
+    Applied to the paired samples (case and control), Wilcoxon signed-rank test results in $s=80$ with $\pvalue=0.002$, for the one-sided test (case higher than control).
+    The proportion of non-adaptive beneficial mutations ($\proba[\SphyBen\given \SpopBen ]$) is higher when excluding genes under adaptation, consistent with our expectation that genes with uniformly conserved functions should fit better the nearly-neutral equilibrium model.
 
     \newpage
 
-    \section{Replicability across populations}
+    \section{Contrasting selection at the phylogenetic and population-genetic scale}
+
+    \subsection{Selection at the population-genetic scale}
     The proportion of deleterious ($\ProbaPopDel$), nearly-neutral ($\ProbaPopNeu$) and of beneficial ($\ProbaPopBen$) mutations estimated at the population-genetic scale across the different populations is shown for each class of selection ($\Sphyclass \in \{\SphyDel, \SphyNeu, \SphyBen \}$).
 
-    \captionof{figure}{Estimation of selection at the population scale for $\SphyDel$ mutations}
-    \begin{minipage}{0.9\linewidth}
-        \includegraphics[width=\linewidth, page=1]{artworks/Theta.neg.stacked.pdf}
+    \captionof{figure}{Estimation of selection at the population scale for $\SphyDel$ mutations.}
+    \begin{center}
+        \begin{minipage}{0.75\linewidth}
+            \begin{minipage}{0.9\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/Theta.neg.stacked.pdf}
+            \end{minipage}
+            \begin{minipage}{0.09\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
+            \end{minipage}
+        \end{minipage}
+    \end{center}
+
+    \captionof{figure}{Estimation of selection at the population scale for $\SphyNeu$ mutations.}
+    \begin{center}
+        \begin{minipage}{0.75\linewidth}
+            \begin{minipage}{0.9\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/Theta.weak.stacked.pdf}
+            \end{minipage}
+            \begin{minipage}{0.09\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
+            \end{minipage}
+        \end{minipage}
+    \end{center}
+
+    \captionof{figure}{Estimation of selection at the population scale for $\SphyBen$ mutations.}
+    \begin{center}
+        \begin{minipage}{0.75\linewidth}
+            \begin{minipage}{0.9\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/Theta.pos.stacked.pdf}
+            \end{minipage}
+            \begin{minipage}{0.09\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
+            \end{minipage}
+        \end{minipage}
+    \end{center}
+
+    \newpage
+    \subsection{Distribution of scaled selection coefficients ($\Sphy$)}\label{subsec:expectedDFE}
+
+    Theoretically, the selection coefficient ($\Sphy$) for any mutation is related to its probability of fixation by the equation $\proba_{\text{fix}} (\Sphy) = \Sphy/(1-\exp(-\Sphy)) $.
+    It is thus possible to predict the distribution of $\Sphy$ of substitutions given the distribution of $\Sphy$ for mutations (e.g. panel A below) by weighting the different mutations by their $\proba_{\text{fix}} (\Sphy)$.
+    The predicted DFE of substitutions (panel B below) matches the observed DFE of substitutions (panel C below) in the terminal lineage, meaning that the $\Sphy$ obtained by phylogenetic mutation-selection codon models is a strong predictor of selection effectively exerted on mutations in terminal lineages.
+
+    The figures shown below are obtained in the Saint Kitts population of \textit{Chlorocebus sabaeus}.
+    These figures across the 28 populations are available at Zenodo (\url{https://doi.org/10.5281/zenodo.7878953}) in file \textit{distribution\_S0\_28\_populations.pdf}.\\
+
+    \begin{minipage}{0.32\linewidth}
+        \flushleft {\tiny A: Expected DFE for mutations}
+        \includegraphics[width=\linewidth, page=1]{artworks/DFE.Chlorocebus_sabaeus.Saint_Kitts.MutSel.pdf}
     \end{minipage}
-    \begin{minipage}{0.09\linewidth}
-        \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
+    \begin{minipage}{0.32\linewidth}
+        \flushleft {\tiny B: Expected DFE for substitutions}
+        \includegraphics[width=\linewidth, page=1]{artworks/DFE.Chlorocebus_sabaeus.Saint_Kitts.MutSel.Flow.pdf}
     \end{minipage}
+    \begin{minipage}{0.32\linewidth}
+        \flushleft {\tiny C: Observed DFE for substitutions}
+        \includegraphics[width=\linewidth, page=1]{artworks/subs.Chlorocebus_sabaeus.Saint_Kitts.bins3Mask0.9.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.32\linewidth}
+        \flushleft {\tiny D: Observed DFE for polymorphisms}
+        \includegraphics[width=\linewidth, page=1]{artworks/poly.Chlorocebus_sabaeus.Saint_Kitts.bins3Mask0.9.pdf}
+    \end{minipage}
+    \begin{minipage}{0.32\linewidth}
+        \flushleft {\tiny E: Site frequency spectrum}
+        \includegraphics[width=\linewidth, page=1]{artworks/Chlorocebus_sabaeus.Saint_Kitts.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.32\linewidth}
+        \flushleft {\tiny F: $S$ as function of $S_0$ for each class}
+        \includegraphics[width=\linewidth, page=1]{artworks/Chlorocebus_sabaeus.Saint_Kitts.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+
+    \begin{itemize}[itemsep=0pt]
+        \item A: Distribution of scaled selection coefficients ($\Sphy$), predicted for all possible non-synonymous DNA mutations away from the ancestral exome.
+        Mutations are divided into three classes of selection: deleterious ($\SphyDel$), nearly-neutral ($\SphyNeu$) and beneficial non-adaptive ($\SphyBen$).
+        \item B: Expected distribution of $\Sphy$ for substitutions obtained by transforming the distribution of $\Sphy$ for mutations (panel A) by weighting each mutation by its scaled probability of fixation given by $\proba_{\text{fix}} (\Sphy) = \Sphy/(1-\exp(-\Sphy))$.
+        \item C: Distribution of scaled selection coefficients ($\Sphy$) for all observed substitutions along the terminal branch of the phylogenetic tree.
+        \item D: Distribution of scaled selection coefficients ($\Sphy$) for all observed polymorphisms currently segregating in the population.
+        \item E: The site-frequency spectrum (SFS) in the population for a random sample of 16 alleles (means in solid lines and standard deviations in color shades) for each class of selection and for synonymous mutations, supposedly neutral (black). The SFS represents the proportion of mutations (y-axis) with a given number of derived alleles in the population (x-axis). At high frequencies, deleterious mutations are underrepresented.
+        \item F: Proportion of beneficial $\ProbaPopDel$, nearly-neutral $\ProbaPopNeu$, and deleterious mutations $\ProbaPopBen$  estimated at the population scale for each class of selection at the phylogenetic scale. Proportions depicted here are not weighted by their mutational opportunities.
+    \end{itemize}
+
+    \section{Filtering of variable sites}
+
+    \subsection{Masking CpG transitions}
+    We also tested our prediction while masking CpG transitions since the mutation rate of CpG dinucleotides is higher than the mutation rate of other dinucleotides, which can affect the estimation of the DFE.
+    Any nucleotide transition including a CpG dinucleotide either in the ancestral or derived state is considered as a CpG transition.
+    We masked all CpG transitions in the mutational opportunities, the substitutions in the terminal branches, and the polymorphisms segregating in the population. We then re-estimated the DFE and the proportion of non-adaptive beneficial mutations.
+
+    \subsection{Probability for beneficial mutations to be non-adaptive}
+    \begin{center}
+        \captionof{table}{$\proba[\SphyBen\given \SpopBen ]$ while masking CpG transitions.}
+        \scriptsize
+        \begin{longtable*}{|l|l|r|r|r|r|r|r|}
+            \toprule
+            Population & Species & $\Ne$ & $\proba[\SphyBen]$ & $\proba [ \SpopBen ]$ & $\frac{\proba[\SphyBen]}{\proba[ \SpopBen ]}$ & $\proba [ \SpopBen \given \SphyBen]$ & $\proba[\SphyBen\given \SpopBen ]$ \\
+            \midrule
+            \endhead
+            \midrule
+            \multicolumn{8}{r}{{Continued on next page}} \\
+            \midrule
+            \endfoot
+
+            \bottomrule
+            \endlastfoot
+            \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $7.5\times 10^{4}$ & $ 0.012$ & $ 0.028$ & $ 0.421$ & $ 0.543$ & $ 0.229$ \\
+            Iran & Bos taurus & $5.6\times 10^{4}$ & $ 0.011$ & $ 0.038$ & $ 0.283$ & $ 0.797$ & $ 0.226$ \\
+            Uganda & Bos taurus & $1.3\times 10^{5}$ & $ 0.011$ & $ 0.022$ & $ 0.479$ & $ 0.406$ & $ 0.195$ \\
+            \rowcolor{LIGHTGREY} Australia & Capra hircus & $1.7\times 10^{5}$ & $ 0.011$ & $ 0.024$ & $ 0.454$ & $ 0.158$ & $ 0.072$ \\
+            \rowcolor{LIGHTGREY} France & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.034$ & $ 0.320$ & $ 0.258$ & $ 0.082$ \\
+            \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.032$ & $ 0.341$ & $ 0.268$ & $ 0.091$ \\
+            \rowcolor{LIGHTGREY} Iran & Capra hircus & $2.3\times 10^{5}$ & $ 0.011$ & $ 0.026$ & $ 0.417$ & $ 0.294$ & $ 0.123$ \\
+            \rowcolor{LIGHTGREY} Italy & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.023$ & $ 0.472$ & $ 0.100$ & $ 0.047$ \\
+            \rowcolor{LIGHTGREY} Morocco & Capra hircus & $2.2\times 10^{5}$ & $ 0.011$ & $ 0.018$ & $ 0.593$ & $ 0.141$ & $ 0.083$ \\
+            Iran & Ovis aries & $3.8\times 10^{5}$ & $ 0.011$ & $ 0.012$ & $ 0.981$ & $ 0.243$ & $ 0.239$ \\
+            Iran (O. orientalis) & Ovis aries & $4.5\times 10^{5}$ & $ 0.011$ & $ 0.019$ & $ 0.603$ & $ 0.155$ & $ 0.093$ \\
+            Iran (O. vignei) & Ovis aries & $3.7\times 10^{5}$ & $ 0.011$ & $ 0.025$ & $ 0.445$ & $ 0.252$ & $ 0.112$ \\
+            Various & Ovis aries & $4.1\times 10^{5}$ & $ 0.011$ & $ 0.016$ & $ 0.704$ & $ 0.198$ & $ 0.139$ \\
+            Morocco & Ovis aries & $ 4\times 10^{5}$ & $ 0.011$ & $ 0.008$ & $ 1.389$ & $ 0.165$ & $ 0.229$ \\
+            \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $1.1\times 10^{5}$ & $ 0.009$ & $ 0.013$ & $ 0.752$ & $ 0.231$ & $ 0.174$ \\
+            \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.009$ & $ 0.018$ & $ 0.519$ & $ 0.209$ & $ 0.108$ \\
+            \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.009$ & $ 0.025$ & $ 0.385$ & $ 0.241$ & $ 0.093$ \\
+            \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.009$ & $ 0.007$ & $ 1.346$ & $ 0.204$ & $ 0.275$ \\
+            \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $1.5\times 10^{5}$ & $ 0.009$ & $ 0.021$ & $ 0.443$ & $ 0.239$ & $ 0.106$ \\
+            \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 1\times 10^{5}$ & $ 0.009$ & $ 0.014$ & $ 0.690$ & $ 0.146$ & $ 0.101$ \\
+            \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $1.8\times 10^{5}$ & $ 0.009$ & $ 0.019$ & $ 0.498$ & $ 0.272$ & $ 0.135$ \\
+            \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $1.2\times 10^{5}$ & $ 0.009$ & $ 0.017$ & $ 0.567$ & $ 0.217$ & $ 0.123$ \\
+            \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.009$ & $ 0.024$ & $ 0.388$ & $ 0.308$ & $ 0.119$ \\
+            African & Homo sapiens & $5.6\times 10^{4}$ & $ 0.010$ & $ 0.026$ & $ 0.367$ & $ 0.411$ & $ 0.151$ \\
+            Admixed American & Homo sapiens & $4.5\times 10^{4}$ & $ 0.010$ & $ 0.017$ & $ 0.551$ & $ 0.374$ & $ 0.206$ \\
+            East Asian & Homo sapiens & $ 4\times 10^{4}$ & $ 0.010$ & $ 0.029$ & $ 0.332$ & $ 0.370$ & $ 0.123$ \\
+            European & Homo sapiens & $4.2\times 10^{4}$ & $ 0.010$ & $ 0.031$ & $ 0.304$ & $ 0.371$ & $ 0.113$ \\
+            South Asian & Homo sapiens & $4.4\times 10^{4}$ & $ 0.010$ & $ 0.032$ & $ 0.302$ & $ 0.369$ & $ 0.111$ \\
+        \end{longtable*}
+    \end{center}
+    \begin{itemize}
+        \item $\Ne$ is the estimated effective population size.
+        \item $\proba [ \SphyBen ]$ (eq.~5) is the probability for a new mutation a non-adaptive beneficial mutation.
+        These mutations have a selection coefficient predicted at the phylogenetic-scale larger than 1, thus toward a more fit amino-acid.
+        \item $\proba [ \SpopBen ]$ (eq.~15) is the probability for a mutation to be beneficial.
+        These mutations have a selection coefficient at the population-scale larger than 1.
+        \item $\proba [ \SpopBen \given \SphyBen]$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a non-adaptive beneficial mutation at the phylogenetic scale (the \textit{precision}).
+        \item $\proba [ \SphyBen \given \SpopBen]$ (eq.~14) is the probability for a mutation to be non-adaptive given it is beneficial at the population scale (the \textit{recall}).
+        This probability is obtained using Bayes' formula.
+    \end{itemize}
+    \newpage
+
+    \subsection{Precision and recall}
+    \captionof{table}{Precision and recall while masking CpG transitions.}
+    \begin{center}
+        \begin{adjustbox}{width=\textwidth}
+            \begin{tabular}{||l|l|r||r|r||r|r||r|r||}
+                \toprule
+                \multicolumn{3}{||c||}{} &
+                \multicolumn{2}{c||}{\shortstack{\textbf{Deleterious mutations} \\ $\bm{\SpopDel \coloneqq \Spop<-1}$ \\ $\bm{\SphyDel \coloneqq \Sphy<-1}$}} &
+                \multicolumn{2}{c||}{\shortstack{\textbf{Nearly-neutral mutations} \\ $\bm{\SpopNeu \coloneqq -1<\Spop<1}$ \\ $\bm{\SphyNeu \coloneqq -1<\Sphy<1}$}} &
+                \multicolumn{2}{c||}{\shortstack{\textbf{Beneficial mutations} \\ $\bm{\SpopBen \coloneqq \Spop>1}$ \\ $\bm{\SphyBen \coloneqq \Sphy>1}$}}
+                \\ \hline
+                \textbf{Population} &
+                \textbf{Species} &
+                $\bm{\Ne}$ &
+                \makecell{\textbf{Precision} \\ $\bm{\proba [\SpopDel \given \SphyDel]}$} &
+                \makecell{\textbf{Recall} \\ $\bm{\proba [\SphyDel \given \SpopDel]}$}           &
+                \makecell{\textbf{Precision}      \\ $\bm{\proba [\SpopNeu \given \SphyNeu]}$}                                    &
+                \makecell{\textbf{Recall}          \\ $\bm{\proba [\SphyNeu \given \SpopNeu]}$}                                  &
+                \makecell{\textbf{Precision}          \\ $\bm{\proba [\SpopBen \given \SphyBen]}$}          &
+                \makecell{\textbf{Recall}        \\ $\bm{\proba [\SphyBen \given \SpopBen]}$}
+                \\   \midrule
+                \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $7.5\times 10^{4}$ & $ 0.887$ & $ 0.984$ & $ 0.740$ & $ 0.356$ & $ 0.543$ & $ 0.229$ \\
+                Iran & Bos taurus & $5.6\times 10^{4}$ & $ 0.888$ & $ 1.000$ & $ 0.632$ & $ 0.302$ & $ 0.797$ & $ 0.226$ \\
+                Uganda & Bos taurus & $1.3\times 10^{5}$ & $ 0.929$ & $ 0.973$ & $ 0.501$ & $ 0.349$ & $ 0.406$ & $ 0.195$ \\
+                \rowcolor{LIGHTGREY} Australia & Capra hircus & $1.7\times 10^{5}$ & $ 0.926$ & $ 0.972$ & $ 0.609$ & $ 0.421$ & $ 0.158$ & $ 0.072$ \\
+                \rowcolor{LIGHTGREY} France & Capra hircus & $1.9\times 10^{5}$ & $ 0.927$ & $ 0.959$ & $ 0.354$ & $ 0.321$ & $ 0.258$ & $ 0.082$ \\
+                \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $1.9\times 10^{5}$ & $ 0.931$ & $ 0.967$ & $ 0.502$ & $ 0.423$ & $ 0.268$ & $ 0.091$ \\
+                \rowcolor{LIGHTGREY} Iran & Capra hircus & $2.3\times 10^{5}$ & $ 0.937$ & $ 0.966$ & $ 0.529$ & $ 0.451$ & $ 0.294$ & $ 0.123$ \\
+                \rowcolor{LIGHTGREY} Italy & Capra hircus & $1.9\times 10^{5}$ & $ 0.927$ & $ 0.970$ & $ 0.550$ & $ 0.390$ & $ 0.100$ & $ 0.047$ \\
+                \rowcolor{LIGHTGREY} Morocco & Capra hircus & $2.2\times 10^{5}$ & $ 0.933$ & $ 0.965$ & $ 0.534$ & $ 0.401$ & $ 0.141$ & $ 0.083$ \\
+                Iran & Ovis aries & $3.8\times 10^{5}$ & $ 0.947$ & $ 0.957$ & $ 0.446$ & $ 0.393$ & $ 0.243$ & $ 0.239$ \\
+                Iran (O. orientalis) & Ovis aries & $4.5\times 10^{5}$ & $ 0.951$ & $ 0.961$ & $ 0.396$ & $ 0.386$ & $ 0.155$ & $ 0.093$ \\
+                Iran (O. vignei) & Ovis aries & $3.7\times 10^{5}$ & $ 0.954$ & $ 0.960$ & $ 0.379$ & $ 0.432$ & $ 0.252$ & $ 0.112$ \\
+                Various & Ovis aries & $4.1\times 10^{5}$ & $ 0.949$ & $ 0.956$ & $ 0.434$ & $ 0.418$ & $ 0.198$ & $ 0.139$ \\
+                Morocco & Ovis aries & $ 4\times 10^{5}$ & $ 0.946$ & $ 0.959$ & $ 0.453$ & $ 0.374$ & $ 0.165$ & $ 0.229$ \\
+                \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $1.1\times 10^{5}$ & $ 0.916$ & $ 0.971$ & $ 0.523$ & $ 0.306$ & $ 0.231$ & $ 0.174$ \\
+                \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.933$ & $ 0.969$ & $ 0.486$ & $ 0.353$ & $ 0.209$ & $ 0.108$ \\
+                \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.918$ & $ 0.973$ & $ 0.533$ & $ 0.348$ & $ 0.241$ & $ 0.093$ \\
+                \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.925$ & $ 0.971$ & $ 0.572$ & $ 0.343$ & $ 0.204$ & $ 0.275$ \\
+                \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $1.5\times 10^{5}$ & $ 0.931$ & $ 0.971$ & $ 0.521$ & $ 0.378$ & $ 0.239$ & $ 0.106$ \\
+                \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 1\times 10^{5}$ & $ 0.916$ & $ 0.972$ & $ 0.535$ & $ 0.313$ & $ 0.146$ & $ 0.101$ \\
+                \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $1.8\times 10^{5}$ & $ 0.928$ & $ 0.970$ & $ 0.546$ & $ 0.378$ & $ 0.272$ & $ 0.135$ \\
+                \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $1.2\times 10^{5}$ & $ 0.917$ & $ 0.971$ & $ 0.507$ & $ 0.309$ & $ 0.217$ & $ 0.123$ \\
+                \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.930$ & $ 0.969$ & $ 0.495$ & $ 0.372$ & $ 0.308$ & $ 0.119$ \\
+                African & Homo sapiens & $5.6\times 10^{4}$ & $ 0.888$ & $ 0.978$ & $ 0.587$ & $ 0.296$ & $ 0.411$ & $ 0.151$ \\
+                Admixed American & Homo sapiens & $4.5\times 10^{4}$ & $ 0.874$ & $ 0.979$ & $ 0.591$ & $ 0.256$ & $ 0.374$ & $ 0.206$ \\
+                East Asian & Homo sapiens & $ 4\times 10^{4}$ & $ 0.877$ & $ 0.980$ & $ 0.593$ & $ 0.280$ & $ 0.370$ & $ 0.123$ \\
+                European & Homo sapiens & $4.2\times 10^{4}$ & $ 0.885$ & $ 0.980$ & $ 0.591$ & $ 0.301$ & $ 0.371$ & $ 0.113$ \\
+                South Asian & Homo sapiens & $4.4\times 10^{4}$ & $ 0.886$ & $ 0.979$ & $ 0.591$ & $ 0.303$ & $ 0.369$ & $ 0.111$ \\
+                \bottomrule
+            \end{tabular}
+        \end{adjustbox}
+    \end{center}
+    \begin{itemize}
+        \item $\Ne$ is the estimated effective population size.
+        \item \textit{Precision} is the estimation of the selection coefficient at population scale ($\Spop$) given that $\Sphy$ is known.
+        \item \textit{Recall} is the estimation of $\Sphy$ given selection coefficient at the population scale ($\Spop$) is known.
+        \item \textit{Recall} for beneficial mutations ($\proba [\SphyBen \given \SpopBen]$) is the probability for a mutation to be non-adaptive given it is beneficial at the population scale.
+    \end{itemize}
+
+    Altogether, comparing this table other estimations, we acknowledge that the exact proportion of non-adaptive among beneficial mutations is dependent on the whether we masked CpG sites.
+    However, we can still see that non-adaptive beneficial mutations are positively selected compared to neutral and deleterious ones, and this result is not dependent on whether we masked CpG sites or not.
 
     \newpage
 
-    \captionof{figure}{Estimation of selection at the population scale for $\SphyNeu$ mutations}
-    \begin{minipage}{0.9\linewidth}
-        \includegraphics[width=\linewidth, page=1]{artworks/Theta.weak.stacked.pdf}
-    \end{minipage}
-    \begin{minipage}{0.09\linewidth}
-        \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-    \end{minipage}
+    \subsection{Example site-frequency spectrum}\label{subsec:CpG-expectedDFE}
 
-    \captionof{figure}{Estimation of selection at the population scale for $\SphyBen$ mutations}
-    \begin{minipage}{0.9\linewidth}
-        \includegraphics[width=\linewidth, page=1]{artworks/Theta.pos.stacked.pdf}
-    \end{minipage}
-    \begin{minipage}{0.09\linewidth}
-        \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-    \end{minipage}
+    The site-frequency spectrum (SFS, panel A) and the congruency between fitness effects estimates ($\Sphy$ versus $\Sphy$, panel B) shown below are obtained in the African population of \textit{Homo sapiens} and the South African population of \textit{Chlorocebus sabaeus}.
+
+
+    \begin{center}
+        \captionof{figure}{Site-frequency spectrum in African population of \textit{Homo sapiens}, masking CpG transitions.}
+        \begin{minipage}{0.49\linewidth}
+            \flushleft {\tiny A: Site frequency spectrum}
+            \includegraphics[width=\linewidth, page=1]{artworks/CpG.Homo_sapiens.AFR.MutSel-sfs.pdf}
+        \end{minipage}
+        \begin{minipage}{0.49\linewidth}
+            \flushleft {\tiny B: $S$ as function of $S_0$ for each class}
+            \includegraphics[width=\linewidth, page=1]{artworks/CpG.Homo_sapiens.AFR.MutSel.polyDFE_C.pdf}
+        \end{minipage}
+    \end{center}
+
+    \begin{center}
+        \captionof{figure}{Site-frequency spectrum in South African population of \textit{Chlorocebus sabaeus}, masking CpG transitions.}
+        \begin{minipage}{0.49\linewidth}
+            \flushleft {\tiny A: Site frequency spectrum}
+            \includegraphics[width=\linewidth, page=1]{artworks/CpG.Chlorocebus_sabaeus.South_Africa.MutSel-sfs.pdf}
+        \end{minipage}
+        \begin{minipage}{0.49\linewidth}
+            \flushleft {\tiny B: $S$ as function of $S_0$ for each class}
+            \includegraphics[width=\linewidth, page=1]{artworks/CpG.Chlorocebus_sabaeus.South_Africa.MutSel.polyDFE_C.pdf}
+        \end{minipage}
+    \end{center}
+
+    \begin{itemize}[itemsep=0pt]
+        \item A: The site-frequency spectrum (SFS) in the population for a random sample of 16 alleles (means in solid lines and standard deviations in color shades) for each class of selection and for synonymous mutations, supposedly neutral (black). The SFS represents the proportion of mutations (y-axis) with a given number of derived alleles in the population (x-axis). Here SFS are weighted by the mutational opportunities in each class of selection (synonymous, $\SphyDel$, $\SphyNeu$ and $\SphyBen$).
+        \item B: Proportion of beneficial $\ProbaPopDel$, nearly-neutral $\ProbaPopNeu$, and deleterious mutations $\ProbaPopBen$  estimated at the population scale for each class of selection at the phylogenetic scale. Proportions depicted here are not weighted by their mutational opportunities.
+    \end{itemize}
 
     \newpage
-
     \section{Including divergence data for the estimation of $\Spop$}
 
     \subsection{Including divergence in polyDFE}
@@ -813,9 +1054,9 @@
     For the class of a given class of selection coefficient ($\Sphyclass \in \{\SphyDel, \SphyNeu, \SphyBen \}$), the number of substitutions has already been computed and is given by $D\left( \Sphyclass \right)$ (see eq.~6), and the number of sites is given by $L \left( \Sphyclass \right)$ (see eq.~4).
     Otherwise, the procedure is the same as described section \textit{Scaled selection coefficients ($\Spop$) in a population-based method}.
 
-    \subsection{Probabilities of beneficial back-mutations}
+    \subsection{Probability for beneficial mutations to be non-adaptive}
     \begin{center}
-        \captionof{table}{Probability of beneficial back-mutations among all beneficial ones - including divergence.}
+        \captionof{table}{$\proba[\SphyBen\given \SpopBen ]$ when including divergence to estimate $\Spop$.}
         \scriptsize
         \begin{longtable*}{|l|l|r|r|r|r|r|r|}
             \toprule
@@ -861,18 +1102,18 @@
     \end{center}
     \begin{itemize}
         \item $\Ne$ is the estimated effective population size.
-        \item $\proba [ \SphyBen ]$ (eq.~5) is the probability for a new mutation a beneficial back-mutation.
+        \item $\proba [ \SphyBen ]$ (eq.~5) is the probability for a new mutation a non-adaptive mutation.
         These mutations have a selection coefficient predicted at the phylogenetic-scale larger than 1, thus toward a more fit amino-acid.
         \item $\proba [ \SpopBen ]$ (eq.~15) is the probability for a mutation to be beneficial.
         These mutations have a selection coefficient at the population-scale larger than 1.
-        \item $\proba [ \SpopBen \given \SphyBen]$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a beneficial back-mutation at the phylogenetic scale (the \textit{precision}).
-        \item $\proba [ \SphyBen \given \SpopBen]$ (eq.~14) is the probability for a mutation to a beneficial back-mutations, given it is beneficial (the \textit{recall}).
+        \item $\proba [ \SpopBen \given \SphyBen]$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a non-adaptive mutation at the phylogenetic scale (the \textit{precision}).
+        \item $\proba [ \SphyBen \given \SpopBen]$ (eq.~14) is the probability for a mutation to be non-adaptive given it is beneficial at the population scale (the \textit{recall}).
         This probability is obtained using Bayes' formula.
     \end{itemize}
     \newpage
 
     \subsection{Precision and recall}
-    \captionof{table}{Precision and recall - including divergence}
+    \captionof{table}{Precision and recall while including divergence to estimate $\Spop$.}
     \begin{center}
         \begin{adjustbox}{width=\textwidth}
             \begin{tabular}{||l|l|r||r|r||r|r||r|r||}
@@ -928,17 +1169,29 @@
         \item $\Ne$ is the estimated effective population size.
         \item \textit{Precision} is the estimation of the selection coefficient at population scale ($\Spop$) given that $\Sphy$ is known.
         \item  \textit{Recall} is the estimation of $\Sphy$ given selection coefficient at the population scale ($\Spop$) is known.
-        \item \textit{Recall} for beneficial mutations ($\proba [\SphyBen \given \SpopBen]$) is thus the proportion of beneficial back-mutations among all beneficial mutations.
+        \item \textit{Recall} for beneficial mutations ($\proba [\SphyBen \given \SpopBen]$) is the probability for a mutation to be non-adaptive given it is beneficial at the population scale.
     \end{itemize}
 
-    Altogether, comparing this table to tables 1 and S3, we acknowledge that the exact proportion of beneficial back-mutations among all beneficial ones is different whether we included or not substitutions in the terminal lineage for the estimation of $\Spop$.
-    However, we can still see that beneficial back-mutations are positively selected compared to neutral and deleterious ones, and this result is not sensitive to inclusion of substitutions in the terminal lineage.
+    Altogether, comparing this table to tables 1 and S3, we acknowledge that the exact proportion of non-adaptive beneficial mutations among all beneficial ones is different whether we included or not substitutions in the terminal lineage for the estimation of $\Spop$.
+    However, we can still see that non-adaptive beneficial mutations are positively selected compared to neutral and deleterious ones, and this result is not sensitive to inclusion of substitutions in the terminal lineage.
+    \newpage
+
+    \subsection{Misannotations of ancestral alleles}
+
+    If misannotation is influencing the recall for $\SphyBen$ ($\proba[\SphyBen\given \SpopBen ]$), then the recall should increase as a function of  divergence to the sister species ($\ds$: number of synonymous substitutions per sites) since divergence would increase the rate of misannotations.
+    Shown below is recall $\proba[\SphyBen\given \SpopBen ]$ as a function of divergence ($\ds$) in which the latter is not an explanatory variable.
+
+    \begin{center}
+        \captionof{figure}{$\proba[\SphyBen\given \SpopBen ]$ while including divergence to estimate $\Spop$, as a function of distance to the sister species.}
+        \includegraphics[width=0.75\linewidth, page=1]{artworks/results.distance.recall_pos.div.scatter.pdf}
+    \end{center}
+
     \newpage
 
     \subsection{Excluding genes under adaptation}
 
     \begin{center}
-        \captionof{table}{$\proba[\SphyBen\given \SpopBen ]$ for each population when excluding or not genes under adaptation - including divergence.}
+        \captionof{table}{$\proba[\SphyBen\given \SpopBen ]$ excluding or not genes under adaptation, when including divergence to estimate $\Spop$.}
         \begin{tabular}{|l|l|r|r|}
             \toprule
             Population & Species & Control & Case \\
@@ -978,7 +1231,7 @@
     Comparison of $\proba[\SphyBen\given \SpopBen ]$ while including divergence for the whole genome (control) and when excluding genes under adaptation (case).
     The non-parametric Wilcoxon signed-rank test tests the null hypothesis that the distribution of the differences (case versus control) is symmetric about zero.
     Applied to the paired samples (case and control), Wilcoxon signed-rank test results in $s=120$ with $\pvalue=0.027$ for one-sided test (case higher than control).
-    The proportion of beneficial back-mutations ($\proba[\SphyBen\given \SpopBen ]$) is higher when excluding genes under adaptation, consistent with our expectation that genes with uniformly conserved functions should fit better the back-mutation equilibrium model.
+    The proportion of beneficial non-adaptive mutations ($\proba[\SphyBen\given \SpopBen ]$) is higher when excluding genes under adaptation, consistent with our expectation that genes with uniformly conserved functions should fit better the nearly-neutral equilibrium model.
 
     \newpage
 
@@ -995,9 +1248,9 @@
         \proba [ \SpopBen \given \Sphyclass] &= \proba [  \Spop > 1 \given \Sphyclass ] = p_6.  \label{eq:polyProbaAdv-mD}
     \end{align}
 
-    \subsection{Probabilities of beneficial back-mutations}
+    \subsection{Probability for beneficial mutations to be non-adaptive}
     \begin{center}
-        \captionof{table}{Probability of beneficial back-mutations among all beneficial ones - model D.}
+        \captionof{table}{$\proba[\SphyBen\given \SpopBen ]$ when using a discrete DFE to estimate $\Spop$.}
         \scriptsize
         \begin{longtable*}{|l|l|r|r|r|r|r|r|}
             \toprule
@@ -1043,18 +1296,17 @@
     \end{center}
     \begin{itemize}
         \item $\Ne$ is the estimated effective population size.
-        \item $\proba [ \SphyBen ]$ (eq.~5) is the probability for a new mutation a beneficial back-mutation.
+        \item $\proba [ \SphyBen ]$ (eq.~5) is the probability for a new mutation a non-adaptive beneficial mutation.
         These mutations have a selection coefficient predicted at the phylogenetic-scale larger than 1, thus toward a more fit amino-acid.
         \item $\proba [ \SpopBen ]$ (eq.~15) is the probability for a mutation to be beneficial.
         These mutations have a selection coefficient at the population-scale larger than 1.
-        \item $\proba [ \SpopBen \given \SphyBen]$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a beneficial back-mutation at the phylogenetic scale (the \textit{precision}).
-        \item $\proba [ \SphyBen \given \SpopBen]$ (eq.~14) is the probability for a mutation to a beneficial back-mutations, given it is beneficial (the \textit{recall}).
+        \item $\proba [ \SpopBen \given \SphyBen]$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a beneficial non-adaptive mutation at the phylogenetic scale (the \textit{precision}).
+        \item $\proba [ \SphyBen \given \SpopBen]$ (eq.~14) is the probability for a mutation to be non-adaptive given it is beneficial at the population scale (the \textit{recall}).
         This probability is obtained using Bayes' formula.
     \end{itemize}
-    \newpage
 
     \subsection{Precision and recall}
-    \captionof{table}{Precision and recall - model D}
+    \captionof{table}{Precision and recall when using a discrete DFE to estimate $\Spop$.}
     \begin{center}
         \begin{adjustbox}{width=\textwidth}
             \begin{tabular}{||l|l|r||r|r||r|r||r|r||}
@@ -1110,14 +1362,15 @@
         \item $\Ne$ is the estimated effective population size.
         \item \textit{Precision} is the estimation of the selection coefficient at population scale ($\Spop$) given that $\Sphy$ is known.
         \item \textit{Recall} is the estimation of $\Sphy$ given selection coefficient at the population scale ($\Spop$) is known.
-        \item \textit{Recall} for beneficial mutations ($\proba [\SphyBen \given \SpopBen]$) is thus the proportion of beneficial back-mutations among all beneficial mutations.
+        \item \textit{Recall} for beneficial mutations ($\proba [\SphyBen \given \SpopBen]$) is the probability for a mutation to be non-adaptive given it is beneficial at the population scale.
     \end{itemize}
 
-    Altogether, comparing this table other estimations, we acknowledge that the exact proportion of beneficial back-mutations among all beneficial ones is dependent on the model used to estimate the DFE.
-    However, we can still see that beneficial back-mutations are positively selected compared to neutral and deleterious ones, and this result is not sensitive to the underlying DFE at the population scale.
+    Altogether, comparing this table other estimations, we acknowledge that the exact proportion of non-adaptive among all beneficial ones is dependent on the model used to estimate the DFE.
+    However, we can still see that non-adaptive beneficial mutations are positively selected compared to neutral and deleterious ones, and this result is not sensitive to the underlying DFE at the population scale.
 
     \newpage
 
     \newpage
+
     \printbibliography
 \end{document}

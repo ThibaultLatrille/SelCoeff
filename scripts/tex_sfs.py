@@ -9,9 +9,10 @@ dict_method = {"MutSel": "Site-specific Mutation-Selection codon models.",
                "SIFT": "SIFT score", }
 
 
-def minipage(size, file):
-    assert os.path.exists(file), f"{file} does not exist."
+def minipage(size, file, name=""):
+    assert os.path.exists(file), f"File {file} does not exist"
     out = "\\begin{minipage}{" + str(size) + "\\linewidth} \n"
+    out += "\\flushleft {\\tiny " + name + "}\n"
     out += "\\includegraphics[width=\\linewidth, page=1]{" + file + "} \n"
     out += "\\end{minipage}\n"
     return out
@@ -52,30 +53,33 @@ def main(args):
                 dfe_suffix = f"{sp}.{pop}.{method}.pdf".replace(' ', '_')
                 dfe_path = f"{args.dfe_prefix}{dfe_suffix}"
 
-                six_panels = "/TSV/" in args.hist_prefix
+                six_panels = "/HOLD_" in args.hist_prefix
                 if six_panels:
                     hist_holder = f"{sp}.{pop}.".replace(' ', '_')
                     hist_subs_path = args.hist_prefix.replace("/HOLD_", "/subs." + hist_holder) + ".pdf"
                     hist_poly_path = args.hist_prefix.replace("/HOLD_", "/poly." + hist_holder) + ".pdf"
 
-                    o.write(minipage(0.32, dfe_path))
-                    o.write(minipage(0.32, dfe_path.replace(".pdf", ".Flow.pdf")))
-                    o.write(minipage(0.32, hist_subs_path))
+                    o.write(minipage(0.32, dfe_path, "A: Expected DFE for mutations"))
+                    o.write(minipage(0.32, dfe_path.replace(".pdf", ".Flow.pdf"),
+                                     "B: Expected DFE for substitutions"))
+                    o.write(minipage(0.32, hist_subs_path, "C: Observed DFE for substitutions"))
 
                     o.write("\\\\ \n")
-                    o.write(minipage(0.32, hist_poly_path))
-                    o.write(minipage(0.32, sfs.replace("-sfs.pdf", "-sfs.normalize.pdf")))
+                    o.write(minipage(0.32, hist_poly_path, "D: Observed DFE for polymorphisms"))
+                    o.write(minipage(0.32, sfs.replace("-sfs.pdf", "-sfs.normalize.pdf"),
+                                     "E: Site frequency spectrum"))
                     for model in ["C", "D"]:
                         polyDFE = sfs.replace("-sfs.pdf", f".polyDFE_{model}.pdf")
                         if os.path.exists(polyDFE):
-                            o.write(minipage(0.32, polyDFE))
+                            o.write(minipage(0.32, polyDFE,
+                                             f"F: $S$ as function of $S_0$ for each class"))
                 else:
                     hist_suffix = f"{sp}.{pop}.pdf".replace(' ', '_')
                     hist_path = f"{args.hist_prefix}{hist_suffix}"
                     o.write(minipage(0.49, dfe_path))
                     o.write(minipage(0.49, hist_path))
                     o.write("\\\\ \n")
-                    o.write(minipage(0.49, sfs.replace("-sfs.pdf", "-sfs.normalize.pdf")))
+                    o.write(minipage(0.49, sfs.replace("-sfs.pdf", "-sfs.pdf")))
                     for model in ["C", "D"]:
                         polyDFE = sfs.replace("-sfs.pdf", f".polyDFE_{model}.pdf")
                         if os.path.exists(polyDFE):

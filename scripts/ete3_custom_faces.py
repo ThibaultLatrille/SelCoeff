@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 import re
 import math
+from itertools import product
 from collections import defaultdict
 
 try:
@@ -27,72 +28,40 @@ from ete3.treeview.qt import (QGraphicsRectItem, QGraphicsLineItem,
 
 from ete3.treeview.main import add_face_to_node, _Background, _Border, COLOR_SCHEMES
 
-_aafgcolors = {
-    'A': "#000000",
-    'R': "#000000",
-    'N': "#000000",
-    'D': "#000000",
-    'C': "#000000",
-    'Q': "#000000",
-    'E': "#000000",
-    'G': "#000000",
-    'H': "#000000",
-    'I': "#000000",
-    'L': "#000000",
-    'K': "#000000",
-    'M': "#000000",
-    'F': "#000000",
-    'P': "#000000",
-    'S': "#000000",
-    'T': "#000000",
-    'W': "#000000",
-    'Y': "#000000",
-    'V': "#000000",
-    'B': "#000000",
-    'Z': "#000000",
-    'X': "#000000",
-    '.': "#000000",
-    '-': "#000000",
-}
+_aafgcolors = defaultdict(lambda: "#000000")
+_aafgcolors.update({
+    '_': "#FFFFFF"
+})
 
-_aabgcolors = {
-    'A': "#C8C8C8",
-    'R': "#145AFF",
-    'N': "#00DCDC",
-    'D': "#E60A0A",
-    'C': "#E6E600",
-    'Q': "#00DCDC",
-    'E': "#E60A0A",
-    'G': "#EBEBEB",
-    'H': "#8282D2",
-    'I': "#0F820F",
-    'L': "#0F820F",
-    'K': "#145AFF",
-    'M': "#E6E600",
-    'F': "#3232AA",
-    'P': "#DC9682",
-    'S': "#FA9600",
-    'T': "#FA9600",
-    'W': "#B45AB4",
-    'Y': "#3232AA",
-    'V': "#0F820F",
-    'B': "#FF69B4",
-    'Z': "#FF69B4",
-    'X': "#BEA06E",
-    '.': "#FFFFFF",
-    '-': "#FFFFFF",
-}
+_aabgcolors = defaultdict(lambda: "#FFFFFF")
+_aabgcolors.update(
+    {
+        "A": "#fea0fd",
+        "C": "#fc0cfe",
+        "D": "#2e7bbe",
+        "E": "#677892",
+        "F": "#ff385d",
+        "G": "#2799ff",
+        "H": "#dbc58e",
+        "I": "#fa21a1",
+        "K": "#debecc",
+        "L": "#e01e82",
+        "M": "#d13e7b",
+        "N": "#abc8f5",
+        "P": "#5766f9",
+        "Q": "#8c6e81",
+        "R": "#85746a",
+        "S": "#e7b4fd",
+        "T": "#a658b7",
+        "V": "#fe51b8",
+        "W": "#ff3701",
+        "Y": "#cb5339",
+        'X': "#BEA06E"
+    })
+
 _ntfgcolors = defaultdict(lambda: "#000000")
 _ntfgcolors.update({
-    'A': '#000000',
-    'G': '#000000',
-    'I': '#000000',
-    'C': '#000000',
-    'T': '#000000',
-    'U': '#000000',
-    '.': "#000000",
-    '-': "#000000",
-    ' ': "#000000"
+    '_': "#FFFFFF"
 })
 
 _ntbgcolors = defaultdict(lambda: "#FFFFFF")
@@ -103,9 +72,16 @@ _ntbgcolors.update({
     'C': '#FF8C4B',
     'T': '#A0FFA0',
     'U': '#FF8080',
-    '.': "#FFFFFF",
-    '-': "#FFFFFF",
-    ' ': "#FFFFFF",
+    '|': "#000000"
+})
+
+_bwfgcolors = defaultdict(lambda: "#000000")
+_bwfgcolors.update({
+    '_': "#FFFFFF"
+})
+
+_bwbgcolors = defaultdict(lambda: "#FFFFFF")
+_bwbgcolors.update({
     '|': "#000000"
 })
 
@@ -836,85 +812,6 @@ class ProfileFace(Face):
             return float(self.max_value)
         else:
             return float(v)
-
-
-class OLD_SequenceFace(Face):
-    """ Creates a new molecular sequence face object.
-
-
-    :param seq:  Sequence string to be drawn
-    :param seqtype: Type of sequence: "nt" or "aa"
-    :param fsize:   Font size,  (default=10)
-
-    You can set custom colors for aminoacids or nucleotides:
-
-    :param aafg: a dictionary in which keys are aa codes and values
-      are foreground RGB colors
-
-    :param aabg: a dictionary in which keys are aa codes and values
-      are background RGB colors
-
-    :param ntfg: a dictionary in which keys are nucleotides codes
-      and values are foreground RGB colors
-
-    :param ntbg: a dictionary in which keys are nucleotides codes and values
-      are background RGB colors
-
-    """
-
-    def __init__(self, seq, seqtype, fsize=10, aafg=None, \
-                 aabg=None, ntfg=None, ntbg=None):
-
-        Face.__init__(self)
-        self.seq = seq
-        self.fsize = fsize
-        self.fsize = fsize
-        self.style = seqtype
-
-        if not aafg:
-            aafg = _aafgcolors
-        if not aabg:
-            aabg = _aabgcolors
-        if not ntfg:
-            ntfg = _ntfgcolors
-        if not ntbg:
-            ntbg = _ntbgcolors
-
-        self.aafg = aafg
-        self.aabg = aabg
-        self.ntfg = ntfg
-        self.ntbg = ntbg
-
-    def update_pixmap(self):
-        font = QFont("Courier", self.fsize)
-        fm = QFontMetrics(font)
-        height = fm.leading() + fm.overlinePos() + fm.underlinePos()
-        # width  = fm.size(Qt.AlignTop, self.seq).width()
-        width = self.fsize * len(self.seq)
-
-        self.pixmap = QPixmap(width, height)
-        self.pixmap.fill()
-        p = QPainter(self.pixmap)
-        x = 0
-        y = height - fm.underlinePos() * 2
-
-        p.setFont(font)
-
-        for letter in self.seq:
-            letter = letter.upper()
-
-            if self.style == "nt":
-                letter_brush = QBrush(QColor(self.ntbg.get(letter, "white")))
-                letter_pen = QPen(QColor(self.ntfg.get(letter, "black")))
-            else:
-                letter_brush = QBrush(QColor(self.aabg.get(letter, "white")))
-                letter_pen = QPen(QColor(self.aafg.get(letter, "black")))
-
-            p.setPen(letter_pen)
-            p.fillRect(QRectF(x, 0, width, height, letter_brush))
-            p.drawText(QPointF(x, y), letter)
-            x += float(width) / len(self.seq)
-        p.end()
 
 
 class TreeFace(Face):
@@ -1852,7 +1749,7 @@ class SeqMotifFace(StaticItemFace):
             if typ == "-" or typ == "line":
                 i = QGraphicsLineItem(0, h / 2, w, h / 2)
             elif typ == " " or typ == "blank":
-                i = None
+                i = QGraphicsLineItem(0, h / 2, w, h / 2)
             elif typ == "o":
                 i = QGraphicsEllipseItem(0, 0, w, h)
             elif typ == ">":
@@ -2246,49 +2143,51 @@ class SequenceFace(StaticItemFace, Face):
 
         """
 
-    def __init__(self, seq, seqtype="aa", fsize=10,
-                 fg_colors=None, bg_colors=None,
-                 codon=None, col_w=None, alt_col_w=3,
-                 special_col=None, interactive=False, bold=False, light_cols=None):
+    def __init__(self, seq, seqtype="aa", fsize=10, fg_colors=None, bg_colors=None, codon=None,
+                 col_w=None, alt_col_w=3, special_col=None, interactive=False, bold=False, light_cols=None,
+                 aa_cols=None, black_and_white=False):
         self.seq = seq
         self.codon = codon
         self.fsize = fsize
         self.bold = bold
+        self.black_and_white = black_and_white
         self.style = seqtype
         self.col_w = float(self.fsize + 1) if col_w is None else float(col_w)
         self.alt_col_w = float(alt_col_w)
         self.special_col = special_col if special_col else []
         self.light_cols = light_cols if light_cols else []
+        self.aa_cols = aa_cols if aa_cols else []
         self.width = 0  # will store the width of the whole sequence
         self.interact = interactive
-
-        if self.style == "aa":
-            if not fg_colors:
-                fg_colors = _aafgcolors
-            if not bg_colors:
-                bg_colors = _aabgcolors
+        self.col = {}
+        if self.black_and_white:
+            for fg in [True, False]:
+                self.col[fg] = self.init_col(_bwfgcolors if fg else _bwbgcolors, 1.0)
         else:
-            if not fg_colors:
-                fg_colors = _ntfgcolors
-            if not bg_colors:
-                bg_colors = _ntbgcolors
+            for fg, aa, light in product([True, False], [True, False], [True, False]):
+                dico_colors = (_aafgcolors if fg else _aabgcolors) if aa else (_ntfgcolors if fg else _ntbgcolors)
+                alpha = (0.75 if fg else 0.0) if light else 1.0
+                self.col[(fg, aa, light)] = self.init_col(dico_colors, alpha)
 
-        def __init_col(color_dic, alpha=1.0):
-            """to speed up the drawing of colored rectangles and characters"""
-            new_color_dic = {}
-            for car in set(seq):
-                col = QColor(color_dic[car])
-                col.setAlpha(int(255 * alpha))
-                new_color_dic[car] = QBrush(col)
-            return new_color_dic
-
-        self.fg_col = __init_col(fg_colors)
-        self.fg_col_light = __init_col(fg_colors, 0.95)
-        self.bg_col = __init_col(bg_colors)
-        self.bg_col_light = __init_col(bg_colors, 0.15)
         # for future?
         self.row_h = 13.0
         super(SequenceFace, self).__init__(None)
+
+    def init_col(self, color_dic: dict, alpha=1.0) -> dict:
+        """to speed up the drawing of colored rectangles and characters"""
+        new_color_dic = {}
+        for car in set(self.seq.upper()):
+            col = QColor(color_dic[car])
+            col.setAlpha(int(255 * alpha))
+            new_color_dic[car] = QBrush(col)
+        return new_color_dic
+
+    def get_col_dict(self, fg: bool = True, aa: bool = True, light: bool = True) -> dict:
+        """return the color dictionary"""
+        if self.black_and_white:
+            return self.col[fg]
+        else:
+            return self.col[(fg, aa, light)]
 
     def update_items(self):
         self.item = QGraphicsRectItem(0, 0, self.width, self.row_h)
@@ -2301,6 +2200,8 @@ class SequenceFace(StaticItemFace, Face):
         rect_cls = self.InteractiveLetterItem if self.interact \
             else QGraphicsRectItem
         for i, letter in enumerate(self.seq):
+            light = (i in self.light_cols)
+            aa = (i in self.aa_cols)
             letter = letter.upper()
             width = self.col_w
             for reg in self.special_col:
@@ -2310,10 +2211,7 @@ class SequenceFace(StaticItemFace, Face):
             # load interactive item if called correspondingly
             rectitem = rect_cls(0, 0, width, self.row_h, parent=self.item)
             rectitem.setX(seq_width)  # to give correct X to children item
-            if i in self.light_cols:
-                rectitem.setBrush(self.bg_col_light[letter])
-            else:
-                rectitem.setBrush(self.bg_col[letter])
+            rectitem.setBrush(self.get_col_dict(fg=False, aa=aa, light=light)[letter])
             rectitem.setPen(nopen)
             if self.interact:
                 if self.codon:
@@ -2325,10 +2223,7 @@ class SequenceFace(StaticItemFace, Face):
             if width >= self.fsize:
                 text = QGraphicsSimpleTextItem(letter, parent=rectitem)
                 text.setFont(font)
-                if i in self.light_cols:
-                    text.setBrush(self.fg_col_light[letter])
-                else:
-                    text.setBrush(self.fg_col[letter])
+                text.setBrush(self.get_col_dict(fg=True, aa=aa, light=light)[letter])
                 # Center text according to rectitem size
                 txtw = text.boundingRect().width()
                 txth = text.boundingRect().height()

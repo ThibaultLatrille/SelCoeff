@@ -28,8 +28,9 @@ ontology_subset = ""
 method_cats = {m: CategorySNP(m,bound_file="",bins=bins,windows=windows).all() for m in config['METHOD_LIST']}
 binning = (f"bins{bins}" if windows == 0 else f"windows{bins}x{windows}")
 if 'mask_adaptation' in config and config['mask_adaptation']:
-    binning += "NonAdaptive"
-    MASK_LIST.append(f"{FOLDER}/data_processed/Mask/adaptation.tsv.gz")
+    level = "site" if config['mask_adaptation'] == "site" else "gene"
+    binning += "NonAdaptive" + level.capitalize()
+    MASK_LIST.append(f"{FOLDER}/data_processed/Mask/adaptation_{level}.tsv.gz")
 if "mask_identity" in config and config['mask_identity'] > 0.0:
     binning += f"Mask{config['mask_identity']}"
     MASK_LIST.append(f"{FOLDER}/data_processed/Mask/identity.{config['mask_identity']}.tsv.gz")
@@ -46,8 +47,8 @@ output_supp = "OUTPUT_SUPP" in config and config['OUTPUT_SUPP']
 for row_id, row in pd.read_csv(sample_list,sep="\t").iterrows():
     pop2sp[row['SampleName']] = row['Species']
     if output_supp:
-        LIST_SUPP.append(f"{FOLDER}/TSV/subs.{row['Species']}.{row['SampleName']}.{binning}.pdf")
-        LIST_SUPP.append(f"{FOLDER}/TSV/poly.{row['Species']}.{row['SampleName']}.{binning}.pdf")
+        LIST_SUPP.append(f"{FOLDER}/supp/pdf_subs/{row['Species']}.{row['SampleName']}/{binning}-0.pdf")
+        LIST_SUPP.append(f"{FOLDER}/supp/pdf_poly/{row['Species']}.{row['SampleName']}/{binning}-0.pdf")
     vcf = f"{FOLDER}/data_poly/{row['Species']}.{row['SampleName']}.vcf.gz"
     if os.path.exists(vcf):
         VCF_LIST.append(vcf)
@@ -158,9 +159,11 @@ rule mask_adaptation:
         script=f"{FOLDER}/scripts/mask_adaptation.py",
         exp_folder=f"{FOLDER}/data_div/Experiments"
     output:
-        tsv=f"{FOLDER}/data_processed/Mask/adaptation.tsv.gz"
+        tsv=f"{FOLDER}/data_processed/Mask/adaptation_{{level}}.tsv.gz"
+    params:
+        site_level=lambda wildcards: "--site_level" if wildcards.level == "site" else ""
     shell:
-        "python3 {input.script} --exp_folder {input.exp_folder} --output {output.tsv}"
+        "python3 {input.script} --exp_folder {input.exp_folder} --output {output.tsv} {params.site_level}"
 
 rule mask_identity_pct:
     input:
@@ -303,7 +306,7 @@ rule substitutions:
         xml_folder=f"{FOLDER}/data_div/omm_markers",
         ancestral=rules.ancestral_reconstruction.output
     output:
-        tsv=f"{FOLDER}/TSV/subs.{{species}}.{{popu}}.tsv.gz"
+        tsv=f"{FOLDER}/supp/tsv_subs/{{species}}.{{popu}}.tsv.gz"
     params:
         folder=f"{FOLDER}/data_processed/ancestral_reconstruction/{{species}}.{{popu}}"
     shell:
@@ -316,28 +319,41 @@ rule polymorphism:
         xml_folder=f"{FOLDER}/data_div/omm_markers",
         vcf=f"{FOLDER}/data_poly/{{species}}.{{popu}}.vcf.gz"
     output:
-        tsv=f"{FOLDER}/TSV/poly.{{species}}.{{popu}}.tsv.gz"
+        tsv=f"{FOLDER}/supp/tsv_poly/{{species}}.{{popu}}.tsv.gz"
     params:
         subsample=f"--subsample {config['subsample']}",
         anc_proba=f"--anc_proba {config['mask_anc_proba_SNPS'] if 'mask_anc_proba_SNPS' in config else 0.0}"
     shell:
-        "python3 {input.script} --species {wildcards.species} --xml_folder {input.xml_folder} {params.anc_proba} --vcf {input.vcf} --output_tsv {output.tsv}"
+        "python3 {input.script} --species {wildcards.species} --xml_folder {input.xml_folder} {params.subsample} {params.anc_proba} --vcf {input.vcf} --output_tsv {output.tsv}"
 
 
-rule plot_variations:
+rule write_variations:
     input:
-        script=f"{FOLDER}/scripts/plot_variations.py",
-        tsv=f"{FOLDER}/TSV/{{variations}}.{{species}}.{{popu}}.tsv.gz",
+        script=f"{FOLDER}/scripts/write_variations.py",
+        tsv=f"{FOLDER}/supp/tsv_{{variations}}/{{species}}.{{popu}}.tsv.gz",
         tree=f"{FOLDER}/data_div/mammals_species.nwk",
         fasta_folder=FASTA_FOLDER,
         mask=lambda wildcards: mask_list(wildcards.species,wildcards.popu),
         bounds=rules.annotate_vcf.output.bounds
     output:
-        pdf=f"{FOLDER}/TSV/{{variations}}.{{species}}.{{popu}}.{binning}.pdf"
+        fasta=f"{FOLDER}/supp/fasta_{{variations}}/{{species}}.{{popu}}.{binning}.fasta",
+        tree=f"{FOLDER}/supp/fasta_{{variations}}/{{species}}.{{popu}}.{binning}.nwk",
+        hist=f"{FOLDER}/supp/hist/{{variations}}.{{species}}.{{popu}}.{binning}.pdf"
     params:
         mask=lambda wildcards: format_mask_list(mask_list(wildcards.species,wildcards.popu))
     shell:
-        "python3 {input.script} {params.mask} --species {wildcards.species} --tree {input.tree} --fasta_folder {input.fasta_folder} --input {input.tsv} --output {output.pdf} --bins {bins} --windows {windows} --bounds {input.bounds}"
+        "python3 {input.script} {params.mask} --species {wildcards.species} --tree {input.tree} --fasta_folder {input.fasta_folder} --input {input.tsv} --bins {bins} --windows {windows} --bounds {input.bounds} --output_fasta {output.fasta} --output_tree {output.tree} --output_hist {output.hist} "
+
+
+rule plot_variations:
+    input:
+        script=f"{FOLDER}/scripts/plot_variations.py",
+        fasta=rules.write_variations.output.fasta,
+        tree=rules.write_variations.output.tree,
+    output:
+        pdf=f"{FOLDER}/supp/pdf_{{variations}}/{{species}}.{{popu}}/{binning}-0.pdf"
+    shell:
+        "python3 {input.script} --species {wildcards.species} --tree {input.tree} --fasta {input.fasta} --output {output.pdf}"
 
 
 def reconstruct_substitutions(wildcards):
@@ -437,9 +453,11 @@ rule upset_plot:
     output:
         pdf=f"{FOLDER}/data_processed/upset_plot/{binning}.pdf"
     params:
-        mask=lambda wildcards: format_mask_list(MASK_LIST)
+        mask=lambda wildcards: format_mask_list(MASK_LIST),
+        subsample=f"--subsample {config['subsample']}",
+        anc_proba=f"--anc_proba {config['mask_anc_proba_SNPS'] if 'mask_anc_proba_SNPS' in config else 0.0}"
     shell:
-        "python3 {input.script} {params.mask} --vcf {input.vcf} --output {output.pdf}"
+        "python3 {input.script} {params.mask} {params.subsample} {params.anc_proba} --vcf {input.vcf} --output {output.pdf}"
 
 rule SNP_effect:
     input:
@@ -471,6 +489,6 @@ rule latex:
         pdf=f"{EXP_FOLDER}/supp-mat.pdf"
     params:
         hist_prefix="--hist_prefix " + (
-            f"{FOLDER}/TSV/HOLD_{binning}" if output_supp else f"{FOLDER}/data_processed/ancestral_{binning}/"),
+            f"{FOLDER}/supp/hist/HOLD_{binning}" if output_supp else f"{FOLDER}/data_processed/ancestral_{binning}/"),
         dfe_prefix=f"--dfe_prefix {FOLDER}/data_processed/opportunities_{binning}/DFE."
     shell: "python3 {input.script} {params.hist_prefix} {params.dfe_prefix} --sample_list {input.sample_list} --sfs {input.sfs} --results {input.tsv_dfe} --tex_source {input.tex_source} --tex_target {output.tex_target} --tex_include {output.tex_include}"

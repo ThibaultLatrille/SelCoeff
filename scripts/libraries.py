@@ -102,10 +102,14 @@ def clean_ensg_path(path):
     return path
 
 
+def open_file(path):
+    path = clean_ensg_path(path)
+    return gzip.open(path, 'rt') if path.endswith(".gz") else open(path, 'r')
+
+
 def open_fasta(path):
     outfile = {}
-    path = clean_ensg_path(path)
-    ali_file = gzip.open(path, 'rt') if path.endswith(".gz") else open(path, 'r')
+    ali_file = open_file(path)
     for seq_id in ali_file:
         outfile[seq_id.replace('>', '').strip()] = ali_file.readline().strip()
     return outfile
@@ -115,7 +119,7 @@ def fasta_txt(dico_fasta):
     return "\n".join([f">{seq_id}\n{seq}" for seq_id, seq in dico_fasta.items()])
 
 
-def write_fasta(dico_fasta, output):
+def write_fasta(dico_fasta: dict[str: str], output: str):
     outfile = gzip.open(output, 'wt') if output.endswith(".gz") else open(output, 'w')
     outfile.write(fasta_txt(dico_fasta))
     outfile.close()
