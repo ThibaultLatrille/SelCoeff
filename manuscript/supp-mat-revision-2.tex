@@ -180,13 +180,9 @@
 
     The parameterization of the models is described as a Bayesian hierarchical model, including the prior distributions and the parameters of the model.
     This hierarchical model is formally represented as directed acyclic graph of dependencies between variables, depicted below.
-    Nodes of the directed acyclic graph are the variables, and edges are the functions.
-    Hyper-parameters are depicted in {\color{RED}{red}} circles, random variables in {\color{BLUE}{blue}} circles, and transformed variables in black.
-            {\color{BLUE}{Blue}} dashed line denotes a drawing from a random distribution, and black solid lines denote a function.
-    All the nodes pointing toward a given node (upstream) are its dependencies which determine its distribution.
-    The other way around, following the arrows in the DAG (downstream), simple {prior} distributions are combined together to form more complex joint {prior} distributions which ultimately define the {prior} distribution of the model.
 
     \begin{center}
+        \captionof{figure}{Bayesian hierarchical model.}
         \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=0.6cm and 1.2cm,semithick]
             \tikzstyle{every state}=[]
 
@@ -223,6 +219,12 @@
             (sbH) edge [dashed, BLUE] node [above] {\ref{eq:DistribStickBreaking},\ref{eq:Beta}} (sb);
         \end{tikzpicture}
     \end{center}
+
+    Nodes of the directed acyclic graph are the variables, and edges are the functions.
+    Hyper-parameters are depicted in {\color{RED}{red}} circles, random variables in {\color{BLUE}{blue}} circles, and transformed variables in black.
+            {\color{BLUE}{Blue}} dashed line denotes a drawing from a random distribution, and black solid lines denote a function.
+    All the nodes pointing toward a given node (upstream) are its dependencies which determine its distribution.
+    The other way around, following the arrows in the DAG (downstream), simple {prior} distributions are combined together to form more complex joint {prior} distributions which ultimately define the {prior} distribution of the model.
 
     \subsection{Nucleotide mutation rates}
     The generalized time-reversible (GTR) nucleotide mutation rate matrix $\Mutmatrix$ is a function of the nucleotide frequencies $\Mutequi$ and the symmetric exchangeability rates $\Exchan$~\cite{tavare_probabilistic_1986}.
@@ -584,15 +586,17 @@
     \subsection{Phylogenetic Generalized Linear Model}
 
     Because a correlation must account for phylogenetic relationship and non-independence of samples, we fitted a Phylogenetic Generalized Linear Model (PGLM) in R with the package caper\cite{orme_caper_2013}, with multi-furcation of the different populations inside each species.
-    The mammalian tree imported from TimeTree\cite{kumar_timetree_2017} and pruned to the species used in this study.
-    Multifurcations of the different populations are placed at the same divergence time as the species.
+    The mammalian tree imported from TimeTree\cite{kumar_timetree_2017} and pruned to the species used in this study is, in newick format:
 
     \lstinputlisting[breaklines]{artworks/PGLM.tree}
 
+    And shown in the figure below:
     \begin{center}
+        \captionof{figure}{Tree used for PGLM (Phylogenetic Generalized Linear Model).}
         \includegraphics[width=0.65\linewidth, page=1]{artworks/PGLM.pdf}
     \end{center}
 
+    Multifurcations of the different populations are placed at the same divergence time as the species.
     Then, for each population, the proportion of deleterious ($\ProbaPopDel$), nearly-neutral ($\ProbaPopNeu$) and of beneficial ($\ProbaPopBen$) mutations estimated at the population-genetic scale is shown as function of $\Ne$.
     $r^2$ and p-value are obtained from the PGLM model.
 
@@ -846,6 +850,7 @@
     The figures shown below are obtained in the Saint Kitts population of \textit{Chlorocebus sabaeus}.
     These figures across the 28 populations are available at Zenodo (\url{https://doi.org/10.5281/zenodo.7878953}) in file \textit{distribution\_S0\_28\_populations.pdf}.\\
 
+    \captionof{figure}{Distribution of scaled selection coefficients ($\Sphy$).}
     \begin{minipage}{0.32\linewidth}
         \flushleft {\tiny A: Expected DFE for mutations}
         \includegraphics[width=\linewidth, page=1]{artworks/DFE.Chlorocebus_sabaeus.Saint_Kitts.MutSel.pdf}
@@ -872,6 +877,7 @@
         \includegraphics[width=\linewidth, page=1]{artworks/Chlorocebus_sabaeus.Saint_Kitts.MutSel.polyDFE_C.pdf}
     \end{minipage}
 
+    \small
     \begin{itemize}[itemsep=0pt]
         \item A: Distribution of scaled selection coefficients ($\Sphy$), predicted for all possible non-synonymous DNA mutations away from the ancestral exome.
         Mutations are divided into three classes of selection: deleterious ($\SphyDel$), nearly-neutral ($\SphyNeu$) and beneficial non-adaptive ($\SphyBen$).
@@ -881,6 +887,7 @@
         \item E: The site-frequency spectrum (SFS) in the population for a random sample of 16 alleles (means in solid lines and standard deviations in color shades) for each class of selection and for synonymous mutations, supposedly neutral (black). The SFS represents the proportion of mutations (y-axis) with a given number of derived alleles in the population (x-axis). At high frequencies, deleterious mutations are underrepresented.
         \item F: Proportion of beneficial $\ProbaPopDel$, nearly-neutral $\ProbaPopNeu$, and deleterious mutations $\ProbaPopBen$  estimated at the population scale for each class of selection at the phylogenetic scale. Proportions depicted here are not weighted by their mutational opportunities.
     \end{itemize}
+    \normalsize
 
     \section{Filtering of variable sites}
 
