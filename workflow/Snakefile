@@ -49,6 +49,8 @@ for row_id, row in pd.read_csv(sample_list,sep="\t").iterrows():
     if output_supp:
         LIST_SUPP.append(f"{FOLDER}/supp/pdf_subs/{row['Species']}.{row['SampleName']}/{binning}-0.pdf")
         LIST_SUPP.append(f"{FOLDER}/supp/pdf_poly/{row['Species']}.{row['SampleName']}/{binning}-0.pdf")
+        LIST_SUPP.append(f"{FOLDER}/supp/ontology_subs/{row['Species']}.{row['SampleName']}.tsv")
+        LIST_SUPP.append(f"{FOLDER}/supp/ontology_poly/{row['Species']}.{row['SampleName']}.tsv")
     vcf = f"{FOLDER}/data_poly/{row['Species']}.{row['SampleName']}.vcf.gz"
     if os.path.exists(vcf):
         VCF_LIST.append(vcf)
@@ -205,7 +207,7 @@ rule annotate_vcf:
         script=f"{FOLDER}/scripts/annotate_vcf.py",
         sift_file=rules.merge_SIFT.output,
         mask=lambda wildcards: mask_list(wildcards.species,wildcards.popu),
-        fasta_pop=rules.fixed_snp_by_pop.output.fasta,
+        fasta_pop=rules.fixed_snp_by_pop.output.fasta
     output:
         tsv=f"{FOLDER}/data_processed/vcf_annotate_{binning}/snps.{{species}}.{{popu}}.tsv.gz",
         bounds=f"{FOLDER}/data_processed/vcf_annotate_{binning}/bounds.{{species}}.{{popu}}.tsv"
@@ -326,6 +328,21 @@ rule polymorphism:
     shell:
         "python3 {input.script} --species {wildcards.species} --xml_folder {input.xml_folder} {params.subsample} {params.anc_proba} --vcf {input.vcf} --output_tsv {output.tsv}"
 
+rule SNP_ontology:
+    input:
+        script=f"{FOLDER}/scripts/SNP_ontology.py",
+        tsv=f"{FOLDER}/supp/tsv_{{variations}}/{{species}}.{{popu}}.tsv.gz",
+        xml=f'{FOLDER}/data_div/omm_markers',
+        fasta_folder=FASTA_FOLDER,
+        mask=lambda wildcards: mask_list(wildcards.species,wildcards.popu),
+        bounds=rules.annotate_vcf.output.bounds
+    output:
+        tsv=f"{FOLDER}/supp/ontology_{{variations}}/{{species}}.{{popu}}.tsv"
+    params:
+        mask=lambda wildcards: format_mask_list(mask_list(wildcards.species,wildcards.popu))
+    shell:
+        "python3 {input.script} --fasta_folder {input.fasta_folder} {params.mask} --species {wildcards.species} --xml_folder {input.xml} --input {input.tsv} --bins {bins} --windows {windows} --bounds {input.bounds} --output_tsv {output.tsv}"
+
 
 rule write_variations:
     input:
@@ -349,7 +366,7 @@ rule plot_variations:
     input:
         script=f"{FOLDER}/scripts/plot_variations.py",
         fasta=rules.write_variations.output.fasta,
-        tree=rules.write_variations.output.tree,
+        tree=rules.write_variations.output.tree
     output:
         pdf=f"{FOLDER}/supp/pdf_{{variations}}/{{species}}.{{popu}}/{binning}-0.pdf"
     shell:
