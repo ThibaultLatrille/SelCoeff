@@ -194,11 +194,12 @@
     To determine if SNPs were ancestral of derived, we reconstructed the ancestral exome of each population.
     We then classified every non-synonymous SNP as either $\SphyDel$, $\SphyNeu$, or $\SphyBen$ according its $\Sphy$ value (fig.~\ref{fig:method}B-C).
 
+    First, $\SphyBen$ SNPs are spread across the genomes and not strongly associated to the ontology terms of their respective genes (table~S4, fig.~S4).
     In humans, some SNPs have been associated with specific clinical prognosis terms obtained by clinical evaluation of the impact of variants on human Mendelian disorders~\cite{landrum_clinvar_2018}.
     Although this classification also relies on deep protein alignments and therefore cannot be considered an independent result from our own, it does provide a consistency check if the effect of a mutation on human health is in line with its fitness effect predicted by our method.
     Therefore, we investigated whether the non-synonymous SNPs classified as $\SphyDel$ or $\SphyBen$ showed enrichment in specific clinical terms compared to SNPs classified as $\SphyNeu$.
-    Our results show that SNPs predicted as deleterious are associated with clinical terms such as \textit{Likely Pathogenic} and \textit{Pathogenic}, implying that, in general, the selective pressure of a mutation exerted across mammals is also predictive of its clinical effect in humans (table~S4)~\cite{sullivan_leveraging_2023}.
-    Conversely, $\SphyBen$ mutations are associated with clinical terms such as \textit{Benign} and \textit{Likely Benign}, which shows that $\SphyBen$ mutations are less likely to be functionally damaging (table~S5).
+    Our results show that SNPs predicted as deleterious are associated with clinical terms such as \textit{Likely Pathogenic} and \textit{Pathogenic}, implying that, in general, the selective pressure of a mutation exerted across mammals is also predictive of its clinical effect in humans (table~S5)~\cite{sullivan_leveraging_2023}.
+    Conversely, $\SphyBen$ mutations are associated with clinical terms such as \textit{Benign} and \textit{Likely Benign}, which shows that $\SphyBen$ mutations are less likely to be functionally damaging (table~S6).
 
     In addition to clinical prognosis, frequencies at which SNPs are segregating within populations provide information on their selective effects.
     For instance, deleterious SNPs usually segregate at lower frequencies because of purifying selection, which tends to remove them from the population (fig.~\ref{fig:homo-afr-results}C for humans).
@@ -220,12 +221,12 @@
 
     Finally, mutations predicted to be $\SphyBen$ were indeed beneficial for individuals bearing them, with a \textit{precision} (fig.~\ref{fig:method}F) in the range of 19--87\% (table~\ref{table:proba} and fig.~\ref{fig:homo-afr-results}D for humans).
     This result confirms that selection toward amino acids restoring existing functions is ongoing in these populations.
-    Importantly, the \textit{recall} value in this case, computed as $\proba [ \SphyBen  \given  \SpopBen]$, is the probability for a beneficial mutation at the population scale to be a non-adaptive, i.e., going toward a  fitter amino acid given a stable fitness landscape (fig.~\ref{fig:method}G, table~S6).
+    Importantly, the \textit{recall} value in this case, computed as $\proba [ \SphyBen  \given  \SpopBen]$, is the probability for a beneficial mutation at the population scale to be a non-adaptive, i.e., going toward a  fitter amino acid given a stable fitness landscape (fig.~\ref{fig:method}G, table~S7).
     In other words, the \textit{recall} value quantifies the number of beneficial mutations restoring damaged genomes instead of creating adaptive innovations.
     Across the 28 populations, this proportion is in the range of 11--82\% (table~\ref{table:proba}).
 
     Additionally, we controlled that these estimations are not affected by SNP mispolarization (figs.~S6-S7).
-    Moreover, because the phylogenetic mutation-selection codon model should fit better for genes with uniformly conserved functions, as a control, we filtered out genes under pervasive adaptation~\cite{latrille_genes_2023}, and indeed we found an increase in the proportion of beneficial mutations that are non-adaptive ($\proba [ \SphyBen  \given  \SpopBen]$), consistent with our expectation (Wilcoxon signed-rank, $s=80$, $p=0.002$, table~S7).
+    Moreover, because the phylogenetic mutation-selection codon model should fit better for genes with uniformly conserved functions, as a control, we filtered out genes under pervasive adaptation~\cite{latrille_genes_2023}, and indeed we found an increase in the proportion of beneficial mutations that are non-adaptive ($\proba [ \SphyBen  \given  \SpopBen]$), consistent with our expectation (Wilcoxon signed-rank, $s=80$, $p=0.002$, table~S8).
 
     \section*{Discussion}
     \subsection*{Beneficial mutations are not necessarily adaptive}
