@@ -1,0 +1,134 @@
+\documentclass{article}
+\usepackage{lmodern}
+\usepackage[export]{adjustbox}
+\usepackage{tabu}
+\tabulinesep=0.6mm
+\newcommand\cellwidth{\TX@col@width}
+\usepackage{hhline}
+\setlength{\arrayrulewidth}{1.2pt}
+\usepackage{multicol,multirow,array}
+\usepackage{etoolbox}
+\usepackage{bm}
+\AtBeginEnvironment{tabu}{\footnotesize}
+\usepackage{booktabs}
+\usepackage[margin=40pt]{geometry}
+\usepackage{longtable}
+\begin{document}
+437 tests performed.\tiny
+\begin{longtable}{|l|r|r|r|r|r|r|}
+\toprule
+GO id & GO name & p & r & Mann-Whitney U & pval & pvalHolm \\
+\midrule
+\endfirsthead
+\toprule
+GO id & GO name & p & r & Mann-Whitney U & pval & pvalHolm \\
+\midrule
+\endhead
+\midrule
+\multicolumn{7}{r}{Continued on next page} \\
+\midrule
+\endfoot
+\bottomrule
+\endlastfoot
+GO:0003777 & microtubule motor activity & $ 0.027$ & $ 1.802$ & $1.1\times 10^{5}$ & $1.8\times 10^{-6}$ & $\bm{0.0008{^*}}$ \\
+GO:0005578 & proteinaceous extracellular matrix & $ 0.069$ & $ 2.071$ & $4.7\times 10^{5}$ & $1.9\times 10^{-6}$ & $\bm{0.00084{^*}}$ \\
+GO:0003774 & motor activity & $ 0.023$ & $ 1.127$ & $1.1\times 10^{5}$ & $6.7\times 10^{-5}$ & $\bm{ 0.029{^*}}$ \\
+GO:0030198 & extracellular matrix organization & $ 0.039$ & $ 1.956$ & $2.7\times 10^{5}$ & $0.00055$ & $ 0.239~~$ \\
+GO:0007018 & microtubule-based movement & $ 0.023$ & $ 0.924$ & $1.3\times 10^{5}$ & $0.00073$ & $ 0.315~~$ \\
+GO:0005576 & extracellular region & $ 0.178$ & $ 2.195$ & $1.9\times 10^{6}$ & $0.00083$ & $ 0.359~~$ \\
+GO:0006898 & receptor-mediated endocytosis & $ 0.027$ & $ 1.803$ & $1.7\times 10^{5}$ & $ 0.001$ & $ 0.512~~$ \\
+GO:0006355 & regulation of transcription & $ 0.069$ & $ 0.275$ & $1.9\times 10^{6}$ & $ 0.002$ & $ 0.815~~$ \\
+GO:0005604 & basement membrane & $ 0.019$ & $ 1.638$ & $1.1\times 10^{5}$ & $ 0.002$ & $ 0.852~~$ \\
+GO:0007229 & integrin-mediated signaling pathway & $ 0.019$ & $ 1.930$ & $1.1\times 10^{5}$ & $ 0.003$ & $ 1.000~~$ \\
+GO:0016887 & ATPase activity & $ 0.031$ & $ 1.149$ & $1.8\times 10^{5}$ & $ 0.003$ & $ 1.000~~$ \\
+GO:0007155 & cell adhesion & $ 0.062$ & $ 1.438$ & $5.8\times 10^{5}$ & $ 0.005$ & $ 1.000~~$ \\
+GO:0005634 & nucleus & $ 0.266$ & $ 0.557$ & $3.9\times 10^{6}$ & $ 0.005$ & $ 1.000~~$ \\
+GO:0006351 & transcription & $ 0.073$ & $ 0.339$ & $1.9\times 10^{6}$ & $ 0.008$ & $ 1.000~~$ \\
+GO:0005654 & nucleoplasm & $ 0.124$ & $ 0.443$ & $2.6\times 10^{6}$ & $ 0.009$ & $ 1.000~~$ \\
+GO:0006366 & transcription from RNA polymerase II promoter & $ 0.008$ & $ 0.063$ & $6.2\times 10^{5}$ & $ 0.011$ & $ 1.000~~$ \\
+GO:0005829 & cytosol & $ 0.212$ & $ 0.541$ & $3.5\times 10^{6}$ & $ 0.012$ & $ 1.000~~$ \\
+GO:0016853 & isomerase activity & $ 0.015$ & $ 4.066$ & $ 1\times 10^{5}$ & $ 0.015$ & $ 1.000~~$ \\
+GO:0071356 & cellular response to tumor necrosis factor & $ 0.015$ & $ 7.069$ & $ 1\times 10^{5}$ & $ 0.016$ & $ 1.000~~$ \\
+GO:0005518 & collagen binding & $ 0.015$ & $ 2.900$ & $ 1\times 10^{5}$ & $ 0.017$ & $ 1.000~~$ \\
+GO:0043087 & regulation of GTPase activity & $ 0.015$ & $ 2.025$ & $1.1\times 10^{5}$ & $ 0.027$ & $ 1.000~~$ \\
+GO:0000139 & Golgi membrane & $ 0.012$ & $ 0.214$ & $6.3\times 10^{5}$ & $ 0.028$ & $ 1.000~~$ \\
+GO:0043235 & receptor complex & $ 0.023$ & $ 0.935$ & $1.9\times 10^{5}$ & $ 0.028$ & $ 1.000~~$ \\
+GO:0000981 & RNA polymerase II transcription factor activity & $ 0.027$ & $ 0.452$ & $9.1\times 10^{5}$ & $ 0.029$ & $ 1.000~~$ \\
+GO:0005739 & mitochondrion & $ 0.058$ & $ 0.471$ & $1.4\times 10^{6}$ & $ 0.029$ & $ 1.000~~$ \\
+GO:0005581 & collagen trimer & $ 0.015$ & $ 2.124$ & $1.1\times 10^{5}$ & $ 0.036$ & $ 1.000~~$ \\
+GO:0051015 & actin filament binding & $ 0.019$ & $ 0.912$ & $1.5\times 10^{5}$ & $ 0.036$ & $ 1.000~~$ \\
+GO:0001843 & neural tube closure & $ 0.015$ & $ 1.164$ & $1.1\times 10^{5}$ & $ 0.036$ & $ 1.000~~$ \\
+GO:0005737 & cytoplasm & $ 0.317$ & $ 0.692$ & $4.1\times 10^{6}$ & $ 0.037$ & $ 1.000~~$ \\
+GO:0043565 & sequence-specific DNA binding & $ 0.015$ & $ 0.308$ & $ 6\times 10^{5}$ & $ 0.039$ & $ 1.000~~$ \\
+GO:0004222 & metalloendopeptidase activity & $ 0.019$ & $ 1.188$ & $1.6\times 10^{5}$ & $ 0.043$ & $ 1.000~~$ \\
+GO:0007166 & cell surface receptor signaling pathway & $ 0.031$ & $ 2.871$ & $ 3\times 10^{5}$ & $ 0.046$ & $ 1.000~~$ \\
+GO:0007156 & homophilic cell adhesion via plasma membrane... & $ 0.015$ & $ 1.013$ & $1.2\times 10^{5}$ & $ 0.050$ & $ 1.000~~$ \\
+GO:0007286 & spermatid development & $ 0.015$ & $ 2.497$ & $1.2\times 10^{5}$ & $ 0.051$ & $ 1.000~~$ \\
+GO:0008202 & steroid metabolic process & $ 0.015$ & $ 2.755$ & $1.2\times 10^{5}$ & $ 0.051$ & $ 1.000~~$ \\
+GO:0061024 & membrane organization & $ 0.019$ & $ 1.516$ & $1.6\times 10^{5}$ & $ 0.052$ & $ 1.000~~$ \\
+GO:1901796 & regulation of signal transduction by p53 class... & $ 0.019$ & $ 1.333$ & $1.6\times 10^{5}$ & $ 0.058$ & $ 1.000~~$ \\
+GO:0006397 & mRNA processing & $ 0.004$ & $ 0.210$ & $3.5\times 10^{5}$ & $ 0.061$ & $ 1.000~~$ \\
+GO:0006915 & apoptotic process & $ 0.015$ & $ 0.463$ & $6.4\times 10^{5}$ & $ 0.065$ & $ 1.000~~$ \\
+GO:0043547 & positive regulation of GTPase activity & $ 0.035$ & $ 2.651$ & $3.7\times 10^{5}$ & $ 0.068$ & $ 1.000~~$ \\
+GO:0007010 & cytoskeleton organization & $ 0.019$ & $ 1.771$ & $1.7\times 10^{5}$ & $ 0.068$ & $ 1.000~~$ \\
+GO:0030308 & negative regulation of cell growth & $ 0.015$ & $ 3.055$ & $1.3\times 10^{5}$ & $ 0.070$ & $ 1.000~~$ \\
+GO:0007160 & cell-matrix adhesion & $ 0.015$ & $ 1.046$ & $1.2\times 10^{5}$ & $ 0.073$ & $ 1.000~~$ \\
+GO:0006897 & endocytosis & $ 0.023$ & $ 1.408$ & $2.2\times 10^{5}$ & $ 0.073$ & $ 1.000~~$ \\
+GO:0003677 & DNA binding & $ 0.077$ & $ 0.448$ & $1.7\times 10^{6}$ & $ 0.075$ & $ 1.000~~$ \\
+GO:0043202 & lysosomal lumen & $ 0.015$ & $ 1.522$ & $1.3\times 10^{5}$ & $ 0.075$ & $ 1.000~~$ \\
+GO:0003700 & DNA binding transcription factor activity & $ 0.027$ & $ 0.343$ & $8.7\times 10^{5}$ & $ 0.076$ & $ 1.000~~$ \\
+GO:0008134 & transcription factor binding & $ 0.004$ & $ 0.048$ & $3.2\times 10^{5}$ & $ 0.077$ & $ 1.000~~$ \\
+GO:0005488 & binding & $ 0.046$ & $ 0.641$ & $4.1\times 10^{5}$ & $ 0.078$ & $ 1.000~~$ \\
+GO:0045944 & positive regulation of transcription from RNA... & $ 0.039$ & $ 0.324$ & $1.1\times 10^{6}$ & $ 0.085$ & $ 1.000~~$ \\
+GO:0005794 & Golgi apparatus & $ 0.046$ & $ 0.430$ & $1.2\times 10^{6}$ & $ 0.087$ & $ 1.000~~$ \\
+GO:0016032 & viral process & $ 0.008$ & $ 0.321$ & $4.1\times 10^{5}$ & $ 0.089$ & $ 1.000~~$ \\
+GO:0055085 & transmembrane transport & $ 0.054$ & $ 1.533$ & $5.9\times 10^{5}$ & $ 0.092$ & $ 1.000~~$ \\
+GO:0006260 & DNA replication & $ 0.019$ & $ 1.051$ & $1.8\times 10^{5}$ & $ 0.096$ & $ 1.000~~$ \\
+GO:0030425 & dendrite & $ 0.008$ & $ 0.121$ & $3.9\times 10^{5}$ & $ 0.099$ & $ 1.000~~$ \\
+GO:0005524 & ATP binding & $ 0.127$ & $ 0.666$ & $1.5\times 10^{6}$ & $ 0.103$ & $ 1.000~~$ \\
+GO:0005615 & extracellular space & $ 0.100$ & $ 1.699$ & $1.3\times 10^{6}$ & $ 0.107$ & $ 1.000~~$ \\
+GO:0007283 & spermatogenesis & $ 0.039$ & $ 1.824$ & $3.9\times 10^{5}$ & $ 0.108$ & $ 1.000~~$ \\
+GO:0005179 & hormone activity & $ 0.012$ & $ 7.683$ & $9.9\times 10^{4}$ & $ 0.118$ & $ 1.000~~$ \\
+GO:0098793 & presynapse & $ 0.012$ & $ 2.065$ & $9.6\times 10^{4}$ & $ 0.119$ & $ 1.000~~$ \\
+GO:0005254 & chloride channel activity & $ 0.012$ & $ 1.694$ & $9.6\times 10^{4}$ & $ 0.124$ & $ 1.000~~$ \\
+GO:0036064 & ciliary basal body & $ 0.015$ & $ 1.378$ & $1.4\times 10^{5}$ & $ 0.125$ & $ 1.000~~$ \\
+GO:0070062 & extracellular exosome & $ 0.104$ & $ 0.570$ & $2.1\times 10^{6}$ & $ 0.125$ & $ 1.000~~$ \\
+GO:0090630 & activation of GTPase activity & $ 0.012$ & $ 2.519$ & $9.9\times 10^{4}$ & $ 0.127$ & $ 1.000~~$ \\
+GO:0044212 & transcription regulatory region DNA binding & $ 0.004$ & $ 0.322$ & $2.7\times 10^{5}$ & $ 0.128$ & $ 1.000~~$ \\
+GO:0055114 & oxidation-reduction process & $ 0.019$ & $ 0.482$ & $6.4\times 10^{5}$ & $ 0.129$ & $ 1.000~~$ \\
+GO:0019886 & antigen processing and presentation of exogenous... & $ 0.012$ & $ 1.393$ & $9.6\times 10^{4}$ & $ 0.129$ & $ 1.000~~$ \\
+GO:0005743 & mitochondrial inner membrane & $ 0.008$ & $ 0.463$ & $3.7\times 10^{5}$ & $ 0.133$ & $ 1.000~~$ \\
+GO:0022617 & extracellular matrix disassembly & $ 0.012$ & $ 1.009$ & $9.6\times 10^{4}$ & $ 0.135$ & $ 1.000~~$ \\
+GO:0042493 & response to drug & $ 0.004$ & $ 0.043$ & $2.6\times 10^{5}$ & $ 0.137$ & $ 1.000~~$ \\
+GO:0008380 & RNA splicing & $ 0.008$ & $ 0.098$ & $2.6\times 10^{5}$ & $ 0.139$ & $ 1.000~~$ \\
+GO:0043687 & post-translational protein modification & $ 0.008$ & $ 0.319$ & $3.6\times 10^{5}$ & $ 0.140$ & $ 1.000~~$ \\
+GO:0010951 & negative regulation of endopeptidase activity & $ 0.012$ & $ 2.037$ & $9.9\times 10^{4}$ & $ 0.140$ & $ 1.000~~$ \\
+GO:0000978 & RNA polymerase II proximal promoter... & $ 0.012$ & $ 0.250$ & $4.5\times 10^{5}$ & $ 0.140$ & $ 1.000~~$ \\
+GO:0003713 & transcription coactivator activity & $ 0.004$ & $ 0.339$ & $2.6\times 10^{5}$ & $ 0.142$ & $ 1.000~~$ \\
+GO:0001227 & transcriptional repressor activity & $ 0.012$ & $ 1.384$ & $9.9\times 10^{4}$ & $ 0.144$ & $ 1.000~~$ \\
+GO:0005623 & cell & $ 0.012$ & $ 1.927$ & $ 1\times 10^{5}$ & $ 0.150$ & $ 1.000~~$ \\
+GO:0030574 & collagen catabolic process & $ 0.012$ & $ 1.036$ & $9.9\times 10^{4}$ & $ 0.151$ & $ 1.000~~$ \\
+GO:0006457 & protein folding & $ 0.015$ & $ 2.465$ & $1.5\times 10^{5}$ & $ 0.158$ & $ 1.000~~$ \\
+GO:0016477 & cell migration & $ 0.004$ & $ 0.121$ & $2.4\times 10^{5}$ & $ 0.159$ & $ 1.000~~$ \\
+GO:0070374 & positive regulation of ERK1 and ERK2 cascade & $ 0.019$ & $ 4.238$ & $ 2\times 10^{5}$ & $ 0.160$ & $ 1.000~~$ \\
+GO:0007605 & sensory perception of sound & $ 0.015$ & $ 0.824$ & $1.5\times 10^{5}$ & $ 0.162$ & $ 1.000~~$ \\
+GO:0031225 & anchored component of membrane & $ 0.012$ & $ 0.892$ & $ 1\times 10^{5}$ & $ 0.171$ & $ 1.000~~$ \\
+GO:0016757 & transferase activity & $ 0.004$ & $ 0.435$ & $2.4\times 10^{5}$ & $ 0.177$ & $ 1.000~~$ \\
+GO:0002376 & immune system process & $ 0.012$ & $ 0.411$ & $4.3\times 10^{5}$ & $ 0.177$ & $ 1.000~~$ \\
+GO:0005759 & mitochondrial matrix & $ 0.008$ & $ 0.361$ & $3.3\times 10^{5}$ & $ 0.185$ & $ 1.000~~$ \\
+GO:0010389 & regulation of G2/M transition of mitotic cell... & $ 0.012$ & $ 0.924$ & $ 1\times 10^{5}$ & $ 0.188$ & $ 1.000~~$ \\
+GO:0005667 & transcription factor complex & $ 0.004$ & $ 0.177$ & $2.3\times 10^{5}$ & $ 0.189$ & $ 1.000~~$ \\
+GO:0030054 & cell junction & $ 0.031$ & $ 0.251$ & $8.1\times 10^{5}$ & $ 0.190$ & $ 1.000~~$ \\
+GO:0001650 & fibrillar center & $ 0.019$ & $ 1.540$ & $1.1\times 10^{5}$ & $ 0.191$ & $ 1.000~~$ \\
+GO:0014069 & postsynaptic density & $ 0.004$ & $ 0.172$ & $2.2\times 10^{5}$ & $ 0.200$ & $ 1.000~~$ \\
+GO:0046934 & phosphatidylinositol-4 & $ 0.012$ & $ 1.135$ & $1.1\times 10^{5}$ & $ 0.201$ & $ 1.000~~$ \\
+GO:0007267 & cell-cell signaling & $ 0.004$ & $ 0.354$ & $2.2\times 10^{5}$ & $ 0.201$ & $ 1.000~~$ \\
+GO:0001649 & osteoblast differentiation & $ 0.012$ & $ 1.917$ & $1.1\times 10^{5}$ & $ 0.201$ & $ 1.000~~$ \\
+GO:0045893 & positive regulation of transcription & $ 0.023$ & $ 0.596$ & $6.6\times 10^{5}$ & $ 0.205$ & $ 1.000~~$ \\
+GO:0007399 & nervous system development & $ 0.015$ & $ 0.450$ & $ 5\times 10^{5}$ & $ 0.205$ & $ 1.000~~$ \\
+GO:0001501 & skeletal system development & $ 0.015$ & $ 1.212$ & $1.6\times 10^{5}$ & $ 0.207$ & $ 1.000~~$ \\
+GO:0019903 & protein phosphatase binding & $ 0.012$ & $ 0.875$ & $1.1\times 10^{5}$ & $ 0.208$ & $ 1.000~~$ \\
+GO:1902476 & chloride transmembrane transport & $ 0.012$ & $ 1.458$ & $1.1\times 10^{5}$ & $ 0.210$ & $ 1.000~~$ \\
+GO:0007568 & aging & $ 0.015$ & $ 2.053$ & $1.6\times 10^{5}$ & $ 0.210$ & $ 1.000~~$ \\
+\end{longtable}
+\end{document}
