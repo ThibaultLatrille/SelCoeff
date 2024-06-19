@@ -20,6 +20,14 @@ preamble_list = [r'\documentclass{article}', r'\usepackage{lmodern}', r'\usepack
                  r'\usepackage{booktabs}', r'\usepackage[margin=40pt]{geometry}', r'\usepackage{longtable}']
 
 
+def trim_sentence(sentence: str, n: int) -> str:
+    # Trim the sentence to n characters, split the sentence at the last space and add "..."
+    if len(sentence) > n:
+        sentence = sentence[:n]
+        sentence = sentence[:sentence.rfind(" ")] + "..."
+    return sentence
+
+
 def n_sites_ensg(fasta_folder, mask_grouped):
     dico_n_sites = {}
     for file in os.listdir(fasta_folder):
@@ -91,15 +99,15 @@ def ontology_enrichment(cds_p_dico, cds_n_dico, go_id2cds_list, go_id2name, set_
             statistic, pval = st.mannwhitneyu(x, y, alternative='two-sided')
             go_term = go_id2name[go_id].replace("_", "-").replace("[", "").replace("]", "")
             # Cut the name if too long
-            if len(go_term) > 25:
-                go_term = go_term[:25] + "..."
+            go_term = trim_sentence(go_term, 50)
+            dico_ouput["GOid"].append(go_id)
             dico_ouput["GO"].append(go_term)
-            dico_ouput["p(go)"].append(p)
-            dico_ouput["r(go|no go)"].append(np.mean(x) / np.mean(y))
+            dico_ouput["p"].append(p)
+            dico_ouput["r"].append(np.mean(x) / np.mean(y))
             dico_ouput["U"].append(statistic)
             dico_ouput["pval"].append(pval)
 
-    header = ["Gene ontology", "p(go)", "r(go/no go)", "Mann-Whitney U", "pval", "pvalHolm"]
+    header = ["GO id", "GO name", "p", "r", "Mann-Whitney U", "pval", "pvalHolm"]
     df_onto = pd.DataFrame(dico_ouput)
     df_onto = adjusted_holm_pval(df_onto, alpha=0.05, format_p=False)
     df_onto.sort_values(by=["pval_adj", "pval"], inplace=True)

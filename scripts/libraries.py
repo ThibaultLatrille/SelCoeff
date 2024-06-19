@@ -102,9 +102,10 @@ def clean_ensg_path(path):
     return path
 
 
-def open_file(path):
-    path = clean_ensg_path(path)
-    return gzip.open(path, 'rt') if path.endswith(".gz") else open(path, 'r')
+def open_file(path, rw="r"):
+    if rw == "r":
+        path = clean_ensg_path(path)
+    return gzip.open(path, f'{rw}t') if path.endswith(".gz") else open(path, rw)
 
 
 def open_fasta(path):

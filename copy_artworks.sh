@@ -30,3 +30,5 @@
 \cp -rf ./experiments/3bins-mC-nodiv-CpG/analysis/Chlorocebus_sabaeus.South_Africa.MutSel.polyDFE_C.pdf ./manuscript/artworks/CpG.Chlorocebus_sabaeus.South_Africa.MutSel.polyDFE_C.pdf
 \cp -rf ./experiments/3bins-mC-nodiv-CpG/analysis/Homo_sapiens.AFR.MutSel-sfs.pdf ./manuscript/artworks/CpG.Homo_sapiens.AFR.MutSel-sfs.pdf
 \cp -rf ./experiments/3bins-mC-nodiv-CpG/analysis/Homo_sapiens.AFR.MutSel.polyDFE_C.pdf ./manuscript/artworks/CpG.Homo_sapiens.AFR.MutSel.polyDFE_C.pdf
+\cp -rf ./supp/ontology_poly/Homo_sapiens.EUR.hist_pval.pdf ./manuscript/artworks/ontology_poly.Homo_sapiens.EUR.hist.pdf
+\cp -rf ./supp/ontology_poly/Homo_sapiens.EUR.tex ./manuscript/artworks/ontology_poly.Homo_sapiens.EUR.tex
