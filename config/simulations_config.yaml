@@ -1,0 +1,2 @@
+bins: 3 # The number of bins: 0, 2, 3 or 5 for predetermined bins. Otherwise, bins with equal number of SNPs in each bin.
+MODEL: "polyDFE_C"

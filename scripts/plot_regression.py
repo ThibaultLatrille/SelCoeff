@@ -31,7 +31,7 @@ def discard_col(col, df):
 
 
 def generate_dico_labels(cat_snps: CategorySNP):
-    dico_label = {'pop': "Population", "species": "Species", "pop_size": "Effective population size $N_e$ (x1000)",
+    dico_label = {'pop': "Population", "species": "Species", "pop_size": "$N_e$ (x1000)",
                   "all_dS": "Total $dS$"}
 
     pr = "\\mathbb{P}"
@@ -208,9 +208,10 @@ def main(args):
     cols = [
         ["pop_size", 'pos', 'mut_sum_P-Spos', 'frac_pos_P-Spos', 'pos_P-Spos', 'bayes_P-Spos_P-pos'],
         ["pop_size"] + [f'{p}_{c}' for c, p in product(cat_snps.non_syn_list, ['precision', 'recall'])],
-        cat_snps.non_syn_list + [f'proba_{c}_div' for c in cat_snps.non_syn_list]
+        ["pop_size"] + [f'{p}_P-S{c}' for c, p in product(cat_snps.non_syn_list, ['mut_sum', 'all'])],
+        cat_snps.non_syn_list + [f'proba_{c}_div' for c in cat_snps.non_syn_list],
+        [f'{p}_P-S{c}' for c, p in product(cat_snps.non_syn_list, cat_snps.non_syn_list)]
     ]
-
 
     if len(cat_snps.non_syn_list) == 2:
         cols.append(['all_omega_div', 'neg_omega_div', 'ratio_neg_omega_div'])

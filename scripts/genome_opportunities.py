@@ -70,6 +70,7 @@ def main(args):
     np.random.seed(seed=0)
     rd_ensg_list = np.random.choice(list(seqs.keys()), size=size, replace=False)
 
+    outfile = open_file(f"{args.output.replace('.tsv', '.log.gz')}", "w")
     for ensg in rd_ensg_list:
         cds_rates.add_ensg(ensg)
         cds_rates.add_mut_ensg(ensg)
@@ -143,14 +144,16 @@ def main(args):
                 if np.isfinite(q):
                     for cat in cats:
                         dico_flow[cat] += q
-
                     (flow_pos if rate > 0 else flow_neg).add(q)
-
         cds_rates.rm_ensg(ensg)
 
         counts_mu = counts_mu + np.histogram(list_rates, bins=bins, weights=list_mu)[0]
         if args.method == "MutSel":
             counts_q = counts_q + np.histogram(list_rates, bins=bins, weights=list_q)[0]
+            # Output the list rate one rate per line
+            if len(list_rates) > 0:
+                outfile.write(";".join([str(rate) for rate in list_rates]) + "\n")
+    outfile.close()
 
     for cat in cat_snps.non_syn_list:
         dico_opp[cat] /= dico_opp["μNonSyn"]
