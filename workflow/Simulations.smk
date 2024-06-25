@@ -14,8 +14,7 @@ assert model in ["polyDFE_D", "polyDFE_C", "polyDFE_B"]
 polyDFE_param = f"-m {model.split('_')[-1]}"
 polyDFE_param += " 6" if model == "polyDFE_D" else ""
 
-SIMULATIONS = [i for i in os.listdir(f"{EXP_FOLDER}/sfs") if
-               os.path.isdir(f"{EXP_FOLDER}/sfs/{i}") and not i.startswith(".")]
+SIMULATIONS = {sim: sim_param for sim, sim_param in config["SIMULATIONS"].items()}
 for simulation in SIMULATIONS:
     os.makedirs(f"{EXP_FOLDER}/analysis/{simulation}",exist_ok=True)
 
@@ -28,14 +27,24 @@ rule all:
     input:
         f"{EXP_FOLDER}/results.tsv",
 
-# rule prepare_sfs:
-#     input:
-#         script=f"{FOLDER}/scripts/simul_DFE.py",
-#         dfe=f"{EXP_FOLDER}/DFE.Homo_sapiens.AFR.MutSel.log.gz"
-#     output:
-#         sfs=f"{EXP_FOLDER}/sfs/{{simulation}}/{{cat}}.sfs"
-#     shell:
-#         "python3 {input.script} -d {input.dfe} -f {wildcards.cat} --output {output.sfs}"
+
+def cat_to_param(cat):
+    dico_cat = {"neg": "negative", "weak": "neutral", "pos": "positive"}
+    return dico_cat[cat]
+
+
+rule simul_DFE:
+    output:
+        sfs=f"{EXP_FOLDER}/sfs/{{simulation}}/{{cat}}.sfs"
+    params:
+        script=f"{FOLDER}/scripts/simul_DFE.py",
+        dfe=f"{EXP_FOLDER}/DFE.Homo_sapiens.AFR.MutSel.log.gz",
+        sfs=f"{EXP_FOLDER}/sfs/control/{{cat}}.sfs",
+        fenetre=lambda wildcards: cat_to_param(wildcards.cat),
+        simu=lambda wildcards: SIMULATIONS[wildcards.simulation]
+    shell:
+        "python3 {params.script} -s {params.sfs} -d {params.dfe} -f {params.fenetre} {params.simu} --output {output.sfs}"
+
 
 rule polyDFE:
     input:
