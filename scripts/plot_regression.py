@@ -65,12 +65,13 @@ def column_format(size):
     return "|" + "|".join(["l"] * 2 + ["r"] * (size - 2)) + "|"
 
 
-def plot_scatter(df, col_x, col_y, dico_label, pgls_dict, color_dict, output, xscale="linear"):
+def plot_scatter(df, col_x, col_y, dico_label, pgls_dict, color_dict, output,
+                 xscale="linear", xlabel="", ylabel=""):
     plt.figure(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
 
-    plt.xlabel(dico_label[col_x], fontsize=14)
-    plt.ylabel(dico_label[col_y], fontsize=14)
-    if col_y in pgls_dict['pop_size']:
+    plt.xlabel(dico_label[col_x] + xlabel, fontsize=14)
+    plt.ylabel(dico_label[col_y] + ylabel, fontsize=14)
+    if col_y in pgls_dict[col_x]:
         plt.title(pgls_dict[col_x][col_y], fontsize=14)
     df_sub = df[["species", col_x, col_y]].copy()
     # group by species and compute mean
@@ -87,10 +88,20 @@ def plot_scatter(df, col_x, col_y, dico_label, pgls_dict, color_dict, output, xs
         plt.scatter(df_sp[col_x], df_sp[col_y], s=60.0, color=color_dict[sp], edgecolors="dimgrey",
                     linewidths=0.25, zorder=10, marker="o", label=f'{sp.replace("_", " ")}')
 
-    plt.xlim((min(df_sub[col_x]) * 0.95, max(df_sub[col_x]) * 1.05))
-    if xscale == "log":
-        plt.xscale("log")
-    plt.legend(fontsize=14)
+    if xscale == "unity":
+        lim_min = min(df_sub[col_x].min(), df_sub[col_y].min())
+        lim_max = max(df_sub[col_x].max(), df_sub[col_y].max())
+        scaling = 0.05 * (lim_max - lim_min)
+        lim_min -= scaling
+        lim_max += scaling
+        plt.xlim((lim_min, lim_max))
+        plt.ylim((lim_min, lim_max))
+        plt.plot([lim_min, lim_max], [lim_min, lim_max], '--', color="black", linewidth=1.0)
+    else:
+        plt.xlim((min(df_sub[col_x]) * 0.95, max(df_sub[col_x]) * 1.05))
+        if xscale == "log":
+            plt.xscale("log")
+        plt.legend(fontsize=14)
     plt.tight_layout()
     plt.savefig(output, format="pdf")
     plt.clf()
@@ -182,6 +193,10 @@ def main(args):
 
     cm = colormaps['tab10']
     color_dict = {sp: cm((i + 1) / len(species)) for i, sp in enumerate(species)}
+    for cat_S in polydfe_cat_dico:
+        output = args.output.replace('.tsv', f'.reg.{cat_S}.scatter.pdf')
+        plot_scatter(df, f'all_{cat_S}', f'mut_sum_{cat_S}', dico_label, pgls_dict, color_dict, output, xscale="unity",
+                     xlabel=" (all)", ylabel=" (sum)")
     for col_y in y_list:
         if discard_col(col_y, df):
             continue
