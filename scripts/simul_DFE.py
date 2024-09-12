@@ -1,15 +1,19 @@
 import numpy as np
-from random import choices
 import argparse
 import gzip
 import time
+import numba as nb
+from functools import lru_cache
+import scipy.integrate as integrate
+import math
 
 
-def open_file(path, rw="r"):
+def open_file(path: str, rw: str):
     return gzip.open(path, f'{rw}t') if path.endswith(".gz") else open(path, rw)
 
 
-def do_sample(dfe_file, k):
+def open_dfe(dfe_file: str):
+    t = time.time()
     liste_per_cds = []
     with open_file(dfe_file, 'r') as opened_dfe:
         for line in opened_dfe:
@@ -17,16 +21,18 @@ def do_sample(dfe_file, k):
             if len(txt) < 10:
                 continue
             liste_per_cds.append(txt)
-    sample = choices(liste_per_cds, k=k)
+    print(f"Time spent in open_dfe: {time.time() - t:.2f}s")
+    return np.asarray(liste_per_cds, dtype="object")
+
+
+def do_sample(liste_per_cds: np.ndarray) -> np.ndarray:
+    sample = np.random.choice(liste_per_cds, size=int(1e3))
     out_list = list(map(float, [s for lst_s in sample for s in lst_s]))
-    return out_list
+    sample = np.random.choice(out_list, size=int(1e6))
+    return sample
 
 
-def density(s: float, x: float) -> float:
-    return (1 - np.exp(-s * (1 - x))) / (x * (1 - x) * (1 - np.exp(-s)))
-
-
-def build_mixed_dfes(dfe_path: str, fenetre: str, adapt: float = 10) -> list:
+def build_mixed_dfes(sample: np.ndarray, fenetre: str, adapt: float = 10) -> np.ndarray:
     p_pospos = 0.721
     p_posneut = 0.279
     p_posneg = 1.4 * 10 ** (-5)
@@ -36,25 +42,25 @@ def build_mixed_dfes(dfe_path: str, fenetre: str, adapt: float = 10) -> list:
     p_neutneut = 0.579
     p_neutpos = 0.099
     p_neutneg = 0.322
-    sample = choices(do_sample(dfe_path, 100), k=100000)
-    pos_dfe = [s for s in sample if s > 1]
-    neutral_dfe = [s for s in sample if (1 > s > -1)]
-    neg_dfe = [s for s in sample if s < -1]
-    n = 100000
+    print(f"{len(sample)} S in the DFE sample")
+    pos_dfe = sample[sample > 1]
+    neutral_dfe = sample[np.abs(sample) <= 1]
+    neg_dfe = sample[sample < -1]
+    n = int(1e5)
     if fenetre == 'positive':
-        mixed_pos_dfe = (choices(pos_dfe, k=round(n * p_pospos)) +
-                         choices(neg_dfe, k=round(n * p_posneg)) +
-                         choices(neutral_dfe, k=round(n * p_posneut)))
+        mixed_pos_dfe = np.concatenate([np.random.choice(pos_dfe, size=round(n * p_pospos)),
+                                        np.random.choice(neg_dfe, size=round(n * p_posneg)),
+                                        np.random.choice(neutral_dfe, size=round(n * p_posneut))])
         return mixed_pos_dfe
     elif fenetre == 'negative':
-        mixed_neg_dfe = (round(n * p_negpos) * [adapt] +
-                         choices(neg_dfe, k=round(n * p_negneg)) +
-                         choices(neutral_dfe, k=round(n * p_negneut)))
+        mixed_neg_dfe = np.concatenate([np.array(round(n * p_negpos) * [adapt]),
+                                        np.random.choice(neg_dfe, size=round(n * p_negneg)),
+                                        np.random.choice(neutral_dfe, size=round(n * p_negneut))])
         return mixed_neg_dfe
     elif fenetre == 'neutral':
-        mixed_neutral_dfe = (round(n * p_neutpos) * [adapt] +
-                             choices(neg_dfe, k=round(n * p_neutneg)) +
-                             choices(neutral_dfe, k=round(n * p_neutneut)))
+        mixed_neutral_dfe = np.concatenate([np.array(round(n * p_neutpos) * [adapt]),
+                                            np.random.choice(neg_dfe, size=round(n * p_neutneg)),
+                                            np.random.choice(neutral_dfe, size=round(n * p_neutneut))])
         return mixed_neutral_dfe
 
 
@@ -63,48 +69,94 @@ def open_sfs(sfs_file: str) -> tuple:
         header = opened_sfs.readline().split()
         name = header[0] + 'Simulated'
         data_signature = opened_sfs.readline()
-        k = int(data_signature.split()[2])
+        n = int(data_signature.split()[2])
         syn_sfs = opened_sfs.readline().split()
         syn = np.sum([int(x) for x in syn_sfs[:-1]])
         syn_opp = syn_sfs[-1]
         non_syn_sfs = opened_sfs.readline().split()
         non_syn = np.sum([int(x) for x in non_syn_sfs[:-1]])
         non_syn_opp = non_syn_sfs[-1]
-    return name, data_signature, k, syn, syn_opp, non_syn, non_syn_opp
+    return name, data_signature, n, syn, syn_opp, non_syn, non_syn_opp
 
 
-def write_sfs_file(output_path: str, name: str, data_signature: str, sfs_syn: list, sfs_non_syn: list):
+def write_sfs_file(output_path: str, name: str, data_signature: str, sfs_syn: np.ndarray, sfs_non_syn: np.ndarray):
     with open(output_path, 'w') as sortie:
         sortie.write(name + '\n')
         sortie.write(data_signature)
-        sortie.write(' '.join([str(x) for x in sfs_syn]) + '\n')
-        sortie.write(' '.join([str(x) for x in sfs_non_syn]) + '\n')
+        sortie.write(' '.join([str(int(float(x))) for x in sfs_syn]) + '\n')
+        sortie.write(' '.join([str(int(float(x))) for x in sfs_non_syn]) + '\n')
 
 
-def simulate_sfs(sfs_path, dfe, output_path):
-    name, data_signature, k, syn, syn_opp, non_syn, non_syn_opp = open_sfs(sfs_path)
-    y_sel, y_neu = [0.0], [0.0]
+@lru_cache(maxsize=None)
+def comb(n: int, i: int) -> int:
+    return math.comb(n, i)
+
+
+@nb.jit(nopython=True)
+def neutral_distribution(i: int, n: int, x: float) -> float:
+    return np.power(x, i - 1) * np.power(1 - x, n - i)
+
+
+@nb.jit(nopython=True)
+def selection_distribution(i: int, n: int, s: float, x: float) -> float:
+    if s == 0:
+        return neutral_distribution(i, n, x)
+    return (1 - np.exp(-s * (1 - x))) * np.power(x, i - 1) * np.power(1 - x, n - i - 1) / (1 - np.exp(-s))
+
+
+def generate_sampled_sfs(dfe: np.ndarray, n: int, syn: int, non_syn: int) -> tuple[np.ndarray, np.ndarray]:
+    y_neu, y_sel = np.zeros(n), np.zeros(n)
+    for i in range(1, n):
+        f_i = comb(n, i) * integrate.quad(lambda x: neutral_distribution(i, n, x), 0, 1)[0]
+        y_neu[i] = f_i
+
+    for i in range(1, n):
+        mean_fi = np.mean([integrate.quad(lambda x: selection_distribution(i, n, s, x), 0, 1)[0] for s in dfe])
+        y_sel[i] = comb(n, i) * mean_fi
+
+    y_neu = y_neu * (syn / np.sum(y_neu))
+    y_sel = y_sel * (non_syn / np.sum(y_sel))
+    for i in range(1, n):
+        y_neu[i] = np.random.poisson(y_neu[i])
+        y_sel[i] = np.random.poisson(y_sel[i])
+    return y_neu[1:], y_sel[1:]
+
+
+@nb.jit(nopython=True)
+def density(s: float, x: float) -> float:
+    return (1 - np.exp(-s * (1 - x))) / (x * (1 - x) * (1 - np.exp(-s)))
+
+
+@nb.jit(nopython=True)
+def generate_sfs(dfe: np.ndarray, k: int, syn: int, non_syn: int) -> tuple[np.ndarray, np.ndarray]:
+    y_sel, y_neu = [], []
     for i in range(1, k):
         x = float(i) / k
         y_neu.append(1 / x)
-        d_list = [density(s, x) for s in dfe]
+        d_list = np.array([density(s, x) for s in dfe])
         y_sel.append(np.mean(d_list))
-        print(f"SFS for {i}/{k}: syn={y_neu[-1]:.3f}, non_syn={y_sel[-1]:.3f}")
-    y_neu = np.array(y_neu) * (syn / np.sum(y_neu))
-    y_sel = np.array(y_sel) * (non_syn / np.sum(y_sel))
-    sfs_syn = [int(y_neu[i]) for i in range(1, k)] + [syn_opp]
-    sfs_non_syn = [int(y_sel[i]) for i in range(1, k)] + [non_syn_opp]
+    y_neu = np.array(y_neu)
+    y_neu = y_neu * (syn / np.sum(y_neu))
+    y_sel = np.array(y_sel)
+    y_sel = y_sel * (non_syn / np.sum(y_sel))
+    return np.round(y_neu), np.round(y_sel)
+
+
+def simulate_sfs(sfs_path, dfe, output_path):
+    name, data_signature, n, syn, syn_opp, non_syn, non_syn_opp = open_sfs(sfs_path)
+    t = time.time()
+    sfs_syn, sfs_non_syn = generate_sampled_sfs(dfe, n, syn, non_syn)
+    sfs_syn = np.append(sfs_syn, syn_opp)
+    sfs_non_syn = np.append(sfs_non_syn, non_syn_opp)
+    print(f"Time spent in simulate_sfs: {time.time() - t:.2f}s")
     write_sfs_file(output_path, name, data_signature, sfs_syn, sfs_non_syn)
 
 
 def main(dfe_file: str, sfs_file: str, fenetre: str, adapt: float, output_path: str):
     # Count the amount of time spent in this function
-    start = time.time()
-    dfe = build_mixed_dfes(dfe_file, fenetre, adapt)
-    print(f"Time spent building DFE: {time.time() - start:.2f}s")
-    start = time.time()
+    sample = do_sample(open_dfe(dfe_file))
+    dfe = build_mixed_dfes(sample, fenetre, adapt)
     simulate_sfs(sfs_file, dfe, output_path)
-    print(f"Time spent simulating SFS: {time.time() - start:.2f}s")
 
 
 if __name__ == '__main__':
