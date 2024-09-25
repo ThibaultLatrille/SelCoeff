@@ -18,7 +18,7 @@ name.check(mamTree, mamData)
 table_output <- data.frame()
 y_list <- colnames(mamData)
 print(y_list)
-for (x_label in c("pop_size", "all_dS", "all_P-Spos", "all_P-Sneg")) {
+for (x_label in c("pop_size", "all_dS", "all_P-Spos", "all_P-Sneg", "all_P-Sweak")) {
     for (y_label in y_list) {
         if ((y_label == x_label) || (y_label == "Names") || (y_label == "species")) {
             next

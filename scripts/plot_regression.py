@@ -65,14 +65,14 @@ def column_format(size):
     return "|" + "|".join(["l"] * 2 + ["r"] * (size - 2)) + "|"
 
 
-def plot_scatter(df, col_x, col_y, dico_label, pgls_dict, color_dict, output,
-                 xscale="linear", xlabel="", ylabel=""):
+def plot_scatter(df, col_x, col_y, dico_label, color_dict, output,
+                 xscale="linear", xlabel="", ylabel="", title=""):
     plt.figure(figsize=(1920 / my_dpi, 960 / my_dpi), dpi=my_dpi)
 
     plt.xlabel(dico_label[col_x] + xlabel, fontsize=14)
     plt.ylabel(dico_label[col_y] + ylabel, fontsize=14)
-    if col_y in pgls_dict[col_x]:
-        plt.title(pgls_dict[col_x][col_y], fontsize=14)
+    if title != "":
+        plt.title(title, fontsize=14)
     df_sub = df[["species", col_x, col_y]].copy()
     # group by species and compute mean
     for sp, df_sp in df_sub.groupby("species"):
@@ -101,7 +101,7 @@ def plot_scatter(df, col_x, col_y, dico_label, pgls_dict, color_dict, output,
         plt.xlim((min(df_sub[col_x]) * 0.95, max(df_sub[col_x]) * 1.05))
         if xscale == "log":
             plt.xscale("log")
-        plt.legend(fontsize=14)
+    plt.legend(fontsize=10)
     plt.tight_layout()
     plt.savefig(output, format="pdf")
     plt.clf()
@@ -125,6 +125,10 @@ def collapse_table_by_species(df):
                 max_val = tex_f(df_sp[column].max())
                 dico_df[column].append(f"[{min_val}, {max_val}]")
     return pd.DataFrame(dico_df)
+
+
+def goodness_of_fit(x, y):
+    return 1 - np.sum((y - x) ** 2) / np.sum((y - np.mean(y)) ** 2)
 
 
 def main(args):
@@ -188,30 +192,40 @@ def main(args):
                 continue
             y_label = row["y_label"]
             assert y_label in df.columns
+            pv = row["Pr(>|t|)"]
             corr = "Positive correlation" if row["Estimate"] > 0 else "Negative correlation"
+            corr = corr if pv < 0.05 else "No correlation"
             pgls_dict[row["x_label"]][row["y_label"]] = f"{corr} ($r^2$={row['r2']:.2f}, p={tex_f(row['Pr(>|t|)'])})"
 
     cm = colormaps['tab10']
     color_dict = {sp: cm((i + 1) / len(species)) for i, sp in enumerate(species)}
     for cat_S in polydfe_cat_dico:
         output = args.output.replace('.tsv', f'.reg.{cat_S}.scatter.pdf')
-        plot_scatter(df, f'all_{cat_S}', f'mut_sum_{cat_S}', dico_label, pgls_dict, color_dict, output, xscale="unity",
-                     xlabel=" (all)", ylabel=" (sum)")
+        x, y = df[f'all_{cat_S}'], df[f'mut_sum_{cat_S}']
+        title = f"$R^2={goodness_of_fit(x, y):.2f}$"
+        plot_scatter(df, f'all_{cat_S}', f'mut_sum_{cat_S}', dico_label, color_dict, output, xscale="unity",
+                     xlabel=" (one DFE)", ylabel=" (three DFE)", title=title)
     for col_y in y_list:
         if discard_col(col_y, df):
             continue
         output = args.output.replace('.tsv', f'.pop_size.{col_y}.scatter.pdf')
-        plot_scatter(df, "pop_size", col_y, dico_label, pgls_dict, color_dict, output)
+        title = pgls_dict.get("pop_size", {}).get(col_y, "")
+        plot_scatter(df, "pop_size", col_y, dico_label, color_dict, output, title=title)
 
     output = args.output.replace('.tsv', f'.distance.recall_pos.scatter.pdf')
-    plot_scatter(df, "all_dS", "recall_pos", dico_label, pgls_dict, color_dict, output, xscale="log")
+    title = pgls_dict.get("all_dS", {}).get("recall_pos", "")
+    plot_scatter(df, "all_dS", "bayes_P-Spos_P-pos", dico_label, color_dict, output, xscale="log", title=title)
 
-    # Print number of populations for which the recall is between in 0.2 and 0.4
+    # Print number of populations for which the recall is between in 0.15 and 0.45
     print(df["recall_pos"])
     low_bound = 0.15
     high_bound = 0.45
     total = np.sum((df[f'recall_pos'] > low_bound) & (df[f'recall_pos'] < high_bound))
     print(f"{total} out of {len(df)} with {low_bound} < recall < {high_bound}")
+    # Print min, max and mean of the recall pos
+    print(f"Min recall: {df['recall_pos'].min()}")
+    print(f"Max recall: {df['recall_pos'].max()}")
+    print(f"Mean recall: {df['recall_pos'].mean()}")
 
     df = sort_df(df, args.sample_list)
     df = row_color(df)
