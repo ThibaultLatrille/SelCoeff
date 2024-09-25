@@ -1,7 +1,9 @@
+import os
 import numpy as np
 import argparse
 import gzip
 import time
+import pandas as pd
 import numba as nb
 from functools import lru_cache
 import scipy.integrate as integrate
@@ -32,35 +34,48 @@ def do_sample(liste_per_cds: np.ndarray) -> np.ndarray:
     return sample
 
 
-def build_mixed_dfes(sample: np.ndarray, fenetre: str, adapt: float = 10) -> np.ndarray:
-    p_pospos = 0.721
-    p_posneut = 0.279
-    p_posneg = 1.4 * 10 ** (-5)
-    p_negneg = 0.911
-    p_negpos = 0.007
-    p_negneut = 0.082
-    p_neutneut = 0.579
-    p_neutpos = 0.099
-    p_neutneg = 0.322
+def extract_data(filepath: str):
+    df = pd.read_csv(filepath, sep="\t")
+    row_neg0 = df[df["category"] == "neg"]
+    row_weak0 = df[df["category"] == "weak"]
+    row_pos0 = df[df["category"] == "pos"]
+    return {"pos_neg0": row_neg0["P-Spos"].values[0],
+            "pos_weak0": row_weak0["P-Spos"].values[0],
+            "pos_pos0": row_pos0["P-Spos"].values[0],
+            "neg_neg0": row_neg0["P-Sneg"].values[0],
+            "neg_weak0": row_weak0["P-Sneg"].values[0],
+            "neg_pos0": row_pos0["P-Sneg"].values[0],
+            "weak_neg0": row_neg0["P-Sweak"].values[0],
+            "weak_weak0": row_weak0["P-Sweak"].values[0],
+            "weak_pos0": row_pos0["P-Sweak"].values[0]
+            }
+
+
+def build_mixed_dfes(sample: np.ndarray, fenetre: str, adapt: float = 10, params_file: str = "") -> np.ndarray:
+    dp = extract_data(params_file)
     print(f"{len(sample)} S in the DFE sample")
     pos_dfe = sample[sample > 1]
     neutral_dfe = sample[np.abs(sample) <= 1]
     neg_dfe = sample[sample < -1]
     n = int(1e5)
     if fenetre == 'positive':
-        mixed_pos_dfe = np.concatenate([np.random.choice(pos_dfe, size=round(n * p_pospos)),
-                                        np.random.choice(neg_dfe, size=round(n * p_posneg)),
-                                        np.random.choice(neutral_dfe, size=round(n * p_posneut))])
+        mixed_pos_dfe = np.concatenate([np.random.choice(pos_dfe, size=round(n * dp["pos_pos0"])),
+                                        np.random.choice(neg_dfe, size=round(n * dp["neg_pos0"])),
+                                        np.random.choice(neutral_dfe, size=round(n * dp["weak_pos0"]))])
         return mixed_pos_dfe
     elif fenetre == 'negative':
-        mixed_neg_dfe = np.concatenate([np.array(round(n * p_negpos) * [adapt]),
-                                        np.random.choice(neg_dfe, size=round(n * p_negneg)),
-                                        np.random.choice(neutral_dfe, size=round(n * p_negneut))])
+        # pos_array = np.random.exponential(adapt, size=round(n * dp["pos_neg0"]))
+        pos_array = np.array(round(n * dp["pos_neg0"]) * [adapt])
+        mixed_neg_dfe = np.concatenate([pos_array,
+                                        np.random.choice(neg_dfe, size=round(n * dp["neg_neg0"])),
+                                        np.random.choice(neutral_dfe, size=round(n * dp["weak_neg0"]))])
         return mixed_neg_dfe
     elif fenetre == 'neutral':
-        mixed_neutral_dfe = np.concatenate([np.array(round(n * p_neutpos) * [adapt]),
-                                            np.random.choice(neg_dfe, size=round(n * p_neutneg)),
-                                            np.random.choice(neutral_dfe, size=round(n * p_neutneut))])
+        # pos_array = np.random.exponential(adapt, size=round(n * dp["pos_weak0"]))
+        pos_array = np.array(round(n * dp["pos_weak0"]) * [adapt])
+        mixed_neutral_dfe = np.concatenate([pos_array,
+                                            np.random.choice(neg_dfe, size=round(n * dp["neg_weak0"])),
+                                            np.random.choice(neutral_dfe, size=round(n * dp["weak_weak0"]))])
         return mixed_neutral_dfe
 
 
@@ -152,19 +167,23 @@ def simulate_sfs(sfs_path, dfe, output_path):
     write_sfs_file(output_path, name, data_signature, sfs_syn, sfs_non_syn)
 
 
-def main(dfe_file: str, sfs_file: str, fenetre: str, adapt: float, output_path: str):
+def main(dfe_file: str, parsed_DFE_file: str, sfs_file: str, fenetre: str, adapt: float, seed: int, output_path: str):
     # Count the amount of time spent in this function
+    # seed of the random number generator
+    np.random.seed(seed)
     sample = do_sample(open_dfe(dfe_file))
-    dfe = build_mixed_dfes(sample, fenetre, adapt)
+    dfe = build_mixed_dfes(sample, fenetre, adapt, parsed_DFE_file)
     simulate_sfs(sfs_file, dfe, output_path)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-d', '--dfe_file', type=str, help='Path to the DFE file', required=True)
+    parser.add_argument('-p', '--parsed_DFE', type=str, help='Path to the parameter file', required=True)
     parser.add_argument('-s', '--sfs_file', type=str, help='Path to the SFS file', required=True)
     parser.add_argument('-f', '--fenetre', type=str, help='Window to simulate', required=True)
     parser.add_argument("-a", "--adapt", type=float, help="Adaptation strength", required=False)
+    parser.add_argument('-r', '--seed', type=int, help='Seed for the random number generator', required=False)
     parser.add_argument('-o', '--output', type=str, help='Path to the output file', required=True)
     args = parser.parse_args()
-    main(args.dfe_file, args.sfs_file, args.fenetre, args.adapt, args.output)
+    main(args.dfe_file, args.parsed_DFE, args.sfs_file, args.fenetre, args.adapt, args.seed, args.output)

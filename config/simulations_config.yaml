@@ -1,2 +1,14 @@
-bins: 3 # The number of bins: 0, 2, 3 or 5 for predetermined bins. Otherwise, bins with equal number of SNPs in each bin.
 MODEL: "polyDFE_C"
+SAMPLE_LIST: "sample_simu.tsv"
+EXPERIMENT: "3bins-mc-nodiv"
+SIMULATIONS:
+  S20_SEED0: "-a 20 --seed 0"
+  S20_SEED42: "-a 20 --seed 42"
+  S20_SEED123: "-a 20 --seed 123"
+  S20_SEED456: "-a 20 --seed 456"
+  S20_SEED789: "-a 20 --seed 789"
+  S20_SEED101112: "-a 20 --seed 101112"
+  S20_SEED131415: "-a 20 --seed 131415"
+  S20_SEED161718: "-a 20 --seed 161718"
+  S20_SEED192021: "-a 20 --seed 192021"
+  S20_SEED222324: "-a 20 --seed 222324"

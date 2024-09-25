@@ -153,6 +153,7 @@ def main(args):
             # Output the list rate one rate per line
             if len(list_rates) > 0:
                 outfile.write(";".join([str(rate) for rate in list_rates]) + "\n")
+
     outfile.close()
 
     for cat in cat_snps.non_syn_list:
