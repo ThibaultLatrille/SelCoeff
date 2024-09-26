@@ -1,7 +1,7 @@
 %! BibTeX Compiler = biber
 %DIF LATEXDIFF DIFFERENCE FILE
 %DIF DEL main-PLOS.tex   Mon Apr 22 11:40:16 2024
-%DIF ADD main.tex        Wed Jun 19 15:37:30 2024
+%DIF ADD main.tex        Thu Sep 26 16:31:30 2024
 %TC:ignore
 \documentclass{article}
 
@@ -25,7 +25,11 @@
 
 \usepackage{biorxiv}
 \usepackage[backend=biber,eprint=false,isbn=false,url=false,intitle=true,style=nature,date=year]{biblatex}
-\addbibresource{codon_models.bib}
+%DIF 25c25
+%DIF < \addbibresource{codon_models.bib}
+%DIF -------
+\addbibresource{references.bib} %DIF > 
+%DIF -------
 
 \usepackage{url}
 \usepackage{amssymb,amsfonts,amsmath,amsthm,mathtools}
@@ -96,9 +100,7 @@
 % The submission checklist is available at:
 % https://docs.google.com/document/d/1SScaqEAgZGpeaXxpWPDh1NOLaDDLLmkGOYgaGvbY-4o/edit#
 % Response to reviewers at:
-%DIF < % https://docs.google.com/document/d/1kzt4uf6GgmuAVHx6-LQyzFuee9biyaWoMV6RNO6lSzI/edit?usp=sharing
-%DIF -------
-% https://docs.google.com/document/d/1qjQxvXefMm06h2j13oaXnGgO-NLwuQtGZ5k7KZXS-50/edit?usp=sharing %DIF > 
+% https://docs.google.com/document/d/1kzt4uf6GgmuAVHx6-LQyzFuee9biyaWoMV6RNO6lSzI/edit?usp=sharing
 %DIF PREAMBLE EXTENSION ADDED BY LATEXDIFF
 %DIF UNDERLINE PREAMBLE %DIF PREAMBLE
 \RequirePackage[normalem]{ulem} %DIF PREAMBLE
@@ -186,7 +188,7 @@
 
 %TC:endignore
     \begin{abstract}
-        Mutations can be beneficial by bringing innovation to their bearer, allowing them to adapt to environmental change. These mutations are typically unpredictable since they respond to an unforeseen change in the environment. However, mutations can also be beneficial because they are simply restoring a state of higher fitness that was lost due to genetic drift in a stable environment. In contrast to adaptive mutations, these beneficial non-adaptive mutations can be predicted if the underlying fitness landscape is stable and known. The contribution of such non-adaptive mutations to molecular evolution has been widely neglected mainly because their detection is very challenging. We have here reconstructed protein-coding-gene fitness landscapes shared between mammals, using mutation-selection models and a multi-species alignments across 87 mammals. These fitness landscapes have allowed us to predict the fitness effect of polymorphisms found in 28 mammalian populations. Using methods that quantify selection at the population level, we have confirmed that beneficial non-adaptive mutations are indeed positively selected in extant populations. Our work confirms that deleterious substitutions are accumulating in mammals and are being reverted, generating a balance in which genomes are damaged and restored simultaneously at different loci. We observe that beneficial non-adaptive mutations represent between 15\% and 45\% of all beneficial mutations in 24 of 28 populations analyzed, showing that a substantial part of ongoing positive selection is not driven solely by adaptation to environmental change in mammals.
+        Mutations can be beneficial by bringing innovation to their bearer, allowing them to adapt to environmental change. These mutations are typically unpredictable since they respond to an unforeseen change in the environment. However, mutations can also be beneficial because they are simply restoring a state of higher fitness that was lost due to genetic drift in a stable environment. In contrast to adaptive mutations, these beneficial non-adaptive mutations can be predicted if the underlying fitness landscape is stable and known. The contribution of such non-adaptive mutations to molecular evolution has been widely neglected mainly because their detection is very challenging. We have here reconstructed protein-coding-gene fitness landscapes shared between mammals, using mutation-selection models and a multi-species alignments across 87 mammals. These fitness landscapes have allowed us to predict the fitness effect of polymorphisms found in 28 mammalian populations. Using methods that quantify selection at the population level, we have confirmed that beneficial non-adaptive mutations are indeed positively selected in extant populations. Our work confirms that deleterious substitutions are accumulating in mammals and are being reverted, generating a balance in which genomes are damaged and restored simultaneously at different loci. We observe that beneficial non-adaptive mutations represent between 15\% and 45\% of all beneficial mutations in 24 of 28 populations analyzed, \DIFdelbegin \DIFdel{showing }\DIFdelend \DIFaddbegin \DIFadd{suggesting }\DIFaddend that a substantial part of ongoing positive selection is not driven solely by adaptation to environmental change in mammals.
     \end{abstract}
 
     \keywords{Adaptation \and Nearly-neutral \and Phylogenetics \and Population-genetics \and Codon models }
@@ -197,10 +199,15 @@
     \section*{Introduction}
     Adaptation is one of the main processes shaping the diversity of forms and functions across the tree of life~\cite{darwin_origin_1859}.
     Evolutionary adaptation is tightly linked to environmental change and species responding to this change~\cite{merrell_adaptive_1994, gavrilets_adaptive_2009}.
-    For adaptation to occur, there must be variation within populations, which mostly appears via mutations in the DNA sequence.
+    \DIFaddbegin \DIFadd{Such environmental changes are either abiotic (e.g. temperature, humidity) or biotic (e.g. pressure from predators or viruses~\mbox{%DIFAUXCMD
+\cite{enard_viruses_2016}}\hskip0pt%DIFAUXCMD
+).
+    }\DIFaddend For adaptation to occur, there must be variation within populations, which mostly appears via mutations in the DNA sequence.
     While neutral mutations will not impact an individual's fitness, deleterious mutations have a negative effect, and beneficial mutations improve their bearer's fitness.
     A beneficial mutation is thus more likely than a neutral mutation to invade the population and reach fixation, resulting in a substitution at the species level.
-    Upon environmental change, because adaptive beneficial mutations toward new fitness optima are more likely, the number of substitutions also increases (fig.~\ref{fig:fitness-landscape}A).
+\DIFaddbegin 
+
+    \DIFaddend Upon environmental change, because adaptive beneficial mutations toward new fitness optima are more likely, the number of substitutions also increases (fig.~\ref{fig:fitness-landscape}A).
     An increased substitution rate is thus commonly interpreted as a sign of adaptation~\cite{mcdonald_adaptative_1991, smith_adaptive_2002, welch_estimating_2006}.
     The availability of large-scale genomic data and the development of theoretical models have enabled the detection and quantification of substitution rate changes across genes and lineages~\cite{yang_statistical_2000, eyre-walker_genomic_2006, moutinho_variation_2019}.
     These approaches, now common practice in evolutionary biology, have helped better understand the processes underpinning the rates of molecular evolution, contributing to disentangling the effects of mutation, selection and drift in evolution~\cite{lynch_mutation_2023}.
@@ -226,30 +233,33 @@
     \subsection*{Fitness landscape reconstruction}
 
     The mutation-selection framework permits to link the patterns of substitution along a phylogenetic tree with the underlying fitness landscape~\cite{halpern_evolutionary_1998, mccandlish_modeling_2014}.
-    Such mutation-selection models applied to protein-coding DNA sequences at the codon level allow us to estimate relative fitnesses for all amino acids for each site of the sequence, explicitly assuming that the underlying fitness landscape is stable along the phylogenetic tree~\cite{rodrigue_mechanistic_2010, tamuri_estimating_2012, rodrigue_detecting_2017}.
+    Such mutation-selection models applied to protein-coding DNA \DIFdelbegin \DIFdel{sequences }\DIFdelend \DIFaddbegin \DIFadd{sequence alignments }\DIFaddend at the codon level allow us to estimate relative fitnesses for all amino acids for each site of the sequence, explicitly assuming that the underlying fitness landscape is stable along the phylogenetic tree~\cite{rodrigue_mechanistic_2010, tamuri_estimating_2012, rodrigue_detecting_2017}.
     Moreover, effective population size ($\Ne$) is considered constant along the phylogenetic tree precisely because of the fixed fitness landscape assumption, the consequences of which are detailed in the Discussion.
     Importantly, because mutation-selection codon models at the phylogenetic scale are based on population-genetics equations, their estimates of selection coefficients are directly interpretable as fitness effects at the population scale; and because they work at the DNA level, we are able to account for mutational bias in DNA and structure of the genetic code.
-    The model further integrates the shared evolutionary history between samples and their divergence, which, together, allow us to estimate fitness effects in mammalian phylogenetic trees even though sequences are not independent samples and might not represent the equilibrium distribution of amino acids (see section \ref{subsec:s-phylogeny-method} in Materials \& Methods, model parameters in section S1 and fig.~S1).
+    The model further integrates the shared evolutionary history between samples and their divergence, which, together, allow us to estimate fitness effects in \DIFdelbegin \DIFdel{mammalian phylogenetic trees }\DIFdelend \DIFaddbegin \DIFadd{sequence alignments }\DIFaddend even though sequences are not independent samples and might not represent the equilibrium distribution of amino acids (see section \ref{subsec:s-phylogeny-method} in Materials \& Methods, model parameters in section S1 and fig.~S1).
 
-    Theoretically, we can thus use large-scale genomic data to assess whether the fitness estimated at the phylogenetic scale predicts the fitness effect at the population scale for both deleterious and beneficial non-adaptive mutations.
-    The placental mammals represent an excellent study system to perform such analysis.
+    \DIFdelbegin \DIFdel{Theoretically, we can thus }\DIFdelend \DIFaddbegin \DIFadd{Accordingly, fitting the mutation-selection model to a multi-species sequence alignment allows us to obtain relative fitnesses for all amino acids (fig.~\ref{fig:method}A).
+    The difference in fitness between a pair of amino acids allows us to predict whether any mutation would be a deleterious mutation toward a less fit amino acid, a nearly-neutral mutation, or a mutation toward a known fitter amino acid constituting thus a beneficial non-adaptive mutation (fig.~\ref{fig:method}B).
+    We can hence }\DIFaddend use large-scale genomic data to \DIFdelbegin \DIFdel{assess whether the fitness }\DIFdelend \DIFaddbegin \DIFadd{test whether such fitnesses }\DIFaddend estimated at the phylogenetic scale \DIFdelbegin \DIFdel{predicts the fitness effect }\DIFdelend \DIFaddbegin \DIFadd{predict the fitness effects }\DIFaddend at the population scale\DIFdelbegin \DIFdel{for both deleterious and beneficial non-adaptive mutations}\DIFdelend .
+    The placental mammals represent an excellent study system to perform such \DIFaddbegin \DIFadd{an }\DIFaddend analysis.
     Having originated $\sim$102 million years ago, they diversified quickly~\cite{foley_genomic_2023}.
     Additionally, polymorphism data are available for many species~\cite{howe_ensembl_2021}, as are high quality protein-coding DNA alignments across the genome~\cite{ranwez_orthomam_2007, scornavacca_orthomam_2019}.
     By performing our analysis on 14,509 orthologous protein-coding genes across 87 species, we focus on genes shared across all mammals in our dataset and not newly functionalized genes in a lineage.
 
-    For each gene, fitting the mutation-selection model to the multi-species sequence alignment, assuming that the underlying fitness landscape is stable along the phylogenetic tree, allows us to obtain relative fitnesses for all amino acids for each site of the alignment (fig.~\ref{fig:method}A).
-    Given these relative fitnesses ($F$) for each amino acid, the difference in fitness between a pair of amino acids is the scaled selection coefficient ($\Sphy = \Delta F$), which is formally the product of the selection coefficient at the individual level ($s$) and the effective population size ($\Ne$), as $\Sphy = 4 \Ne \times s$.
-    The value of $\Sphy$ informs us on the strength of selection exerted on amino acids changes.
+    \DIFdelbegin \DIFdel{For each gene, fitting the mutation-selection model to the multi-species sequence alignment, assuming that the underlying fitness landscape is stable along the phylogenetic tree, allows us to obtain relative fitnesses for all amino acids for each site of the alignment (fig.~\ref{fig:method}A).
+    Given these relative fitnesses ($F$) for each amino acid, the difference in fitness between a pair of amino acids is the scaled selection coefficient ($\Sphy = \Delta F$), which is formally the product of the selection coefficient at the individual level ($s$) and the effective population size ($\Ne$), as $\Sphy = 4 \Ne \times s$. The value of $\Sphy$ informs us on the strength of selection exerted on amino acids changes.
     Thus, according to its $\Sphy$ value, we can classify any mutation as either a deleterious mutation toward a less fit amino acid ($\SphyDel \coloneqq \Sphy < -1$), a nearly-neutral mutation ($\SphyNeu \coloneqq -1 < \Sphy <1$), or a mutation toward a known fitter amino acid constituting thus a beneficial non-adaptive mutation ($\SphyBen \coloneqq \Sphy > 1$).
+}%DIFDELCMD < 
 
-    Having identified which potential DNA changes represent beneficial non-adaptive mutations (fig.~\ref{fig:method}B), we retrieved polymorphism data from 28 wild and domesticated populations belonging to six genera (\textit{Equus}, \textit{Bos}, \textit{Capra}, \textit{Ovis}, \textit{Chlorocebus}, and \textit{Homo}) to assess the presence of beneficial non-adaptive mutations at the population scale.
-    We focused on mutations currently segregating within populations and substitutions in the terminal branches, and checked if any of these observed changes were indeed beneficial (fig.~\ref{fig:method}C-E).
+%DIFDELCMD <     %%%
+\DIFdelend Having identified which potential DNA changes represent beneficial non-adaptive mutations (fig.~\ref{fig:method}\DIFdelbegin \DIFdel{B}\DIFdelend \DIFaddbegin \DIFadd{A-B}\DIFaddend ), we retrieved polymorphism data from 28 wild and domesticated populations belonging to six genera (\textit{Equus}, \textit{Bos}, \textit{Capra}, \textit{Ovis}, \textit{Chlorocebus}, and \textit{Homo}) to assess the presence of beneficial non-adaptive mutations at the population scale.
+    We focused on \DIFaddbegin \DIFadd{both }\DIFaddend mutations currently segregating within populations and \DIFaddbegin \DIFadd{on }\DIFaddend substitutions in the terminal branches, and checked if any of these observed changes were indeed beneficial (fig.~\ref{fig:method}C-E).
     A similar approach demonstrated the presence of beneficial non-adaptive mutations in humans~\cite{moses_inferring_2009, fischer_germline_2011} and in plants~\cite{chen_hunting_2021}.
     However, the model used to reconstruct the static fitness landscape in these studies can only be applied to deeply conserved protein domains in the tree of life, which corresponds to a subpart of the proteome that evolves slowly.
     The mutation-selection model used in the present work integrates phylogenetic relationships, and thus allows us to estimate the fitness landscape in shallower phylogenetic trees, and therefore can be applied almost exome-wide~\cite{rodrigue_mutationselection_2010}.
 
-    We first quantified the likelihood of any DNA mutation to be a beneficial non-adaptive mutation, that is, whenever a DNA mutation increases fitness under a stable fitness landscape ($\SphyBen$).
-    Subsequently, by quantifying the total amount of beneficial mutations in the current population across all types of DNA mutations ($\SphyDel$, $\SphyNeu$ and $\SphyBen$), we could tease apart beneficial non-adaptive from adaptive mutations resulting from a change in the fitness landscape.
+    We first quantified the likelihood of any DNA mutation to be a beneficial non-adaptive mutation, that is, whenever a DNA mutation increases fitness under a stable fitness landscape\DIFdelbegin \DIFdel{($\SphyBen$)}\DIFdelend .
+    Subsequently, by quantifying the total amount of beneficial mutations in the current population across all types of DNA mutations\DIFdelbegin \DIFdel{($\SphyDel$, $\SphyNeu$ and $\SphyBen$), }\DIFdelend \DIFaddbegin \DIFadd{, }\DIFaddend we could tease apart beneficial non-adaptive from adaptive mutations resulting from a change in the fitness landscape.
     Altogether, in this study, by integrating large-scale genomic datasets at both phylogenetic and population scales, we propose a way to explicitly quantify the contribution of beneficial non-adaptive mutations to positive selection across the entire exome of the six genera (figs.~\ref{fig:method}F-G).
 
     \section*{Results}
@@ -258,22 +268,35 @@
     First, we assessed whether fitness effects derived from the mutation-selection model at the phylogenetic scale predict selection occurring in terminal branches.
     We recovered the mutations that reached fixation in the terminal branches of the six genera.
     We only considered mutations fixed in a population as substitutions in the corresponding branch by discarding mutations segregating in our population samples.
-    We classified each substitution identified in the terminal branches as either $\SphyDel$, $\SphyNeu$, or $\SphyBen$ depending on its $\Sphy$ value obtained at the phylogenetic scale (fig.~\ref{fig:method}A-C).
-    Because estimation $\Sphy$ was based on the assumption that the fitness landscape is stable across mammals, $\SphyBen$ mutations (i.e., with $\Sphy>1$) bring the bearer of this mutation toward an amino acid predicted to be fitter across mammals.
+    \DIFdelbegin \DIFdel{We classified }\DIFdelend \DIFaddbegin \DIFadd{For }\DIFaddend each substitution identified in the terminal branches \DIFdelbegin \DIFdel{as either $\SphyDel$, $\SphyNeu$, or $\SphyBen$ depending on }\DIFdelend \DIFaddbegin \DIFadd{we obtained }\DIFaddend its $\Sphy$ value \DIFdelbegin \DIFdel{obtained at the phylogenetic }\DIFdelend \DIFaddbegin \DIFadd{such as predicted at the mammalian }\DIFaddend scale (fig.~\ref{fig:method}\DIFdelbegin \DIFdel{A-C).
+    Because estimation }\DIFdelend \DIFaddbegin \DIFadd{A-B).
+    We could classify each substitution as either deleterious $\SphyDel \coloneqq \Sphy < -1$), nearly-neutral ($\SphyNeu \coloneqq -1 < \Sphy <1$), or beneficial ($\SphyBen \coloneqq \Sphy > 1$)
+    Because }\DIFaddend $\Sphy$ \DIFdelbegin \DIFdel{was }\DIFdelend \DIFaddbegin \DIFadd{values were }\DIFaddend based on the assumption that the fitness landscape is stable across mammals, $\SphyBen$ mutations (i.e., with $\Sphy>1$) bring the bearer of this mutation toward an amino acid predicted to be fitter across mammals.
     Importantly, the mammalian alignment used to estimate the amino acid fitness landscape did not include the six focal genera and their sister species.
     This ensures independence between, on the one hand, the fitness landscape estimated, and on the other hand, both substitutions that occurred in the terminal branches, and segregating polymorphisms of the focal populations.
     Example substitutions in the terminal lineage of \textit{Chlorocebus sabaeus} which are classified as $\SphyBen$ are shown in supplementary materials (section S2).
     For instance, in the mammalian protein-coding DNA alignment of gene \textit{SELE}, the nucleotide at site 1722 has mutated (from T to C) at the base of Simiiformes (monkeys and apes), modifying the corresponding amino acid from Serine to Proline, but has been subsequently reverted in the branch of \textit{Chlorocebus sabaeus} (fig.~S2).
     However, other substitutions classified as $\SphyBen$ in the terminal branch of \textit{Chlorocebus sabaeus} cannot be clearly interpreted as reversions along the terminal branch, and show several transitions to this amino acid across the mammalian phylogeny, as for instance site 3145 of gene \textit{THSD7A} (fig.~S3).
 
-
     Among all the substitutions found in each terminal branch, between 10 and 13\% were $\SphyBen$, while $\SphyBen$ mutations only represent between 0.9 and 1.2\% of all non-synonymous mutations (table~S1 and fig.~\ref{fig:homo-afr-results}A-B for humans).
-    Furthermore, since in principle, $\SphyBen$ mutations are bound to reach fixation more often than neutral mutations, we calculated the $\dnds$ ratio of non-synonymous over synonymous divergence for all terminal lineages, focusing on the non-synonymous changes predicted as $\SphyBen$ mutations ($\dn(\SphyBen) / \ds$).
-    We obtained values between 1.17 and 1.75 in the different lineages (table~S2), meaning that $\SphyBen$ mutations reach fixation slightly more frequently than synonymous mutations that are supposed to be neutral, consistent with these $\SphyBen$ mutations being weakly beneficial.
+    \DIFaddbegin \DIFadd{Of note, if we were to assume a stationary mutation-selection-drift equilibrium in the terminal lineage, we would expect a symmetric proportion of positively ($\SphyBen$) and negatively ($\SphyDel$) selected substitutions if there were no adaptation.
+    The lack of symmetry along the terminal branches then provides a means to estimate the frequency of non-adaptive beneficial substitutions.
+    Mathematically, twice the fraction of $\SphyBen$ substitutions is an estimate of this rate.
+    This rate is highly consistent across lineages (table~S1) and suggests an overall frequency of nearly neutral substitutions due to consistent long-term selection pressures, mutation and drift of approximately 20\% of all substitutions (20\%-26\% across species).
+}
 
-    This result further indicates that using $\dnds$ as an estimate of adaptation is biased due to the presence of beneficial non-adaptive mutations among the non-synonymous substitutions.
+    \DIFaddend Furthermore, since in principle, $\SphyBen$ mutations are bound to reach fixation more often than neutral mutations, we calculated the $\dnds$ ratio of non-synonymous over synonymous divergence for all terminal lineages, focusing on the non-synonymous changes predicted as $\SphyBen$ mutations ($\dn(\SphyBen) / \ds$).
+    We obtained values between 1.17 and 1.75 in the different lineages (table~S2), meaning that $\SphyBen$ mutations reach fixation slightly more frequently than synonymous mutations that are supposed to be neutral, consistent with these $\SphyBen$ mutations being weakly beneficial.
+    \DIFaddbegin \DIFadd{Such an observation is consistent with the premise that $\SphyBen$ mutations are weakly beneficial, translating to a scaled selection coefficient between 0.32 and 1.24 (table~S2).
+    Finding $\dn(\SphyBen) / \ds > 1$ for these sites confirms that these sites are closer to optimality at the end of the branch than at the beginning.
+    Even though the beneficial effect of these mutations does not come from an environmental change, it does not change the fact that they have contributed positively to the population’s fitness.
+    It is just that at mutation-selection-drift equilibrium, the increase in fitness at these sites is offset by deleterious substitutions elsewhere in the genome so that there is no net adaptation.
+}\DIFaddend 
+
+    This result further indicates that using $\dnds$ as an estimate of \DIFdelbegin \DIFdel{adaptation is biased }\DIFdelend \DIFaddbegin \DIFadd{purifying selection is biased (overestimated) }\DIFaddend due to the presence of beneficial non-adaptive mutations among the non-synonymous substitutions.
     By discarding all beneficial non-adaptive mutations we can obtain an estimate of $\dnds$ which is not inflated.
     By comparing these two ways of calculating $\dnds$ (see section~\ref{subsec:substitution-mapping-in-the-terminal-branch} in Materials \& Methods), we calculated that beneficial non-adaptive mutations inflate $\dnds$ values by between 9 and 12\% across genera. This represents a substantial increase when considering that beneficial non-adaptive mutations only represent between 0.9 and 1.2\% of non-synonymous mutational opportunities (table~S3).
+
 
     \subsection*{Selection in populations}
     Second, we assessed whether our calculated $\Sphy$ values predicted at the phylogenetic scale were also indicative of the selective forces exerted at the population level.
@@ -281,17 +304,19 @@
     To determine if SNPs were ancestral of derived, we reconstructed the ancestral exome of each population.
     We then classified every non-synonymous SNP as either $\SphyDel$, $\SphyNeu$, or $\SphyBen$ according its $\Sphy$ value (fig.~\ref{fig:method}B-C).
 
-    First, $\SphyBen$ SNPs are spread across the genomes and not strongly associated to the ontology terms of their respective genes (table~S4, fig.~S4).
+    First, \DIFdelbegin \DIFdel{$\SphyBen$ SNPs }\DIFdelend \DIFaddbegin \DIFadd{SNPs classified as $\SphyBen$ }\DIFaddend are spread across the genomes and not strongly associated to the ontology terms of their respective genes (table~S4, fig.~S4).
     In humans, some SNPs have been associated with specific clinical prognosis terms obtained by clinical evaluation of the impact of variants on human Mendelian disorders~\cite{landrum_clinvar_2018}.
-    Although this classification also relies on deep protein alignments and therefore cannot be considered an independent result from our own, it does provide a consistency check if the effect of a mutation on human health is in line with its fitness effect predicted by our method.
+    Although this classification also relies on deep protein alignments and therefore cannot be considered an independent result from our own, it does provide a consistency check if the effect of a mutation on human health is in line with its fitness effect predicted by our method\DIFaddbegin \DIFadd{~\mbox{%DIFAUXCMD
+\cite{grimm_evaluation_2015}}\hskip0pt%DIFAUXCMD
+}\DIFaddend .
     Therefore, we investigated whether the non-synonymous SNPs classified as $\SphyDel$ or $\SphyBen$ showed enrichment in specific clinical terms compared to SNPs classified as $\SphyNeu$.
     Our results show that SNPs predicted as deleterious are associated with clinical terms such as \textit{Likely Pathogenic} and \textit{Pathogenic}, implying that, in general, the selective pressure of a mutation exerted across mammals is also predictive of its clinical effect in humans (table~S5)~\cite{sullivan_leveraging_2023}.
     Conversely, $\SphyBen$ mutations are associated with clinical terms such as \textit{Benign} and \textit{Likely Benign}, which shows that $\SphyBen$ mutations are less likely to be functionally damaging (table~S6).
 
     In addition to clinical prognosis, frequencies at which SNPs are segregating within populations provide information on their selective effects.
     For instance, deleterious SNPs usually segregate at lower frequencies because of purifying selection, which tends to remove them from the population (fig.~\ref{fig:homo-afr-results}C for humans).
-    By gathering information across many SNPs, it is possible to estimate the distribution of fitness effects (DFE) at the population scale, taking synonymous SNPs as a neutral expectation~\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009, galtier_adaptive_2016, tataru_inference_2017}.
-    From the estimated DFE, we can derive the proportion of beneficial mutations ($\ProbaPopBen$), nearly-neutral mutations ($\ProbaPopNeu$) and deleterious mutations ($\ProbaPopDel$) at the population scale (see section~\ref{subsec:s-polymorphism-method} in Materials \& Methods).
+    By gathering information across many SNPs, it is possible to estimate the distribution of fitness effects \DIFdelbegin \DIFdel{(DFE) }\DIFdelend at the population scale, taking synonymous SNPs as a neutral expectation~\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009, galtier_adaptive_2016, tataru_inference_2017}.
+    From \DIFdelbegin \DIFdel{the estimated DFE}\DIFdelend \DIFaddbegin \DIFadd{these estimated fitness effects}\DIFaddend , we can derive the proportion of beneficial mutations ($\ProbaPopBen$), nearly-neutral mutations ($\ProbaPopNeu$) and deleterious mutations ($\ProbaPopDel$) at the population scale (see section~\ref{subsec:s-polymorphism-method} in Materials \& Methods\DIFaddbegin \DIFadd{, figs.~S5-S8}\DIFaddend ).
     These approaches offer a unique opportunity to contrast selection coefficients estimated at the population scale ($\Spop$) and at the phylogenetic scale ($\Sphy$).
 
     Across our selection classes ($\SphyDel$, $\SphyNeu$ and $\SphyBen$), one can ultimately estimate the proportion of correct and incorrect predictions, leading to an estimation of \textit{precision} and \textit{recall} (fig.~\ref{fig:method}F-G and section~\ref{subsec:precisison_recall} in Materials \& Methods).
@@ -303,17 +328,46 @@
     The variable proportions between populations can be explained by the effective number of individuals in the population ($\Ne$), a major driver of selection efficacy.
     Moreover, estimates of mutation rate per generation ($u$), from \textcite{bergeron_evolution_2023} and \textcite{orlando_recalibrating_2013}, and Watterson’s $\theta$ obtained from the synonymous SFS as in \textcite{achaz_frequency_2009}, allow us to obtain $\Ne$ through $\Ne=\theta/4 u)$.
     Using correlation analyses that accounted for phylogenetic relationship (see section \ref{subsec:correlation-diversity} in Materials \& Methods), we found that higher $\Ne$ was associated with a smaller proportion of nearly-neutral mutations ($r^2=0.31$, $p=0.001$, fig.~\ref{fig:diversity}A).
-    This result follows the prediction of the nearly-neutral theory and suggests that in populations with higher diversity (e.g.,~\textit{Bos} or \textit{Ovis}), discrimination between beneficial and deleterious mutations is more likely to occur (figs.~S3-S5).
+    This result follows the prediction of the nearly-neutral theory and suggests that in populations with higher diversity (e.g.,~\textit{Bos} or \textit{Ovis}), discrimination between beneficial and deleterious mutations is more likely to occur (figs.~\DIFdelbegin \DIFdel{S3-S5}\DIFdelend \DIFaddbegin \DIFadd{S9-S12}\DIFaddend ).
     Conversely, many more mutations are effectively neutral in populations with lower diversity (e.g.,~\textit{Homo}).
 
     Finally, mutations predicted to be $\SphyBen$ were indeed beneficial for individuals bearing them, with a \textit{precision} (fig.~\ref{fig:method}F) in the range of 19--87\% (table~\ref{table:proba} and fig.~\ref{fig:homo-afr-results}D for humans).
     This result confirms that selection toward amino acids restoring existing functions is ongoing in these populations.
-    Importantly, the \textit{recall} value in this case, computed as $\proba [ \SphyBen  \given  \SpopBen]$, is the probability for a beneficial mutation at the population scale to be a non-adaptive, i.e., going toward a  fitter amino acid given a stable fitness landscape (fig.~\ref{fig:method}G, table~S7).
+    Importantly, the \textit{recall} value in this case, computed as $\proba [ \SphyBen \given \SpopBen]$, is the probability for a beneficial mutation at the population scale to be a non-adaptive, i.e., going toward a fitter amino acid given a stable fitness landscape (fig.~\ref{fig:method}G, table~S7).
     In other words, the \textit{recall} value quantifies the number of beneficial mutations restoring damaged genomes instead of creating adaptive innovations.
-    Across the 28 populations, this proportion is in the range of 11--82\% (table~\ref{table:proba}).
+    Across the 28 populations, this proportion is in the range of 11--82\% (table~\ref{table:proba})\DIFdelbegin \DIFdel{.
+}\DIFdelend \DIFaddbegin \DIFadd{, with a mean of 30\%.
+    Accounting for phylogenetic relationships, we found no correlation between the proportion of beneficial non-adaptive mutations and estimates of $\Ne$ based on genetic diversity ($r^2=0.00$, $p=0.772$, fig.~\ref{fig:diversity}B).
+}\DIFaddend 
 
-    Additionally, we controlled that these estimations are not affected by SNP mispolarization (figs.~S6-S7).
-    Moreover, because the phylogenetic mutation-selection codon model should fit better for genes with uniformly conserved functions, as a control, we filtered out genes under pervasive adaptation~\cite{latrille_genes_2023}, and indeed we found an increase in the proportion of beneficial mutations that are non-adaptive ($\proba [ \SphyBen  \given  \SpopBen]$), consistent with our expectation (Wilcoxon signed-rank, $s=80$, $p=0.002$, table~S8).
+    \DIFdelbegin \DIFdel{Additionally}\DIFdelend \DIFaddbegin \DIFadd{We additionally performed controls and simulations to ensure our results were robust.
+    First}\DIFaddend , we controlled that these estimations \DIFdelbegin \DIFdel{are }\DIFdelend \DIFaddbegin \DIFadd{were }\DIFaddend not affected by SNP mispolarization (figs.~\DIFdelbegin \DIFdel{S6-S7).
+    Moreover, }\DIFdelend \DIFaddbegin \DIFadd{S13-S14).
+    Second, we performed simulations at the population-genetic level and confirmed that our method was able to recover the proportion of beneficial mutations that are non-adaptive in synthetic polymorphism datasets (fig.~S15).
+    Third, we ran our analysis filtering out CpG mutations and obtained values of $\proba [ \SphyBen \given \SpopBen]$ in the range of 5--27\%, with a mean of 14\% (tables~S8-9 and fig.~S16-17), providing more conservative estimates.
+    Finally, }\DIFaddend because the phylogenetic mutation-selection codon model should fit better for genes with uniformly conserved functions, \DIFdelbegin \DIFdel{as a control, }\DIFdelend we filtered out genes under pervasive adaptation~\cite{latrille_genes_2023} \DIFdelbegin \DIFdel{, and indeed }\DIFdelend \DIFaddbegin \DIFadd{as a control.
+    In this subset of the exome, containing genes with a more stable fitness landscape, }\DIFaddend we found an increase in the proportion of beneficial mutations that are non-adaptive (\DIFaddbegin \DIFadd{Wilcoxon signed-rank, $s=80$, $p=0.002$, table~S10), consistent with our expectation that beneficial mutations occur more frequently in genes under changing fitness landscapes.
+}
+
+    \subsection*{\DIFadd{Selection in the terminal lineage and in populations}}
+
+    \DIFadd{As an alternative to relying solely on currently segregating mutations to quantify selection, one can leverage both polymorphism within a population and substitutions in the terminal lineage to estimate the distribution of fitness effects (DFE).
+    Hence, we estimated }\textit{\DIFadd{precision}} \DIFadd{and }\textit{\DIFadd{recall}} \DIFadd{as done previously, but now including the number of substitutions per site as input for the DFE estimators (see \ref{subsec:s-polymorphism-method} in Materials \& Methods and fig.~S18).
+    When including substitutions in the terminal lineage, estimates of }\DIFaddend $\proba [ \SphyBen \given \SpopBen]$ \DIFdelbegin \DIFdel{)}\DIFdelend \DIFaddbegin \DIFadd{are in the 10--78\% range with a mean of 36\% (table~S11-12), and 19 out of 28 estimates fall between 15\% and 45\%.
+}
+
+    \DIFadd{Additionally, we controlled that these estimations were not affected by SNP mispolarization (fig.~S19).
+    We also filtered out genes under pervasive adaptation, and again found an increase in $\proba [ \SphyBen \given \SpopBen]$}\DIFaddend , consistent with our expectation (Wilcoxon signed-rank, \DIFdelbegin \DIFdel{$s=80$, $p=0.002$}\DIFdelend \DIFaddbegin \DIFadd{$s=120$, $p=0.027$}\DIFaddend , table~\DIFdelbegin \DIFdel{S8).
+    }\DIFdelend \DIFaddbegin \DIFadd{S13).
+    We assessed the impact of fitting the same functional form of DFE to the three different categories of changes $\SphyDel$, $\SphyNeu$ and $\SphyBen$.
+    To this aim we computed the total amount of current selection by fitting either a single DFE on the whole dataset or by summing the other three independent DFEs.
+    These disjoint estimates are well correlated, with a goodness of fit $r^2={0.95, 0.89, 0.82}$ for $\proba [\SpopDel]$, $\proba [\SpopNeu]$ and $\proba [\SpopBen]$, respectively (figs.~S20-22).
+    Finally, we evaluated the effect of fitting a parametric functional form for the DFE.
+    As implemented in \mbox{%DIFAUXCMD
+\textcite{tataru_inference_2017}}\hskip0pt%DIFAUXCMD
+, the DFE is a mixture between a reflected gamma distribution and an exponential distribution (eq.~\ref{eq:parametric-dfe}, section~\ref{subsec:precisison_recall} in Materials \& Methods).
+    Instead of using such a continuous DFE, we also tested our prediction with a non-parametric functional form for the DFE, obtaining estimates of $\proba [ \SphyBen \given \SpopBen]$ in the 8--94\% range, with a mean of 43\% (tables~S14-15).
+}\DIFaddend 
 
     \section*{Discussion}
     \subsection*{Beneficial mutations are not necessarily adaptive}
@@ -322,38 +376,83 @@
     In particular, we have been able to quantify the proportion of beneficial mutations that are non-adapative (i.e., not a response to a change in fitness landscape), which has only been achievable by combining exome-wide data from both phylogenetic and population scales.
     At the phylogenetic scale, codon diversity at each site of a protein-coding DNA alignment allows for reconstructing an amino-acid fitness landscape, assuming that this landscape is stable along the phylogenetic tree.
     These amino-acid fitness landscapes allow us to predict any mutation’s selection coefficient ($\Sphy$) along a protein-coding sequence.
-    We have compared these selective effects to observations at the population level (figs.~S8-10), and by doing so, we have confirmed that mutations predicted to be deleterious ($\SphyDel \coloneqq \Sphy < -1$) are generally purified away in extant populations.
+    We have compared these selective effects to observations at the population level\DIFdelbegin \DIFdel{(figs.~S8-10)}\DIFdelend , and by doing so, we have confirmed that mutations predicted to be deleterious ($\SphyDel \coloneqq \Sphy < -1$) are generally purified away in extant populations.
     Our results concur with previous studies showing that SIFT scores~\cite{ng_sift_2003, vaser_sift_2016}, based on amino acid alignments across species, also inform on the deleterious fitness effects exerted at the population scale~\cite{chen_hunting_2021}.
-    However, contrary to SIFT scores, our mutation-selection model is parameterized by a fitness function such that changes are directly interpretable as fitness effects (see also section S7).
-    In this regard, an interesting prediction of our model is that some deleterious mutations reach fixation due to genetic drift, while beneficial non-adaptive mutations are restoring states of higher fitness.
+    However, contrary to SIFT scores, our mutation-selection model is parameterized by a fitness function such that changes are directly interpretable as fitness effects (see also section \DIFdelbegin \DIFdel{S7}\DIFdelend \DIFaddbegin \DIFadd{S5}\DIFaddend ).
+    In this regard, an interesting prediction of our model is that some deleterious mutations reach fixation due to genetic drift, while beneficial non-adaptive mutations \DIFdelbegin \DIFdel{are restoring }\DIFdelend \DIFaddbegin \DIFadd{restore }\DIFaddend states of higher fitness.
     We have tested this hypothesis and have found that a substantial part of these predicted non-adaptive mutations ($\SphyBen \coloneqq \Sphy > 1 $) are indeed beneficial in extant populations.
     We estimate that between 11 and 82\% of all beneficial mutations in mammalian populations are not adaptive.
     More specifically, in 24 out of 28 populations analyzed, the percentage of beneficial mutations estimated to be non-adaptive falls between 15 and 45\%.
     These results suggest that many beneficial mutations are not adaptive, but rather restore states of higher fitness.
     Hence, we can correctly estimate the extent of adaptive evolution only if we account for the number of beneficial non-adaptive mutations~\cite{keightley_what_2010, rice_evolutionarily_2015}.
-    Altogether, we argue that we should dissociate positive selection from adaptive evolution and limit the use of adaptive mutations to those that are associated with adaptation to environmental change as such~\cite{charlesworth_other_2007, mustonen_fitness_2009}.
+    \DIFdelbegin \DIFdel{Altogether}\DIFdelend \DIFaddbegin \DIFadd{Here instead}\DIFaddend , we argue that we should dissociate positive selection from adaptive evolution and limit the use of adaptive mutations to those that are associated with adaptation to environmental change as such~\DIFdelbegin \DIFdel{\mbox{%DIFAUXCMD
+\cite{charlesworth_other_2007, mustonen_fitness_2009}}\hskip0pt%DIFAUXCMD
+}\DIFdelend \DIFaddbegin \DIFadd{\mbox{%DIFAUXCMD
+\cite{charlesworth_other_2007, mustonen_fitness_2009, mustonen_fitness_2010}}\hskip0pt%DIFAUXCMD
+}\DIFaddend .
 
-    \subsection*{The influence of effective population size}
+    \DIFaddbegin \subsection*{\DIFadd{Assumptions and methodological limitations}}
+
+    \DIFadd{The exact estimation of the contribution of beneficial non-adaptive mutations to positive selection relies on some hypotheses at both the phylogenetic and population scales and is sensitive to methodological limitations.
+    Indeed, data quality and potentially inadequate modeling choices of both the fitness landscape (at the phylogenetic scale) and fitness effects (at the population scale) might also lead to missed predictions~\mbox{%DIFAUXCMD
+\cite{moutinho_variation_2019}}\hskip0pt%DIFAUXCMD
+.
+    In practice, we obtained different values of the proportion of non-adaptive beneficial mutations depending on i) the filtering or not of CpG mutations~\mbox{%DIFAUXCMD
+\cite{eyre-walker_how_2014}}\hskip0pt%DIFAUXCMD
+, ii) whether we included substitutions in the terminal lineage along with within-population polymorphisms to estimate fitness effects~\mbox{%DIFAUXCMD
+\cite{tataru_inference_2017}}\hskip0pt%DIFAUXCMD
+, and iii) the model used to infer the fitness effects.
+    It appears that our estimation can be sensitive to model misspecification and overall, while we provide an order of magnitude for the contribution of beneficial non-adaptive mutations to positive selection, methodological improvement on the estimation of the DFE is needed to increase the precision of this value.
+}
+
+    \DIFadd{To be conservative, we considered mutations as adaptive if they were detected as being under positive selection at the population scale despite them being either incorrectly predicted as deleterious ($\SphyDel$) or nearly-neutral ($\SphyNeu \coloneqq -1 < \Sphy <1$) from the amino-acid mammalian fitnesses.
+    An example of an incorrectly predicted deleterious mutation ($\SphyDel$) from its fitness landscape could be an amino acid having always been deleterious across mammals, but being advantageous ($\SpopBen$) in the current species due to environmental changes or a major shift in their fitness landscape (e.g. domestication)
+    To visualize an example of a wrongly predicted nearly-neutral mutation, we can first imagine a site where only hydrophilic amino acids are accepted because of the protein properties (e.g. a surface site of a globular protein).
+    Let us then assume that such a site is also a target for viruses, hence promoting amino-acid changes which modify the site's viral affinity~\mbox{%DIFAUXCMD
+\cite{enard_viruses_2016}}\hskip0pt%DIFAUXCMD
+.
+    Given the selective pressure favoring amino-acid change, but restricting the possibilities to hydrophilic amino acids, most hydrophilic amino acids will likely be visited along the phylogenetic tree and the mutation-selection model will give high and similar fitnesses to all of them.
+    In such a case, any mutation between hydrophilic amino acids will be wrongly predicted as nearly-neutral ($\SphyNeu$), while it is in fact adaptive.
+    In summary, under a changing fitness landscapes~\mbox{%DIFAUXCMD
+\cite{mustonen_molecular_2008}}\hskip0pt%DIFAUXCMD
+, our phylogenetic mutation-selection model takes an average over fitness changes observed along the phylogeny, causing beneficial mutations ($\SpopBen$) to be predicted as either deleterious ($\SphyDel$) or nearly-neutral ($\SphyNeu$), therefore mechanically reducing $\proba [ \SphyBen \given \SpopBen]$, and making our estimate conservative.
+}
+
+    \subsection*{\DIFadd{Convergent adaptation}}
+
+    \DIFadd{If there are several substitutions toward the same amino acid along the mammalian tree (see fig.~S3), our mutation-selection model cannot formally distinguish between a scenario where mammals have fixed deleterious mutations that are reverted in several lineages, from more complex scenarios involving convergent adaptation across mammals.
+    In a first scenario, repeated changes of fitness landscapes in the same direction could occur along several lineages, leading to repeated substitutions in multiple lineages (parallel or convergent adaptation).
+    In a second scenario, an environmental change that occurred near the root of placental mammals ($\sim$100 Mys ago), to which extant populations are currently responding independently through weakly adaptive mutations, could also lead to repeated substitutions toward the same amino acids.
+    Importantly, we would usually expect adaptive convergent mutations to be linked to particular converging phenotypes across mammals, and hence, they should not massively affect the whole genome as we find (table~S4, fig. S4).
+    Moreover, after filtering out genes usually associated to recurrent adaptation (e.g. immune genes), we recover an even higher proportion of beneficial non-adaptive mutations (table~S8).
+    For these reasons, we argue that the signal of predictable positive selection we recover in extant population is indeed mainly driven by non-adaptive evolution.
+}
+
+    \DIFaddend \subsection*{The influence of effective population size}
 
     Across the genome, beneficial non-adaptive mutations and deleterious mutations reaching fixation create a balance in which genomes are constantly damaged and restored simultaneously at different loci due to drift.
     Since the probability of fixation of mutations depends on the effective population size ($\Ne$), the history of $\Ne$ plays a crucial role in determining the number of beneficial non-adaptive mutations compensating for deleterious mutations~\cite{latrille_inferring_2021}.
     For example, a population size expansion will increase the efficacy of selection, and a larger proportion of mutations will be beneficial (otherwise effectively neutral), thus increasing the number of beneficial non-adaptive mutations.
     On the other hand, a population that has experienced a high $\Ne$ throughout its history should be closer to an optimal state under a stable fitness landscape, having suffered fewer fixations of deleterious mutations and therefore decreasing the probability of beneficial non-adaptive mutations~\cite{huber_determining_2017}.
     Overall, we expect the proportion of beneficial non-adaptive mutations to be more dependent on $\Ne$’s long-term expansions and contractions than on the short-term ones~\cite{charlesworth_other_2007,huber_determining_2017}.
-    Accounting for phylogenetic relationships, we found no correlation between the proportion of beneficial non-adaptive mutations and estimates of $\Ne$ based on genetic diversity ($r^2=0.00$, $p=0.772$, fig.~\ref{fig:diversity}B).
+\DIFdelbegin \DIFdel{Accounting for phylogenetic relationships, we found no correlation between the proportion of beneficial non-adaptive mutations and estimates of $\Ne$ based on genetic diversity ($r^2=0.00$, $p=0.772$, fig.~\ref{fig:diversity}B).
+}\DIFdelend 
 
     Moreover, because our model assumes a fixed fitness landscape, it implicitly assumes that $\Ne$ is constant along the phylogenetic tree.
     Fluctuations due to changes in the fitness landscape or in $\Ne$ will be averaged out by the assumption of the current model that $\Ne$ is constant across lineages.
     It was recently shown~\cite{latrille_inferring_2021}, using computer intensive mutation-selection models with fluctuating $\Ne$, that relaxing the assumption of a constant $\Ne$ results in more extreme estimates of amino-acid fitnesses than with the standard model used in this study.
     In other words, by assuming a constant $\Ne$, we are underpowered to detect beneficial non-adaptive mutations since amino acids will have more similar fitnesses.
-    As a consequence, some of the beneficial non-adaptive mutations currently segregating in population will be incorrectly classified as nearly-neutral by the mutation-selection model, and thus be wrongly interpreted as adaptive.
+    As a consequence, some of the beneficial non-adaptive mutations currently segregating in population will be incorrectly classified as nearly-neutral by the mutation-selection model, and thus be wrongly interpreted as adaptive \DIFaddbegin \DIFadd{(see previous section)}\DIFaddend .
     This ultimately results in lower estimates of the proportion of beneficial non-adaptive mutations.
     Given this inflation of missed predictions due to change in population sizes~\cite{lanfear_population_2014, jones_shifting_2017, platt_protein_2018}, our estimated proportion of beneficial non-adaptive mutations among adaptive ones is likely to be an underestimation.
 
     \subsection*{The role of epistasis and compensatory mutations}
 
     Our model assumes that amino-acid fitness landscapes are site-specific and also independent of one another, whereas under pervasive epistasis, the fitness effect of any mutation at a particular site would depend on the amino acids present at other sites.
-    Epistasis has been shown to play a role in the evolution of protein-coding genes, with amino-acid residues in contact within a protein or between proteins tending to co-evolve~\cite{morcos_directcoupling_2011, marks_protein_2012, starr_epistasis_2016}.
+    Epistasis \DIFaddbegin \DIFadd{is common for mutations that influence the protein’s physical properties (e.g. conformation, stability, or affinity for ligands) or might arise due to nonlinear relationship between the protein’s physical properties and fitness~\mbox{%DIFAUXCMD
+\cite{starr_epistasis_2016}}\hskip0pt%DIFAUXCMD
+.
+    Regardless of its origin, epistasis }\DIFaddend has been shown to play a role in the evolution of protein-coding genes, with amino-acid residues in contact within a protein or between proteins tending to co-evolve~\cite{morcos_directcoupling_2011, marks_protein_2012, starr_epistasis_2016}.
     Particularly, the residues in contact co-evolve to become more compatible with each other generating an entrenchment~\cite{goldstein_nonadaptive_2015, goldstein_sequence_2017, park_epistatic_2022}.
     Epistasis therefore allows for compensatory mutations, which restore fitness through mutations at loci different from where deleterious mutations took place, representing another case of non-adaptive beneficial mutations, but one which is not accounted for by our method.
     Hence, the beneficial mutations that we classify as putatively adaptive might in fact be compensatory mutations, making our estimation of the rate of non-adaptive beneficial mutations conservative.
@@ -361,47 +460,105 @@
     Despite epistasis being an important factor in protein evolution, several deep-mutational scanning experiments have revealed that a site-specific fitness landscape predicts the evolution of sequences in nature with considerable accuracy~\cite{ashenberg_mutational_2013, doud_sitespecific_2015, bloom_identification_2017}.
     Additionally, the fact that we observe such a high proportion of beneficial non-adaptive mutations suggests that the underlying assumptions of our model, namely site-independence, implying no epistasis, and a static fitness landscape, are a reasonable approximation for the underlying fitness landscape of proteins.
     Our results imply that the fitness effects of new mutations are mostly conserved across mammalian orthologs, in agreement with other studies showing that for conserved orthologs with similar structures and functions, models without epistasis provide a reasonable estimate of fitness effects in protein coding genes~\cite{youssef_consequences_2020, vigue_deciphering_2022}.
+    \DIFdelbegin %DIFDELCMD < 
 
-    \subsection*{Other assumptions and methodological limitations}
+%DIFDELCMD <     %%%
+\subsection*{\DIFdel{Other assumptions and methodological limitations}}
+%DIFAUXCMD
+%DIFDELCMD < 
 
-    The exact estimation of the contribution of beneficial non-adaptive mutations to positive selection relies on some hypotheses at both the phylogenetic and population scales and is sensitive to methodological limitations.
-    Indeed, data quality and potentially inadequate modeling choices of both the fitness landscape (at the phylogenetic scale) and fitness effects (at the population scale) might also lead to missed prediction~\cite{moutinho_variation_2019}.
+%DIFDELCMD <     %%%
+\DIFdel{The exact estimation of the contribution of beneficial non-adaptive mutations to positive selection relies on some hypotheses at both the phylogenetic and population scales and is sensitive to methodological limitations.
+    Indeed, data quality and potentially inadequate modeling choices of both the fitness landscape (}\DIFdelend \DIFaddbegin \DIFadd{Conceptually, the framework presented here, with the addition of a more complex protein fitness landscape }\DIFaddend at the phylogenetic scale\DIFdelbegin \DIFdel{) and fitness effects (at the population scale) might also lead to missed prediction~\mbox{%DIFAUXCMD
+\cite{moutinho_variation_2019}}\hskip0pt%DIFAUXCMD
+.
     To be conservative, we considered that any mutation under positive selection at the population scale ($\SpopBen$) but not predicted as such at the phylogenetic scale (not $\SphyBen$) is potentially an adaptation.
-    In practice, we obtained different values of the proportion of non-adaptive beneficial mutations depending on the model used to infer the fitness effects at the population scale, and the filtering or not of CpG mutations~\cite{eyre-walker_how_2014} (tables~S8-14).
+    In practice, we obtained different values of the proportion of non-adaptive beneficial mutations depending on the model used to infer the fitness effects at the populationscale, and the filtering or not of CpG mutations~\mbox{%DIFAUXCMD
+\cite{eyre-walker_how_2014} }\hskip0pt%DIFAUXCMD
+(tables~S8-14).
     It appears that our estimation can be sensitive to model misspecification and overall, while we provide an order of magnitude for the contribution of beneficial non-adaptive mutations to positive selection, methodological improvement on the estimation of the distribution of fitness effects is needed to increase the precision of this value.
+}\DIFdelend \DIFaddbegin \DIFadd{, could be used to infer the relative contribution of compensatory mutations to non-adaptive and adaptive evolution.
+}\DIFaddend 
 
-    Importantly, if there are several substitutions toward the same amino acid along the mammalian tree, (see fig.~S3) our mutation-selection model cannot distinguish between a scenario where mammals have fixed deleterious mutations that are reverted in several lineages, from more complex scenarios involving adaptation.
+    \DIFdelbegin \DIFdel{Importantly, if there are several substitutions toward the same amino acid along the mammalian tree, (see fig.~S3) our mutation-selection model cannot distinguish between a scenario where mammals have fixed deleterious mutations that are reverted in several lineages, from more complex scenarios involving adaptation.
     In a first scenario, repeated changes of fitness landscapes in the same direction could occur along several lineages, leading to repeated substitutions in multiple lineages (parallel or convergent adaptation).
     Of note, repeated substitutions that we observe (section~S2) are spread across the phylogeny and are usually shared by distant species/clades with very different lifestyles and environments.
     It is therefore unlikely that all the beneficial mutations that we classified as non-adaptive (between 15 and 45\%) would result from parallel adaptation.
-    In a second scenario, an environmental change that occurred near the root of placental mammals ($\sim$100 Mys ago), to which extant populations are currently responding through weakly adaptive mutations could also lead to repeated substitutions toward the same amino acids.
+    In a second scenario, an environmental change that occurred near the root of placental mammals ($\sim$100 Mys ago), to which extant populations are currently responding through weakly adaptivemutations could also lead to repeated substitutions toward the same amino acids.
     However, for this latter hypothesis to totally explain our results, it would imply that a large proportion of weakly adaptive mutations arising in present day populations of mammals are the late consequence of $\sim$100 Mys-old environmental changes.
     While we cannot rule out that some cases of the latter scenarios are included in our results, we argue that the hypothesis of non-adaptive evolution on a fixed fitness landscape of functionally constrained proteins remains more parsimonious for most cases.
+}%DIFDELCMD < 
 
-    \subsection*{Detecting adaptation above the nearly-neutral background}
+%DIFDELCMD <     %%%
+\DIFdelend \subsection*{Detecting adaptation above the nearly-neutral background}
 
-    A long-standing debate in molecular evolution is whether the variations we observe between species in protein-coding genes are primarily due to nearly-neutral mutations reaching fixation by drift or primarily due to adaptation~\cite{kimura_evolutionary_1968,jensen_importance_2019,gillespie_substitution_1994,ohta_nearly_1992}.
-    Here we provide evidence that in mammalian orthologs, many substitutions occur through fixation of both deleterious mutations and beneficial non-adaptive mutations.
-    However, detecting adaptation above this background of nearly-neutral substitutions remains a challenge~\cite{kimura_evolutionary_1968,ohta_development_1996}.
+    A long-standing \DIFdelbegin \DIFdel{debate in molecular evolution is whether the variations we observe between species in }\DIFdelend \DIFaddbegin \DIFadd{debate in molecular evolution is whether the variation we observe between species in }\DIFaddend protein-coding \DIFdelbegin \DIFdel{genes are primarily due to nearly-neutral mutations reaching fixation by drift or primarily due to adaptation~\mbox{%DIFAUXCMD
+\cite{kimura_evolutionary_1968,jensen_importance_2019,gillespie_substitution_1994,ohta_nearly_1992}}\hskip0pt%DIFAUXCMD
+.
+Here we }\DIFdelend \DIFaddbegin \DIFadd{genes is primarily due to nearly-neutral mutations reaching fixation by drift or primarily due to adaptation~\mbox{%DIFAUXCMD
+\cite{kimura_evolutionary_1968,ohta_nearly_1992,gillespie_substitution_1994,jensen_importance_2019}}\hskip0pt%DIFAUXCMD
+.
+    Measuring the ``rate of adaptation'' in proteins, as pioneered by \mbox{%DIFAUXCMD
+\textcite{mcdonald_adaptative_1991}}\hskip0pt%DIFAUXCMD
+, has been central to inform this debate~\mbox{%DIFAUXCMD
+\cite{galtier_half_2024}}\hskip0pt%DIFAUXCMD
+.
+    However, the McDonald \& Kreitman test detects signatures of accelerated evolution in a given terminal branch compared to an expectation based on polymorphism present in the population. It considers the fraction of substitutions that fix too quickly as ``adaptive''~\mbox{%DIFAUXCMD
+\cite{mcdonald_adaptative_1991, smith_adaptive_2002, welch_estimating_2006} }\hskip0pt%DIFAUXCMD
+despite there being other processes that can lead to their fixation~\mbox{%DIFAUXCMD
+\cite{galtier_adaptation_2007,rousselle_influence_2019,joseph_increased_2024a} }\hskip0pt%DIFAUXCMD
+and some of these substitutions being beneficial but non-adaptive~\mbox{%DIFAUXCMD
+\cite{hartl_compensatory_1996, charlesworth_other_2007, mustonen_fitness_2009, jones_shifting_2017}}\hskip0pt%DIFAUXCMD
+.
+    Here, the expectation is built on the pattern of substitutions across a phylogeny compared to the fitness effects that can be estimated from both substitutions in a terminal lineage and polymorphism in populations.
+    Moreover, the goal is not to detect a fraction of beneficial substitution (i.e. ``adaptive'' substitutions for \mbox{%DIFAUXCMD
+\textcite{mcdonald_adaptative_1991}}\hskip0pt%DIFAUXCMD
+), but to estimate the proportion of non-adaptive mutations among beneficial ones.
+}
 
-    One first strategy is precisely to use a nearly-neutral substitution model as a null model of evolution.
+    \DIFadd{We }\DIFaddend provide evidence that in mammalian orthologs, many substitutions occur through fixation of both deleterious mutations and beneficial non-adaptive mutations.
+    \DIFdelbegin \DIFdel{However, detecting }\DIFdelend \DIFaddbegin \DIFadd{Detecting }\DIFaddend adaptation above this background of \DIFdelbegin \DIFdel{nearly-neutral }\DIFdelend substitutions remains a challenge~\DIFdelbegin \DIFdel{\mbox{%DIFAUXCMD
+\cite{kimura_evolutionary_1968,ohta_development_1996}}\hskip0pt%DIFAUXCMD
+.
+    }%DIFDELCMD < 
+
+%DIFDELCMD <     %%%
+\DIFdel{One first }\DIFdelend \DIFaddbegin \DIFadd{\mbox{%DIFAUXCMD
+\cite{kimura_evolutionary_1968, ohta_development_1996}}\hskip0pt%DIFAUXCMD
+.
+    Mathematically, the surplus of positive selection due to an externally-driven changing fitness landscape is called }\textit{\DIFadd{fitness flux}}\DIFadd{, and requires experimentally measuring the selection coefficient of each mutation in each genetic background.
+    The }\textit{\DIFadd{fitness flux}} \DIFadd{can be estimated if either the substitutions history is known~\mbox{%DIFAUXCMD
+\cite{mustonen_fitness_2009} }\hskip0pt%DIFAUXCMD
+or changes of frequency in currently segregating variants~\mbox{%DIFAUXCMD
+\cite{mustonen_fitness_2010}}\hskip0pt%DIFAUXCMD
+.
+    Without experimentally measured selection coefficients, another }\DIFaddend strategy is precisely to use a nearly-neutral substitution model as a null model of evolution.
     Under a strictly neutral evolution of protein-coding sequence, we expect the ratio of non-synonymous over synonymous substitutions ($\dnds$) to be equal to one.
     Deviations from this neutral expectation, such as $\dnds > 1$, which can be generated by an excess of non-synonymous substitutions, is generally interpreted as a sign of adaptation.
     However, as shown in this study, a $\dnds > 1$ is not necessarily a signature of adaptation but can be due to beneficial non-adaptive mutations.
     So, by relaxing the strict neutrality and assuming a stable fitness landscape instead, one can predict the expected rate of evolution, called $\omega_0$~\cite{spielman_relationship_2015, dosreis_how_2015}.
     Adaptation can thus be considered as evolution under a changing fitness landscape and tested as such by searching for the signature of $\dnds > \omega_0$~\cite{cvijovic_fate_2015, rodrigue_detecting_2017, rodrigue_bayesian_2021}.
     Using a stable fitness landscape as a null model of evolution, thus accounting for selective constraints exerted on the different amino acids, increased the statistical power in testing for adaptation~\cite{latrille_genes_2023}.
-    Instead of relying solely on summary statistics (such as $\dnds$ or $\omega_0$), another strategy to detect adaptation is to include changes in the fitness landscapes inherently within the mutation-selection framework~\cite{tamuri_mutationselection_2021}.
+    Instead of relying solely on summary statistics (such as $\dnds$ or $\omega_0$), another strategy to detect adaptation is to include changes in the fitness landscapes inherently within the \DIFdelbegin \DIFdel{mutation-selection framework~\mbox{%DIFAUXCMD
+\cite{tamuri_mutationselection_2021}}\hskip0pt%DIFAUXCMD
+}\DIFdelend \DIFaddbegin \DIFadd{mutation selection framework, either with small changes along the phylogeny ~\mbox{%DIFAUXCMD
+\cite{tamuri_mutationselection_2021} }\hskip0pt%DIFAUXCMD
+or either by allowing fitness to change on subsets of branches ~\mbox{%DIFAUXCMD
+\cite{kazmi_detecting_2019, stolyarova_senescence_2020}}\hskip0pt%DIFAUXCMD
+}\DIFaddend .
     Such mechanistic models could be more general than site-specific fitness landscapes, including epistasis and changing fitness landscapes~\cite{goldstein_sequence_2017, stolyarova_senescence_2020}.
 
     \subsection*{Conclusions}
 
-    Here, we have provided empirical evidence that an evolutionary model assuming a stable fitness landscape at the mammalian scale allows us to predict the fitness effects of mutations in extant populations and individuals, acknowledging the balance between deleterious and beneficial non-adaptive mutations.
+    \DIFdelbegin \DIFdel{Here, we }\DIFdelend \DIFaddbegin \DIFadd{We }\DIFaddend have provided empirical evidence that an evolutionary model assuming a stable fitness landscape at the mammalian scale allows us to predict the fitness effects of mutations in extant populations and individuals, acknowledging the balance between deleterious and beneficial non-adaptive mutations.
     We argue that such a model would represent a null expectation for the evolution of protein-coding genes in the absence of adaptation.
     Altogether, because a substantial part of positive selection can be explained by beneficial non-adaptive mutations, but not its entirety, we argue that the mammalian exome is shaped by both adaptive and non-adaptive processes, and that none of them alone is sufficient to explain the observed patterns of changes.
-    In that sense, to avoid conflating beneficial mutations with adaptive evolution, the term ``adaptation`` should retain its original meaning associated with a change in the underlying fitness landscape and be modelled as such.
+    In that sense, to avoid conflating beneficial mutations with adaptive evolution, the term ``adaptation`` should retain its original meaning associated with a change in the underlying fitness landscape and be modelled as such\DIFaddbegin \DIFadd{~\mbox{%DIFAUXCMD
+\cite{mustonen_fitness_2009, mustonen_fitness_2010}}\hskip0pt%DIFAUXCMD
+}\DIFaddend .
 
-    \section{Materials \& Methods}
+    \DIFaddbegin \newpage
+    \DIFaddend \section{Materials \& Methods}
     \label{sec:methods}
 
     \subsection{Phylogenetic dataset}\label{subsec:phylo-dataset}
@@ -451,7 +608,11 @@
     \end{equation}
     In our subsequent derivation the source ($a$) and target ($b$) codons as well as the site ($i$) are implicit and thus never explicitly written.
 
-    We used the Bayesian software \textit{BayesCode} (\url{https://github.com/ThibaultLatrille/bayescode}, v1.3.1) to estimate the selection coefficients for each protein-coding gene in the mammalian dataset.
+    \DIFaddbegin \DIFadd{The scaled selection coefficient ($\Sphy = \Delta F$) is formally the product of the selection coefficient at the individual level ($s$) and the effective population size ($\Ne$), as $\Sphy = 4 \Ne \times s$. The value of $\Sphy$ informs us on the strength of selection exerted on amino acids changes.
+    Thus, according to its $\Sphy$ value, we can classify any mutation as either a deleterious mutation toward a less fit amino acid ($\SphyDel \coloneqq \Sphy < -1$), a nearly-neutral mutation ($\SphyNeu \coloneqq -1 < \Sphy <1$), or a mutation toward a known fitter amino acid, constituting thus a beneficial non-adaptive mutation ($\SphyBen \coloneqq \Sphy > 1$).
+}
+
+    \DIFaddend We used the Bayesian software \textit{BayesCode} (\url{https://github.com/ThibaultLatrille/bayescode}, v1.3.1) to estimate the selection coefficients for each protein-coding gene in the mammalian dataset.
     We ran the MCMC algorithm implemented in BayesCode for $2,000$ generations as described in \textcite{latrille_genes_2023}.
     For each gene, after discarding a burn-in period of $1,000$ generations of MCMC, we obtained posterior mean estimates (over the $1,000$ generations left of MCMC) of the mutation rate matrix ($\UniDimArray{\mu}$) as well as the $20$ amino-acid fitness landscape ($\UniDimArray{F^{(i)}}$) at each site $i$.
 
@@ -518,16 +679,17 @@
     \subsection{Scaled selection coefficients ($\Spop$) in a population-based method}
     \label{subsec:s-polymorphism-method}
 
-    To obtain a quantitative estimate of the distribution of selection coefficients for each category of SNPs, we used the polyDFE model~\cite{tataru_inference_2017, tataru_polydfe_2020}.
+    To obtain a quantitative estimate of the distribution of selection coefficients for each category of SNPs, we used the \DIFdelbegin \DIFdel{polyDFE }\DIFdelend \DIFaddbegin \textit{\DIFadd{polyDFE}} \DIFaddend model~\cite{tataru_inference_2017, tataru_polydfe_2020}.
     This model uses the count of derived alleles to infer the distribution of fitness effects (DFE).
     The probability of sampling an allele at a given frequency (before fixation or extinction) is informative of its scaled selection coefficient at the population scale ($\Spop$).
     Therefore, pooled across many sites, the site-frequency spectrum (SFS) provides information on the underlying $\Spop$ of mutations.
     However, estimating a single $\Spop$ for all sampled mutations is biologically unrealistic, and a DFE of mutations is usually assumed~\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009}.
-    The polyDFE\cite{tataru_inference_2017, tataru_polydfe_2020} software implements a mixture of a $\Gamma$ and exponential distributions to model the DFE of non-synonymous mutations, while synonymous mutations are considered neutral.
+    The \DIFdelbegin \DIFdel{polyDFE}\DIFdelend \DIFaddbegin \textit{\DIFadd{polyDFE}}\DIFaddend \cite{tataru_inference_2017, tataru_polydfe_2020} software implements a mixture of a $\Gamma$ and exponential distributions to model the DFE of non-synonymous mutations, while synonymous mutations are considered neutral.
     The model estimates the parameters $\DelMean$, $b$, $p_b$ and $\AdvMean$ for non-synonymous mutations as:
 
     \begin{equation}
-        \phi \left( \Spop; \DelMean , b, p_b, \AdvMean \right) =
+        \DIFaddbegin \label{eq:parametric-dfe}
+        \DIFaddend \phi \left( \Spop; \DelMean , b, p_b, \AdvMean \right) =
         \begin{dcases}
             \left( 1 - p_b \right) f_{\Gamma}(-\Spop; -\DelMean, b) & \text{ if $\Spop \leq 0$,} \\
             p_b f_{e}(\Spop; \AdvMean) & \text{ if $\Spop > 0$,} \\
@@ -540,26 +702,35 @@
     $\AdvMean \geq 1$ is the estimated mean of the DFE for $\Spop > 0$;
     and $f_{\Gamma}(\Spop; m, b)$ is the density of the $\Gamma$ distribution with mean $m$ and shape $b$, while $f_{e}(\Spop; m)$ is the density of the exponential distribution with mean $m$.
 
-    PolyDFE requires one SFS for non-synonymous mutations and one for synonymous mutations (neutral expectation), as well as the number of sites on which each SFS was sampled.
+    \DIFdelbegin \DIFdel{PolyDFE }\DIFdelend \DIFaddbegin \textit{\DIFadd{PolyDFE}} \DIFaddend requires one SFS for non-synonymous mutations and one for synonymous mutations (neutral expectation), as well as the number of sites on which each SFS was sampled.
     For populations containing more than $8$ individuals, the SFS was subsampled down to $16$ chromosomes ($8$ diploid individuals) without replacement (hyper-geometric distribution) to alleviate the effect of different sampling depths in the 28 populations.
     Altogether, for each class of selection ($\Sphyclass \in \{\SphyDel, \SphyNeu, \SphyBen \}$) of non-synonymous SNPs, we aggregated all the SNPs in the selection class $\Sphyclass$ as an SFS.
     The number of sites on which each SFS was sampled is given by $L(\Sphyclass)$ for the non-synonymous SFS and $L_{\text{syn}}$ for the synonymous SFS respectively.
-    For each class of selection $\Sphyclass$, once fitted to the data using maximum likelihood with polyDFE, the parameters of the DFE $\left( \DelMean , b, p_b, \AdvMean \right)$ were used to compute $\proba [ \SpopDel \given  \Sphyclass] $, $\proba [ \SpopNeu \given \Sphyclass]$, and $\proba [ \SpopBen \given \Sphyclass]$ as:
+    For each class of selection $\Sphyclass$, once fitted to the data using maximum likelihood with \DIFdelbegin \DIFdel{polyDFE}\DIFdelend \DIFaddbegin \textit{\DIFadd{polyDFE}}\DIFaddend , the parameters of the DFE $\left( \DelMean , b, p_b, \AdvMean \right)$ were used to compute $\proba [ \SpopDel \given  \Sphyclass] $, $\proba [ \SpopNeu \given \Sphyclass]$, and $\proba [ \SpopBen \given \Sphyclass]$ as:
 
     \begin{align}
-        \proba [ \SpopDel \given  \Sphyclass] &= \proba [ \Spop < -1 \given \Sphyclass ] = \left( 1 - p_b \right) \int_{1}^{+\infty} f_{\Gamma}(\Spop; -\DelMean, b) \der \Spop, \label{eq:polyProbaDel} \\
-        \proba [ \SpopNeu \given \Sphyclass] &= \proba [ -1 < \Spop < 1 \given \Sphyclass ] = p_b \int_{0}^{1} f_{e}(\Spop; \AdvMean) \der \Spop + \left( 1 - p_b \right) \int_{0}^{1} f_{\Gamma}(\Spop; -\DelMean, b) \der \Spop, \\
+        \proba [ \SpopDel \given  \Sphyclass] &= \proba [ \Spop < -1 \given \Sphyclass ] = \left( 1 - p_b \right) \int\DIFdelbegin \DIFdel{_{1}^{+\infty} }\DIFdelend \DIFaddbegin \DIFadd{_{-\infty}^{-1} }\DIFaddend f_{\Gamma}(\DIFaddbegin \DIFadd{-}\DIFaddend \Spop; -\DelMean, b) \der \Spop, \label{eq:polyProbaDel} \\
+        \proba [ \SpopNeu \given \Sphyclass] &= \proba [ -1 < \Spop < 1 \given \Sphyclass ] = \DIFaddbegin \left( \DIFadd{1 - }\DIFaddend p_b \DIFaddbegin \right) \DIFaddend \int\DIFdelbegin \DIFdel{_{0}^{1} }\DIFdelend \DIFaddbegin \DIFadd{_{-1}^{0} }\DIFaddend f\DIFdelbegin \DIFdel{_{e}}\DIFdelend \DIFaddbegin \DIFadd{_{\Gamma}}\DIFaddend (\DIFaddbegin \DIFadd{-}\DIFaddend \Spop; \DIFdelbegin %DIFDELCMD < \AdvMean%%%
+\DIFdelend \DIFaddbegin \DIFadd{-}\DelMean\DIFadd{, b}\DIFaddend ) \der \Spop + \DIFdelbegin %DIFDELCMD < \left( %%%
+\DIFdel{1 - }\DIFdelend p_b \DIFdelbegin %DIFDELCMD < \right) %%%
+\DIFdelend \int_{0}^{1} f\DIFdelbegin \DIFdel{_{\Gamma}}\DIFdelend \DIFaddbegin \DIFadd{_{e}}\DIFaddend (\Spop; \DIFdelbegin \DIFdel{-}%DIFDELCMD < \DelMean%%%
+\DIFdel{, b}\DIFdelend \DIFaddbegin \AdvMean\DIFaddend ) \der \Spop, \\
         \proba [ \SpopBen \given \Sphyclass] &= \proba [ \Spop > 1 \given \Sphyclass] = p_b \int_{1}^{+\infty} f_{e}(\Spop; \AdvMean) \der \Spop. \label{eq:polyProbaAdv}
     \end{align}
 
-    \subsection{\textit{Precision} and \textit{recall}}
+    \DIFaddbegin \DIFadd{Rather than relying solely on currently segregating mutations to quantify selection, }\textit{\DIFadd{polyDFE}} \DIFadd{can leverage both divergence and polymorphism to estimate the parameters of the DFE.
+    We can thus add four more inputs to }\textit{\DIFadd{polyDFE}}\DIFadd{: $D \left( \Sphyclass \right) $, $L \left( \Sphyclass \right)$, $D_{\text{syn}}$ and $L_{\text{syn}}$ such as defined in the previous section.
+    Because the estimates of DFE are different with this method, we naturally obtained different values of $\proba [ \SpopDel \given  \Sphyclass] $, $\proba [ \SpopNeu \given \Sphyclass]$, and $\proba [ \SpopBen \given \Sphyclass]$.
+}
+
+    \DIFaddend \subsection{\textit{Precision} and \textit{recall}}
     \label{subsec:precisison_recall}
     For readability, we give here \textit{precision} and \textit{recall} for beneficial mutations ($\SphyBen$ and $\SpopBen$), but it can be obtained using the same derivation for the deleterious mutations ($\SphyDel$ and $\SpopDel$) and nearly-neutral mutations ($\SphyNeu$ and $\SpopNeu$).
 
     \textit{Precision} is the proportion of mutations correctly predicted as beneficial ($\proba [ \SpopBen \cap  \SphyBen]$) out of all predicted as beneficial non-adaptive mutations ($\proba [ \SphyBen]$), which can be written as a conditional probability:
 
     \begin{equation}
-        \frac{\proba [ \SpopBen  \cap  \SphyBen]}{\proba [ \SphyBen]} = \proba [ \SpopBen  \given  \SphyBen].
+        \frac{\proba [ \SpopBen  \cap  \SphyBen]}{\proba [ \SphyBen]} = \proba [ \SpopBen \given \SphyBen].
         \label{eq:precision}
     \end{equation}
     Namely, \textit{precision} corresponds to the probability for a $\SphyBen$ mutation to be effectively beneficial at the population level ($\SpopBen$).
@@ -590,7 +761,7 @@
     Estimates for $u$ were averaged per species across the pedigree-based estimation in \textcite{bergeron_evolution_2023} for \textit{Homo}, \textit{Bos}, \textit{Capra} and \textit{Chlorocebus}.
     For \textit{Ovis} we used the estimated $u$ of \textit{Capra}.
     For \textit{Equus}, we used $u$ as estimated in \textcite{orlando_recalibrating_2013} ($u=7.24\times10^{-9}$).
-    Because a correlation must account for phylogenetic relationship and non-independence of samples, we fitted a Phylogenetic Generalized Linear Model in \textit{R} with the package \texttt{caper}~\cite{orme_caper_2013}.
+    Because a correlation must account for phylogenetic relationship and non-independence of samples, we fitted a Phylogenetic Generalized Linear Model in \textit{R} with the \DIFaddbegin \DIFadd{method }\texttt{\DIFadd{pgls}} \DIFadd{with default settings from the }\DIFaddend package \texttt{caper}~\cite{orme_caper_2013}.
     The mammalian dated tree was obtained from TimeTree~\cite{kumar_timetree_2017} and pruned to include only the species analysed in this study, with multi-furcation of the different populations from each species placed at the same divergence time as the species (section S4.1).
 
     \section*{Data availability}
@@ -628,7 +799,7 @@
         \includegraphics[width=\textwidth, page=1] {artworks/figure.fitness-landscape}
         \caption{
             (A \& B) For a given codon position of a protein-coding DNA sequence, amino acids (x-axis) have different fitness values (y-axis).
-            Under a fluctuating fitness landscape (A), these fitnesses change with time.
+            Under a \DIFdelbeginFL \DIFdelFL{fluctuating }\DIFdelendFL \DIFaddbeginFL \DIFaddFL{changing }\DIFaddendFL fitness landscape (A), these fitnesses \DIFdelbeginFL \DIFdelFL{change }\DIFdelendFL \DIFaddbeginFL \DIFaddFL{fluctuate }\DIFaddendFL with time.
             The protein sequence follows the moving target defined by the amino-acid fitnesses. Since substitutions are preferentially accepted if they are in the direction of this target, substitutions are, on average, adaptive.
             At the phylogenetic scale (C), beneficial substitutions are common (positive signs), promoting phenotype diversification across species.
             Under a stable fitness landscape (B), most mutations reaching fixation are either slightly deleterious reaching fixation due to drift or are beneficial non-adaptive mutations restoring a more optimal amino acid.
@@ -674,7 +845,7 @@
         \caption{
             Populations in circles, mean of the species across the populations as squares.
             (A) Proportion of nearly-neutral mutations at the population scale ($\proba [ \SpopNeu]$ in the y-axis), shown as a function of estimated effective population size ($\Ne$ in the x-axis).
-            (B) Proportion of beneficial non-adaptive mutations among all beneficial mutations ($\proba [ \SphyBen  \given  \SpopBen]$ in the y-axis), shown as a function of $\Ne$ in x-axis.
+            (B) Proportion of beneficial non-adaptive mutations among all beneficial mutations ($\proba [ \SphyBen \given \SpopBen]$ in the y-axis), shown as a function of $\Ne$ in x-axis.
             Correlations account for phylogenetic relationship and non-independence of samples, through the fit of a Phylogenetic Generalized Linear Model (see section~\ref{subsec:s-polymorphism-method} in Materials \& Methods).
         }
         \label{fig:diversity}

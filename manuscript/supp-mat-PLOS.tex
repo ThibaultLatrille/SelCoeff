@@ -386,7 +386,7 @@
 
     In the figures below, the first line is the name of the gene, the second line the position of the mutation in the OrthoMam protein-coding DNA alignment, and the arrow in the third line corresponds to the nucleotide position of the mutation.
     Finally, for reproducibility, we generated the fasta alignment for all $\SphyBen$ mutations that we detected, either in the terminal lineage or in segregating polymorphism.
-    These fasta files are available at Zenodo (\url{https://doi.org/10.5281/zenodo.7878953}), across all populations, under a zip file (\textit{alignment\_around\_non\_adaptive\_mutations.zip}) and we provide a python script to obtain the figures shown below given these alignments (\textit{plot\_variations.py}).
+    These fasta files are available at Zenodo (\url{https://doi.org/10.5281/zenodo.7878953}), across all populations, under the compressed archive \textit{alignment\_focused\_around\_non\_adaptive\_mutations.zip} and we provide a python script to obtain the figures shown below given these alignments.
 
     \newpage
     \begin{center}
@@ -728,97 +728,6 @@
     Beneficial non-adaptive mutations are associated with clinical terms such as \textit{Benign} and \textit{Likely Benign}.
     \newpage
 
-    \section{Contrasting selection at the phylogenetic and population-genetic scale}
-
-    \subsection{Selection at the population-genetic scale}
-    The proportion of deleterious ($\ProbaPopDel$), nearly-neutral ($\ProbaPopNeu$) and of beneficial ($\ProbaPopBen$) mutations estimated at the population-genetic scale across the different populations is shown for each class of selection ($\Sphyclass \in \{\SphyDel, \SphyNeu, \SphyBen \}$).
-
-    \captionof{figure}{Estimation of selection at the population scale for $\SphyDel$ mutations.}
-    \begin{center}
-        \begin{minipage}{0.75\linewidth}
-            \begin{minipage}{0.9\linewidth}
-                \includegraphics[width=\linewidth, page=1]{artworks/Theta.neg.stacked.pdf}
-            \end{minipage}
-            \begin{minipage}{0.09\linewidth}
-                \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-            \end{minipage}
-        \end{minipage}
-    \end{center}
-
-    \captionof{figure}{Estimation of selection at the population scale for $\SphyNeu$ mutations.}
-    \begin{center}
-        \begin{minipage}{0.75\linewidth}
-            \begin{minipage}{0.9\linewidth}
-                \includegraphics[width=\linewidth, page=1]{artworks/Theta.weak.stacked.pdf}
-            \end{minipage}
-            \begin{minipage}{0.09\linewidth}
-                \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-            \end{minipage}
-        \end{minipage}
-    \end{center}
-
-    \captionof{figure}{Estimation of selection at the population scale for $\SphyBen$ mutations.}
-    \begin{center}
-        \begin{minipage}{0.75\linewidth}
-            \begin{minipage}{0.9\linewidth}
-                \includegraphics[width=\linewidth, page=1]{artworks/Theta.pos.stacked.pdf}
-            \end{minipage}
-            \begin{minipage}{0.09\linewidth}
-                \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
-            \end{minipage}
-        \end{minipage}
-    \end{center}
-
-    \newpage
-    \subsection{Distribution of scaled selection coefficients ($\Sphy$)}\label{subsec:expectedDFE}
-
-    Theoretically, the selection coefficient ($\Sphy$) for any mutation is related to its probability of fixation by the equation $\proba_{\text{fix}} (\Sphy) = \Sphy/(1-\exp(-\Sphy)) $.
-    It is thus possible to predict the distribution of $\Sphy$ of substitutions given the distribution of $\Sphy$ for mutations (e.g. panel A below) by weighting the different mutations by their $\proba_{\text{fix}} (\Sphy)$.
-    The predicted DFE of substitutions (panel B below) matches the observed DFE of substitutions (panel C below) in the terminal lineage, meaning that the $\Sphy$ obtained by phylogenetic mutation-selection codon models is a strong predictor of selection effectively exerted on mutations in terminal lineages.
-
-    The figures shown below are obtained in the Saint Kitts population of \textit{Chlorocebus sabaeus}.
-    These figures across the 28 populations are available at Zenodo (\url{https://doi.org/10.5281/zenodo.7878953}) in file \textit{distribution\_S0\_28\_populations.pdf}.\\
-
-    \captionof{figure}{Distribution of scaled selection coefficients ($\Sphy$).}
-    \begin{minipage}{0.32\linewidth}
-        \flushleft {\tiny A: Expected DFE for mutations}
-        \includegraphics[width=\linewidth, page=1]{artworks/DFE.Chlorocebus_sabaeus.Saint_Kitts.MutSel.pdf}
-    \end{minipage}
-    \begin{minipage}{0.32\linewidth}
-        \flushleft {\tiny B: Expected DFE for substitutions}
-        \includegraphics[width=\linewidth, page=1]{artworks/DFE.Chlorocebus_sabaeus.Saint_Kitts.MutSel.Flow.pdf}
-    \end{minipage}
-    \begin{minipage}{0.32\linewidth}
-        \flushleft {\tiny C: Observed DFE for substitutions}
-        \includegraphics[width=\linewidth, page=1]{artworks/subs.Chlorocebus_sabaeus.Saint_Kitts.bins3Mask0.9.pdf}
-    \end{minipage}
-    \\
-    \begin{minipage}{0.32\linewidth}
-        \flushleft {\tiny D: Observed DFE for polymorphisms}
-        \includegraphics[width=\linewidth, page=1]{artworks/poly.Chlorocebus_sabaeus.Saint_Kitts.bins3Mask0.9.pdf}
-    \end{minipage}
-    \begin{minipage}{0.32\linewidth}
-        \flushleft {\tiny E: Site frequency spectrum}
-        \includegraphics[width=\linewidth, page=1]{artworks/Chlorocebus_sabaeus.Saint_Kitts.MutSel-sfs.normalize.pdf}
-    \end{minipage}
-    \begin{minipage}{0.32\linewidth}
-        \flushleft {\tiny F: $S$ as function of $S_0$ for each class}
-        \includegraphics[width=\linewidth, page=1]{artworks/Chlorocebus_sabaeus.Saint_Kitts.MutSel.polyDFE_C.pdf}
-    \end{minipage}
-
-    \small
-    \begin{itemize}[itemsep=0pt]
-        \item A: Distribution of scaled selection coefficients ($\Sphy$), predicted for all possible non-synonymous DNA mutations away from the ancestral exome.
-        Mutations are divided into three classes of selection: deleterious ($\SphyDel$), nearly-neutral ($\SphyNeu$) and beneficial non-adaptive ($\SphyBen$).
-        \item B: Expected distribution of $\Sphy$ for substitutions obtained by transforming the distribution of $\Sphy$ for mutations (panel A) by weighting each mutation by its scaled probability of fixation given by $\proba_{\text{fix}} (\Sphy) = \Sphy/(1-\exp(-\Sphy))$.
-        \item C: Distribution of scaled selection coefficients ($\Sphy$) for all observed substitutions along the terminal branch of the phylogenetic tree.
-        \item D: Distribution of scaled selection coefficients ($\Sphy$) for all observed polymorphisms currently segregating in the population.
-        \item E: The site-frequency spectrum (SFS) in the population for a random sample of 16 alleles (means in solid lines and standard deviations in color shades) for each class of selection and for synonymous mutations, supposedly neutral (black). The SFS represents the proportion of mutations (y-axis) with a given number of derived alleles in the population (x-axis). At high frequencies, deleterious mutations are underrepresented.
-        \item F: Proportion of beneficial $\ProbaPopDel$, nearly-neutral $\ProbaPopNeu$, and deleterious mutations $\ProbaPopBen$  estimated at the population scale for each class of selection at the phylogenetic scale. Proportions depicted here are not weighted by their mutational opportunities.
-    \end{itemize}
-    \normalsize
-
-    \newpage
     \section{Correlation with diversity}
 
     \subsection{Phylogenetic Generalized Linear Model}
@@ -989,45 +898,143 @@
     Overall, the observed DFE of substitution is much better explained by the expected DFE of new mutations (section S\ref{subsec:expectedDFE} than by mispolarizations).
 
     \newpage
-    \subsection{Simulations of site-frequency spectra}
+    \section{Excluding genes under adaptation}
 
-    We performed simulations based on population-genetic formalism to test whether our approach is able to recover the proportion of beneficial mutations that are non-adaptive in synthetic polymorphism datasets.
-    More specifically, we performed simulations of site-frequency spectra, thus at the population-genetic scale, by using a mixture of the DFEs that is predicted from the phylogenetic mutation-selection model, and adding adaptive mutations to this DFE.
-    In practice, simulations are performed under the Poisson Random Field (PRF) framework of population genetics\cite{sawyer_population_1992}.
-    Each simulation generates a synthetic synonymous SFS, and a synthetic non-synonymous SFS for the mutations in the category $x \in \{ \SphyDel, \SphyNeu, \SphyBen \}$.
-
-    Technically, for non-synonymous mutations, we first draw a random sample of the selection coefficients from the mixture of DFE using as parameter $\proba [y \given x]$ for $y \in \{ \SpopDel, \SpopNeu, \SpopBen \}$.
-    Importantly, $\proba [\SpopBen | \SphyDel]$ and $\proba [\SpopBen | \SphyNeu]$ are considered adaptive mutations, and thus their selection coefficients have a selection coefficient of $S_{\text{adaptive}}=10$.
-    All the others are drawn for the DFEs that are predicted from the phylogenetic mutation-selection model.
-    Synonymous mutations are considered neutral and have $S=0$.
-
-    Given these selection coefficients, to obtain the expected SFS we integrate over the limiting density of frequency that mutations are segregating in the population, as described from eqs. 1--2 in \textcite{tataru_inference_2017}.
-    And finally, given this expected SFS, we perform a Poisson random sampling to obtain a sampled SFS of size n matching the total number of polymorphism to simulate.
-
-    In summary, the simulations generates a synonymous SFS, and a non-synonymous SFS for the mutations in the category $x \in \{ \SphyDel, \SphyNeu, \SphyBen \}$, and require as input the following:
-    \begin{itemize}
-        \item Total number of polymorphisms to simulate (synonymous and non-synonymous).
-        \item The DFE of $\Sphy$ predicted from the phylogenetic mutation-selection.
-        \item Estimates of $\proba [y \given x]$ for $y \in \{ \SpopDel, \SpopNeu, \SpopBen \}$.
-        \item Selection coefficient for adaptive mutations, here $S_{\text{adaptive}}=20$.
-        \item The sampled SFS size $n$, here $n=16$ (i.e.\ twice the number of sampled individuals).
-    \end{itemize}
-
-    From these two SFS (synonymous and non-synonymous), we run polyDFE to obtain $\proba [\SpopDel \given x]$, $\proba [\SpopNeu \given x]$ and $\proba [\SpopBen \given x]$ (eqs.\ 9--11 in the main manuscript).
-    By doing so for the 3 categories $x \in \{ \SphyDel, \SphyNeu, \SphyBen \}$, we can ultimately compute $\proba [\SphyBen \given \SpopBen]$ (eqs.\ 14--15 in the main manuscript), which can be then be compared to the ground truth.
+    \subsection{Probability for beneficial mutations to be non-adaptive}
+    \begin{center}
+        \captionof{table}{$\proba[\SphyBen\given \SpopBen ]$ excluding or not genes under adaptation.}
+        \begin{tabular}{|l|l|r|r|}
+            \toprule
+            Population & Species & Control & Case \\
+            \midrule
+            \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $ 0.536$ & $ 0.880$ \\
+            Iran & Bos taurus & $ 0.243$ & $ 0.249$ \\
+            Uganda & Bos taurus & $ 0.415$ & $ 0.429$ \\
+            \rowcolor{LIGHTGREY} Australia & Capra hircus & $ 0.177$ & $ 0.190$ \\
+            \rowcolor{LIGHTGREY} France & Capra hircus & $ 0.190$ & $ 0.201$ \\
+            \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $ 0.165$ & $ 0.169$ \\
+            \rowcolor{LIGHTGREY} Iran & Capra hircus & $ 0.193$ & $ 0.176$ \\
+            \rowcolor{LIGHTGREY} Italy & Capra hircus & $ 0.243$ & $ 0.261$ \\
+            \rowcolor{LIGHTGREY} Morocco & Capra hircus & $ 0.245$ & $ 0.283$ \\
+            \rowcolor{LIGHTGREY} Iran & Ovis aries & $ 0.407$ & $ 0.454$ \\
+            Iran (O. orientalis) & Ovis aries & $ 0.190$ & $ 0.207$ \\
+            Iran (O. vignei) & Ovis aries & $ 0.110$ & $ 0.135$ \\
+            Various & Ovis aries & $ 0.222$ & $ 0.246$ \\
+            Morocco & Ovis aries & $ 0.514$ & $ 0.627$ \\
+            \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $ 0.293$ & $ 0.325$ \\
+            \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $ 0.275$ & $ 0.273$ \\
+            \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $ 0.245$ & $ 0.242$ \\
+            \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $ 0.821$ & $ 0.873$ \\
+            \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $ 0.257$ & $ 0.254$ \\
+            \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 0.358$ & $ 0.395$ \\
+            \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $ 0.341$ & $ 0.375$ \\
+            \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $ 0.336$ & $ 0.355$ \\
+            \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $ 0.250$ & $ 0.263$ \\
+            African & Homo sapiens & $ 0.349$ & $ 0.363$ \\
+            Admixed American & Homo sapiens & $ 0.345$ & $ 0.312$ \\
+            East Asian & Homo sapiens & $ 0.249$ & $ 0.233$ \\
+            European & Homo sapiens & $ 0.248$ & $ 0.211$ \\
+            South Asian & Homo sapiens & $ 0.224$ & $ 0.218$ \\
+            \bottomrule
+        \end{tabular}
+    \end{center}
+    Genes under adaptation retrieved from \textcite{latrille_genes_2023}.
+    Comparison of $\proba[\SphyBen\given \SpopBen ]$ for the whole genome (control) and when excluding genes under adaptation (case).
+    The non-parametric Wilcoxon signed-rank test evaluates the null hypothesis that the distribution of the differences (case versus control) is symmetric about zero.
+    Applied to the paired samples (case and control), Wilcoxon signed-rank test results in $s=80$ with $\pvalue=0.002$, for the one-sided test (case higher than control).
+    The proportion of non-adaptive beneficial mutations ($\proba[\SphyBen\given \SpopBen ]$) is higher when excluding genes under adaptation, consistent with our expectation that genes with uniformly conserved functions should fit better the nearly-neutral equilibrium model.
 
     \newpage
+
+    \section{Contrasting selection at the phylogenetic and population-genetic scale}
+
+    \subsection{Selection at the population-genetic scale}
+    The proportion of deleterious ($\ProbaPopDel$), nearly-neutral ($\ProbaPopNeu$) and of beneficial ($\ProbaPopBen$) mutations estimated at the population-genetic scale across the different populations is shown for each class of selection ($\Sphyclass \in \{\SphyDel, \SphyNeu, \SphyBen \}$).
+
+    \captionof{figure}{Estimation of selection at the population scale for $\SphyDel$ mutations.}
     \begin{center}
-        \captionof{figure}{Simulations of site-frequency spectra.}
-        \includegraphics[width=\linewidth, page=1]{artworks/simulations.pos.pdf}
+        \begin{minipage}{0.75\linewidth}
+            \begin{minipage}{0.9\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/Theta.neg.stacked.pdf}
+            \end{minipage}
+            \begin{minipage}{0.09\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
+            \end{minipage}
+        \end{minipage}
     \end{center}
 
-    We used 8 different set of parameters ($\proba [y \given x]$ and numbers of polymorphism) and simulated 10 replicates for each set of parameters.
-    These set of input parameters are provided to match $\proba [\SphyBen \given \SpopBen]$ of the following populations: Set 1 for Admixed American (Homo sapiens), Set 2 for African (Homo sapiens), Set 3 for Nevis (Chlorocebus sabaeus), Set 4 for Iran (Ovis orientalis), Set 5 for Uganda (Bos taurus), Set 6 for Morocco (Ovis aries), Set 7 for Equus caballus, Set 8 for Gambia (Chlorocebus sabaeus).
-    For each synthetic data we run polyDFE and derived $\proba [\SphyBen \given \SpopBen]$ which is then compared to the ground truth (calculated analytically from the set parameters $\proba [y \given x], x \in \{ \SphyDel, \SphyNeu, \SphyBen \}, y \in \{ \SpopDel, \SpopNeu, \SpopBen \}$).
-    These simulations show that we are able to retrieve accurately the proportion of non-adaptive mutations in those synthetic datasets.
+    \captionof{figure}{Estimation of selection at the population scale for $\SphyNeu$ mutations.}
+    \begin{center}
+        \begin{minipage}{0.75\linewidth}
+            \begin{minipage}{0.9\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/Theta.weak.stacked.pdf}
+            \end{minipage}
+            \begin{minipage}{0.09\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
+            \end{minipage}
+        \end{minipage}
+    \end{center}
+
+    \captionof{figure}{Estimation of selection at the population scale for $\SphyBen$ mutations.}
+    \begin{center}
+        \begin{minipage}{0.75\linewidth}
+            \begin{minipage}{0.9\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/Theta.pos.stacked.pdf}
+            \end{minipage}
+            \begin{minipage}{0.09\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
+            \end{minipage}
+        \end{minipage}
+    \end{center}
 
     \newpage
+    \subsection{Distribution of scaled selection coefficients ($\Sphy$)}\label{subsec:expectedDFE}
+
+    Theoretically, the selection coefficient ($\Sphy$) for any mutation is related to its probability of fixation by the equation $\proba_{\text{fix}} (\Sphy) = \Sphy/(1-\exp(-\Sphy)) $.
+    It is thus possible to predict the distribution of $\Sphy$ of substitutions given the distribution of $\Sphy$ for mutations (e.g. panel A below) by weighting the different mutations by their $\proba_{\text{fix}} (\Sphy)$.
+    The predicted DFE of substitutions (panel B below) matches the observed DFE of substitutions (panel C below) in the terminal lineage, meaning that the $\Sphy$ obtained by phylogenetic mutation-selection codon models is a strong predictor of selection effectively exerted on mutations in terminal lineages.
+
+    The figures shown below are obtained in the Saint Kitts population of \textit{Chlorocebus sabaeus}.
+    These figures across the 28 populations are available at Zenodo (\url{https://doi.org/10.5281/zenodo.7878953}) in file \textit{distribution\_S0\_28\_populations.pdf}.\\
+
+    \captionof{figure}{Distribution of scaled selection coefficients ($\Sphy$).}
+    \begin{minipage}{0.32\linewidth}
+        \flushleft {\tiny A: Expected DFE for mutations}
+        \includegraphics[width=\linewidth, page=1]{artworks/DFE.Chlorocebus_sabaeus.Saint_Kitts.MutSel.pdf}
+    \end{minipage}
+    \begin{minipage}{0.32\linewidth}
+        \flushleft {\tiny B: Expected DFE for substitutions}
+        \includegraphics[width=\linewidth, page=1]{artworks/DFE.Chlorocebus_sabaeus.Saint_Kitts.MutSel.Flow.pdf}
+    \end{minipage}
+    \begin{minipage}{0.32\linewidth}
+        \flushleft {\tiny C: Observed DFE for substitutions}
+        \includegraphics[width=\linewidth, page=1]{artworks/subs.Chlorocebus_sabaeus.Saint_Kitts.bins3Mask0.9.pdf}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.32\linewidth}
+        \flushleft {\tiny D: Observed DFE for polymorphisms}
+        \includegraphics[width=\linewidth, page=1]{artworks/poly.Chlorocebus_sabaeus.Saint_Kitts.bins3Mask0.9.pdf}
+    \end{minipage}
+    \begin{minipage}{0.32\linewidth}
+        \flushleft {\tiny E: Site frequency spectrum}
+        \includegraphics[width=\linewidth, page=1]{artworks/Chlorocebus_sabaeus.Saint_Kitts.MutSel-sfs.normalize.pdf}
+    \end{minipage}
+    \begin{minipage}{0.32\linewidth}
+        \flushleft {\tiny F: $S$ as function of $S_0$ for each class}
+        \includegraphics[width=\linewidth, page=1]{artworks/Chlorocebus_sabaeus.Saint_Kitts.MutSel.polyDFE_C.pdf}
+    \end{minipage}
+
+    \small
+    \begin{itemize}[itemsep=0pt]
+        \item A: Distribution of scaled selection coefficients ($\Sphy$), predicted for all possible non-synonymous DNA mutations away from the ancestral exome.
+        Mutations are divided into three classes of selection: deleterious ($\SphyDel$), nearly-neutral ($\SphyNeu$) and beneficial non-adaptive ($\SphyBen$).
+        \item B: Expected distribution of $\Sphy$ for substitutions obtained by transforming the distribution of $\Sphy$ for mutations (panel A) by weighting each mutation by its scaled probability of fixation given by $\proba_{\text{fix}} (\Sphy) = \Sphy/(1-\exp(-\Sphy))$.
+        \item C: Distribution of scaled selection coefficients ($\Sphy$) for all observed substitutions along the terminal branch of the phylogenetic tree.
+        \item D: Distribution of scaled selection coefficients ($\Sphy$) for all observed polymorphisms currently segregating in the population.
+        \item E: The site-frequency spectrum (SFS) in the population for a random sample of 16 alleles (means in solid lines and standard deviations in color shades) for each class of selection and for synonymous mutations, supposedly neutral (black). The SFS represents the proportion of mutations (y-axis) with a given number of derived alleles in the population (x-axis). At high frequencies, deleterious mutations are underrepresented.
+        \item F: Proportion of beneficial $\ProbaPopDel$, nearly-neutral $\ProbaPopNeu$, and deleterious mutations $\ProbaPopBen$  estimated at the population scale for each class of selection at the phylogenetic scale. Proportions depicted here are not weighted by their mutational opportunities.
+    \end{itemize}
+    \normalsize
 
     \section{Filtering of variable sites}
 
@@ -1194,75 +1201,13 @@
     \end{itemize}
 
     \newpage
+    \section{Including divergence data for the estimation of $\Spop$}
 
-    \section{Excluding genes under adaptation}
-
-    \subsection{Probability for beneficial mutations to be non-adaptive}
-    \begin{center}
-        \captionof{table}{$\proba[\SphyBen\given \SpopBen ]$ excluding or not genes under adaptation.}
-        \begin{tabular}{|l|l|r|r|}
-            \toprule
-            Population & Species & Control & Case \\
-            \midrule
-            \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $ 0.536$ & $ 0.880$ \\
-            Iran & Bos taurus & $ 0.243$ & $ 0.249$ \\
-            Uganda & Bos taurus & $ 0.415$ & $ 0.429$ \\
-            \rowcolor{LIGHTGREY} Australia & Capra hircus & $ 0.177$ & $ 0.190$ \\
-            \rowcolor{LIGHTGREY} France & Capra hircus & $ 0.190$ & $ 0.201$ \\
-            \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $ 0.165$ & $ 0.169$ \\
-            \rowcolor{LIGHTGREY} Iran & Capra hircus & $ 0.193$ & $ 0.176$ \\
-            \rowcolor{LIGHTGREY} Italy & Capra hircus & $ 0.243$ & $ 0.261$ \\
-            \rowcolor{LIGHTGREY} Morocco & Capra hircus & $ 0.245$ & $ 0.283$ \\
-            \rowcolor{LIGHTGREY} Iran & Ovis aries & $ 0.407$ & $ 0.454$ \\
-            Iran (O. orientalis) & Ovis aries & $ 0.190$ & $ 0.207$ \\
-            Iran (O. vignei) & Ovis aries & $ 0.110$ & $ 0.135$ \\
-            Various & Ovis aries & $ 0.222$ & $ 0.246$ \\
-            Morocco & Ovis aries & $ 0.514$ & $ 0.627$ \\
-            \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $ 0.293$ & $ 0.325$ \\
-            \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $ 0.275$ & $ 0.273$ \\
-            \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $ 0.245$ & $ 0.242$ \\
-            \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $ 0.821$ & $ 0.873$ \\
-            \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $ 0.257$ & $ 0.254$ \\
-            \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 0.358$ & $ 0.395$ \\
-            \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $ 0.341$ & $ 0.375$ \\
-            \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $ 0.336$ & $ 0.355$ \\
-            \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $ 0.250$ & $ 0.263$ \\
-            African & Homo sapiens & $ 0.349$ & $ 0.363$ \\
-            Admixed American & Homo sapiens & $ 0.345$ & $ 0.312$ \\
-            East Asian & Homo sapiens & $ 0.249$ & $ 0.233$ \\
-            European & Homo sapiens & $ 0.248$ & $ 0.211$ \\
-            South Asian & Homo sapiens & $ 0.224$ & $ 0.218$ \\
-            \bottomrule
-        \end{tabular}
-    \end{center}
-    Genes under adaptation retrieved from \textcite{latrille_genes_2023}.
-    Comparison of $\proba[\SphyBen\given \SpopBen ]$ for the whole genome (control) and when excluding genes under adaptation (case).
-    The non-parametric Wilcoxon signed-rank test evaluates the null hypothesis that the distribution of the differences (case versus control) is symmetric about zero.
-    Applied to the paired samples (case and control), Wilcoxon signed-rank test results in $s=80$ with $\pvalue=0.002$, for the one-sided test (case higher than control).
-    The proportion of non-adaptive beneficial mutations ($\proba[\SphyBen\given \SpopBen ]$) is higher when excluding genes under adaptation, consistent with our expectation that genes with uniformly conserved functions should fit better the nearly-neutral equilibrium model.
-
-    \newpage
-
-    \section{Including substitutions in the terminal lineage to estimate $\Spop$}
-
-    \captionof{figure}{Including substitutions in the terminal lineage to estimate $\Spop$.}
-    \includegraphics[width=\textwidth, page=1] {artworks/figure.method.proba.div.pdf}
-    Same as figure 2 in the main text, but including substitutions in the terminal lineage to estimate $\Spop$.
-    At the phylogenetic scale (A), we estimated the amino-acid fitness for each site from protein-coding DNA alignments using mutation-selection codon models.
-    For every possible mutation, the difference in amino-acid fitness before and after the mutation allows us to compute the selection coefficient at the phylogenetic scale ($\Sphy$).
-    Depending on $\Sphy$ (B) mutations can be predicted as deleterious ($\SphyDel$), nearly-neutral ($\SphyNeu$) or beneficial non-adaptive mutations ($\SphyBen$) toward a fitter amino acid and repairing existing functions.
-    For each population, each observed single nucleotide polymorphism (SNP) segregating can also be classified according to its $\Sphy$ value (C).
-    Within the terminal lineage leading to this population, each substitution can be classified according to its $\Spop$ value (C).
-    Non-synonymous polymorphisms and divergence, contrasted to synonymous polymorphisms and divergence (deemed neutral) is used to estimate selection coefficients (D-E) at the population scale ($\Spop$), for each class of selection ($\SphyDel$, $\SphyNeu$, $\SphyBen$).
-    We can thus assess whether $\Sphy$ predicts $\Spop$ and compute \textit{precision} (F) and \textit{recall} (G) for each class.
-    The \textit{recall} value for class $\SphyBen$ is the probability for beneficial mutations to be non-adaptive (G).
-
-    \subsection{Including substitutions in polyDFE}
+    \subsection{Including divergence in polyDFE}
     Divergence data (number of substitutions per site) can also be included into polyDFE to estimate the DFE.
     For the class of a given class of selection coefficient ($\Sphyclass \in \{\SphyDel, \SphyNeu, \SphyBen \}$), the number of substitutions has already been computed and is given by $D\left( \Sphyclass \right)$ (see eq.~6), and the number of sites is given by $L \left( \Sphyclass \right)$ (see eq.~4).
     Otherwise, the procedure is the same as described section \textit{Scaled selection coefficients ($\Spop$) in a population-based method}.
 
-    \newpage
     \subsection{Probability for beneficial mutations to be non-adaptive}
     \begin{center}
         \captionof{table}{$\proba[\SphyBen\given \SpopBen ]$ when including divergence to estimate $\Spop$.}
@@ -1443,44 +1388,10 @@
     The proportion of beneficial non-adaptive mutations ($\proba[\SphyBen\given \SpopBen ]$) is higher when excluding genes under adaptation, consistent with our expectation that genes with uniformly conserved functions should fit better the nearly-neutral equilibrium model.
 
     \newpage
-    \subsection{Fitting one or three distributions of fitness effects}
 
-    We also performed another test to assess that fitting the same functional form of DFE (distribution of fitness effects) to three categories of selection (i.e. $\SphyDel, \SphyNeu, \SphyBen$) is a sound methodology.
-    Typically, $\proba [ \SpopBen ]$ can be computed from two different estimates, by either splitting data (polymorphism within populations and substitutions in the terminal lineages) in three category (i.e. $\SphyDel, \SphyNeu, \SphyBen$) or not at all.
-    In the case of splitting data in three categories and fitting three DFE, $\proba [ \SpopBen ]$ is obtained by summing over the three category using the law of total probability (eq.\ 15 in the main manuscript):
+    \section{Discrete distribution of $\Spop$ at the population scale}
 
-    \begin{equation}
-        \proba [ \SpopBen ] \text{ (three DFE) } = \proba [\SpopBen \given \SphyDel ] \times \proba [\SphyDel ] + \proba [\SpopBen \given \SphyNeu ] \times \proba [\SphyNeu ] + \proba [\SpopBen \given \SphyBen ] \times \proba [\SphyBen ].
-        \label{eq:total_proba}
-    \end{equation}
-
-    But it is also possible to compute $\proba [ \SpopBen ]$ directly from fitting one DFE to the full data (polymorphism within populations and substitutions in the terminal lineages), not splitting at all, and then $\proba [ \SpopBen ]$ is obtained from the parameters of the DFE (eq.\ 11 in the main manuscript):
-    \begin{align}
-        \proba [ \SpopBen ] \text{ (one DFE) } &= \proba [ \Spop > 1 ] = p_b \int_{1}^{+\infty} f_{e}(\Spop; \AdvMean) \der \Spop. \label{eq:polyProbaAdv}
-    \end{align}
-
-    We reproduced this experiment for $\proba [ \SpopDel ]$, $\proba [ \SpopNeu ]$ and $\proba [ \SpopBen ]$ as shown below.
-    The goodness of fit is calculated as the coefficient of determination ($R^2$) for the prediction $\proba [ \SpopBen ] \text{ (three DFE) } = \proba [ \SpopBen ] \text{ (one DFE) }$, meaning calculating the residuals of the fit to the 1:1 line.
-
-    \newpage
-    \begin{center}
-        \captionof{figure}{$\proba [ \SpopDel ]$ when fitting a single or three DFEs.}
-        \includegraphics[width=0.75\linewidth, page=1]{artworks/results.reg.neg.div.scatter.pdf}
-    \end{center}
-    \begin{center}
-        \captionof{figure}{$\proba [ \SpopNeu ]$ when fitting a single or three DFEs.}
-        \includegraphics[width=0.75\linewidth, page=1]{artworks/results.reg.weak.div.scatter.pdf}
-    \end{center}
-    \begin{center}
-        \captionof{figure}{$\proba [ \SpopBen ]$ when fitting a single or three DFEs.}
-        \includegraphics[width=0.75\linewidth, page=1]{artworks/results.reg.pos.div.scatter.pdf}
-    \end{center}
-
-    \newpage
-
-    \section{Non-parametric distribution of fitness effects}
-
-    \subsection{polyDFE model D (non-parametric)}
+    \subsection{polyDFE model D (discrete distribution)}
     Additionally to including divergence, with also tested our prediction with polyDFE model D instead of model C.
     In polyDFE model D, the DFE of non-synonymous mutations is given as a discrete DFE of $K$ categories (instead of a continuous distribution in model C), where the selection coefficients of each category $i$ ($1 \leq i \leq K$) are fixed parameters $\Spop_i$, and each value $\Spop_i$ has a probability $p_i$ (estimated), with $\sum_{i=1}^{K} p_i =1$.
     We used $K=6$ with $\Spop_1 = -500$, $\Spop_2 = -4$, $\Spop_3 =-1$, $\Spop_4 = 0$, $\Spop_5 = 1$, $\Spop_6 = 4$.\\
@@ -1609,7 +1520,9 @@
     \end{itemize}
 
     Altogether, comparing this table other estimations, we acknowledge that the exact proportion of non-adaptive among all beneficial ones is dependent on the model used to estimate the DFE.
-    However, we can still see that non-adaptive beneficial mutations are positively selected compared to neutral and deleterious ones, and this result is valid for different underlying DFE.
+    However, we can still see that non-adaptive beneficial mutations are positively selected compared to neutral and deleterious ones, and this result is not sensitive to the underlying DFE at the population scale.
+
+    \newpage
 
     \newpage
 
