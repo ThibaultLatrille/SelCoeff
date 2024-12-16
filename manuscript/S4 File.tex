@@ -1,0 +1,915 @@
+%TC:ignore
+\documentclass{article}
+\usepackage[hypcap=false]{caption}
+\usepackage{xcolor, colortbl}
+\definecolor{RED}{HTML}{EB6231}
+\definecolor{BLUE}{HTML}{5D80B4}
+\definecolor{LIGHTGREY}{gray}{0.9}
+\definecolor{BLUELINK}{HTML}{0645AD}
+\definecolor{DARKBLUELINK}{HTML}{0B0080}
+\usepackage[colorlinks=false]{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+% for linking between references, figures, TOC, etc in the pdf document
+\hypersetup{colorlinks,
+    linkcolor=DARKBLUELINK,
+    anchorcolor=DARKBLUELINK,
+    citecolor=DARKBLUELINK,
+    filecolor=DARKBLUELINK,
+    menucolor=DARKBLUELINK,
+    urlcolor=BLUELINK
+} % Color citation links in purple
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{naturalnames}{hyperref}
+
+\usepackage[backend=biber,eprint=false,isbn=false,url=false,intitle=true,style=nature,date=year]{biblatex}
+\addbibresource{codon_models.bib}
+
+\usepackage{bbm}
+\usepackage[margin=50pt]{geometry}
+\usepackage{amssymb,amsfonts,amsmath,amsthm,mathtools}
+\usepackage{lmodern}
+\usepackage{bm,bbold}
+\usepackage{verbatim}
+\usepackage{float}
+\usepackage{listings, enumerate, enumitem}
+\usepackage[export]{adjustbox}
+\usepackage{tabu}
+\usepackage{longtable}
+\tabulinesep=0.6mm
+\newcommand\cellwidth{\TX@col@width}
+\usepackage{hhline}
+\setlength{\arrayrulewidth}{1.2pt}
+\usepackage{multicol,multirow,array}
+\usepackage{etoolbox}
+\AtBeginEnvironment{tabu}{\footnotesize}
+\usepackage{booktabs}
+\usepackage{makecell}
+\usepackage{orcidlink}
+\usepackage{graphicx}
+\usepackage{blkarray}
+\usepackage{pgf,tikz}
+\usetikzlibrary{shapes,arrows,backgrounds,fit,positioning,arrows,automata,calc}
+\tikzset{res/.style={ellipse,draw,minimum height=1.0cm,minimum width=0.8cm}}
+\tikzset{literal/.style={rectangle,draw,minimum height=0.5cm,minimum width=0.8cm,text width = 1.2 cm, align = center}}
+
+\pdfinclusioncopyfonts=1
+
+\renewcommand{\baselinestretch}{1.5}
+\renewcommand{\arraystretch}{0.6}
+\frenchspacing
+
+\renewcommand{\thetable}{\Alph{table}}
+\renewcommand{\thefigure}{\Alph{figure}}
+\renewcommand{\theequation}{S.\arabic{equation}}
+
+\newcommand{\UniDimArray}[1]{\bm{#1}}
+\newcommand{\BiDimArray}[1]{\bm{#1}}
+
+\newcommand{\der}{\text{d}}
+\newcommand{\e}{\text{e}}
+\newcommand{\Ne}{N_{\text{e}}}
+\newcommand{\proba}{\mathbb{P}}
+\newcommand{\pfix}{\proba_{\text{fix}}}
+\newcommand{\dn}{d_N}
+\newcommand{\ds}{d_S}
+\newcommand{\dnds}{\dn / \ds}
+\newcommand{\Sphy}{S_{0}}
+\newcommand{\SphyMean}{\overline{\Sphy}}
+\newcommand{\SphyDel}{\mathcal{D}_0}
+\newcommand{\SphyNeu}{\mathcal{N}_0}
+\newcommand{\SphyBen}{\mathcal{B}_0}
+\newcommand{\Sphyclass}{x}
+\newcommand{\SphyclassAlt}{y}
+\newcommand{\given}{\mid}
+\newcommand{\Spop}{S}
+\newcommand{\SpopDel}{\mathcal{D}}
+\newcommand{\SpopNeu}{\mathcal{N}}
+\newcommand{\SpopBen}{\mathcal{B}}
+\newcommand{\ProbaPopDel}{\proba{[} \SpopDel]}
+\newcommand{\ProbaPopNeu}{\proba{[} \SpopNeu ]}
+\newcommand{\ProbaPopBen}{\proba{[} \SpopBen ]}
+\newcommand{\AdvMean}{\beta_b}
+\newcommand{\DelMean}{\beta_d}
+\newcommand{\thetaSyn}{\theta_{\text{S}}}
+\newcommand{\pvalue}{p\text{-value}}
+
+% Model
+\newcommand{\submatrix}{q}
+\newcommand{\Submatrix}{\BiDimArray{\submatrix}}
+\newcommand{\probmatrix}{P}
+\newcommand{\Probmatrix}{\BiDimArray{\probmatrix}}
+\newcommand{\fit}{F}
+\newcommand{\Fit}{\UniDimArray{\fit}}
+\newcommand{\indice}{l}
+\newcommand{\indiceexp}{^{(\indice)}}
+\newcommand{\ci}{{a}}
+\newcommand{\cj}{{b}}
+\newcommand{\itoj}{\ci \mapsto \cj}
+\newcommand{\nuc}{\mathcal{M}}
+\newcommand{\fiti}{\fit_{\ci}}
+\newcommand{\fitj}{\fit_{\cj}}
+\newcommand{\mutmatrix}{R}
+\newcommand{\Mutmatrix}{\BiDimArray{\mutmatrix}}
+\newcommand{\exchan}{\rho}
+\newcommand{\Exchan}{\UniDimArray{\exchan}}
+\newcommand{\mutequi}{\sigma}
+\newcommand{\Mutequi}{\UniDimArray{\mutequi}}
+\newcommand{\Tree}{\mathcal{T}}
+\newcommand{\branch}{\text{j}}
+\newcommand{\branchexp}{^{(\branch)}}
+\newcommand{\branchlength}{l}
+% Alignment
+\newcommand{\data}{D}
+\newcommand{\Data}{\BiDimArray{\data}}
+\newcommand{\site}{\text{i}}
+\newcommand{\Nsite}{\text{N}}
+\newcommand{\siteexp}{^{(\site)}}
+\newcommand{\Setsite}{\site \in \{1, \hdots, \Nsite\} }
+\newcommand{\branchsiteexp}{^{(\branch, \site)}}
+% Categories
+\newcommand{\cat}{\text{k}}
+\newcommand{\Ncat}{\text{K}}
+\newcommand{\catexp}{^{(\cat)}}
+\newcommand{\catInterval}{\{1, \hdots, \Ncat\}}
+\newcommand{\Setcat}{\cat \in \catInterval }
+\newcommand{\branchcatexp}{^{(\branch, \cat)}}
+\newcommand{\profile}{\phi}
+\newcommand{\Profile}{\UniDimArray{\profile}}
+\newcommand{\concentrationProfile}{\alpha}
+\newcommand{\centerProfile}{\UniDimArray{\gamma}}
+\newcommand{\catVar}{\kappa}
+\newcommand{\catsite}{\catVar\left(\site\right)}
+\newcommand{\catmultivar}{m}
+\newcommand{\catMultiVar}{\UniDimArray{\catmultivar}}
+\newcommand{\stickbreaking}{\theta}
+\newcommand{\StickBreaking}{\UniDimArray{\stickbreaking}}
+\newcommand{\stick}{\psi}
+\newcommand{\stickbreakinghyper}{\beta}
+\newcommand{\Multivariate}{\UniDimArray{Z}}
+\newcommand{\subhistory}{\mathcal{H}}
+
+\title{\textbf{Estimating the proportion of beneficial mutations that are not adaptive in mammals}}
+
+\author{
+    \large
+    \textbf{T. {Latrille}$^{1\dag}$\orcidlink{0000-0002-9643-4668}, J. {Joseph}$^{2\dag}$\orcidlink{0009-0002-1312-9930}, D.~A. {Hartasánchez}$^{1}$\orcidlink{0000-0003-2596-6883}, N. {Salamin}$^{1}$\orcidlink{0000-0002-3963-4954}}\\
+    \scriptsize $^{1}$Department of Computational Biology, Université de Lausanne, Lausanne, Switzerland\\
+    \scriptsize $^{2}$Laboratoire de Biométrie et Biologie Evolutive, UMR5558, Université Lyon 1, Villeurbanne, France \\
+    \scriptsize $^{\dag}$These authors contributed equally to this work\\
+    \normalsize \texttt{\href{mailto:thibault.latrille@ens-lyon.org}{thibault.latrille@ens-lyon.org}} \\
+}
+
+
+\date{}
+
+\begin{document}
+    \maketitle
+    \part*{S4 File}
+    \vspace{-1em}
+    \tableofcontents
+    \listoffigures
+    \listoftables
+    \clearpage
+
+    \section{Probability for beneficial mutations to be non-adaptive (\texorpdfstring{$\proba{[}\SphyBen\given \SpopBen {]}$}{P[B₀|B]})}
+
+    \subsection{Across different populations}
+    Probability for beneficial mutations to be non-adaptive, namely $\proba{[}\SphyBen\given \SpopBen {]}$, is obtained from Bayes' formula (eq.~14) merging three terms: the probability for a new mutation to be a non-adaptive beneficial mutation ($\proba{[} \SphyBen {]}$, eq.~5), the probability for a mutation to be beneficial ($\proba{[} \SpopBen {]}$, eq.~15) and the probability for a mutation to be beneficial at the population scale given that it is predicted to be a non-adaptive beneficial mutation at the phylogenetic scale ($\proba{[} \SpopBen \given \SphyBen{]}$, eq.~12).
+    These four estimates across populations are shown in Table~\ref{table:proba}.
+
+    \begin{center}
+        \scriptsize
+        \begin{longtable*}{|l|l|r|r|r|r|r|r|}
+            \toprule
+            Population & Species & $N_e$ & $\proba{[}\SphyBen{]}$ & $\proba{[} \SpopBen {]}$ & $\frac{\proba{[}\SphyBen]}{\proba{[} \SpopBen ]}$ & $\proba{[} \SpopBen \given \SphyBen{]}$ & $\proba{[}\SphyBen\given \SpopBen {]}$ \\
+            \midrule
+            \endhead
+            \midrule
+            \multicolumn{8}{r}{{Continued on next page}} \\
+            \midrule
+            \endfoot
+            \bottomrule
+            \endlastfoot
+            \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $7.5\times 10^{4}$ & $ 0.012$ & $ 0.015$ & $ 0.827$ & $ 0.648$ & $ 0.536$ \\
+            Iran & Bos taurus & $5.6\times 10^{4}$ & $ 0.011$ & $ 0.039$ & $ 0.279$ & $ 0.873$ & $ 0.243$ \\
+            Uganda & Bos taurus & $1.3\times 10^{5}$ & $ 0.011$ & $ 0.015$ & $ 0.720$ & $ 0.576$ & $ 0.415$ \\
+            \rowcolor{LIGHTGREY} Australia & Capra hircus & $1.7\times 10^{5}$ & $ 0.011$ & $ 0.023$ & $ 0.480$ & $ 0.368$ & $ 0.177$ \\
+            \rowcolor{LIGHTGREY} France & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.022$ & $ 0.515$ & $ 0.368$ & $ 0.190$ \\
+            \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.025$ & $ 0.448$ & $ 0.368$ & $ 0.165$ \\
+            \rowcolor{LIGHTGREY} Iran & Capra hircus & $2.3\times 10^{5}$ & $ 0.011$ & $ 0.021$ & $ 0.525$ & $ 0.368$ & $ 0.193$ \\
+            \rowcolor{LIGHTGREY} Italy & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.017$ & $ 0.660$ & $ 0.368$ & $ 0.243$ \\
+            \rowcolor{LIGHTGREY} Morocco & Capra hircus & $2.2\times 10^{5}$ & $ 0.011$ & $ 0.017$ & $ 0.667$ & $ 0.368$ & $ 0.245$ \\
+            Iran & Ovis aries & $3.8\times 10^{5}$ & $ 0.012$ & $ 0.006$ & $ 1.984$ & $ 0.205$ & $ 0.407$ \\
+            Iran (O. orientalis) & Ovis aries & $4.5\times 10^{5}$ & $ 0.011$ & $ 0.012$ & $ 0.983$ & $ 0.193$ & $ 0.190$ \\
+            Iran (O. vignei) & Ovis aries & $3.7\times 10^{5}$ & $ 0.012$ & $ 0.020$ & $ 0.579$ & $ 0.190$ & $ 0.110$ \\
+            Various & Ovis aries & $4.1\times 10^{5}$ & $ 0.011$ & $ 0.012$ & $ 0.967$ & $ 0.229$ & $ 0.222$ \\
+            Morocco & Ovis aries & $ 4\times 10^{5}$ & $ 0.012$ & $ 0.005$ & $ 2.435$ & $ 0.211$ & $ 0.514$ \\
+            \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $1.1\times 10^{5}$ & $ 0.009$ & $ 0.021$ & $ 0.452$ & $ 0.648$ & $ 0.293$ \\
+            \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.009$ & $ 0.018$ & $ 0.515$ & $ 0.535$ & $ 0.275$ \\
+            \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.009$ & $ 0.021$ & $ 0.444$ & $ 0.552$ & $ 0.245$ \\
+            \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.009$ & $ 0.007$ & $ 1.423$ & $ 0.577$ & $ 0.821$ \\
+            \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $1.5\times 10^{5}$ & $ 0.009$ & $ 0.022$ & $ 0.437$ & $ 0.588$ & $ 0.257$ \\
+            \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 1\times 10^{5}$ & $ 0.009$ & $ 0.016$ & $ 0.597$ & $ 0.599$ & $ 0.358$ \\
+            \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $1.8\times 10^{5}$ & $ 0.009$ & $ 0.016$ & $ 0.594$ & $ 0.574$ & $ 0.341$ \\
+            \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $1.2\times 10^{5}$ & $ 0.009$ & $ 0.017$ & $ 0.563$ & $ 0.598$ & $ 0.336$ \\
+            \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.009$ & $ 0.022$ & $ 0.427$ & $ 0.585$ & $ 0.250$ \\
+            African & Homo sapiens & $5.6\times 10^{4}$ & $ 0.010$ & $ 0.020$ & $ 0.484$ & $ 0.721$ & $ 0.349$ \\
+            Admixed American & Homo sapiens & $4.5\times 10^{4}$ & $ 0.010$ & $ 0.019$ & $ 0.500$ & $ 0.690$ & $ 0.345$ \\
+            East Asian & Homo sapiens & $ 4\times 10^{4}$ & $ 0.010$ & $ 0.027$ & $ 0.362$ & $ 0.688$ & $ 0.249$ \\
+            European & Homo sapiens & $4.2\times 10^{4}$ & $ 0.010$ & $ 0.027$ & $ 0.361$ & $ 0.688$ & $ 0.248$ \\
+            South Asian & Homo sapiens & $4.4\times 10^{4}$ & $ 0.010$ & $ 0.030$ & $ 0.324$ & $ 0.691$ & $ 0.224$ \\
+        \end{longtable*}
+        \captionof{table}[Probability for beneficial mutations to be non-adaptive ($\proba{[}\SphyBen\given \SpopBen {]}$)]{
+        \textbf{Probability for beneficial mutations to be non-adaptive ($\bm{\proba{[}\SphyBen\given \SpopBen {]}}$).}
+        $\Ne$ is the estimated effective population size.
+        $\proba{[} \SphyBen {]}$ (eq.~5) is the probability for a new mutation to be a non-adaptive beneficial mutation.
+        These mutations have a selection coefficient predicted at the phylogenetic-scale larger than 1, thus toward a more fit amino-acid.
+        $\proba{[} \SpopBen {]}$ (eq.~15) is the probability for a mutation to be beneficial.
+        These mutations have a selection coefficient at the population-scale larger than 1.
+        $\proba{[} \SpopBen \given \SphyBen{]}$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given that it is predicted to be a non-adaptive beneficial mutation at the phylogenetic scale (the \textit{precision}).
+        $\proba{[} \SphyBen \given \SpopBen{]}$ (eq.~14) is the probability for a mutation to be non-adaptive given that it is beneficial at the population scale (the \textit{recall}).
+        This probability is obtained using Bayes' formula.
+        \label{table:proba}
+        }
+    \end{center}
+
+    \newpage
+    \subsection{Misannotations of ancestral alleles}
+
+    A potential caveat of our method is that if a deleterious derived allele segregates at low frequency but is wrongly annotated as ancestral, it will result in a SNP that will be both predicted as advantageous and segregating at high frequency, wrongly suggesting that this variant is correctly inferred as beneficial.
+    In this context, misannotations of ancestral alleles could inflate our estimation of the proportion of beneficial non-adaptive mutations.
+    However, we show that this problem impacts our estimation in two ways, albeit, only slightly. \\
+
+    First, if misannotation is influencing the recall for $\SphyBen$ ($\proba{[}\SphyBen\given \SpopBen {]}$), then the recall should increase as a function of  divergence to the sister species ($\ds$: number of synonymous substitutions per site) since divergence would increase the rate of misannotations.
+    Shown in Figure~\ref{fig:distance-sister} is recall $\proba{[}\SphyBen\given \SpopBen {]}$ as a function of divergence ($\ds$) in which the latter is not an explanatory variable.
+
+    \begin{center}
+        \includegraphics[width=0.75\linewidth, page=1]{artworks/results.distance.recall_pos.scatter.pdf}
+        \captionof{figure}[$\proba{[}\SphyBen\given \SpopBen {]}$ as a function of distance to the sister species.]{\textbf{Proportion of non-adaptive mutations among beneficial ones ($\bm{\proba{[}\SphyBen\given \SpopBen {]}}$) as a function of distance to the sister species.}
+        $\proba{[} \SphyBen \given \SpopBen{]}$ (eq.~14) is the probability for a beneficial mutation to be non-adaptive.
+        $\ds$ is number of synonymous substitutions per site that occurred since divergence with the sister species (closest species in the mammalian tree).
+        Populations are represented by circles, and squares are the mean for the species.
+        Correlations account for phylogenetic relationship and non-independence of samples, through the fit of a Phylogenetic Generalized Linear Model (see Materials \& Methods).\label{fig:distance-sister}}
+    \end{center}
+
+    \newpage
+
+    Second, the distribution of selection coefficients ($\Sphy$) that we observed for segregating mutations and for divergence also suggests that we effectively controlled for misannotations.
+    Under a scenario where beneficial non-adaptive mutations would only be the result of misannotations, one would expect that the positive part of the fitness effects ($\proba{[}\Sphy{]}$) of observed polymorphisms currently segregating in the population should reflect the negative one ($\proba{[}-\Sphy{]}$).
+    Indeed, the number of misannotated beneficial mutations should be proportional to the number of deleterious mutations with the same selection coefficient.
+    The ratio between advantageous and deleterious polymorphisms of the same selection coefficient should therefore be a constant that represents the rate of misannotation (typically influenced by the distance to the sister species).
+    However, this is not what we observe in the DFE of polymorphisms (shown in Figure~\ref{mispol-expectation} for the African population of \textit{Homo sapiens}) thus giving us the confidence that misannotations are not common.
+    Overall, the observed DFE of substitutions is much better explained by the expected DFE of new mutations (section S\ref{subsec:expectedDFE} than by misannotations).
+
+
+    \begin{center}
+        \includegraphics[width=0.75\linewidth, page=1]{artworks/poly.Homo_sapiens.AFR.folded_ratio.pdf}
+        \captionof{figure}[Ratio of $\proba{[}\Sphy{]}$ over $\proba{[}-\Sphy{]}$ for polymorphisms of the African population of \textit{Homo sapiens}.]{\textbf{Ratio of $\bm{\proba{[}\Sphy{]}}$ over $\bm{\proba{[}-\Sphy{]}}$ for polymorphisms of the African population of \textit{Homo sapiens}.}
+        From the histogram of distribution of scaled selection coefficients ($\Sphy$) for all observed polymorphism, we obtain 30 bins for positive selection coefficient ($\Sphy$) and 30 bins for negative selection coefficient ($\Sphy$). For a given bin of $\Sphy$, $\proba{[}\Sphy{]}$ the number of observed polymorphisms in the positive part, while $\proba{[}-\Sphy{]}$ the number of observed polymorphisms in the negative part. $\bm{\proba{[}\Sphy{]} / \proba{[}-\Sphy{]}}$ is the ratio of the positive part over the negative part. Alternatively stated, it is folding the DFE of observed polymorphism (Panel~D of Fig~D in S3~File) around 0, by taking the right part (positive $\Sphy$) of the histogram over the left part (negative $\Sphy$).
+        }
+        \label{mispol-expectation}
+    \end{center}
+
+    \newpage
+    \subsection{Simulations of site-frequency spectra}
+
+    We performed population-genetic simulations to test whether our approach is able to recover the proportion of beneficial mutations that are non-adaptive in synthetic polymorphism datasets.
+    More specifically, we performed simulations of site-frequency spectra, thus at the population-genetic scale, by using a mixture of the DFEs that is predicted from the phylogenetic mutation-selection model, and adding adaptive mutations to this DFE.
+    In practice, simulations are performed under the Poisson Random Field (PRF) framework of population genetics\cite{sawyer_population_1992}.
+    Each simulation generates a synthetic synonymous SFS, and a synthetic non-synonymous SFS for the mutations in the category $x \in \{ \SphyDel, \SphyNeu, \SphyBen \}$.
+
+    Technically, for non-synonymous mutations, we first draw a random sample of the selection coefficients from the mixture of DFEs using $\proba{[}y \given x{]}$ for $y \in \{ \SpopDel, \SpopNeu, \SpopBen \}$ as parameters.
+    Importantly, $\proba{[}\SpopBen \given \SphyDel{]}$ and $\proba{[}\SpopBen \given \SphyNeu{]}$ are considered adaptive mutations, and thus their selection coefficients have a selection coefficient of $S_{\text{adaptive}}=10$.
+    All the others are drawn for the DFEs that are predicted from the phylogenetic mutation-selection model.
+    Synonymous mutations are considered neutral and have $S=0$.
+
+    Given these selection coefficients, to obtain the expected SFS we integrate over the limiting density of frequency that mutations are segregating in the population, as described from eqs. 1--2 in \textcite{tataru_inference_2017}.
+    And finally, given this expected SFS, we perform a Poisson random sampling to obtain a sampled SFS of size n matching the total number of polymorphism to simulate.
+
+    In summary, the simulations generates a synonymous SFS, and a non-synonymous SFS for the mutations in the category $x \in \{ \SphyDel, \SphyNeu, \SphyBen \}$, and require as input the following:
+    \begin{itemize}
+        \item Total number of polymorphisms to simulate (synonymous and non-synonymous).
+        \item The DFE of $\Sphy$ predicted from the phylogenetic mutation-selection.
+        \item Estimates of $\proba{[}y \given x{]}$ for $y \in \{ \SpopDel, \SpopNeu, \SpopBen \}$.
+        \item Selection coefficient for adaptive mutations, here $S_{\text{adaptive}}=20$.
+        \item The sampled SFS size $n$, here $n=16$ (i.e.\ twice the number of sampled individuals).
+    \end{itemize}
+
+    From these two SFS (synonymous and non-synonymous), we run polyDFE to obtain $\proba{[}\SpopDel \given x{]}$, $\proba{[}\SpopNeu \given x{]}$ and $\proba{[}\SpopBen \given x{]}$ (eqs.\ 9--11).
+    By doing so for the 3 categories $x \in \{ \SphyDel, \SphyNeu, \SphyBen \}$, we can ultimately compute $\proba{[}\SphyBen \given \SpopBen{]}$ (eqs.\ 14--15), which can be then be compared to the ground truth.
+
+    We used 8 different sets of parameters ($\proba{[}y \given x{]}$ and number of polymorphisms) and simulated 10 replicates for each set of parameters, shown in Figure~\ref{fig:simulations}.
+    These set of input parameters are provided to match $\proba{[}\SphyBen \given \SpopBen{]}$ of the following populations: Set 1 for Admixed American (\textit{Homo sapiens}), Set 2 for African (\textit{Homo sapiens}), Set 3 for Nevis (\textit{Chlorocebus sabaeus}), Set 4 for Iran (\textit{Ovis orientalis}), Set 5 for Uganda (\textit{Bos taurus}), Set 6 for Morocco (\textit{Ovis aries}), Set 7 for \textit{Equus caballus}, Set 8 for Gambia (\textit{Chlorocebus sabaeus}).
+    For each synthetic data we ran polyDFE and derived $\proba{[}\SphyBen \given \SpopBen{]}$ which was then compared to the ground truth (calculated analytically from the set parameters $\proba{[}y \given x], x \in \{ \SphyDel, \SphyNeu, \SphyBen \}, y \in \{ \SpopDel, \SpopNeu, \SpopBen \}$).
+    These simulations show that we are able to accurately retrieve the proportion of non-adaptive mutations in those synthetic datasets.
+
+
+    \begin{center}
+        \includegraphics[width=\linewidth, page=1]{artworks/simulations.pos.pdf}
+        \captionof{figure}[Proportion of non-adaptive mutations among beneficial ones ($\proba{[}\SphyBen\given \SpopBen {]}$) estimated on synthetic site-frequency spectra.]{\textbf{Proportion of non-adaptive mutations among beneficial ones ($\bm{\proba{[}\SphyBen\given \SpopBen {]}}$) estimated on synthetic site-frequency spectra.} Each set has ben simulated using a different value for $\proba{[}\SphyBen\given \SpopBen {]}$. Bars correspond to the $\proba{[}\SphyBen\given \SpopBen {]}$ used to simulate the site-frequency spectra, each blue circle corresponds to $\proba{[}\SphyBen\given \SpopBen {]}$ estimated by one polyDFE simulation, and red crosses correspond to the mean of estimations across 10 replicates.\label{fig:simulations}}
+    \end{center}
+
+
+    \section{Filtering of variable sites}
+
+    \subsection{Masking CpG transitions}
+    We also tested our prediction when masking CpG transitions since the mutation rate of CpG dinucleotides is higher than the mutation rate of other dinucleotides, which can affect the estimation of the DFE.
+    Any nucleotide transition including a CpG dinucleotide either in the ancestral or derived state is considered as a CpG transition.
+    We masked all CpG transitions in the mutational opportunities, the substitutions in the terminal branches, and the polymorphisms segregating in the population. We then re-estimated the DFE and the proportion of non-adaptive beneficial mutations.
+
+    \newpage
+    \subsection{Probability for beneficial mutations to be non-adaptive}
+    When filtering out CpG sites, the estimation of $\proba{[} \SpopBen {]}$ and $\proba{[}\SphyBen\given \SpopBen {]}$ across populations is shown in Table~\ref{table:no-CpG-bayes}.
+    Comparing these results with Table~\ref{table:proba}, we acknowledge that the exact proportion of non-adaptive among beneficial mutations is dependent on the whether we masked CpG sites.
+    However, we can still see that non-adaptive beneficial mutations are positively selected compared to neutral and deleterious ones, and this result is not dependent on whether we masked CpG sites or not.
+
+    \begin{center}
+        \scriptsize
+        \begin{longtable*}{|l|l|r|r|r|r|r|r|}
+            \toprule
+            Population & Species & $\Ne$ & $\proba{[}\SphyBen{]}$ & $\proba{[} \SpopBen {]}$ & $\frac{\proba{[}\SphyBen]}{\proba{[} \SpopBen ]}$ & $\proba{[} \SpopBen \given \SphyBen{]}$ & $\proba{[}\SphyBen\given \SpopBen {]}$ \\
+            \midrule
+            \endhead
+            \midrule
+            \multicolumn{8}{r}{{Continued on next page}} \\
+            \midrule
+            \endfoot
+
+            \bottomrule
+            \endlastfoot
+            \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $7.5\times 10^{4}$ & $ 0.012$ & $ 0.028$ & $ 0.421$ & $ 0.543$ & $ 0.229$ \\
+            Iran & Bos taurus & $5.6\times 10^{4}$ & $ 0.011$ & $ 0.038$ & $ 0.283$ & $ 0.797$ & $ 0.226$ \\
+            Uganda & Bos taurus & $1.3\times 10^{5}$ & $ 0.011$ & $ 0.022$ & $ 0.479$ & $ 0.406$ & $ 0.195$ \\
+            \rowcolor{LIGHTGREY} Australia & Capra hircus & $1.7\times 10^{5}$ & $ 0.011$ & $ 0.024$ & $ 0.454$ & $ 0.158$ & $ 0.072$ \\
+            \rowcolor{LIGHTGREY} France & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.034$ & $ 0.320$ & $ 0.258$ & $ 0.082$ \\
+            \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.032$ & $ 0.341$ & $ 0.268$ & $ 0.091$ \\
+            \rowcolor{LIGHTGREY} Iran & Capra hircus & $2.3\times 10^{5}$ & $ 0.011$ & $ 0.026$ & $ 0.417$ & $ 0.294$ & $ 0.123$ \\
+            \rowcolor{LIGHTGREY} Italy & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.023$ & $ 0.472$ & $ 0.100$ & $ 0.047$ \\
+            \rowcolor{LIGHTGREY} Morocco & Capra hircus & $2.2\times 10^{5}$ & $ 0.011$ & $ 0.018$ & $ 0.593$ & $ 0.141$ & $ 0.083$ \\
+            Iran & Ovis aries & $3.8\times 10^{5}$ & $ 0.011$ & $ 0.012$ & $ 0.981$ & $ 0.243$ & $ 0.239$ \\
+            Iran (O. orientalis) & Ovis aries & $4.5\times 10^{5}$ & $ 0.011$ & $ 0.019$ & $ 0.603$ & $ 0.155$ & $ 0.093$ \\
+            Iran (O. vignei) & Ovis aries & $3.7\times 10^{5}$ & $ 0.011$ & $ 0.025$ & $ 0.445$ & $ 0.252$ & $ 0.112$ \\
+            Various & Ovis aries & $4.1\times 10^{5}$ & $ 0.011$ & $ 0.016$ & $ 0.704$ & $ 0.198$ & $ 0.139$ \\
+            Morocco & Ovis aries & $ 4\times 10^{5}$ & $ 0.011$ & $ 0.008$ & $ 1.389$ & $ 0.165$ & $ 0.229$ \\
+            \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $1.1\times 10^{5}$ & $ 0.009$ & $ 0.013$ & $ 0.752$ & $ 0.231$ & $ 0.174$ \\
+            \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.009$ & $ 0.018$ & $ 0.519$ & $ 0.209$ & $ 0.108$ \\
+            \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.009$ & $ 0.025$ & $ 0.385$ & $ 0.241$ & $ 0.093$ \\
+            \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.009$ & $ 0.007$ & $ 1.346$ & $ 0.204$ & $ 0.275$ \\
+            \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $1.5\times 10^{5}$ & $ 0.009$ & $ 0.021$ & $ 0.443$ & $ 0.239$ & $ 0.106$ \\
+            \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 1\times 10^{5}$ & $ 0.009$ & $ 0.014$ & $ 0.690$ & $ 0.146$ & $ 0.101$ \\
+            \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $1.8\times 10^{5}$ & $ 0.009$ & $ 0.019$ & $ 0.498$ & $ 0.272$ & $ 0.135$ \\
+            \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $1.2\times 10^{5}$ & $ 0.009$ & $ 0.017$ & $ 0.567$ & $ 0.217$ & $ 0.123$ \\
+            \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.009$ & $ 0.024$ & $ 0.388$ & $ 0.308$ & $ 0.119$ \\
+            African & Homo sapiens & $5.6\times 10^{4}$ & $ 0.010$ & $ 0.026$ & $ 0.367$ & $ 0.411$ & $ 0.151$ \\
+            Admixed American & Homo sapiens & $4.5\times 10^{4}$ & $ 0.010$ & $ 0.017$ & $ 0.551$ & $ 0.374$ & $ 0.206$ \\
+            East Asian & Homo sapiens & $ 4\times 10^{4}$ & $ 0.010$ & $ 0.029$ & $ 0.332$ & $ 0.370$ & $ 0.123$ \\
+            European & Homo sapiens & $4.2\times 10^{4}$ & $ 0.010$ & $ 0.031$ & $ 0.304$ & $ 0.371$ & $ 0.113$ \\
+            South Asian & Homo sapiens & $4.4\times 10^{4}$ & $ 0.010$ & $ 0.032$ & $ 0.302$ & $ 0.369$ & $ 0.111$ \\
+        \end{longtable*}
+        \captionof{table}[$\proba{[}\SphyBen\given \SpopBen {]}$ when masking CpG transitions.]{\textbf{$\bm{\proba{[}\SphyBen\given \SpopBen {]}}$ when masking CpG transitions.}
+        $\Ne$ is the estimated effective population size.
+        $\proba{[} \SphyBen {]}$ (eq.~5) is the probability for a new mutation to be a non-adaptive beneficial mutation.
+        These mutations have a selection coefficient predicted at the phylogenetic-scale larger than 1, thus toward a more fit amino-acid.
+        $\proba{[} \SpopBen {]}$ (eq.~15) is the probability for a mutation to be beneficial.
+        These mutations have a selection coefficient at the population-scale larger than 1.
+        $\proba{[} \SpopBen \given \SphyBen{]}$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a non-adaptive beneficial mutation at the phylogenetic scale (the \textit{precision}).
+        $\proba{[} \SphyBen \given \SpopBen{]}$ (eq.~14) is the probability for a mutation to be non-adaptive given it is beneficial at the population scale (the \textit{recall}).
+        This probability is obtained using Bayes' formula.\label{table:no-CpG-bayes}}
+    \end{center}
+
+    \newpage
+
+    \subsection{Precision and recall}
+    The estimation of precision and recall across populations while filtering out CpG sites for the estimation of $\Spop$ is shown in Table~\ref{table:no-CpG}.
+    Comparing these results with tables 1, we acknowledge that the exact quantification of \textit{precision} and \textit{recall} is dependent on the whether we masked CpG sites.
+    However, we can still see that non-adaptive beneficial mutations are positively selected compared to neutral and deleterious ones, and this result is not dependent on whether we masked CpG sites or not.
+    \begin{center}
+        \begin{adjustbox}{width=\textwidth}
+            \begin{tabular}{||l|l|r||r|r||r|r||r|r||}
+                \toprule
+                \multicolumn{3}{||c||}{} &
+                \multicolumn{2}{c||}{\shortstack{\textbf{Deleterious mutations} \\ $\bm{\SpopDel \coloneqq \Spop<-1}$ \\ $\bm{\SphyDel \coloneqq \Sphy<-1}$}} &
+                \multicolumn{2}{c||}{\shortstack{\textbf{Nearly-neutral mutations} \\ $\bm{\SpopNeu \coloneqq -1<\Spop<1}$ \\ $\bm{\SphyNeu \coloneqq -1<\Sphy<1}$}} &
+                \multicolumn{2}{c||}{\shortstack{\textbf{Beneficial mutations} \\ $\bm{\SpopBen \coloneqq \Spop>1}$ \\ $\bm{\SphyBen \coloneqq \Sphy>1}$}}
+                \\ \hline
+                \textbf{Population} &
+                \textbf{Species} &
+                $\bm{\Ne}$ &
+                \makecell{\textbf{Precision} \\ $\bm{\proba{[}\SpopDel \given \SphyDel]}$} &
+                \makecell{\textbf{Recall} \\ $\bm{\proba{[}\SphyDel \given \SpopDel]}$}           &
+                \makecell{\textbf{Precision}      \\ $\bm{\proba{[}\SpopNeu \given \SphyNeu]}$}                                    &
+                \makecell{\textbf{Recall}          \\ $\bm{\proba{[}\SphyNeu \given \SpopNeu]}$}                                  &
+                \makecell{\textbf{Precision}          \\ $\bm{\proba{[}\SpopBen \given \SphyBen]}$}          &
+                \makecell{\textbf{Recall}        \\ $\bm{\proba{[}\SphyBen \given \SpopBen]}$}
+                \\   \midrule
+                \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $7.5\times 10^{4}$ & $ 0.887$ & $ 0.984$ & $ 0.740$ & $ 0.356$ & $ 0.543$ & $ 0.229$ \\
+                Iran & Bos taurus & $5.6\times 10^{4}$ & $ 0.888$ & $ 1.000$ & $ 0.632$ & $ 0.302$ & $ 0.797$ & $ 0.226$ \\
+                Uganda & Bos taurus & $1.3\times 10^{5}$ & $ 0.929$ & $ 0.973$ & $ 0.501$ & $ 0.349$ & $ 0.406$ & $ 0.195$ \\
+                \rowcolor{LIGHTGREY} Australia & Capra hircus & $1.7\times 10^{5}$ & $ 0.926$ & $ 0.972$ & $ 0.609$ & $ 0.421$ & $ 0.158$ & $ 0.072$ \\
+                \rowcolor{LIGHTGREY} France & Capra hircus & $1.9\times 10^{5}$ & $ 0.927$ & $ 0.959$ & $ 0.354$ & $ 0.321$ & $ 0.258$ & $ 0.082$ \\
+                \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $1.9\times 10^{5}$ & $ 0.931$ & $ 0.967$ & $ 0.502$ & $ 0.423$ & $ 0.268$ & $ 0.091$ \\
+                \rowcolor{LIGHTGREY} Iran & Capra hircus & $2.3\times 10^{5}$ & $ 0.937$ & $ 0.966$ & $ 0.529$ & $ 0.451$ & $ 0.294$ & $ 0.123$ \\
+                \rowcolor{LIGHTGREY} Italy & Capra hircus & $1.9\times 10^{5}$ & $ 0.927$ & $ 0.970$ & $ 0.550$ & $ 0.390$ & $ 0.100$ & $ 0.047$ \\
+                \rowcolor{LIGHTGREY} Morocco & Capra hircus & $2.2\times 10^{5}$ & $ 0.933$ & $ 0.965$ & $ 0.534$ & $ 0.401$ & $ 0.141$ & $ 0.083$ \\
+                Iran & Ovis aries & $3.8\times 10^{5}$ & $ 0.947$ & $ 0.957$ & $ 0.446$ & $ 0.393$ & $ 0.243$ & $ 0.239$ \\
+                Iran (O. orientalis) & Ovis aries & $4.5\times 10^{5}$ & $ 0.951$ & $ 0.961$ & $ 0.396$ & $ 0.386$ & $ 0.155$ & $ 0.093$ \\
+                Iran (O. vignei) & Ovis aries & $3.7\times 10^{5}$ & $ 0.954$ & $ 0.960$ & $ 0.379$ & $ 0.432$ & $ 0.252$ & $ 0.112$ \\
+                Various & Ovis aries & $4.1\times 10^{5}$ & $ 0.949$ & $ 0.956$ & $ 0.434$ & $ 0.418$ & $ 0.198$ & $ 0.139$ \\
+                Morocco & Ovis aries & $ 4\times 10^{5}$ & $ 0.946$ & $ 0.959$ & $ 0.453$ & $ 0.374$ & $ 0.165$ & $ 0.229$ \\
+                \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $1.1\times 10^{5}$ & $ 0.916$ & $ 0.971$ & $ 0.523$ & $ 0.306$ & $ 0.231$ & $ 0.174$ \\
+                \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.933$ & $ 0.969$ & $ 0.486$ & $ 0.353$ & $ 0.209$ & $ 0.108$ \\
+                \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.918$ & $ 0.973$ & $ 0.533$ & $ 0.348$ & $ 0.241$ & $ 0.093$ \\
+                \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.925$ & $ 0.971$ & $ 0.572$ & $ 0.343$ & $ 0.204$ & $ 0.275$ \\
+                \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $1.5\times 10^{5}$ & $ 0.931$ & $ 0.971$ & $ 0.521$ & $ 0.378$ & $ 0.239$ & $ 0.106$ \\
+                \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 1\times 10^{5}$ & $ 0.916$ & $ 0.972$ & $ 0.535$ & $ 0.313$ & $ 0.146$ & $ 0.101$ \\
+                \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $1.8\times 10^{5}$ & $ 0.928$ & $ 0.970$ & $ 0.546$ & $ 0.378$ & $ 0.272$ & $ 0.135$ \\
+                \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $1.2\times 10^{5}$ & $ 0.917$ & $ 0.971$ & $ 0.507$ & $ 0.309$ & $ 0.217$ & $ 0.123$ \\
+                \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.930$ & $ 0.969$ & $ 0.495$ & $ 0.372$ & $ 0.308$ & $ 0.119$ \\
+                African & Homo sapiens & $5.6\times 10^{4}$ & $ 0.888$ & $ 0.978$ & $ 0.587$ & $ 0.296$ & $ 0.411$ & $ 0.151$ \\
+                Admixed American & Homo sapiens & $4.5\times 10^{4}$ & $ 0.874$ & $ 0.979$ & $ 0.591$ & $ 0.256$ & $ 0.374$ & $ 0.206$ \\
+                East Asian & Homo sapiens & $ 4\times 10^{4}$ & $ 0.877$ & $ 0.980$ & $ 0.593$ & $ 0.280$ & $ 0.370$ & $ 0.123$ \\
+                European & Homo sapiens & $4.2\times 10^{4}$ & $ 0.885$ & $ 0.980$ & $ 0.591$ & $ 0.301$ & $ 0.371$ & $ 0.113$ \\
+                South Asian & Homo sapiens & $4.4\times 10^{4}$ & $ 0.886$ & $ 0.979$ & $ 0.591$ & $ 0.303$ & $ 0.369$ & $ 0.111$ \\
+                \bottomrule
+            \end{tabular}
+        \end{adjustbox}
+        \captionof{table}[Precision and recall when masking CpG transitions.]{
+        \textbf{Precision and recall when masking CpG transitions.}
+        $\Ne$ is the estimated effective population size.
+        \textit{Precision} is the estimation of the selection coefficient at population scale ($\Spop$) given that $\Sphy$ is known.
+        \textit{Recall} is the estimation of $\Sphy$ given selection coefficient at the population scale ($\Spop$) is known.
+        \textit{Recall} for beneficial mutations ($\proba{[}\SphyBen \given \SpopBen{]}$) is the probability for a mutation to be non-adaptive given it is beneficial at the population scale.\label{table:no-CpG}}
+    \end{center}
+
+
+    \newpage
+
+    \subsection{Example site-frequency spectrum}\label{subsec:CpG-expectedDFE}
+
+    The site-frequency spectrum (SFS, panel A) and the congruency between fitness effects estimates ($\Spop$ versus $\Sphy$, panel B) are shown in Figure~\ref{mutsel-dfe-sfs} for the African population of \textit{Homo sapiens} and the South African population of \textit{Chlorocebus sabaeus}.
+
+
+    \begin{center}
+        \begin{minipage}{0.49\linewidth}
+            \flushleft {\tiny A: Site frequency spectrum}
+            \includegraphics[width=\linewidth, page=1]{artworks/CpG.Homo_sapiens.AFR.MutSel-sfs.pdf}
+        \end{minipage}
+        \begin{minipage}{0.49\linewidth}
+            \flushleft {\tiny B: $\Spop$ as function of $\Sphy$ for each class}
+            \includegraphics[width=\linewidth, page=1]{artworks/CpG.Homo_sapiens.AFR.MutSel.polyDFE_C.pdf}
+        \end{minipage}
+    \end{center}
+
+    \begin{center}
+        \begin{minipage}{0.49\linewidth}
+            \flushleft {\tiny C: Site frequency spectrum}
+            \includegraphics[width=\linewidth, page=1]{artworks/CpG.Chlorocebus_sabaeus.South_Africa.MutSel-sfs.pdf}
+        \end{minipage}
+        \begin{minipage}{0.49\linewidth}
+            \flushleft* {\tiny D: $\Spop$ as function of $\Sphy$ for each class}
+            \includegraphics[width=\linewidth, page=1]{artworks/CpG.Chlorocebus_sabaeus.South_Africa.MutSel.polyDFE_C.pdf}
+        \end{minipage}
+    \captionof{figure}[Site-frequency spectrum when masking CpG transitions.]{\textbf{Site-frequency spectrum when masking CpG transitions.} Left (A\&C): the site-frequency spectrum (SFS) in the population for a random sample of 16 alleles (means in solid lines and standard deviations in color shades) for each class of selection ($\SphyDel$, $\SphyNeu$ and $\SphyBen$) and for synonymous mutations, supposedly neutral (black). The SFS represents the proportion of mutations (y-axis) with a given number of derived alleles in the population (x-axis). Here SFS are weighted by the mutational opportunities in each class of selection (synonymous, $\SphyDel$, $\SphyNeu$ and $\SphyBen$). Right (B\&D): proportion of beneficial $\ProbaPopDel$, nearly-neutral $\ProbaPopNeu$, and deleterious mutations $\ProbaPopBen$  estimated at the population scale for each class of selection at the phylogenetic scale. Proportions depicted here are not weighted by their mutational opportunities. Top (A\&C): \textit{Homo sapiens}, African population. Bottom (C\&D): \textit{Chlorocebus sabaeus}, South Africa population.}
+    \label{mutsel-dfe-sfs}
+    \end{center}
+
+
+
+    \newpage
+
+    \section{Excluding genes under adaptation}
+    The proportion of beneficial non-adaptive mutations ($\proba{[}\SphyBen\given \SpopBen {]}$) is higher when excluding genes under adaptation, as shown in Table~\ref{table:no-adaptation-div}, consistent with our expectation that genes with uniformly conserved functions should fit better the nearly-neutral equilibrium model.
+
+
+    \begin{center}
+        \begin{tabular}{|l|l|r|r|}
+            \toprule
+            Population & Species & Control & Case \\
+            \midrule
+            \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $ 0.536$ & $ 0.880$ \\
+            Iran & Bos taurus & $ 0.243$ & $ 0.249$ \\
+            Uganda & Bos taurus & $ 0.415$ & $ 0.429$ \\
+            \rowcolor{LIGHTGREY} Australia & Capra hircus & $ 0.177$ & $ 0.190$ \\
+            \rowcolor{LIGHTGREY} France & Capra hircus & $ 0.190$ & $ 0.201$ \\
+            \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $ 0.165$ & $ 0.169$ \\
+            \rowcolor{LIGHTGREY} Iran & Capra hircus & $ 0.193$ & $ 0.176$ \\
+            \rowcolor{LIGHTGREY} Italy & Capra hircus & $ 0.243$ & $ 0.261$ \\
+            \rowcolor{LIGHTGREY} Morocco & Capra hircus & $ 0.245$ & $ 0.283$ \\
+            \rowcolor{LIGHTGREY} Iran & Ovis aries & $ 0.407$ & $ 0.454$ \\
+            Iran (O. orientalis) & Ovis aries & $ 0.190$ & $ 0.207$ \\
+            Iran (O. vignei) & Ovis aries & $ 0.110$ & $ 0.135$ \\
+            Various & Ovis aries & $ 0.222$ & $ 0.246$ \\
+            Morocco & Ovis aries & $ 0.514$ & $ 0.627$ \\
+            \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $ 0.293$ & $ 0.325$ \\
+            \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $ 0.275$ & $ 0.273$ \\
+            \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $ 0.245$ & $ 0.242$ \\
+            \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $ 0.821$ & $ 0.873$ \\
+            \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $ 0.257$ & $ 0.254$ \\
+            \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 0.358$ & $ 0.395$ \\
+            \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $ 0.341$ & $ 0.375$ \\
+            \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $ 0.336$ & $ 0.355$ \\
+            \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $ 0.250$ & $ 0.263$ \\
+            African & Homo sapiens & $ 0.349$ & $ 0.363$ \\
+            Admixed American & Homo sapiens & $ 0.345$ & $ 0.312$ \\
+            East Asian & Homo sapiens & $ 0.249$ & $ 0.233$ \\
+            European & Homo sapiens & $ 0.248$ & $ 0.211$ \\
+            South Asian & Homo sapiens & $ 0.224$ & $ 0.218$ \\
+            \bottomrule
+        \end{tabular}
+        \captionof{table}[$\proba{[}\SphyBen\given \SpopBen {]}$ excluding or not genes under adaptation.]{\textbf{$\bm{\proba{[}\SphyBen\given \SpopBen {]}}$ excluding or not genes under adaptation.}
+        Genes under adaptation retrieved from \textcite{latrille_genes_2023}.
+        Comparison of $\proba{[}\SphyBen\given \SpopBen {]}$ for the whole genome (control) and when excluding genes under adaptation (case).
+        The non-parametric Wilcoxon signed-rank test evaluates the null hypothesis that the distribution of the differences (case versus control) is symmetric around zero.
+        Applied to the paired samples (case and control), Wilcoxon signed-rank test results in $s=80$ with $\pvalue=0.002$, for the one-sided test (case higher than control).\label{table:no-adaptation}}
+    \end{center}
+
+    \newpage
+
+    \section{Including substitutions in the terminal lineage to estimate \texorpdfstring{$\Spop$}{S}}
+
+    \subsection{Including substitutions in polyDFE}
+
+    Divergence data (number of substitutions per site) can also be included into polyDFE to estimate the DFE, as shown in figure~\ref{fig-incdiv}.
+    For the class of a given class of selection coefficient ($\Sphyclass \in \{\SphyDel, \SphyNeu, \SphyBen \}$), the number of substitutions has already been computed and is given by $D\left( \Sphyclass \right)$ (eq.~6), and the number of sites is given by $L \left( \Sphyclass \right)$ (eq.~4).
+    Otherwise, the procedure is the same as described section \textit{Scaled selection coefficients ($\Spop$) in a population-based method}.
+
+    \begin{center}
+            \includegraphics[width=\textwidth, page=1] {artworks/figure.method.proba.div.pdf}
+            \captionof{figure}[Including substitutions in the terminal lineage to estimate $\Spop$]{\textbf{Including substitutions in the terminal lineage to estimate $\bm{\Spop}$.} Same as Figure 2 in the main text, but including substitutions in the terminal lineage to estimate $\Spop$.
+            At the phylogenetic scale (A), we estimated the amino-acid fitness for each site from protein-coding DNA alignments using mutation-selection codon models.
+            For every possible mutation, the difference in amino-acid fitness before and after the mutation allows us to compute the selection coefficient at the phylogenetic scale ($\Sphy$).
+            Depending on $\Sphy$ (B) mutations can be predicted as deleterious ($\SphyDel$), nearly-neutral ($\SphyNeu$) or beneficial non-adaptive mutations ($\SphyBen$) toward a fitter amino acid and repairing existing functions.
+            For each population, each observed single nucleotide polymorphism (SNP) segregating can also be classified according to its $\Sphy$ value (C).
+            Within the terminal lineage leading to this population, each substitution can be classified according to its $\Spop$ value (C).
+            Non-synonymous polymorphisms and divergence, contrasted to synonymous polymorphisms and divergence (deemed neutral) is used to estimate selection coefficients (D-E) at the population scale ($\Spop$), for each class of selection ($\SphyDel$, $\SphyNeu$, $\SphyBen$).
+            We can thus assess whether $\Sphy$ predicts $\Spop$ and compute \textit{precision} (F) and \textit{recall} (G) for each class.
+            The \textit{recall} value for class $\SphyBen$ is the probability for beneficial mutations to be non-adaptive (G).
+            Icons are adapted from \href{https://phylopic.org}{https://phylopic.org} under a Creative Commons license.
+            \label{fig-incdiv}
+            }
+    \end{center}
+
+    \newpage
+
+    \subsection{Probability for beneficial mutations to be non-adaptive}
+    The estimation of $\proba{[} \SpopBen {]}$ and $\proba{[}\SphyBen\given \SpopBen {]}$ across populations when including substitutions in the terminal lineage and fitting a discrete DFE to $\Spop$ is shown in Table~\ref{table:inc-div-bayes}.
+    Altogether, comparing these results with table~\ref{table:proba}, we acknowledge that the exact proportion of non-adaptive among all beneficial mutations is dependent whether we included or not substitutions in the terminal lineage for the estimation of $\Spop$.
+    However, we can still see that non-adaptive beneficial mutations are positively selected compared to neutral and deleterious ones, and this result is valid whether we included or not substitutions in the terminal lineage for the estimation of $\Spop$.
+
+    \begin{center}
+        \scriptsize
+        \begin{longtable*}{|l|l|r|r|r|r|r|r|}
+            \toprule
+            Population & Species & $\Ne$ & $\proba{[}\SphyBen{]}$ & $\proba{[} \SpopBen {]}$ & $\frac{\proba{[}\SphyBen]}{\proba{[} \SpopBen ]}$ & $\proba{[} \SpopBen \given \SphyBen{]}$ & $\proba{[}\SphyBen\given \SpopBen {]}$ \\
+            \midrule
+            \endhead
+            \midrule
+            \multicolumn{8}{r}{{Continued on next page}} \\
+            \midrule
+            \endfoot
+
+            \bottomrule
+            \endlastfoot
+            \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $7.5\times 10^{4}$ & $ 0.012$ & $ 0.057$ & $ 0.213$ & $ 0.498$ & $ 0.106$ \\
+            Iran & Bos taurus & $5.6\times 10^{4}$ & $ 0.011$ & $ 0.006$ & $ 1.860$ & $ 0.368$ & $ 0.684$ \\
+            Uganda & Bos taurus & $1.3\times 10^{5}$ & $ 0.011$ & $ 0.012$ & $ 0.900$ & $ 0.307$ & $ 0.276$ \\
+            \rowcolor{LIGHTGREY} Australia & Capra hircus & $1.7\times 10^{5}$ & $ 0.011$ & $ 0.007$ & $ 1.651$ & $ 0.178$ & $ 0.294$ \\
+            \rowcolor{LIGHTGREY} France & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.007$ & $ 1.614$ & $ 0.183$ & $ 0.295$ \\
+            \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.012$ & $ 0.923$ & $ 0.177$ & $ 0.163$ \\
+            \rowcolor{LIGHTGREY} Iran & Capra hircus & $2.3\times 10^{5}$ & $ 0.011$ & $ 0.008$ & $ 1.483$ & $ 0.184$ & $ 0.273$ \\
+            \rowcolor{LIGHTGREY} Italy & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.007$ & $ 1.686$ & $ 0.178$ & $ 0.299$ \\
+            \rowcolor{LIGHTGREY} Morocco & Capra hircus & $2.2\times 10^{5}$ & $ 0.011$ & $ 0.006$ & $ 1.892$ & $ 0.184$ & $ 0.349$ \\
+            Iran & Ovis aries & $3.8\times 10^{5}$ & $ 0.012$ & $ 0.010$ & $ 1.132$ & $ 0.189$ & $ 0.214$ \\
+            Iran (O. orientalis) & Ovis aries & $4.5\times 10^{5}$ & $ 0.011$ & $ 0.011$ & $ 1.012$ & $ 0.213$ & $ 0.216$ \\
+            Iran (O. vignei) & Ovis aries & $3.7\times 10^{5}$ & $ 0.012$ & $ 0.021$ & $ 0.561$ & $ 0.186$ & $ 0.105$ \\
+            Various & Ovis aries & $4.1\times 10^{5}$ & $ 0.011$ & $ 0.011$ & $ 1.069$ & $ 0.215$ & $ 0.229$ \\
+            Morocco & Ovis aries & $ 4\times 10^{5}$ & $ 0.012$ & $ 0.012$ & $ 0.973$ & $ 0.217$ & $ 0.211$ \\
+            \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $1.1\times 10^{5}$ & $ 0.009$ & $ 0.004$ & $ 2.120$ & $ 0.341$ & $ 0.723$ \\
+            \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.009$ & $ 0.013$ & $ 0.720$ & $ 0.368$ & $ 0.265$ \\
+            \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.009$ & $ 0.007$ & $ 1.352$ & $ 0.368$ & $ 0.498$ \\
+            \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.009$ & $ 0.010$ & $ 0.956$ & $ 0.368$ & $ 0.352$ \\
+            \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $1.5\times 10^{5}$ & $ 0.009$ & $ 0.013$ & $ 0.727$ & $ 0.368$ & $ 0.268$ \\
+            \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 1\times 10^{5}$ & $ 0.009$ & $ 0.004$ & $ 2.133$ & $ 0.368$ & $ 0.784$ \\
+            \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $1.8\times 10^{5}$ & $ 0.009$ & $ 0.011$ & $ 0.874$ & $ 0.368$ & $ 0.322$ \\
+            \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $1.2\times 10^{5}$ & $ 0.009$ & $ 0.005$ & $ 1.905$ & $ 0.368$ & $ 0.701$ \\
+            \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.009$ & $ 0.014$ & $ 0.698$ & $ 0.368$ & $ 0.257$ \\
+            African & Homo sapiens & $5.6\times 10^{4}$ & $ 0.010$ & $ 0.013$ & $ 0.726$ & $ 0.437$ & $ 0.317$ \\
+            Admixed American & Homo sapiens & $4.5\times 10^{4}$ & $ 0.010$ & $ 0.011$ & $ 0.886$ & $ 0.429$ & $ 0.380$ \\
+            East Asian & Homo sapiens & $ 4\times 10^{4}$ & $ 0.010$ & $ 0.008$ & $ 1.213$ & $ 0.426$ & $ 0.517$ \\
+            European & Homo sapiens & $4.1\times 10^{4}$ & $ 0.010$ & $ 0.009$ & $ 1.104$ & $ 0.422$ & $ 0.466$ \\
+            South Asian & Homo sapiens & $4.4\times 10^{4}$ & $ 0.010$ & $ 0.009$ & $ 1.016$ & $ 0.426$ & $ 0.433$ \\
+        \end{longtable*}
+        \captionof{table}[$\proba{[}\SphyBen\given \SpopBen {]}$ when including divergence to estimate $\Spop$.]{\textbf{$\bm{\proba{[}\SphyBen\given \SpopBen {]}}$ when including divergence to estimate $\bm{\Spop}$.}
+        $\Ne$ is the estimated effective population size.
+        $\proba{[} \SphyBen {]}$ (eq.~5) is the probability for a new mutation to be a non-adaptive mutation.
+        These mutations have a selection coefficient predicted at the phylogenetic-scale larger than 1, thus toward a more fit amino-acid.
+        $\proba{[} \SpopBen {]}$ (eq.~15) is the probability for a mutation to be beneficial.
+        These mutations have a selection coefficient at the population-scale larger than 1.
+        $\proba{[} \SpopBen \given \SphyBen{]}$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a non-adaptive mutation at the phylogenetic scale (the \textit{precision}).
+        $\proba{[} \SphyBen \given \SpopBen{]}$ (eq.~14) is the probability for a mutation to be non-adaptive given it is beneficial at the population scale (the \textit{recall}).
+        This probability is obtained using Bayes' formula.\label{table:inc-div-bayes}}
+    \end{center}
+
+    \newpage
+
+    \subsection{Precision and recall}
+    The estimation of \textit{precision} and \textit{recall} across populations when including substitutions in the terminal lineage for the estimation of $\Spop$ is shown in Table~\ref{table:inc-div}.
+    Comparing these results with tables 1, we acknowledge that the exact quantification of \textit{precision} and \textit{recall} is dependent on whether we included or not substitutions in the terminal lineage for the estimation of $\Spop$.
+    However, we can still see that non-adaptive beneficial mutations are positively selected compared to neutral and deleterious ones, and this result is valid whether we included or not substitutions in the terminal lineage for the estimation of $\Spop$.
+
+    \begin{center}
+        \begin{adjustbox}{width=\textwidth}
+            \begin{tabular}{||l|l|r||r|r||r|r||r|r||}
+                \toprule
+                \multicolumn{3}{||c||}{} &
+                \multicolumn{2}{c||}{\shortstack{\textbf{Deleterious mutations} \\ $\bm{\SpopDel \coloneqq \Spop<-1}$ \\ $\bm{\SphyDel \coloneqq \Sphy<-1}$}} &
+                \multicolumn{2}{c||}{\shortstack{\textbf{Nearly-neutral mutations} \\ $\bm{\SpopNeu \coloneqq -1<\Spop<1}$ \\ $\bm{\SphyNeu \coloneqq -1<\Sphy<1}$}} &
+                \multicolumn{2}{c||}{\shortstack{\textbf{Beneficial mutations} \\ $\bm{\SpopBen \coloneqq \Spop>1}$ \\ $\bm{\SphyBen \coloneqq \Sphy>1}$}}
+                \\ \hline
+                \textbf{Population} &
+                \textbf{Species} &
+                $\bm{\Ne}$ &
+                \makecell{\textbf{Precision} \\ $\bm{\proba{[}\SpopDel \given \SphyDel]}$} &
+                \makecell{\textbf{Recall} \\ $\bm{\proba{[}\SphyDel \given \SpopDel]}$}           &
+                \makecell{\textbf{Precision}      \\ $\bm{\proba{[}\SpopNeu \given \SphyNeu]}$}                                    &
+                \makecell{\textbf{Recall}          \\ $\bm{\proba{[}\SphyNeu \given \SpopNeu]}$}                                  &
+                \makecell{\textbf{Precision}          \\ $\bm{\proba{[}\SpopBen \given \SphyBen]}$}          &
+                \makecell{\textbf{Recall}        \\ $\bm{\proba{[}\SphyBen \given \SpopBen]}$}
+                \\   \midrule
+                \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $7.5\times 10^{4}$ & $ 0.937$ & $ 0.955$ & $ 0.111$ & $ 0.192$ & $ 0.498$ & $ 0.106$ \\
+                Iran & Bos taurus & $5.6\times 10^{4}$ & $ 0.935$ & $ 0.970$ & $ 0.565$ & $ 0.356$ & $ 0.368$ & $ 0.684$ \\
+                Uganda & Bos taurus & $1.3\times 10^{5}$ & $ 0.951$ & $ 0.967$ & $ 0.516$ & $ 0.422$ & $ 0.307$ & $ 0.276$ \\
+                \rowcolor{LIGHTGREY} Australia & Capra hircus & $1.7\times 10^{5}$ & $ 0.952$ & $ 0.970$ & $ 0.598$ & $ 0.452$ & $ 0.178$ & $ 0.294$ \\
+                \rowcolor{LIGHTGREY} France & Capra hircus & $1.9\times 10^{5}$ & $ 0.951$ & $ 0.969$ & $ 0.574$ & $ 0.433$ & $ 0.183$ & $ 0.295$ \\
+                \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $1.9\times 10^{5}$ & $ 0.957$ & $ 0.966$ & $ 0.515$ & $ 0.460$ & $ 0.177$ & $ 0.163$ \\
+                \rowcolor{LIGHTGREY} Iran & Capra hircus & $2.3\times 10^{5}$ & $ 0.951$ & $ 0.967$ & $ 0.542$ & $ 0.422$ & $ 0.184$ & $ 0.273$ \\
+                \rowcolor{LIGHTGREY} Italy & Capra hircus & $1.9\times 10^{5}$ & $ 0.951$ & $ 0.969$ & $ 0.582$ & $ 0.436$ & $ 0.178$ & $ 0.299$ \\
+                \rowcolor{LIGHTGREY} Morocco & Capra hircus & $2.2\times 10^{5}$ & $ 0.949$ & $ 0.968$ & $ 0.556$ & $ 0.412$ & $ 0.184$ & $ 0.349$ \\
+                Iran & Ovis aries & $3.8\times 10^{5}$ & $ 0.963$ & $ 0.962$ & $ 0.421$ & $ 0.424$ & $ 0.189$ & $ 0.214$ \\
+                Iran (O. orientalis) & Ovis aries & $4.5\times 10^{5}$ & $ 0.968$ & $ 0.961$ & $ 0.413$ & $ 0.460$ & $ 0.213$ & $ 0.216$ \\
+                Iran (O. vignei) & Ovis aries & $3.7\times 10^{5}$ & $ 0.972$ & $ 0.959$ & $ 0.360$ & $ 0.528$ & $ 0.186$ & $ 0.105$ \\
+                Various & Ovis aries & $4.1\times 10^{5}$ & $ 0.966$ & $ 0.961$ & $ 0.430$ & $ 0.454$ & $ 0.215$ & $ 0.229$ \\
+                Morocco & Ovis aries & $ 4\times 10^{5}$ & $ 0.966$ & $ 0.958$ & $ 0.372$ & $ 0.416$ & $ 0.217$ & $ 0.211$ \\
+                \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $1.1\times 10^{5}$ & $ 0.940$ & $ 0.976$ & $ 0.654$ & $ 0.409$ & $ 0.341$ & $ 0.723$ \\
+                \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.950$ & $ 0.971$ & $ 0.526$ & $ 0.421$ & $ 0.368$ & $ 0.265$ \\
+                \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.942$ & $ 0.974$ & $ 0.609$ & $ 0.402$ & $ 0.368$ & $ 0.498$ \\
+                \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.950$ & $ 0.974$ & $ 0.611$ & $ 0.452$ & $ 0.368$ & $ 0.352$ \\
+                \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $1.5\times 10^{5}$ & $ 0.950$ & $ 0.972$ & $ 0.545$ & $ 0.434$ & $ 0.368$ & $ 0.268$ \\
+                \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 1\times 10^{5}$ & $ 0.940$ & $ 0.977$ & $ 0.668$ & $ 0.412$ & $ 0.368$ & $ 0.784$ \\
+                \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $1.8\times 10^{5}$ & $ 0.947$ & $ 0.972$ & $ 0.550$ & $ 0.411$ & $ 0.368$ & $ 0.322$ \\
+                \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $1.2\times 10^{5}$ & $ 0.940$ & $ 0.976$ & $ 0.646$ & $ 0.407$ & $ 0.368$ & $ 0.701$ \\
+                \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.950$ & $ 0.971$ & $ 0.527$ & $ 0.426$ & $ 0.368$ & $ 0.257$ \\
+                African & Homo sapiens & $5.6\times 10^{4}$ & $ 0.911$ & $ 0.980$ & $ 0.666$ & $ 0.341$ & $ 0.437$ & $ 0.317$ \\
+                Admixed American & Homo sapiens & $4.5\times 10^{4}$ & $ 0.902$ & $ 0.976$ & $ 0.580$ & $ 0.284$ & $ 0.429$ & $ 0.380$ \\
+                East Asian & Homo sapiens & $ 4\times 10^{4}$ & $ 0.904$ & $ 0.984$ & $ 0.744$ & $ 0.341$ & $ 0.426$ & $ 0.517$ \\
+                European & Homo sapiens & $4.1\times 10^{4}$ & $ 0.906$ & $ 0.984$ & $ 0.737$ & $ 0.344$ & $ 0.422$ & $ 0.466$ \\
+                South Asian & Homo sapiens & $4.4\times 10^{4}$ & $ 0.907$ & $ 0.984$ & $ 0.737$ & $ 0.349$ & $ 0.426$ & $ 0.433$ \\
+                \bottomrule
+            \end{tabular}
+        \end{adjustbox}
+        \captionof{table}[Precision and recall when including divergence to estimate $\Spop$.]{\textbf{Precision and recall when including divergence to estimate $\bm{\Spop}$.}
+        $\Ne$ is the estimated effective population size.
+        \textit{Precision} is the estimation of the selection coefficient at population scale ($\Spop$) given that $\Sphy$ is known.
+        \textit{Recall} is the estimation of $\Sphy$ given selection coefficient at the population scale ($\Spop$) is known.
+        \textit{Recall} for beneficial mutations ($\proba{[}\SphyBen \given \SpopBen{]}$) is the probability for a mutation to be non-adaptive given it is beneficial at the population scale.
+        \label{table:inc-div}}
+    \end{center}
+
+    \newpage
+
+    \subsection{Misannotations of ancestral alleles}
+
+    If misannotation is influencing the recall for $\SphyBen$ ($\proba{[}\SphyBen\given \SpopBen {]}$), then the recall should increase as a function of  divergence to the sister species ($\ds$: number of synonymous substitutions per sites) since divergence would increase the rate of misannotations.
+    Shown in Figure~\ref{fig:distance-incdiv} is recall $\proba{[}\SphyBen\given \SpopBen {]}$ as a function of divergence ($\ds$) in which the latter is not an explanatory variable.
+
+    \begin{center}
+        \includegraphics[width=0.75\linewidth, page=1]{artworks/results.distance.recall_pos.div.scatter.pdf}
+        \captionof{figure}[$\proba{[}\SphyBen\given \SpopBen {]}$ when including divergence to estimate $\Spop$, as a function of distance to the sister species.]{\textbf{$\bm{\proba{[}\SphyBen\given \SpopBen {]}}$ when including divergence to estimate $\bm{\Spop}$, as a function of distance to the sister species}. $\proba{[} \SphyBen \given \SpopBen{]}$ (eq.~14) is the probability for a beneficial mutation to be non-adaptive. $\ds$ is number of synonymous substitutions per site that occurred since divergence with the sister species (closest species in the mammalian tree). Same as Figure~\ref{fig:distance-sister} but including divergence to estimate $\Spop$. Populations are represented by circles, and squares are the mean for the species. Correlations account for phylogenetic relationship and non-independence of samples, through the fit of a Phylogenetic Generalized Linear Model (see Materials \& Methods).\label{fig:distance-incdiv}}
+    \end{center}
+
+    \newpage
+
+    \subsection{Excluding genes under adaptation}
+    The proportion of beneficial non-adaptive mutations ($\proba{[}\SphyBen\given \SpopBen {]}$) is higher when excluding genes under adaptation, as shown in Table~\ref{table:no-adaptation-div}, consistent with our expectation that genes with uniformly conserved functions should fit better the nearly-neutral equilibrium model.
+
+    \begin{center}
+        \begin{tabular}{|l|l|r|r|}
+            \toprule
+            Population & Species & Control & Case \\
+            \midrule
+            \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $ 0.106$ & $ 0.106$ \\
+            Iran & Bos taurus & $ 0.684$ & $ 0.755$ \\
+            Uganda & Bos taurus & $ 0.276$ & $ 0.310$ \\
+            \rowcolor{LIGHTGREY} Australia & Capra hircus & $ 0.294$ & $ 0.319$ \\
+            \rowcolor{LIGHTGREY} France & Capra hircus & $ 0.295$ & $ 0.325$ \\
+            \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $ 0.163$ & $ 0.174$ \\
+            \rowcolor{LIGHTGREY} Iran & Capra hircus & $ 0.273$ & $ 0.299$ \\
+            \rowcolor{LIGHTGREY} Italy & Capra hircus & $ 0.299$ & $ 0.321$ \\
+            \rowcolor{LIGHTGREY} Morocco & Capra hircus & $ 0.349$ & $ 0.419$ \\
+            Iran & Ovis aries & $ 0.214$ & $ 0.241$ \\
+            Iran (O. orientalis) & Ovis aries & $ 0.216$ & $ 0.213$ \\
+            Iran (O. vignei) & Ovis aries & $ 0.105$ & $ 0.089$ \\
+            Various & Ovis aries & $ 0.229$ & $ 0.196$ \\
+            Morocco & Ovis aries & $ 0.211$ & $ 0.206$ \\
+            \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $ 0.723$ & $ 0.833$ \\
+            \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $ 0.265$ & $ 0.285$ \\
+            \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $ 0.498$ & $ 0.547$ \\
+            \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $ 0.352$ & $ 0.571$ \\
+            \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $ 0.268$ & $ 0.265$ \\
+            \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 0.784$ & $ 0.892$ \\
+            \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $ 0.322$ & $ 0.307$ \\
+            \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $ 0.701$ & $ 0.825$ \\
+            \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $ 0.257$ & $ 0.271$ \\
+            African & Homo sapiens & $ 0.317$ & $ 0.278$ \\
+            Admixed American & Homo sapiens & $ 0.380$ & $ 0.363$ \\
+            East Asian & Homo sapiens & $ 0.517$ & $ 0.499$ \\
+            European & Homo sapiens & $ 0.466$ & $ 0.456$ \\
+            South Asian & Homo sapiens & $ 0.433$ & $ 0.304$ \\
+            \bottomrule
+        \end{tabular}
+        \captionof{table}[$\proba{[}\SphyBen\given \SpopBen {]}$ excluding or not genes under adaptation, when including divergence to estimate $\Spop$.]{\textbf{$\bm{\proba{[}\SphyBen\given \SpopBen {]}}$ excluding or not genes under adaptation, when including divergence to estimate $\bm{\Spop}$.}
+        Genes under adaptation retrieved from~\cite{latrille_genes_2023}.
+        Comparison of $\proba{[}\SphyBen\given \SpopBen {]}$ when including divergence for the whole genome (control) and when excluding genes under adaptation (case).
+        The non-parametric Wilcoxon signed-rank test tests the null hypothesis that the distribution of the differences (case versus control) is symmetric about zero.
+        Applied to the paired samples (case and control), Wilcoxon signed-rank test results in $s=120$ with $\pvalue=0.027$ for one-sided test (case higher than control).\label{table:no-adaptation-div}
+        }
+    \end{center}
+
+
+    \newpage
+    \subsection{Fitting one or three distributions of fitness effects}
+
+    We also performed another test to assess that fitting the same functional form of DFE to three categories of selection (i.e., $\SphyDel, \SphyNeu, \SphyBen$) is a sound methodology.
+    Typically, $\proba{[} \SpopBen {]}$ can be computed from two different estimates, by either splitting data (polymorphism within populations and substitutions in the terminal lineages) in three category (i.e., $\SphyDel, \SphyNeu, \SphyBen$) or not at all.
+    In the case of splitting data in three categories and fitting three DFEs, $\proba{[} \SpopBen {]}$ is obtained by summing over the three categories using the law of total probability (eq.\ 15):
+
+    \begin{equation}
+        \proba{[} \SpopBen ] \text{ (three DFEs) } = \proba{[}\SpopBen \given \SphyDel ] \times \proba{[}\SphyDel ] + \proba{[}\SpopBen \given \SphyNeu ] \times \proba{[}\SphyNeu ] + \proba{[}\SpopBen \given \SphyBen ] \times \proba{[}\SphyBen ].
+        \label{eq:total_proba}
+    \end{equation}
+
+    But it is also possible to compute $\proba{[} \SpopBen {]}$ directly from fitting one DFE to the full data (polymorphism within populations and substitutions in the terminal lineages), not splitting at all, and then $\proba{[} \SpopBen {]}$ is obtained from the parameters of the DFE (eq.\ 11):
+    \begin{align}
+        \proba{[} \SpopBen ] \text{ (one DFE) } &= \proba{[} \Spop > 1 ] = p_b \int_{1}^{+\infty} f_{e}(\Spop; \AdvMean) \der \Spop. \label{eq:polyProbaAdv}
+    \end{align}
+
+    We reproduced this experiment for $\proba{[} \SpopDel {]}$ (Figure~\ref{fig:one-three-neg}), $\proba{[} \SpopNeu {]}$ (Figure~\ref{fig:one-three-weak}) and $\proba{[} \SpopBen {]}$ (Figure~\ref{fig:one-three-pos}).
+
+
+    \begin{center}
+        \includegraphics[width=0.75\linewidth, page=1]{artworks/results.reg.neg.div.scatter.pdf}
+        \captionof{figure}[$\proba{[} \SpopDel {]}$ when fitting a single or three DFEs.]{\textbf{$\bm{\proba{[} \SpopDel {]}}$ when fitting a single or three DFEs.} Populations are represented by circles, and squares are the mean for the species. Goodness of fit is calculated as the coefficient of determination ($R^2$) for the prediction $\proba{[} \SpopDel ] \text{ (three DFEs) } = \proba{[} \SpopDel ] \text{ (one DFE) }$, meaning calculating the residuals of the fit to the 1:1 line.\label{fig:one-three-neg}}
+    \end{center}
+
+    \newpage
+    \begin{center}
+        \includegraphics[width=0.75\linewidth, page=1]{artworks/results.reg.weak.div.scatter.pdf}
+        \captionof{figure}[$\proba{[} \SpopNeu {]}$ when fitting a single or three DFEs.]{\textbf{$\bm{\proba{[} \SpopNeu {]}}$ when fitting a single or three DFEs.} Populations are represented by circles, and squares are the mean for the species. Goodness of fit is calculated as the coefficient of determination ($R^2$) for the prediction $\proba{[} \SpopNeu ] \text{ (three DFEs) } = \proba{[} \SpopNeu ] \text{ (one DFE) }$, meaning calculating the residuals of the fit to the 1:1 line.\label{fig:one-three-weak}}
+    \end{center}
+
+    \begin{center}
+        \includegraphics[width=0.75\linewidth, page=1]{artworks/results.reg.pos.div.scatter.pdf}
+        \captionof{figure}[$\proba{[} \SpopBen {]}$ when fitting a single or three DFEs.]{\textbf{$\bm{\proba{[} \SpopBen {]}}$ when fitting a single or three DFEs.} Populations are represented by circles, and squares are the mean for the species. Goodness of fit is calculated as the coefficient of determination ($R^2$) for the prediction $\proba{[} \SpopBen ] \text{ (three DFEs) } = \proba{[} \SpopBen ] \text{ (one DFE) }$, meaning calculating the residuals of the fit to the 1:1 line.\label{fig:one-three-pos}}
+    \end{center}
+
+    \newpage
+
+    \section{Non-parametric distribution of fitness effects}
+
+    \subsection{polyDFE model D (non-parametric)}
+    Additionally to including divergence, we also tested our prediction with polyDFE model D instead of model C.
+    In polyDFE model D, the DFE of non-synonymous mutations is given as a discrete DFE of $K$ categories (instead of a continuous distribution in model C), where the selection coefficients of each category $i$ ($1 \leq i \leq K$) are fixed parameters $\Spop_i$, and each value $\Spop_i$ has a probability $p_i$ (estimated), with $\sum_{i=1}^{K} p_i =1$.
+    We used $K=6$ with $\Spop_1 = -500$, $\Spop_2 = -4$, $\Spop_3 =-1$, $\Spop_4 = 0$, $\Spop_5 = 1$, $\Spop_6 = 4$.\\
+
+    For each class of selection $\Sphyclass$, the parameters $p_i$ ($i \in \{ 1 \leq i \leq 6 \}$) were used to compute $\proba{[} \SpopDel \given  \Sphyclass{]}$, $\proba{[} \SpopNeu \given \Sphyclass{]}$, and $\proba{[} \SpopBen \given \Sphyclass{]}$ as:
+    \begin{align}
+        \proba{[} \SpopDel \given  \Sphyclass] &= \proba{[} \Spop < -1 \given \Sphyclass ] = p_1 + p_2 \label{eq:polyProbaDel-mD} \\
+        \proba{[} \SpopNeu \given \Sphyclass] &= \proba{[} -1 < \Spop < 1 \given \Sphyclass ] = p_3 + p_4 + p_5,  \\
+        \proba{[} \SpopBen \given \Sphyclass] &= \proba{[}  \Spop > 1 \given \Sphyclass ] = p_6.  \label{eq:polyProbaAdv-mD}
+    \end{align}
+
+    \subsection{Probability for beneficial mutations to be non-adaptive}
+    The estimation of $\proba{[} \SpopBen {]}$ and $\proba{[}\SphyBen\given \SpopBen {]}$ across populations when including substitutions in the terminal lineage and fitting a discrete DFE to $\Spop$ is shown in Table~\ref{table:discrete-dfe-bayes}.
+    Altogether, comparing these results with table~\ref{table:inc-div-bayes}, we acknowledge that the exact proportion of non-adaptive among all beneficial mutations is dependent on the model used to estimate the DFE.
+    However, we can still see that non-adaptive beneficial mutations are positively selected compared to neutral and deleterious ones, and this result is valid for different underlying DFE.
+    \newpage
+
+    \begin{center}
+        \scriptsize
+        \begin{longtable*}{|l|l|r|r|r|r|r|r|}
+            \toprule
+            Population & Species & $\Ne$ & $\proba{[}\SphyBen{]}$ & $\proba{[} \SpopBen {]}$ & $\frac{\proba{[}\SphyBen]}{\proba{[} \SpopBen ]}$ & $\proba{[} \SpopBen \given \SphyBen{]}$ & $\proba{[}\SphyBen\given \SpopBen {]}$ \\
+            \midrule
+            \endhead
+            \midrule
+            \multicolumn{8}{r}{{Continued on next page}} \\
+            \midrule
+            \endfoot
+
+            \bottomrule
+            \endlastfoot
+            \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $7.5\times 10^{4}$ & $ 0.012$ & $ 0.006$ & $ 2.050$ & $ 0.163$ & $ 0.334$ \\
+            Iran & Bos taurus & $5.6\times 10^{4}$ & $ 0.011$ & $ 0.005$ & $ 2.125$ & $ 0.133$ & $ 0.283$ \\
+            Uganda & Bos taurus & $1.3\times 10^{5}$ & $ 0.011$ & $ 0.010$ & $ 1.139$ & $ 0.140$ & $ 0.159$ \\
+            \rowcolor{LIGHTGREY} Australia & Capra hircus & $1.7\times 10^{5}$ & $ 0.011$ & $ 0.002$ & $ 5.637$ & $ 0.151$ & $ 0.850$ \\
+            \rowcolor{LIGHTGREY} France & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.002$ & $ 6.117$ & $ 0.154$ & $ 0.940$ \\
+            \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.002$ & $ 5.842$ & $ 0.156$ & $ 0.911$ \\
+            \rowcolor{LIGHTGREY} Iran & Capra hircus & $2.3\times 10^{5}$ & $ 0.011$ & $ 0.002$ & $ 6.400$ & $ 0.147$ & $ 0.943$ \\
+            \rowcolor{LIGHTGREY} Italy & Capra hircus & $1.9\times 10^{5}$ & $ 0.011$ & $ 0.002$ & $ 5.793$ & $ 0.155$ & $ 0.895$ \\
+            \rowcolor{LIGHTGREY} Morocco & Capra hircus & $2.2\times 10^{5}$ & $ 0.011$ & $ 0.003$ & $ 4.192$ & $ 0.150$ & $ 0.627$ \\
+            Iran & Ovis aries & $3.8\times 10^{5}$ & $ 0.012$ & $ 0.020$ & $ 0.584$ & $ 0.154$ & $ 0.090$ \\
+            Iran (O. orientalis) & Ovis aries & $4.5\times 10^{5}$ & $ 0.011$ & $ 0.021$ & $ 0.535$ & $ 0.148$ & $ 0.079$ \\
+            Iran (O. vignei) & Ovis aries & $3.7\times 10^{5}$ & $ 0.012$ & $ 0.020$ & $ 0.568$ & $ 0.151$ & $ 0.086$ \\
+            Various & Ovis aries & $4.1\times 10^{5}$ & $ 0.011$ & $ 0.021$ & $ 0.553$ & $ 0.152$ & $ 0.084$ \\
+            Morocco & Ovis aries & $ 4\times 10^{5}$ & $ 0.012$ & $ 0.022$ & $ 0.529$ & $ 0.153$ & $ 0.081$ \\
+            \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $1.1\times 10^{5}$ & $ 0.009$ & $ 0.002$ & $ 5.152$ & $ 0.170$ & $ 0.877$ \\
+            \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.009$ & $ 0.007$ & $ 1.266$ & $ 0.157$ & $ 0.199$ \\
+            \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.009$ & $ 0.002$ & $ 3.979$ & $ 0.161$ & $ 0.640$ \\
+            \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.009$ & $ 0.008$ & $ 1.201$ & $ 0.159$ & $ 0.191$ \\
+            \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $1.5\times 10^{5}$ & $ 0.009$ & $ 0.003$ & $ 2.801$ & $ 0.165$ & $ 0.461$ \\
+            \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 1\times 10^{5}$ & $ 0.009$ & $ 0.002$ & $ 5.361$ & $ 0.169$ & $ 0.908$ \\
+            \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $1.8\times 10^{5}$ & $ 0.009$ & $ 0.005$ & $ 1.912$ & $ 0.154$ & $ 0.294$ \\
+            \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $1.2\times 10^{5}$ & $ 0.009$ & $ 0.002$ & $ 4.561$ & $ 0.165$ & $ 0.753$ \\
+            \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.009$ & $ 0.004$ & $ 2.661$ & $ 0.153$ & $ 0.406$ \\
+            African & Homo sapiens & $5.6\times 10^{4}$ & $ 0.010$ & $ 0.010$ & $ 0.997$ & $ 0.154$ & $ 0.154$ \\
+            Admixed American & Homo sapiens & $4.5\times 10^{4}$ & $ 0.010$ & $ 0.008$ & $ 1.206$ & $ 0.158$ & $ 0.190$ \\
+            East Asian & Homo sapiens & $ 4\times 10^{4}$ & $ 0.010$ & $ 0.007$ & $ 1.455$ & $ 0.163$ & $ 0.237$ \\
+            European & Homo sapiens & $4.2\times 10^{4}$ & $ 0.010$ & $ 0.007$ & $ 1.316$ & $ 0.167$ & $ 0.219$ \\
+            South Asian & Homo sapiens & $4.4\times 10^{4}$ & $ 0.010$ & $ 0.007$ & $ 1.340$ & $ 0.164$ & $ 0.219$ \\
+        \end{longtable*}
+        \captionof{table}[$\proba{[}\SphyBen\given \SpopBen {]}$ when using a discrete DFE to estimate $\Spop$.]{\textbf{$\bm{\proba{[}\SphyBen\given \SpopBen {]}}$ when using a discrete DFE to estimate $\bm{\Spop}$.}
+        $\Ne$ is the estimated effective population size.
+        $\proba{[} \SphyBen {]}$ (eq.~5) is the probability for a new mutation to be a non-adaptive beneficial mutation.
+        These mutations have a selection coefficient predicted at the phylogenetic-scale larger than 1, thus toward a more fit amino-acid.
+        $\proba{[} \SpopBen {]}$ (eq.~15) is the probability for a mutation to be beneficial.
+        These mutations have a selection coefficient at the population-scale larger than 1.
+        $\proba{[} \SpopBen \given \SphyBen{]}$ (eq.~12) is the probability for a mutation to be beneficial at the population scale, given it is predicted to be a beneficial non-adaptive mutation at the phylogenetic scale (the \textit{precision}).
+        $\proba{[} \SphyBen \given \SpopBen{]}$ (eq.~14) is the probability for a mutation to be non-adaptive given it is beneficial at the population scale (the \textit{recall}).
+        This probability is obtained using Bayes' formula.\label{table:discrete-dfe-bayes}}
+    \end{center}
+
+    \newpage
+    \subsection{Precision and recall}
+    The estimation of \textit{precision} and \textit{recall} across populations when including substitutions in the terminal lineage and fitting a discrete DFE to $\Spop$ is shown in Table~\ref{table:discrete-dfe}.
+    Altogether, comparing these results with table~\ref{table:inc-div}, we acknowledge that the exact quantification of \textit{precision} and \textit{recall} is dependent on the model used to estimate the DFE.
+    However, we can still see that non-adaptive beneficial mutations are positively selected compared to neutral and deleterious ones, and this result is valid for different underlying DFE.
+
+    \begin{center}
+        \begin{adjustbox}{width=\textwidth}
+            \begin{tabular}{||l|l|r||r|r||r|r||r|r||}
+                \toprule
+                \multicolumn{3}{||c||}{} &
+                \multicolumn{2}{c||}{\shortstack{\textbf{Deleterious mutations} \\ $\bm{\SpopDel \coloneqq \Spop<-1}$ \\ $\bm{\SphyDel \coloneqq \Sphy<-1}$}} &
+                \multicolumn{2}{c||}{\shortstack{\textbf{Nearly-neutral mutations} \\ $\bm{\SpopNeu \coloneqq -1<\Spop<1}$ \\ $\bm{\SphyNeu \coloneqq -1<\Sphy<1}$}} &
+                \multicolumn{2}{c||}{\shortstack{\textbf{Beneficial mutations} \\ $\bm{\SpopBen \coloneqq \Spop>1}$ \\ $\bm{\SphyBen \coloneqq \Sphy>1}$}}
+                \\ \hline
+                \textbf{Population} &
+                \textbf{Species} &
+                $\bm{\Ne}$ &
+                \makecell{\textbf{Precision} \\ $\bm{\proba{[}\SpopDel \given \SphyDel]}$} &
+                \makecell{\textbf{Recall} \\ $\bm{\proba{[}\SphyDel \given \SpopDel]}$}           &
+                \makecell{\textbf{Precision}      \\ $\bm{\proba{[}\SpopNeu \given \SphyNeu]}$}                                    &
+                \makecell{\textbf{Recall}          \\ $\bm{\proba{[}\SphyNeu \given \SpopNeu]}$}                                  &
+                \makecell{\textbf{Precision}          \\ $\bm{\proba{[}\SpopBen \given \SphyBen]}$}          &
+                \makecell{\textbf{Recall}        \\ $\bm{\proba{[}\SphyBen \given \SpopBen]}$}
+                \\   \midrule
+                \rowcolor{LIGHTGREY} Equus c. & Equus caballus & $7.5\times 10^{4}$ & $ 0.911$ & $ 0.974$ & $ 0.645$ & $ 0.319$ & $ 0.163$ & $ 0.334$ \\
+                Iran & Bos taurus & $5.6\times 10^{4}$ & $ 0.895$ & $ 0.973$ & $ 0.639$ & $ 0.288$ & $ 0.133$ & $ 0.283$ \\
+                Uganda & Bos taurus & $1.3\times 10^{5}$ & $ 0.951$ & $ 0.974$ & $ 0.664$ & $ 0.492$ & $ 0.140$ & $ 0.159$ \\
+                \rowcolor{LIGHTGREY} Australia & Capra hircus & $1.7\times 10^{5}$ & $ 0.912$ & $ 0.984$ & $ 0.834$ & $ 0.386$ & $ 0.151$ & $ 0.850$ \\
+                \rowcolor{LIGHTGREY} France & Capra hircus & $1.9\times 10^{5}$ & $ 0.912$ & $ 0.983$ & $ 0.819$ & $ 0.381$ & $ 0.154$ & $ 0.940$ \\
+                \rowcolor{LIGHTGREY} Iran (C. aegagrus) & Capra hircus & $1.9\times 10^{5}$ & $ 0.928$ & $ 0.980$ & $ 0.767$ & $ 0.408$ & $ 0.156$ & $ 0.911$ \\
+                \rowcolor{LIGHTGREY} Iran & Capra hircus & $2.3\times 10^{5}$ & $ 0.955$ & $ 0.969$ & $ 0.616$ & $ 0.459$ & $ 0.147$ & $ 0.943$ \\
+                \rowcolor{LIGHTGREY} Italy & Capra hircus & $1.9\times 10^{5}$ & $ 0.911$ & $ 0.983$ & $ 0.822$ & $ 0.379$ & $ 0.155$ & $ 0.895$ \\
+                \rowcolor{LIGHTGREY} Morocco & Capra hircus & $2.2\times 10^{5}$ & $ 0.950$ & $ 0.976$ & $ 0.706$ & $ 0.468$ & $ 0.150$ & $ 0.627$ \\
+                Iran & Ovis aries & $3.8\times 10^{5}$ & $ 0.983$ & $ 0.958$ & $ 0.421$ & $ 0.796$ & $ 0.154$ & $ 0.090$ \\
+                Iran (O. orientalis) & Ovis aries & $4.5\times 10^{5}$ & $ 0.982$ & $ 0.961$ & $ 0.448$ & $ 0.806$ & $ 0.148$ & $ 0.079$ \\
+                Iran (O. vignei) & Ovis aries & $3.7\times 10^{5}$ & $ 0.974$ & $ 0.963$ & $ 0.480$ & $ 0.685$ & $ 0.151$ & $ 0.086$ \\
+                Various & Ovis aries & $4.1\times 10^{5}$ & $ 0.982$ & $ 0.964$ & $ 0.500$ & $ 0.822$ & $ 0.152$ & $ 0.084$ \\
+                Morocco & Ovis aries & $ 4\times 10^{5}$ & $ 0.983$ & $ 0.958$ & $ 0.387$ & $ 0.782$ & $ 0.153$ & $ 0.081$ \\
+                \rowcolor{LIGHTGREY} Barbados & Chlorocebus sabaeus & $1.1\times 10^{5}$ & $ 0.895$ & $ 0.987$ & $ 0.860$ & $ 0.351$ & $ 0.170$ & $ 0.877$ \\
+                \rowcolor{LIGHTGREY} Central Afr. Rep. & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.925$ & $ 0.974$ & $ 0.653$ & $ 0.373$ & $ 0.157$ & $ 0.199$ \\
+                \rowcolor{LIGHTGREY} Ethiopia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.892$ & $ 0.980$ & $ 0.763$ & $ 0.320$ & $ 0.161$ & $ 0.640$ \\
+                \rowcolor{LIGHTGREY} Gambia & Chlorocebus sabaeus & $1.4\times 10^{5}$ & $ 0.939$ & $ 0.982$ & $ 0.770$ & $ 0.469$ & $ 0.159$ & $ 0.191$ \\
+                \rowcolor{LIGHTGREY} Kenya & Chlorocebus sabaeus & $1.5\times 10^{5}$ & $ 0.916$ & $ 0.976$ & $ 0.680$ & $ 0.345$ & $ 0.165$ & $ 0.461$ \\
+                \rowcolor{LIGHTGREY} Nevis & Chlorocebus sabaeus & $ 1\times 10^{5}$ & $ 0.895$ & $ 0.989$ & $ 0.884$ & $ 0.358$ & $ 0.169$ & $ 0.908$ \\
+                \rowcolor{LIGHTGREY} South Africa & Chlorocebus sabaeus & $1.8\times 10^{5}$ & $ 0.930$ & $ 0.971$ & $ 0.604$ & $ 0.361$ & $ 0.154$ & $ 0.294$ \\
+                \rowcolor{LIGHTGREY} Saint Kitts & Chlorocebus sabaeus & $1.2\times 10^{5}$ & $ 0.898$ & $ 0.986$ & $ 0.839$ & $ 0.353$ & $ 0.165$ & $ 0.753$ \\
+                \rowcolor{LIGHTGREY} Zambia & Chlorocebus sabaeus & $1.7\times 10^{5}$ & $ 0.912$ & $ 0.975$ & $ 0.676$ & $ 0.335$ & $ 0.153$ & $ 0.406$ \\
+                African & Homo sapiens & $5.6\times 10^{4}$ & $ 0.945$ & $ 0.976$ & $ 0.627$ & $ 0.431$ & $ 0.154$ & $ 0.154$ \\
+                Admixed American & Homo sapiens & $4.5\times 10^{4}$ & $ 0.936$ & $ 0.977$ & $ 0.641$ & $ 0.397$ & $ 0.158$ & $ 0.190$ \\
+                East Asian & Homo sapiens & $ 4\times 10^{4}$ & $ 0.943$ & $ 0.977$ & $ 0.648$ & $ 0.422$ & $ 0.163$ & $ 0.237$ \\
+                European & Homo sapiens & $4.2\times 10^{4}$ & $ 0.945$ & $ 0.977$ & $ 0.644$ & $ 0.429$ & $ 0.167$ & $ 0.219$ \\
+                South Asian & Homo sapiens & $4.4\times 10^{4}$ & $ 0.945$ & $ 0.977$ & $ 0.644$ & $ 0.430$ & $ 0.164$ & $ 0.219$ \\
+                \bottomrule
+            \end{tabular}
+        \end{adjustbox}
+        \captionof{table}[Precision and recall when using a discrete DFE to estimate $\Spop$.]{\textbf{Precision and recall when using a discrete DFE to estimate $\bm{\Spop}$.}
+        $\Ne$ is the estimated effective population size.
+        \textit{Precision} is the estimation of the selection coefficient at population scale ($\Spop$) given that $\Sphy$ is known.
+        \textit{Recall} is the estimation of $\Sphy$ given selection coefficient at the population scale ($\Spop$) is known.
+        \textit{Recall} for beneficial mutations ($\proba{[}\SphyBen \given \SpopBen{]}$) is the probability for a mutation to be non-adaptive given it is beneficial at the population scale.\label{table:discrete-dfe}}
+    \end{center}
+
+    \printbibliography
+\end{document}

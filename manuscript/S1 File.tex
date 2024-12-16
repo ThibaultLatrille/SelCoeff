@@ -1,0 +1,377 @@
+%TC:ignore
+\documentclass{article}
+\usepackage[hypcap=false]{caption}
+\usepackage{xcolor, colortbl}
+\definecolor{RED}{HTML}{EB6231}
+\definecolor{BLUE}{HTML}{5D80B4}
+\definecolor{LIGHTGREY}{gray}{0.9}
+\definecolor{BLUELINK}{HTML}{0645AD}
+\definecolor{DARKBLUELINK}{HTML}{0B0080}
+\usepackage[colorlinks=false]{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+% for linking between references, figures, TOC, etc in the pdf document
+\hypersetup{colorlinks,
+    linkcolor=DARKBLUELINK,
+    anchorcolor=DARKBLUELINK,
+    citecolor=DARKBLUELINK,
+    filecolor=DARKBLUELINK,
+    menucolor=DARKBLUELINK,
+    urlcolor=BLUELINK
+} % Color citation links in purple
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{naturalnames}{hyperref}
+
+\usepackage[backend=biber,eprint=false,isbn=false,url=false,intitle=true,style=nature,date=year]{biblatex}
+\addbibresource{codon_models.bib}
+
+\usepackage{bbm}
+\usepackage[margin=50pt]{geometry}
+\usepackage{amssymb,amsfonts,amsmath,amsthm,mathtools}
+\usepackage{lmodern}
+\usepackage{bm,bbold}
+\usepackage{verbatim}
+\usepackage{float}
+\usepackage{listings, enumerate, enumitem}
+\usepackage[export]{adjustbox}
+\usepackage{tabu}
+\usepackage{longtable}
+\tabulinesep=0.6mm
+\newcommand\cellwidth{\TX@col@width}
+\usepackage{hhline}
+\setlength{\arrayrulewidth}{1.2pt}
+\usepackage{multicol,multirow,array}
+\usepackage{etoolbox}
+\AtBeginEnvironment{tabu}{\footnotesize}
+\usepackage{booktabs}
+\usepackage{makecell}
+\usepackage{orcidlink}
+\usepackage{graphicx}
+\usepackage{blkarray}
+\usepackage{pgf,tikz}
+\usetikzlibrary{shapes,arrows,backgrounds,fit,positioning,arrows,automata,calc}
+\tikzset{res/.style={ellipse,draw,minimum height=1.0cm,minimum width=0.8cm}}
+\tikzset{literal/.style={rectangle,draw,minimum height=0.5cm,minimum width=0.8cm,text width = 1.2 cm, align = center}}
+
+\pdfinclusioncopyfonts=1
+
+\renewcommand{\baselinestretch}{1.5}
+\renewcommand{\arraystretch}{0.6}
+\frenchspacing
+
+\renewcommand{\thetable}{\Alph{table}}
+\renewcommand{\thefigure}{\Alph{figure}}
+\renewcommand{\theequation}{S.\arabic{equation}}
+
+\newcommand{\UniDimArray}[1]{\bm{#1}}
+\newcommand{\BiDimArray}[1]{\bm{#1}}
+
+\newcommand{\der}{\text{d}}
+\newcommand{\e}{\text{e}}
+\newcommand{\Ne}{N_{\text{e}}}
+\newcommand{\proba}{\mathbb{P}}
+\newcommand{\pfix}{\proba_{\text{fix}}}
+\newcommand{\dn}{d_N}
+\newcommand{\ds}{d_S}
+\newcommand{\dnds}{\dn / \ds}
+\newcommand{\Sphy}{S_{0}}
+\newcommand{\SphyMean}{\overline{\Sphy}}
+\newcommand{\SphyDel}{\mathcal{D}_0}
+\newcommand{\SphyNeu}{\mathcal{N}_0}
+\newcommand{\SphyBen}{\mathcal{B}_0}
+\newcommand{\Sphyclass}{x}
+\newcommand{\SphyclassAlt}{y}
+\newcommand{\given}{\mid}
+\newcommand{\Spop}{S}
+\newcommand{\SpopDel}{\mathcal{D}}
+\newcommand{\SpopNeu}{\mathcal{N}}
+\newcommand{\SpopBen}{\mathcal{B}}
+\newcommand{\ProbaPopDel}{\proba{[} \SpopDel]}
+\newcommand{\ProbaPopNeu}{\proba{[} \SpopNeu ]}
+\newcommand{\ProbaPopBen}{\proba{[} \SpopBen ]}
+\newcommand{\AdvMean}{\beta_b}
+\newcommand{\DelMean}{\beta_d}
+\newcommand{\thetaSyn}{\theta_{\text{S}}}
+\newcommand{\pvalue}{p\text{-value}}
+
+% Model
+\newcommand{\submatrix}{q}
+\newcommand{\Submatrix}{\BiDimArray{\submatrix}}
+\newcommand{\probmatrix}{P}
+\newcommand{\Probmatrix}{\BiDimArray{\probmatrix}}
+\newcommand{\fit}{F}
+\newcommand{\Fit}{\UniDimArray{\fit}}
+\newcommand{\indice}{l}
+\newcommand{\indiceexp}{^{(\indice)}}
+\newcommand{\ci}{{a}}
+\newcommand{\cj}{{b}}
+\newcommand{\itoj}{\ci \mapsto \cj}
+\newcommand{\nuc}{\mathcal{M}}
+\newcommand{\fiti}{\fit_{\ci}}
+\newcommand{\fitj}{\fit_{\cj}}
+\newcommand{\mutmatrix}{R}
+\newcommand{\Mutmatrix}{\BiDimArray{\mutmatrix}}
+\newcommand{\exchan}{\rho}
+\newcommand{\Exchan}{\UniDimArray{\exchan}}
+\newcommand{\mutequi}{\sigma}
+\newcommand{\Mutequi}{\UniDimArray{\mutequi}}
+\newcommand{\Tree}{\mathcal{T}}
+\newcommand{\branch}{\text{j}}
+\newcommand{\branchexp}{^{(\branch)}}
+\newcommand{\branchlength}{l}
+% Alignment
+\newcommand{\data}{D}
+\newcommand{\Data}{\BiDimArray{\data}}
+\newcommand{\site}{\text{i}}
+\newcommand{\Nsite}{\text{N}}
+\newcommand{\siteexp}{^{(\site)}}
+\newcommand{\Setsite}{\site \in \{1, \hdots, \Nsite\} }
+\newcommand{\branchsiteexp}{^{(\branch, \site)}}
+% Categories
+\newcommand{\cat}{\text{k}}
+\newcommand{\Ncat}{\text{K}}
+\newcommand{\catexp}{^{(\cat)}}
+\newcommand{\catInterval}{\{1, \hdots, \Ncat\}}
+\newcommand{\Setcat}{\cat \in \catInterval }
+\newcommand{\branchcatexp}{^{(\branch, \cat)}}
+\newcommand{\profile}{\phi}
+\newcommand{\Profile}{\UniDimArray{\profile}}
+\newcommand{\concentrationProfile}{\alpha}
+\newcommand{\centerProfile}{\UniDimArray{\gamma}}
+\newcommand{\catVar}{\kappa}
+\newcommand{\catsite}{\catVar\left(\site\right)}
+\newcommand{\catmultivar}{m}
+\newcommand{\catMultiVar}{\UniDimArray{\catmultivar}}
+\newcommand{\stickbreaking}{\theta}
+\newcommand{\StickBreaking}{\UniDimArray{\stickbreaking}}
+\newcommand{\stick}{\psi}
+\newcommand{\stickbreakinghyper}{\beta}
+\newcommand{\Multivariate}{\UniDimArray{Z}}
+\newcommand{\subhistory}{\mathcal{H}}
+
+\title{\textbf{Estimating the proportion of beneficial mutations that are not adaptive in mammals}}
+
+\author{
+    \large
+    \textbf{T. {Latrille}$^{1\dag}$\orcidlink{0000-0002-9643-4668}, J. {Joseph}$^{2\dag}$\orcidlink{0009-0002-1312-9930}, D.~A. {Hartasánchez}$^{1}$\orcidlink{0000-0003-2596-6883}, N. {Salamin}$^{1}$\orcidlink{0000-0002-3963-4954}}\\
+    \scriptsize $^{1}$Department of Computational Biology, Université de Lausanne, Lausanne, Switzerland\\
+    \scriptsize $^{2}$Laboratoire de Biométrie et Biologie Evolutive, UMR5558, Université Lyon 1, Villeurbanne, France \\
+    \scriptsize $^{\dag}$These authors contributed equally to this work\\
+    \normalsize \texttt{\href{mailto:thibault.latrille@ens-lyon.org}{thibault.latrille@ens-lyon.org}} \\
+}
+
+
+\date{}
+
+\begin{document}
+    \maketitle
+    \part*{S1 File}
+    \vspace{-1em}
+    \tableofcontents
+    \listoffigures
+
+    \clearpage
+    \section{Mutation-selection codon models}\label{sec:mutsel}
+
+    \subsection{Prior distributions and parameters of the model}\label{subsec:priors}
+
+    We here present the Mutation-selection codon model as a Bayesian hierarchical model, including the prior distributions and the parameters of the model.
+    This hierarchical model is formally represented as directed acyclic graph of dependencies between variables, depicted in Figure~\ref{mutsel-illustration}:
+
+    \begin{center}
+
+        \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=0.6cm and 1.2cm,semithick]
+            \tikzstyle{every state}=[]
+
+            \node[state] (P) {$\Probmatrix\branchsiteexp$};
+            \node[state] (Q) [below right=of P] {$\Submatrix\branchsiteexp$};
+            \node[state] (R) [below right=of Q] {$\Mutmatrix$};
+            \node[state] (BL) [BLUE, right=of P] {$\branchlength\branchexp$};
+            \node[res] (BLH) [RED, right=of BL] {$ \lambda, \tau $};
+            \node[state] (f) [right=of Q] {$\Fit\siteexp $};
+            \node[state] (Ex) [BLUE, below right=of R] {$\Exchan$};
+            \node[state] (Equi) [BLUE, right=of R] {$\Mutequi$};
+            \node[state] (Base) [BLUE, above right=of f] {$\Profile\catexp$};
+            \node[state] (cat) [BLUE, right=of f] {$\catsite$};
+            \node[res] (ExH) [RED, right=of Ex] {$1,1,1,1,1,1$};
+            \node[res] (EquiH) [RED, right=of Equi] {$1,1,1,1$};
+            \node[state] (baseH) [RED, right=of Base] {$\concentrationProfile, \centerProfile $};
+            \node[state] (sb) [BLUE, right=of cat] {$\StickBreaking$};
+            \node[state] (sbH) [RED, right=of sb] {$\stickbreakinghyper$};
+
+            \path
+            (Q) edge [black] node [above right] {\ref{eq:Probmatrix}} (P)
+            (BL) edge [black] node [] {} (P)
+            (R) edge [black] node {} (Q)
+            (f) edge [black] node [above] {\ref{eq:subrates}} (Q)
+            (Ex) edge [black] node [] {} (R)
+            (Equi) edge [black] node [below] {\ref{eq:gtr-mutrates}} (R)
+            (Base) edge [black] node {} (f)
+            (cat) edge [black] node [above] {\ref{eq:sitefitness}} (f)
+            (BLH) edge [dashed, BLUE] node [above] {\ref{eq:branchlength}} (BL)
+            (ExH) edge [dashed, BLUE] node [above] {\ref{eq:DistribExchan}} (Ex)
+            (EquiH) edge [dashed, BLUE] node [above] {\ref{eq:DistribMutequi}} (Equi)
+            (baseH) edge [dashed, BLUE] node [above] {\ref{eq:DistribBase}} (Base)
+            (sb) edge [dashed, BLUE] node [above] {\ref{eq:DistribMultinomial}} (cat)
+            (sbH) edge [dashed, BLUE] node [above] {\ref{eq:DistribStickBreaking},\ref{eq:Beta}} (sb);
+        \end{tikzpicture}
+        \captionof{figure}[Bayesian hierarchical model.]{
+    \textbf{Bayesian hierarchical model.} Nodes of the directed acyclic graph are the variables, and edges are the functions.
+    Hyper-parameters are depicted in {\color{RED}{red}} circles, random variables in {\color{BLUE}{blue}} circles, and transformed variables in black.
+    {\color{BLUE}{Blue}} dashed line denotes a drawing from a random distribution, and black solid lines denote a function.
+    All the nodes pointing toward a given node (upstream) are its dependencies which determine its distribution.
+    The other way around, following the arrows in the DAG (downstream), simple {prior} distributions are combined together to form more complex joint {prior} distributions which ultimately define the {prior} distribution of the model.
+    Equations~\ref{eq:gtr-mutrates} to~\ref{eq:Probmatrix} describe the relationship between variables (sections~\ref{sec:nuc} to~\ref{sec:codon}).
+    \label{mutsel-illustration}}
+    \end{center}
+
+
+
+    \subsection{Nucleotide mutation rates}
+    \label{sec:nuc}
+    The generalized time-reversible (GTR) nucleotide mutation rate matrix $\Mutmatrix$ is a function of the nucleotide frequencies $\Mutequi$ and the symmetric exchangeability rates $\Exchan$~\cite{tavare_probabilistic_1986}.
+    $\Mutequi = (\mutequi_A , \mutequi_C , \mutequi_G , \mutequi_T)$ is the equilibrium base frequency vector, giving the frequency at which each base occurs at each site.
+    $\Exchan = \left( \exchan_{AC}, \exchan_{AG}, \exchan_{AT}, \exchan_{CG}, \exchan_{CT}, \exchan_{GT}\right)$ is the vector of exchangeabilities between nucleotides.
+    Altogether, the rate matrix is:
+    \begin{equation}
+        \label{eq:gtr-mutrates}
+        \Mutmatrix =
+        \begin{blockarray}{ccccc}
+            & A & C & G & T \\
+            \begin{block}{c(cccc)}
+                A & -\mu_A & {\exchan_{AC}\mutequi_C} & {\exchan_{AG}\mutequi_G} & {\exchan_{AT}\mutequi_T} \\
+                C & {\exchan_{AC}\mutequi_A} &                        -\mu_C & {\exchan_{CG}\mutequi_G} & {\exchan_{CT}\mutequi_T} \\
+                G & {\exchan_{AG}\mutequi_A} & {\exchan_{CG}\mutequi_C} &                        -\mu_G & {\exchan_{GT}\mutequi_T} \\
+                T & {\exchan_{AT}\mutequi_A} & {\exchan_{CT}\mutequi_C} & {\exchan_{GT}\mutequi_G} & -\mu_T\\
+            \end{block}
+        \end{blockarray}
+    \end{equation}
+    By definition, the sum of the entries in each row of the nucleotide rate matrix $\Mutmatrix$ is equal to $0$, giving the diagonal entries:
+    \begin{equation}
+        \mu_a = \sum\limits_{ b \neq a, b \in \{A, C, G, T\} } \mutmatrix_{a,b}
+    \end{equation}
+    The {prior} on the exchangeabilities $\Exchan$ is a uniform Dirichlet distribution of dimension $6$:
+    \begin{equation}
+        \label{eq:DistribExchan}
+        \Exchan \sim \text{Dir}\left( 1,1,1,1,1,1 \right).
+    \end{equation}
+    The {prior} on the equilibrium base frequencies $\Mutequi$ is a uniform Dirichlet distribution of dimension $4$:
+    \begin{equation}
+        \label{eq:DistribMutequi}
+        \Mutequi \sim \text{Dir}\left( 1,1,1,1 \right)
+    \end{equation}
+    The general time-reversible nucleotide matrix is normalized with a total flow of $1$:
+    \begin{equation}
+        \sum\limits_{a \in \{A, C, G, T\}} - \mutequi_a \mutmatrix_{a,a} = 1,
+    \end{equation}
+    such that we expect $1$ {substitution} per unit of branch length.
+
+    \subsection{Site-specific amino-acid fitness profiles}
+    \label{sec:profiles}
+    Site-specific amino-acid fitness profiles are assumed i.i.d. from a mixture model, itself endowed with a truncated Dirichlet process prior.
+    Specifically, the mixture has $\Ncat$ components ($\Ncat = 30$ by default).
+    The prior on component weights~($\StickBreaking$) is modeled using a stick-breaking process, truncated at $\Ncat$ and of parameter $\stickbreakinghyper=1$:
+    \begin{align}
+        \label{eq:DistribStickBreaking}
+        \begin{split}
+            & \StickBreaking \sim \text{StickBreaking}\left( \Ncat, \stickbreakinghyper \right)\\
+            \iff & \stickbreaking_{\cat} = \stick_{\cat}\cdot \prod _{{\indice=1}}^{{\cat-1}}\left(1-\stick_{\indice}\right),\ \Setcat,
+        \end{split}
+    \end{align}
+    where $\stick_{\cat}$ are i.i.d. from a beta distribution
+    \begin{equation}
+        \label{eq:Beta}
+        \stick_{\cat} \sim \text{Beta}\left( 1, \stickbreakinghyper \right),\ \Setcat.
+    \end{equation}
+    Of note, the weights decrease geometrically in expectation, at rate $\stickbreakinghyper$, such that lower values of $\stickbreakinghyper$ induce more heterogeneous distributions of weights.
+
+    Each component of the mixture defines a 20-dimensional fitness profile $\Profile\catexp$ (summing to $1$), for $ \Setcat$.
+    These fitness profiles are i.i.d. from a Dirichlet of center $\centerProfile=1$ and concentration $\concentrationProfile=1$:
+    \begin{equation}
+        \label{eq:DistribBase}
+        \Profile\catexp \sim \text{Dir}\left( \centerProfile,\ \concentrationProfile \right),\ \Setcat.
+    \end{equation}
+
+    Site allocations to the mixture components $\catsite \in \catInterval $, for $\Setsite$ running over the $\Nsite$ sites of the alignment, are i.i.d. multinomial of parameter $\StickBreaking$:
+    \begin{align}
+        \label{eq:DistribMultinomial}
+        \catMultiVar \sim \text{Multinomial}\left( \StickBreaking \right), \\
+        \text{ where } \catmultivar_{\cat} = \sum_{\Setsite} \mathbb{1}_{\catsite = \cat}
+    \end{align}
+
+    For a given parameter configuration for the mixture, the scaled fitness $\Fit\siteexp$ at site $\site$, are obtained by taking the logarithm of fitness assigned to this site:
+    \begin{equation}
+        \label{eq:sitefitness}
+        \Fit\siteexp = \ln \left( \Profile^{\left( \catsite \right)} \right),\ \Setsite.
+    \end{equation}
+
+    \subsection{Branch length}
+    The topology of the rooted phylogenetic tree is supposed to be known and is not estimated by the model.
+    The branch lengths $\branchlength\branchexp$ are defined as the expected number of {neutral} substitutions per {DNA} site along a branch, each from a Gamma distribution of mean $\lambda=0.1$ and scale $\tau=1$:
+    \begin{equation}
+        \label{eq:branchlength}
+        \branchlength\branchexp \sim \text{Gamma}\left( \lambda, \tau \right).
+    \end{equation}
+
+    \subsection{Codon substitution rates}
+    \label{sec:codon}
+    The mutation rate between codons $\ci$ and $\cj$, denoted $\mu_{\itoj}$ depends on the underlying nucleotide change between the codons.
+    First, if codons $\ci$ and $\cj$ are not nearest-neighbours, $\mu_{\itoj}$ is equal to $0$.
+    Second, if codons $\ci$ and $\cj$ are only one mutation away, $\mu_{\itoj}$ is given by the underlying nucleotide relative rate~(${\mutmatrix_{\itoj}}$).
+
+    For a given site $\site$, the {codon} {substitution} rate matrix $\Submatrix\siteexp$ is given by:
+    \begin{equation}
+        \label{eq:subrates}
+        \begin{dcases}
+            \submatrix\siteexp_{\itoj} = 0\text{ if codons $\ci$ and $\cj$ are not nearest-neighbors,} \\
+            \submatrix\siteexp_{\itoj} = \mu_{\itoj}\text{ if codons $\ci$ and $\cj$ are {synonymous},} \\
+            \submatrix\siteexp_{\itoj} = \mu_{\itoj} \dfrac{ \fitj\siteexp - \fiti\siteexp}{{1 - \e^{\fiti\siteexp - \fitj\siteexp} }} \text{ if codons $\ci$ and $\cj$ are non-synonymous,}\\
+            \submatrix\siteexp_{\ci, \ci} = - \sum\limits_{ \cj \neq \ci, \cj=1}^{61} \submatrix\siteexp_{\itoj}.
+        \end{dcases}
+    \end{equation}
+    Together, the probability of transition between codons for a given branch $\branch$ and site $\site$ is:
+    \begin{equation}
+        \label{eq:Probmatrix}
+        \Probmatrix\branchsiteexp = \e^{\branchlength\branchexp \Submatrix\siteexp},
+    \end{equation}
+    which are the matrices necessary to compute the {likelihood} of the data ($\data$) given the parameters of the model using the pruning algorithm.
+
+    \subsection{Bayesian implementation}
+    \label{sec:Bayesian}
+    Bayesian inference was conducted using Markov Chain Monte Carlo (MCMC).
+    Most phylogenetic {MCMC} samplers target the distribution over the model parameters given the sequence alignment, which means that they have to repeatedly invoke the pruning algorithm to recalculate the {likelihood} which is most often the limiting step of the {MCMC}.
+    An alternative, which is used here, is to do the {MCMC} conditionally on the detailed {substitution} history $\subhistory$, thus doing the {MCMC} over the augmented configuration~($\subhistory$, $\data$), under the target distribution obtained by combining the mapping-based {likelihood} with the {prior} over model parameters.
+    The key idea that makes this strategy efficient is that the mapping-based {likelihood} depends on compact summary statistics of $\subhistory$, leading to a very fast evaluation of the {likelihood}.
+    On the other hand, this requires to implement more complex {MCMC} procedures that have to alternate between:
+    \begin{enumerate}
+        \item sampling $\subhistory$ conditionally on the data and the current parameter configuration.
+        \item re-sampling the parameters conditionally on $\subhistory$.
+    \end{enumerate}
+
+    To implement the mapping-based {MCMC} sampling strategy, we first sample the detailed {substitution} history $\subhistory$ for all sites along the tree.
+    Several methods exist for doing this~\cite{nielsen_mapping_2002,rodrigue_uniformization_2008}, which are used here in combination: first trying the accept-reject method of \textcite{nielsen_mapping_2002}, then switching to the uniformization approach of \textcite{rodrigue_uniformization_2008} if the first round has failed.
+
+    Then, we write down the probability of $\subhistory$ given the parameters, and finally, we collect all factors that depend on some parameter of interest and make some simplifications.
+    This ultimately leads to relatively compact sufficient statistics allowing for fast numerical evaluation of the likelihood~\cite{irvahn_phylogenetic_2014,davydov_state_2017}.
+
+    \subsection{BayesCode software}\label{subsec:bayescode}
+    In \textit{BayesCode} (\href{https://github.com/ThibaultLatrille/BayesCode}{github.com/ThibaultLatrille/BayesCode}, v1.3.1), we ran the mutation-selection codon models \textit{mutselomega} for 2000 points of MCMC with the options:
+    \begin{scriptsize}
+        \begin{verbatim}
+ mutselomega ---omegashift 0.0 --ncat 30 -a my_alignment.phy -t my_tree.newick -u 2000 my_genename
+        \end{verbatim}
+    \end{scriptsize}
+    The collection of site-specific fitness profiles ($\UniDimArray{F^{(i)}}, \forall i$) are then obtained by running \textit{readmutselomega}, reading 1000 points of MCMC (first 1000 are considered as burn-in) with the options:
+    \begin{scriptsize}
+        \begin{verbatim}
+ readmutselomega --every 1 --until 2000 --burnin 1000 --ss my_genename
+        \end{verbatim}
+    \end{scriptsize}
+    The gene-specific $4 \times 4$ nucleotide mutation rate matrix ($\UniDimArray{\mu}$) is also obtained by running \textit{readmutselomega}, reading 1000 points of MCMC (first 1000 are considered as burn-in) with the options:
+    \begin{scriptsize}
+        \begin{verbatim}
+ readmutselomega --every 1 --until 2000 --burnin 1000 --nuc my_genename
+        \end{verbatim}
+    \end{scriptsize}
+
+    \printbibliography
+\end{document}

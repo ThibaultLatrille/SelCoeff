@@ -1,0 +1,336 @@
+%TC:ignore
+\documentclass{article}
+\usepackage[hypcap=false]{caption}
+\usepackage{xcolor, colortbl}
+\definecolor{RED}{HTML}{EB6231}
+\definecolor{BLUE}{HTML}{5D80B4}
+\definecolor{LIGHTGREY}{gray}{0.9}
+\definecolor{BLUELINK}{HTML}{0645AD}
+\definecolor{DARKBLUELINK}{HTML}{0B0080}
+\usepackage[colorlinks=false]{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+% for linking between references, figures, TOC, etc in the pdf document
+\hypersetup{colorlinks,
+    linkcolor=DARKBLUELINK,
+    anchorcolor=DARKBLUELINK,
+    citecolor=DARKBLUELINK,
+    filecolor=DARKBLUELINK,
+    menucolor=DARKBLUELINK,
+    urlcolor=BLUELINK
+} % Color citation links in purple
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{naturalnames}{hyperref}
+
+\usepackage[backend=biber,eprint=false,isbn=false,url=false,intitle=true,style=nature,date=year]{biblatex}
+\addbibresource{codon_models.bib}
+
+\usepackage{bbm}
+\usepackage[margin=50pt]{geometry}
+\usepackage{amssymb,amsfonts,amsmath,amsthm,mathtools}
+\usepackage{lmodern}
+\usepackage{bm,bbold}
+\usepackage{verbatim}
+\usepackage{float}
+\usepackage{listings, enumerate, enumitem}
+\usepackage[export]{adjustbox}
+\usepackage{tabu}
+\usepackage{longtable}
+\tabulinesep=0.6mm
+\newcommand\cellwidth{\TX@col@width}
+\usepackage{hhline}
+\setlength{\arrayrulewidth}{1.2pt}
+\usepackage{multicol,multirow,array}
+\usepackage{etoolbox}
+\AtBeginEnvironment{tabu}{\footnotesize}
+\usepackage{booktabs}
+\usepackage{makecell}
+\usepackage{orcidlink}
+\usepackage{graphicx}
+\usepackage{blkarray}
+\usepackage{pgf,tikz}
+\usetikzlibrary{shapes,arrows,backgrounds,fit,positioning,arrows,automata,calc}
+\tikzset{res/.style={ellipse,draw,minimum height=1.0cm,minimum width=0.8cm}}
+\tikzset{literal/.style={rectangle,draw,minimum height=0.5cm,minimum width=0.8cm,text width = 1.2 cm, align = center}}
+
+\pdfinclusioncopyfonts=1
+
+\renewcommand{\baselinestretch}{1.5}
+\renewcommand{\arraystretch}{0.6}
+\frenchspacing
+
+\renewcommand{\thetable}{\Alph{table}}
+\renewcommand{\thefigure}{\Alph{figure}}
+\renewcommand{\theequation}{S.\arabic{equation}}
+
+\newcommand{\UniDimArray}[1]{\bm{#1}}
+\newcommand{\BiDimArray}[1]{\bm{#1}}
+
+\newcommand{\der}{\text{d}}
+\newcommand{\e}{\text{e}}
+\newcommand{\Ne}{N_{\text{e}}}
+\newcommand{\proba}{\mathbb{P}}
+\newcommand{\pfix}{\proba_{\text{fix}}}
+\newcommand{\dn}{d_N}
+\newcommand{\ds}{d_S}
+\newcommand{\dnds}{\dn / \ds}
+\newcommand{\Sphy}{S_{0}}
+\newcommand{\SphyMean}{\overline{\Sphy}}
+\newcommand{\SphyDel}{\mathcal{D}_0}
+\newcommand{\SphyNeu}{\mathcal{N}_0}
+\newcommand{\SphyBen}{\mathcal{B}_0}
+\newcommand{\Sphyclass}{x}
+\newcommand{\SphyclassAlt}{y}
+\newcommand{\given}{\mid}
+\newcommand{\Spop}{S}
+\newcommand{\SpopDel}{\mathcal{D}}
+\newcommand{\SpopNeu}{\mathcal{N}}
+\newcommand{\SpopBen}{\mathcal{B}}
+\newcommand{\ProbaPopDel}{\proba{[} \SpopDel]}
+\newcommand{\ProbaPopNeu}{\proba{[} \SpopNeu ]}
+\newcommand{\ProbaPopBen}{\proba{[} \SpopBen ]}
+\newcommand{\AdvMean}{\beta_b}
+\newcommand{\DelMean}{\beta_d}
+\newcommand{\thetaSyn}{\theta_{\text{S}}}
+\newcommand{\pvalue}{p\text{-value}}
+
+% Model
+\newcommand{\submatrix}{q}
+\newcommand{\Submatrix}{\BiDimArray{\submatrix}}
+\newcommand{\probmatrix}{P}
+\newcommand{\Probmatrix}{\BiDimArray{\probmatrix}}
+\newcommand{\fit}{F}
+\newcommand{\Fit}{\UniDimArray{\fit}}
+\newcommand{\indice}{l}
+\newcommand{\indiceexp}{^{(\indice)}}
+\newcommand{\ci}{{a}}
+\newcommand{\cj}{{b}}
+\newcommand{\itoj}{\ci \mapsto \cj}
+\newcommand{\nuc}{\mathcal{M}}
+\newcommand{\fiti}{\fit_{\ci}}
+\newcommand{\fitj}{\fit_{\cj}}
+\newcommand{\mutmatrix}{R}
+\newcommand{\Mutmatrix}{\BiDimArray{\mutmatrix}}
+\newcommand{\exchan}{\rho}
+\newcommand{\Exchan}{\UniDimArray{\exchan}}
+\newcommand{\mutequi}{\sigma}
+\newcommand{\Mutequi}{\UniDimArray{\mutequi}}
+\newcommand{\Tree}{\mathcal{T}}
+\newcommand{\branch}{\text{j}}
+\newcommand{\branchexp}{^{(\branch)}}
+\newcommand{\branchlength}{l}
+% Alignment
+\newcommand{\data}{D}
+\newcommand{\Data}{\BiDimArray{\data}}
+\newcommand{\site}{\text{i}}
+\newcommand{\Nsite}{\text{N}}
+\newcommand{\siteexp}{^{(\site)}}
+\newcommand{\Setsite}{\site \in \{1, \hdots, \Nsite\} }
+\newcommand{\branchsiteexp}{^{(\branch, \site)}}
+% Categories
+\newcommand{\cat}{\text{k}}
+\newcommand{\Ncat}{\text{K}}
+\newcommand{\catexp}{^{(\cat)}}
+\newcommand{\catInterval}{\{1, \hdots, \Ncat\}}
+\newcommand{\Setcat}{\cat \in \catInterval }
+\newcommand{\branchcatexp}{^{(\branch, \cat)}}
+\newcommand{\profile}{\phi}
+\newcommand{\Profile}{\UniDimArray{\profile}}
+\newcommand{\concentrationProfile}{\alpha}
+\newcommand{\centerProfile}{\UniDimArray{\gamma}}
+\newcommand{\catVar}{\kappa}
+\newcommand{\catsite}{\catVar\left(\site\right)}
+\newcommand{\catmultivar}{m}
+\newcommand{\catMultiVar}{\UniDimArray{\catmultivar}}
+\newcommand{\stickbreaking}{\theta}
+\newcommand{\StickBreaking}{\UniDimArray{\stickbreaking}}
+\newcommand{\stick}{\psi}
+\newcommand{\stickbreakinghyper}{\beta}
+\newcommand{\Multivariate}{\UniDimArray{Z}}
+\newcommand{\subhistory}{\mathcal{H}}
+
+\title{\textbf{Estimating the proportion of beneficial mutations that are not adaptive in mammals}}
+
+\author{
+    \large
+    \textbf{T. {Latrille}$^{1\dag}$\orcidlink{0000-0002-9643-4668}, J. {Joseph}$^{2\dag}$\orcidlink{0009-0002-1312-9930}, D.~A. {Hartasánchez}$^{1}$\orcidlink{0000-0003-2596-6883}, N. {Salamin}$^{1}$\orcidlink{0000-0002-3963-4954}}\\
+    \scriptsize $^{1}$Department of Computational Biology, Université de Lausanne, Lausanne, Switzerland\\
+    \scriptsize $^{2}$Laboratoire de Biométrie et Biologie Evolutive, UMR5558, Université Lyon 1, Villeurbanne, France \\
+    \scriptsize $^{\dag}$These authors contributed equally to this work\\
+    \normalsize \texttt{\href{mailto:thibault.latrille@ens-lyon.org}{thibault.latrille@ens-lyon.org}} \\
+}
+
+
+\date{}
+
+\begin{document}
+    \maketitle
+    \part*{S3 File}
+    \vspace{-1em}
+    \tableofcontents
+    \listoffigures
+    \clearpage
+
+    \section{Contrasting selection at the phylogenetic and population-genetic scales}
+
+    \subsection{Selection at the population-genetic scale}
+    The proportion of deleterious ($\ProbaPopDel$), nearly-neutral ($\ProbaPopNeu$) and of beneficial ($\ProbaPopBen$) mutations estimated at the population-genetic scale across the different populations is shown for each class of selection:
+    $\SphyDel$ (Figure~\ref{fig:pop-neg}), $\SphyNeu$ (Figure~\ref{fig:pop-weak}) and $\SphyBen$ (Figure~\ref{fig:pop-pos}).
+
+
+    \begin{center}
+        \begin{minipage}{0.75\linewidth}
+            \begin{minipage}{0.9\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/Theta.neg.stacked.pdf}
+            \end{minipage}
+            \begin{minipage}{0.09\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
+            \end{minipage}
+        \end{minipage}
+    \captionof{figure}[Estimation of selection at the population scale for $\SphyDel$ mutations.]{\textbf{Estimation of selection at the population scale for $\bm{\SphyDel}$ mutations.} Each stack bar corresponds to the DFE of new mutations predicted to be $\SphyDel$  by the mutation selection model, in a given population. The dashed area represents the proportion of deleterious mutations ($\SpopDel$), the gray area that of neutral mutations ($\SpopNeu$), and the yellow area that of beneficial mutations ($\SpopBen$).\label{fig:pop-neg}}
+    \end{center}
+
+
+    \begin{center}
+        \begin{minipage}{0.75\linewidth}
+            \begin{minipage}{0.9\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/Theta.weak.stacked.pdf}
+            \end{minipage}
+            \begin{minipage}{0.09\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
+            \end{minipage}
+        \end{minipage}
+    \captionof{figure}[Estimation of selection at the population scale for $\SphyNeu$ mutations.]{\textbf{Estimation of selection at the population scale for $\bm{\SphyNeu}$ mutations.} Each stack bar corresponds to the DFE of new mutations predicted to be $\SphyNeu$ by the mutation selection model, in a given population. The dashed area represents the proportion of deleterious mutations ($\SpopDel$), the gray area that of neutral mutations ($\SpopNeu$), and the yellow area that of beneficial mutations ($\SpopBen$).\label{fig:pop-weak}}
+    \end{center}
+
+
+    \begin{center}
+        \begin{minipage}{0.75\linewidth}
+            \begin{minipage}{0.9\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/Theta.pos.stacked.pdf}
+            \end{minipage}
+            \begin{minipage}{0.09\linewidth}
+                \includegraphics[width=\linewidth, page=1]{artworks/legend.polycat}
+            \end{minipage}
+        \end{minipage}
+    \captionof{figure}[Estimation of selection at the population scale for $\SphyBen$ mutations.]{\textbf{Estimation of selection at the population scale for $\bm{\SphyBen}$ mutations.} Each stack bar corresponds to the DFE of new mutations predicted to be $\SphyBen$ by the mutation selection model, in a given population. The dashed area represents the proportion of deleterious mutations ($\SpopDel$), the gray area that of neutral mutations ($\SpopNeu$), and the yellow area that of beneficial mutations ($\SpopBen$).\label{fig:pop-pos}}
+    \end{center}
+
+    \subsection{Distribution of scaled selection coefficients (\texorpdfstring{$\Sphy$}{S₀})}\label{subsec:expectedDFE}
+
+    Theoretically, the selection coefficient ($\Sphy$) for any mutation is related to its probability of fixation by the equation $\proba_{\text{fix}} (\Sphy) = \Sphy/(1-\exp(-\Sphy)) $.
+    It is thus possible to predict the distribution of $\Sphy$ of substitutions given the distribution of $\Sphy$ for mutations (Figure~\ref{dfe-sfs}A for one population of \textit{Chlorocebus sabaeus}) by weighting the different mutations by their $\proba_{\text{fix}} (\Sphy)$.
+    The predicted DFE (distribution of fitness effects) of substitutions (Figure~\ref{dfe-sfs}B) matches the observed DFE of substitutions (Figure~\ref{dfe-sfs}C) in the terminal lineage, meaning that the $\Sphy$ obtained by phylogenetic mutation-selection codon models is a strong predictor of selection effectively exerted on mutations in terminal lineages.
+    Equivalent figures to Figure~\ref{dfe-sfs} for each one of the 28 populations are available at Zenodo (\url{https://doi.org/10.5281/zenodo.7878953}) in file \textit{distribution\_S0\_28\_populations.pdf}.\\
+
+    \newpage
+    \begin{center}
+        \begin{minipage}{0.32\linewidth}
+            \flushleft {\tiny A: Expected DFE for mutations}
+            \includegraphics[width=\linewidth, page=1]{artworks/DFE.Chlorocebus_sabaeus.Saint_Kitts.MutSel.pdf}
+        \end{minipage}
+        \begin{minipage}{0.32\linewidth}
+            \flushleft {\tiny B: Expected DFE for substitutions}
+            \includegraphics[width=\linewidth, page=1]{artworks/DFE.Chlorocebus_sabaeus.Saint_Kitts.MutSel.Flow.pdf}
+        \end{minipage}
+        \begin{minipage}{0.32\linewidth}
+            \flushleft {\tiny C: Observed DFE for substitutions}
+            \includegraphics[width=\linewidth, page=1]{artworks/subs.Chlorocebus_sabaeus.Saint_Kitts.bins3Mask0.9.pdf}
+        \end{minipage}
+        \\
+        \begin{minipage}{0.32\linewidth}
+            \flushleft {\tiny D: Observed DFE for polymorphisms}
+            \includegraphics[width=\linewidth, page=1]{artworks/poly.Chlorocebus_sabaeus.Saint_Kitts.bins3Mask0.9.pdf}
+        \end{minipage}
+        \begin{minipage}{0.32\linewidth}
+            \flushleft {\tiny E: Site frequency spectrum}
+            \includegraphics[width=\linewidth, page=1]{artworks/Chlorocebus_sabaeus.Saint_Kitts.MutSel-sfs.normalize.pdf}
+        \end{minipage}
+        \begin{minipage}{0.32\linewidth}
+            \flushleft {\tiny F: $S$ as function of $S_0$ for each class}
+            \includegraphics[width=\linewidth, page=1]{artworks/Chlorocebus_sabaeus.Saint_Kitts.MutSel.polyDFE_C.pdf}
+        \end{minipage}
+        \captionof{figure}[Distribution of scaled selection coefficients ($\Sphy$).]{\textbf{Distribution of scaled selection coefficients ($\bm{\Sphy}$) in the Saint Kitts population of \textit{Chlorocebus sabaeus}.}
+        A) Distribution of scaled selection coefficients ($\Sphy$), predicted for all possible non-synonymous DNA mutations away from the ancestral exome.
+        Mutations are divided into three classes of selection: deleterious ($\SphyDel$), nearly-neutral ($\SphyNeu$) and beneficial non-adaptive ($\SphyBen$).
+        B) Expected distribution of $\Sphy$ for substitutions obtained by transforming the distribution of $\Sphy$ for mutations (panel A) by weighting each mutation by its scaled probability of fixation given by $\proba_{\text{fix}} (\Sphy) = \Sphy/(1-\exp(-\Sphy))$.
+        C) Distribution of scaled selection coefficients ($\Sphy$) for all observed substitutions along the terminal branch of the phylogenetic tree.
+        D) Distribution of scaled selection coefficients ($\Sphy$) for all observed polymorphisms currently segregating in the population.
+        E) The site-frequency spectrum (SFS) in the population for a random sample of 16 alleles (means in solid lines and standard deviations in color shades) for each class of selection and for synonymous mutations, supposedly neutral (black). The SFS represents the proportion of mutations (y-axis) with a given number of derived alleles in the population (x-axis). At high frequencies, deleterious mutations are underrepresented.
+        F) Proportion of beneficial $\ProbaPopDel$, nearly-neutral $\ProbaPopNeu$, and deleterious mutations $\ProbaPopBen$  estimated at the population scale for each class of selection at the phylogenetic scale. Proportions depicted here are not weighted by their mutational opportunities.}
+        \label{dfe-sfs}
+    \end{center}
+
+    \newpage
+    \section{Correlation with diversity}
+
+    \subsection{Phylogenetic Generalized Linear Model}
+
+    Because a correlation must account for phylogenetic relationship and non-independence of samples, we fitted a Phylogenetic Generalized Linear Model (PGLM) in R with the package caper~\cite{orme_caper_2013}, with multi-furcation of the different populations inside each species.
+    The mammalian tree imported from TimeTree~\cite{kumar_timetree_2017} and pruned to the species used in this study (Figure~\ref{tree}) is shown in newick format:
+
+    \lstinputlisting[breaklines]{artworks/PGLM.tree}
+
+    \begin{center}
+        \includegraphics[width=0.65\linewidth, page=1]{artworks/PGLM.pdf}
+        \captionof{figure}[Tree used for PGLM (Phylogenetic Generalized Linear Model).]{\textbf{Tree used for PGLM (Phylogenetic Generalized Linear Model).} The mammalian dated tree was obtained from TimeTree~\cite{kumar_timetree_2017} and pruned to include only the species analysed in this study, with multi-furcation of the different populations from each species placed at the same divergence time as the divergence to the sister species.}
+        \label{tree}
+    \end{center}
+
+    \newpage
+    Accounting for phylogenetic relationship and non-independence of samples, through the fit of a Phylogenetic Generalized Linear Model, we can estimate regression coefficient between two variables.
+    Thus, for each population, the proportion of deleterious ($\ProbaPopDel$,~\ref{fig:pop-neg-prop}), nearly-neutral ($\ProbaPopNeu$,~\ref{fig:pop-weak-prop}) and beneficial ($\ProbaPopBen$,~\ref{fig:pop-pos-prop}) mutations estimated at the population-genetic scale is shown as function of $\Ne$, and we estimated regression coefficients.
+
+
+    \subsubsection{Proportion of deleterious mutations (\texorpdfstring{$\SpopDel$}{D})}\label{subsec:proportion-deleterious-mutations}
+
+    Higher effective population size ($\Ne$) is typically accompanied by a higher proportion of effectively deleterious mutations at the population scale ($\proba{[} \SpopDel {]}$), as shown in~\ref{fig:pop-neg-prop} (left panel).
+    This trend is also confirmed when we restricted the analysis to class of mutations that are supposedly deleterious at the phylogenetic scale ($\SphyDel$), as shown in~\ref{fig:pop-neg-prop} (right panel).
+    This result is qualitatively in accordance with the nearly-neutral theory of evolution which argues that very slightly deleterious mutations are more efficiently purified in large populations.
+
+    \begin{center}
+    \begin{minipage}{0.45\linewidth}
+        \includegraphics[width=\linewidth, page=1]{artworks/results.pop_size.all_P-Sneg.scatter.pdf}
+    \end{minipage}
+    \begin{minipage}{0.45\linewidth}
+        \includegraphics[width=\linewidth, page=1]{artworks/results.pop_size.neg_P-Sneg.scatter.pdf}
+    \end{minipage}
+    \captionof{figure}[Relationship between the proportion of deleterious mutations ($\SpopDel$) and effective population size.]{\textbf{Relationship between the proportion of deleterious mutations ($\bm{\SpopDel}$) and effective population size.}
+    Left) Proportion of deleterious mutations at the population scale ($\proba{[} \SpopNeu{]}$), shown as a function of estimated effective population size ($\Ne$). Right) Probability for a mutation to be deleterious at the population scale, given it is predicted to be deleterious at the phylogenetic scale, as a function of estimated effective population size ($\Ne$). Populations are represented by circles, and squares are the mean for the species. Correlations account for phylogenetic relationship and non-independence of samples, through the fit of a Phylogenetic Generalized Linear Model (see Materials \& Methods).\label{fig:pop-neg-prop}}
+    \end{center}
+
+    \subsubsection{Proportion of nearly-neutral mutations (\texorpdfstring{$\SpopNeu$}{N})}\label{subsec:proportion-nearly-neutral-mutations}
+    Higher effective population size ($\Ne$) is typically accompanied by a smaller proportion of neutral mutations at the population scale ($\proba{[} \SpopNeu {]}$ in the range 0.06-0.18), as shown in~\ref{fig:pop-weak-prop} (left panel).
+    This result is more pronounced ($\proba{[} \SpopNeu \given \SphyNeu {]}$ in the range 0.36-0.73) when we restricted the analysis to the class of mutations that are supposedly nearly-neutral at the phylogenetic scale ($\SphyNeu$), as shown in~\ref{fig:pop-pos-prop} (right panel).
+    This result suggests that in populations with higher diversity (e.g.,~\textit{Bos} or \textit{Ovis}), mutations are more likely to be detected as under selection (positive or negative).
+    Alternatively stated, mutations in populations with low diversity (e.g.,~\textit{Homo}) are effectively nearly-neutral and behave as neutral mutations would.
+    This result is qualitatively in accordance with the nearly-neutral theory of evolution which argues that mutations are less efficiently selected for in small populations.
+
+    \begin{center}
+        \begin{minipage}{0.45\linewidth}
+            \includegraphics[width=\linewidth, page=1]{artworks/results.pop_size.all_P-Sweak.scatter.pdf}
+        \end{minipage}
+        \begin{minipage}{0.45\linewidth}
+            \includegraphics[width=\linewidth, page=1]{artworks/results.pop_size.weak_P-Sweak.scatter.pdf}
+        \end{minipage}
+        \captionof{figure}[Relationship between the proportion of nearly-neutral mutations ($\SpopNeu$) and effective population size.]{\textbf{Relationship between the proportion of nearly-neutral mutations ($\bm{\SpopNeu}$) and effective population size.}
+        Left) Proportion of deleterious mutations at the population scale ($\proba{[} \SpopNeu{]}$), shown as a function of estimated effective population size ($\Ne$). Right) Probability for a mutation to be nearly-neutral at the population scale, given it is predicted to be nearly-neutral at the phylogenetic scale, as a function of estimated effective population size ($\Ne$). Populations are represented by circles, and squares are the mean for the species. Correlations account for phylogenetic relationship and non-independence of samples, through the fit of a Phylogenetic Generalized Linear Model (see Materials \& Methods).\label{fig:pop-weak-prop}}
+    \end{center}
+
+    \subsubsection{Proportion of beneficial mutations (\texorpdfstring{$\SpopBen$}{B})}\label{subsec:proportion-beneficial-mutations}
+    A higher effective population size ($\Ne$) is accompanied by a smaller proportion of beneficial mutations at the population scale ($\proba{[} \SpopBen {]}$), as shown in~\ref{fig:pop-pos-prop} (left panel).
+    This trend is also confirmed when we restricted the analysis to the class of mutations that are supposedly non-adaptive beneficial at the phylogenetic scale ($\SphyBen$), as shown in~\ref{fig:pop-pos-prop} (right panel).
+
+    \begin{center}
+        \begin{minipage}{0.45\linewidth}
+            \includegraphics[width=\linewidth, page=1]{artworks/results.pop_size.all_P-Spos.scatter.pdf}
+        \end{minipage}
+        \begin{minipage}{0.45\linewidth}
+            \includegraphics[width=\linewidth, page=1]{artworks/results.pop_size.pos_P-Spos.scatter.pdf}
+        \end{minipage}
+        \captionof{figure}[Relationship between the proportion of beneficial mutations ($\SpopBen$) and effective population size.]{\textbf{Relationship between the proportion of beneficial mutations ($\bm{\SpopBen}$) and effective population size.}
+        Left) Proportion of beneficial mutations at the population scale ($\proba{[} \SpopNeu{]}$), shown as a function of estimated effective population size ($\Ne$). Right) Probability for a mutation to be beneficial at the population scale, given it is predicted to be beneficial at the phylogenetic scale, as a function of estimated effective population size ($\Ne$). Populations are represented by circles, and squares are the mean for the species. Correlations account for phylogenetic relationship and non-independence of samples, through the fit of a Phylogenetic Generalized Linear Model (see Materials \& Methods).\label{fig:pop-pos-prop}}
+    \end{center}
+
+
+    \printbibliography
+\end{document}

@@ -1,4 +1,7 @@
 % Template for PLoS
+%DIF LATEXDIFF DIFFERENCE FILE
+%DIF DEL main-PLOS-revision-2-plos2015.tex              Fri Dec  6 15:50:04 2024
+%DIF ADD main-PLOS-revision-2-plos2015-formatting.tex   Sun Dec 15 10:21:46 2024
 % Version 3.6 Aug 2022
 %
 % % % % % % % % % % % % % % % % % % % % % %
@@ -86,7 +89,11 @@
 % cite package, to clean up citations in the main text. Do not remove.
 \usepackage{cite}
 
-% Use nameref to cite supporting information files (see Supporting Information section~for more info)
+%DIF 89c89
+%DIF < % Use nameref to cite supporting information files (see Supporting Information section for more info)
+%DIF -------
+% Use nameref to cite supporting information files (see Supporting Information section~for more info) %DIF > 
+%DIF -------
 \usepackage{nameref,hyperref}
 
 % line numbers
@@ -196,6 +203,87 @@
 %\renewcommand{\arraystretch}{0.6}
 
 %% END MACROS SECTION
+%DIF PREAMBLE EXTENSION ADDED BY LATEXDIFF
+%DIF UNDERLINE PREAMBLE %DIF PREAMBLE
+\RequirePackage[normalem]{ulem} %DIF PREAMBLE
+\RequirePackage{color}\definecolor{RED}{rgb}{1,0,0}\definecolor{BLUE}{rgb}{0,0,1} %DIF PREAMBLE
+\providecommand{\DIFaddtex}[1]{{\protect\color{blue}\uwave{#1}}} %DIF PREAMBLE
+\providecommand{\DIFdeltex}[1]{{\protect\color{red}\sout{#1}}}                      %DIF PREAMBLE
+%DIF SAFE PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFaddbegin}{} %DIF PREAMBLE
+\providecommand{\DIFaddend}{} %DIF PREAMBLE
+\providecommand{\DIFdelbegin}{} %DIF PREAMBLE
+\providecommand{\DIFdelend}{} %DIF PREAMBLE
+\providecommand{\DIFmodbegin}{} %DIF PREAMBLE
+\providecommand{\DIFmodend}{} %DIF PREAMBLE
+%DIF FLOATSAFE PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFaddFL}[1]{\DIFadd{#1}} %DIF PREAMBLE
+\providecommand{\DIFdelFL}[1]{\DIFdel{#1}} %DIF PREAMBLE
+\providecommand{\DIFaddbeginFL}{} %DIF PREAMBLE
+\providecommand{\DIFaddendFL}{} %DIF PREAMBLE
+\providecommand{\DIFdelbeginFL}{} %DIF PREAMBLE
+\providecommand{\DIFdelendFL}{} %DIF PREAMBLE
+%DIF HYPERREF PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFadd}[1]{\texorpdfstring{\DIFaddtex{#1}}{#1}} %DIF PREAMBLE
+\providecommand{\DIFdel}[1]{\texorpdfstring{\DIFdeltex{#1}}{}} %DIF PREAMBLE
+\newcommand{\DIFscaledelfig}{0.5}
+%DIF HIGHLIGHTGRAPHICS PREAMBLE %DIF PREAMBLE
+\RequirePackage{settobox} %DIF PREAMBLE
+\RequirePackage{letltxmacro} %DIF PREAMBLE
+\newsavebox{\DIFdelgraphicsbox} %DIF PREAMBLE
+\newlength{\DIFdelgraphicswidth} %DIF PREAMBLE
+\newlength{\DIFdelgraphicsheight} %DIF PREAMBLE
+% store original definition of \includegraphics %DIF PREAMBLE
+\LetLtxMacro{\DIFOincludegraphics}{\includegraphics} %DIF PREAMBLE
+\newcommand{\DIFaddincludegraphics}[2][]{{\color{blue}\fbox{\DIFOincludegraphics[#1]{#2}}}} %DIF PREAMBLE
+\newcommand{\DIFdelincludegraphics}[2][]{% %DIF PREAMBLE
+\sbox{\DIFdelgraphicsbox}{\DIFOincludegraphics[#1]{#2}}% %DIF PREAMBLE
+\settoboxwidth{\DIFdelgraphicswidth}{\DIFdelgraphicsbox} %DIF PREAMBLE
+\settoboxtotalheight{\DIFdelgraphicsheight}{\DIFdelgraphicsbox} %DIF PREAMBLE
+\scalebox{\DIFscaledelfig}{% %DIF PREAMBLE
+\parbox[b]{\DIFdelgraphicswidth}{\usebox{\DIFdelgraphicsbox}\\[-\baselineskip] \rule{\DIFdelgraphicswidth}{0em}}\llap{\resizebox{\DIFdelgraphicswidth}{\DIFdelgraphicsheight}{% %DIF PREAMBLE
+\setlength{\unitlength}{\DIFdelgraphicswidth}% %DIF PREAMBLE
+\begin{picture}(1,1)% %DIF PREAMBLE
+\thicklines\linethickness{2pt} %DIF PREAMBLE
+{\color[rgb]{1,0,0}\put(0,0){\framebox(1,1){}}}% %DIF PREAMBLE
+{\color[rgb]{1,0,0}\put(0,0){\line( 1,1){1}}}% %DIF PREAMBLE
+{\color[rgb]{1,0,0}\put(0,1){\line(1,-1){1}}}% %DIF PREAMBLE
+\end{picture}% %DIF PREAMBLE
+}\hspace*{3pt}}} %DIF PREAMBLE
+} %DIF PREAMBLE
+\LetLtxMacro{\DIFOaddbegin}{\DIFaddbegin} %DIF PREAMBLE
+\LetLtxMacro{\DIFOaddend}{\DIFaddend} %DIF PREAMBLE
+\LetLtxMacro{\DIFOdelbegin}{\DIFdelbegin} %DIF PREAMBLE
+\LetLtxMacro{\DIFOdelend}{\DIFdelend} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFaddbegin}{\DIFOaddbegin \let\includegraphics\DIFaddincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFaddend}{\DIFOaddend \let\includegraphics\DIFOincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFdelbegin}{\DIFOdelbegin \let\includegraphics\DIFdelincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFdelend}{\DIFOaddend \let\includegraphics\DIFOincludegraphics} %DIF PREAMBLE
+\LetLtxMacro{\DIFOaddbeginFL}{\DIFaddbeginFL} %DIF PREAMBLE
+\LetLtxMacro{\DIFOaddendFL}{\DIFaddendFL} %DIF PREAMBLE
+\LetLtxMacro{\DIFOdelbeginFL}{\DIFdelbeginFL} %DIF PREAMBLE
+\LetLtxMacro{\DIFOdelendFL}{\DIFdelendFL} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFaddbeginFL}{\DIFOaddbeginFL \let\includegraphics\DIFaddincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFaddendFL}{\DIFOaddendFL \let\includegraphics\DIFOincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFdelbeginFL}{\DIFOdelbeginFL \let\includegraphics\DIFdelincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFdelendFL}{\DIFOaddendFL \let\includegraphics\DIFOincludegraphics} %DIF PREAMBLE
+%DIF COLORLISTINGS PREAMBLE %DIF PREAMBLE
+\RequirePackage{listings} %DIF PREAMBLE
+\RequirePackage{color} %DIF PREAMBLE
+\lstdefinelanguage{DIFcode}{ %DIF PREAMBLE
+%DIF DIFCODE_UNDERLINE %DIF PREAMBLE
+  moredelim=[il][\color{red}\sout]{\%DIF\ <\ }, %DIF PREAMBLE
+  moredelim=[il][\color{blue}\uwave]{\%DIF\ >\ } %DIF PREAMBLE
+} %DIF PREAMBLE
+\lstdefinestyle{DIFverbatimstyle}{ %DIF PREAMBLE
+	language=DIFcode, %DIF PREAMBLE
+	basicstyle=\ttfamily, %DIF PREAMBLE
+	columns=fullflexible, %DIF PREAMBLE
+	keepspaces=true %DIF PREAMBLE
+} %DIF PREAMBLE
+\lstnewenvironment{DIFverbatim}{\lstset{style=DIFverbatimstyle}}{} %DIF PREAMBLE
+\lstnewenvironment{DIFverbatim*}{\lstset{style=DIFverbatimstyle,showspaces=true}}{} %DIF PREAMBLE
+%DIF END PREAMBLE EXTENSION ADDED BY LATEXDIFF
 
 \begin{document}
 \vspace*{0.2in}
@@ -318,7 +406,8 @@ Such mutation-selection models applied to protein-coding DNA sequence alignments
 Moreover, effective population size ($\Ne$) is considered constant along the phylogenetic tree precisely because of the fixed fitness landscape assumption, the consequences of which are detailed in the Discussion.
 Importantly, because mutation-selection codon models at the phylogenetic scale are based on population-genetics equations, their estimates of selection coefficients are directly interpretable as fitness effects at the population scale; and because they work at the DNA level, we are able to account for mutational bias in DNA and structure of the genetic code.
 The model further integrates the shared evolutionary history between samples and their divergence, which, together, allow us to estimate fitness effects in sequence alignments even though sequences are not independent samples and might not represent the equilibrium distribution of amino acids (see section~\ref{subsec:s-phylogeny-method} in Materials \& Methods).
-The detailed model implementation is available in~\nameref{S1_File}, described as a Bayesian hierarchical model (Fig~A in~\nameref{S1_File}).
+\DIFdelbegin \DIFdel{Detailed model description }\DIFdelend \DIFaddbegin \DIFadd{The detailed model implementation }\DIFaddend is available in~\nameref{S1_File}\DIFdelbegin \DIFdel{(}%DIFDELCMD < \nameref{S1_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{, described as a Bayesian hierarchical model (Fig~A in~}\nameref{S1_File}\DIFaddend ).
 
 Accordingly, fitting the mutation-selection model to a multi-species sequence alignment allows us to obtain relative fitnesses for all amino acids (Fig~\ref{fig:method}A).
 The difference in fitness between a pair of amino acids allows us to predict whether any mutation would be a deleterious mutation toward a less fit amino acid, a nearly-neutral mutation, or a mutation toward a known fitter amino acid constituting thus a beneficial non-adaptive mutation (Fig~\ref{fig:method}B).
@@ -356,7 +445,7 @@ The mutation-selection model used in the present work integrates phylogenetic re
 
 We first quantified the likelihood of any DNA mutation to be a beneficial non-adaptive mutation, that is, whenever a DNA mutation increases fitness under a stable fitness landscape.
 Subsequently, by quantifying the total amount of beneficial mutations in the current population across all types of DNA mutations, we could tease apart beneficial non-adaptive from adaptive mutations resulting from a change in the fitness landscape.
-Altogether, in this study, by integrating large-scale genomic datasets at both phylogenetic and population scales, we propose a way to explicitly quantify the contribution of beneficial non-adaptive mutations to positive selection across the entire exome of the six genera (Fig~\ref{fig:method}F-G).
+Altogether, in this study, by integrating large-scale genomic datasets at both phylogenetic and population scales, we propose a way to explicitly quantify the contribution of beneficial non-adaptive mutations to positive selection across the entire exome of the six genera (\DIFdelbegin \DIFdel{figs.}\DIFdelend \DIFaddbegin \DIFadd{Fig}\DIFaddend ~\ref{fig:method}F-G).
 
 \section*{Results}
 
@@ -369,15 +458,19 @@ We could classify each substitution as either deleterious $\SphyDel \coloneqq \S
 Because $\Sphy$ values were based on the assumption that the fitness landscape is stable across mammals, $\SphyBen$ mutations (i.e., with $\Sphy>1$) bring the bearer of this mutation toward an amino acid predicted to be fitter across mammals.
 Importantly, the mammalian alignment used to estimate the amino acid fitness landscape did not include the six focal genera and their sister species.
 This ensures independence between, on the one hand, the fitness landscape estimated, and on the other hand, both substitutions that occurred in the terminal branches, and segregating polymorphisms of the focal populations.
-Example substitutions in the terminal lineage of \textit{Chlorocebus sabaeus} which are classified as $\SphyBen$ are shown in~\nameref{S2_File} (section~1.1).
-For instance, in the mammalian protein-coding DNA alignment of gene \textit{SELE}, the nucleotide at site 1722 has mutated (from T to C) at the base of Simiiformes (monkeys and apes), modifying the corresponding amino acid from Serine to Proline, but has been subsequently reverted in the branch of \textit{Chlorocebus sabaeus} (Fig~A in~\nameref{S2_File}).
-However, other substitutions classified as $\SphyBen$ in the terminal branch of \textit{Chlorocebus sabaeus} cannot be clearly interpreted as reversions along the terminal branch, and show several transitions to this amino acid across the mammalian phylogeny, as for instance site 3145 of gene \textit{THSD7A} (Fig~B in~\nameref{S2_File}).
+Example substitutions in the terminal lineage of \textit{Chlorocebus sabaeus} which are classified as $\SphyBen$ are shown in\DIFdelbegin \DIFdel{supplementary materials (sectionS2}\DIFdelend \DIFaddbegin \DIFadd{~}\nameref{S2_File} \DIFadd{(section~1.1}\DIFaddend ).
+For instance, in the mammalian protein-coding DNA alignment of gene \textit{SELE}, the nucleotide at site 1722 has mutated (from T to C) at the base of Simiiformes (monkeys and apes), modifying the corresponding amino acid from Serine to Proline, but has been subsequently reverted in the branch of \textit{Chlorocebus sabaeus} (\DIFdelbegin %DIFDELCMD < \nameref{S2_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Fig~A in~}\nameref{S2_File}\DIFaddend ).
+However, other substitutions classified as $\SphyBen$ in the terminal branch of \textit{Chlorocebus sabaeus} cannot be clearly interpreted as reversions along the terminal branch, and show several transitions to this amino acid across the mammalian phylogeny, as for instance site 3145 of gene \textit{THSD7A} (\DIFdelbegin %DIFDELCMD < \nameref{S3_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Fig~B in~}\nameref{S2_File}\DIFaddend ).
 
-Among all the substitutions found in each terminal branch, between 10 and 13\% were $\SphyBen$, while $\SphyBen$ mutations only represent between 0.9 and 1.2\% of all non-synonymous mutations (Fig~\ref{fig:homo-afr-results}A-B for humans, Table~A in~\nameref{S2_File} for all dataset).
+Among all the substitutions found in each terminal branch, between 10 and 13\% were $\SphyBen$, while $\SphyBen$ mutations only represent between 0.9 and 1.2\% of all non-synonymous mutations (Fig~\ref{fig:homo-afr-results}A-B for humans\DIFdelbegin \DIFdel{and ~}%DIFDELCMD < \nameref{S1_Table} %%%
+\DIFdelend \DIFaddbegin \DIFadd{, Table~A in~}\nameref{S2_File} \DIFaddend for all dataset).
 Of note, if we were to assume a stationary mutation-selection-drift equilibrium in the terminal lineage, we would expect a symmetric proportion of positively ($\SphyBen$) and negatively ($\SphyDel$) selected substitutions if there were no adaptation.
 The lack of symmetry along the terminal branches then provides a means to estimate the frequency of non-adaptive beneficial substitutions.
 Mathematically, twice the fraction of $\SphyBen$ substitutions is an estimate of this rate.
-This rate is highly consistent across lineages (Table~A in~\nameref{S2_File}) and suggests an overall frequency of nearly neutral substitutions due to consistent long-term selection pressures, mutation and drift of approximately 20\% of all substitutions (20\%-26\% across species).
+This rate is highly consistent across lineages (\DIFdelbegin %DIFDELCMD < \nameref{S1_Table}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Table~A in~}\nameref{S2_File}\DIFaddend ) and suggests an overall frequency of nearly neutral substitutions due to consistent long-term selection pressures, mutation and drift of approximately 20\% of all substitutions (20\%-26\% across species).
 
 \begin{figure}[!ht]
 \begin{adjustwidth}{-2.25in}{0in} % Comment out/remove adjustwidth environment if table fits in text column.
@@ -385,29 +478,32 @@ This rate is highly consistent across lineages (Table~A in~\nameref{S2_File}) an
 \includegraphics[width=1.4\textwidth, page=1] {figure3.eps}
 \caption{
 {\bf Selection coefficients of mutations in humans of African descent.}
-(A) Distribution of scaled selection coefficients ($\Sphy$), predicted for all possible non-synonymous DNA mutations away from the ancestral human exome (section~\ref{subsec:nunber-of-sites}).
+(A) Distribution of scaled selection coefficients ($\Sphy$), predicted for all possible non-synonymous DNA mutations away from the ancestral human exome (section\DIFaddbeginFL \DIFaddFL{~}\DIFaddendFL \ref{subsec:nunber-of-sites}).
 Mutations are divided into three classes of selection: deleterious ($\SphyDel$), nearly-neutral ($\SphyNeu$) and beneficial ($\SphyBen$, supposedly beneficial non-adaptive mutations)
-(B) Distribution of scaled selection coefficients ($\Sphy$) for all observed substitutions along the \textit{Homo} branch after the \textit{Homo}-\textit{Pan} split (section~\ref{subsec:substitution-mapping-in-the-terminal-branch}).
+(B) Distribution of scaled selection coefficients ($\Sphy$) for all observed substitutions along the \textit{Homo} branch after the \textit{Homo}-\textit{Pan} split (section\DIFaddbeginFL \DIFaddFL{~}\DIFaddendFL \ref{subsec:substitution-mapping-in-the-terminal-branch}).
 If there are fewer substitutions than expected, this class is thus undergoing purifying selection, as is the case for $\SphyDel$.
 (C) The site-frequency spectrum (SFS) in humans of African descent for a random sample of 16 alleles (means in solid lines and standard deviations in color shades) for each class of selection and for synonymous mutations, supposedly neutral (black). The SFS represents the proportion of mutations (y-axis) with a given number of derived alleles in the population (x-axis).
 At high frequencies, deleterious mutations are underrepresented.
-(D) Proportion of beneficial $\ProbaPopDel$, nearly-neutral $\ProbaPopNeu$, and deleterious mutations $\ProbaPopBen$ estimated at the population scale for each class of selection at the phylogenetic scale (section~\ref{subsec:s-polymorphism-method}). Proportions depicted here are not weighted by their mutational opportunities.
+(D) Proportion of beneficial $\ProbaPopDel$, nearly-neutral $\ProbaPopNeu$, and deleterious mutations $\ProbaPopBen$ estimated at the population scale for each class of selection at the phylogenetic scale (section\DIFaddbeginFL \DIFaddFL{~}\DIFaddendFL \ref{subsec:s-polymorphism-method}). Proportions depicted here are not weighted by their mutational opportunities.
 }
 \label{fig:homo-afr-results}
 \end{adjustwidth}
 \end{figure}
 
 Furthermore, since in principle, $\SphyBen$ mutations are bound to reach fixation more often than neutral mutations, we calculated the $\dnds$ ratio of non-synonymous over synonymous divergence for all terminal lineages, focusing on the non-synonymous changes predicted as $\SphyBen$ mutations ($\dn(\SphyBen) / \ds$).
-We obtained values between 1.17 and 1.75 in the different lineages (Table~B in~\nameref{S2_File}), meaning that $\SphyBen$ mutations reach fixation slightly more frequently than synonymous mutations that are supposed to be neutral, consistent with these $\SphyBen$ mutations being weakly beneficial.
-Such an observation is consistent with the premise that $\SphyBen$ mutations are weakly beneficial, translating to a scaled selection coefficient between 0.32 and 1.24 (section~1.2 in~\nameref{S2_File}).
+We obtained values between 1.17 and 1.75 in the different lineages (\DIFdelbegin %DIFDELCMD < \nameref{S2_Table}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Table~B in~}\nameref{S2_File}\DIFaddend ), meaning that $\SphyBen$ mutations reach fixation slightly more frequently than synonymous mutations that are supposed to be neutral, consistent with these $\SphyBen$ mutations being weakly beneficial.
+Such an observation is consistent with the premise that $\SphyBen$ mutations are weakly beneficial, translating to a scaled selection coefficient between 0.32 and 1.24 (\DIFdelbegin %DIFDELCMD < \nameref{S2_Table}%%%
+\DIFdelend \DIFaddbegin \DIFadd{section~1.2 in~}\nameref{S2_File}\DIFaddend ).
 Finding $\dn(\SphyBen) / \ds > 1$ for these sites confirms that these sites are closer to optimality at the end of the branch than at the beginning.
 Even though the beneficial effect of these mutations does not come from an environmental change, it does not change the fact that they have contributed positively to the population’s fitness.
 It is just that at mutation-selection-drift equilibrium, the increase in fitness at these sites is offset by deleterious substitutions elsewhere in the genome so that there is no net adaptation.
 
 This result further indicates that using $\dnds$ as an estimate of purifying selection is biased (overestimated) due to the presence of beneficial non-adaptive mutations among the non-synonymous substitutions.
 By discarding all beneficial non-adaptive mutations we can obtain an estimate of $\dnds$ which is not inflated.
-By comparing these two ways of calculating $\dnds$ (see section~\ref{subsec:substitution-mapping-in-the-terminal-branch} in Materials \& Methods), we calculated that beneficial non-adaptive mutations inflate $\dnds$ values by between 9 and 12\% across genera (Table~C in~\nameref{S2_File}).
-This represents a substantial increase when considering that beneficial non-adaptive mutations only represent between 0.9 and 1.2\% of non-synonymous mutational opportunities (Table~A in~\nameref{S2_File}).
+By comparing these two ways of calculating $\dnds$ (see section~\ref{subsec:substitution-mapping-in-the-terminal-branch} in Materials \& Methods), we calculated that beneficial non-adaptive mutations inflate $\dnds$ values by between 9 and 12\% across genera \DIFaddbegin \DIFadd{(Table~C in~}\nameref{S2_File}\DIFadd{)}\DIFaddend .
+This represents a substantial increase when considering that beneficial non-adaptive mutations only represent between 0.9 and 1.2\% of non-synonymous mutational opportunities (\DIFdelbegin %DIFDELCMD < \nameref{S3_Table}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Table~A in~}\nameref{S2_File}\DIFaddend ).
 
 
 \subsection*{Selection in populations}
@@ -416,18 +512,26 @@ We retrieved single nucleotide polymorphisms (SNPs) segregating in 28 mammalian 
 To determine if SNPs were ancestral of derived, we reconstructed the ancestral exome of each population.
 We then classified every non-synonymous SNP as either $\SphyDel$, $\SphyNeu$, or $\SphyBen$ according its $\Sphy$ value (Fig~\ref{fig:method}B-C).
 
-First, SNPs classified as $\SphyBen$ are spread across the genomes and not strongly associated to the ontology terms of their respective genes (Table~D and Fig~C in~\nameref{S2_File}).
+First, SNPs classified as $\SphyBen$ are spread across the genomes and not strongly associated to the ontology terms of their respective genes (\DIFdelbegin %DIFDELCMD < \nameref{S4_Table}%%%
+\DIFdel{,~}%DIFDELCMD < \nameref{S4_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Table~D and Fig~C in~}\nameref{S2_File}\DIFaddend ).
 In humans, some SNPs have been associated with specific clinical prognosis terms obtained by clinical evaluation of the impact of variants on human Mendelian disorders~\cite{landrum_clinvar_2018}.
 Although this classification also relies on deep protein alignments and therefore cannot be considered an independent result from our own, it does provide a consistency check if the effect of a mutation on human health is in line with its fitness effect predicted by our method~\cite{grimm_evaluation_2015}.
 Therefore, we investigated whether the non-synonymous SNPs classified as $\SphyDel$ or $\SphyBen$ showed enrichment in specific clinical terms compared to SNPs classified as $\SphyNeu$.
-Our results show that SNPs predicted as deleterious are associated with clinical terms such as \textit{Likely Pathogenic} and \textit{Pathogenic}, implying that, in general, the selective pressure of a mutation exerted across mammals is also predictive of its clinical effect in humans (Table~E in~\nameref{S2_File})~\cite{sullivan_leveraging_2023}.
-Conversely, $\SphyBen$ mutations are associated with clinical terms such as \textit{Benign} and \textit{Likely Benign}, which shows that $\SphyBen$ mutations are less likely to be functionally damaging (Table~F in~\nameref{S2_File}).
+Our results show that SNPs predicted as deleterious are associated with clinical terms such as \textit{Likely Pathogenic} and \textit{Pathogenic}, implying that, in general, the selective pressure of a mutation exerted across mammals is also predictive of its clinical effect in humans (\DIFdelbegin %DIFDELCMD < \nameref{S5_Table}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Table~E in~}\nameref{S2_File}\DIFaddend )~\cite{sullivan_leveraging_2023}.
+Conversely, $\SphyBen$ mutations are associated with clinical terms such as \textit{Benign} and \textit{Likely Benign}, which shows that $\SphyBen$ mutations are less likely to be functionally damaging (\DIFdelbegin %DIFDELCMD < \nameref{S6_Table}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Table~F in~}\nameref{S2_File}\DIFaddend ).
 
 In addition to clinical prognosis, frequencies at which SNPs are segregating within populations provide information on their selective effects.
 For instance, deleterious SNPs usually segregate at lower frequencies because of purifying selection, which tends to remove them from the population (Fig~\ref{fig:homo-afr-results}C for humans).
 By gathering information across many SNPs, it is possible to estimate the distribution of fitness effects at the population scale, taking synonymous SNPs as a neutral expectation~\cite{eyre-walker_distribution_2006, eyre-walker_estimating_2009, galtier_adaptive_2016, tataru_inference_2017}.
-From these estimated fitness effects, we can derive the proportion of deleterious mutations ($\ProbaPopDel$), nearly-neutral mutations ($\ProbaPopNeu$) and beneficial mutations ($\ProbaPopBen$) at the population scale (see section~\ref{subsec:s-polymorphism-method} in Materials \& Methods, Fig~A-C in~\nameref{S3_File}).
-These approaches offer a unique opportunity to contrast selection coefficients estimated at the phylogenetic scale ($\Sphy$) and at the population scale ($\Spop$) in different dataset (Fig~D in~\nameref{S3_File}).
+From these estimated fitness effects, we can derive the proportion of deleterious mutations ($\ProbaPopDel$\DIFdelbegin \DIFdel{,~}%DIFDELCMD < \nameref{S5_Fig}%%%
+\DIFdelend ), nearly-neutral mutations ($\ProbaPopNeu$\DIFdelbegin \DIFdel{,~}%DIFDELCMD < \nameref{S6_Fig}%%%
+\DIFdelend ) and beneficial mutations ($\ProbaPopBen$\DIFdelbegin \DIFdel{,~}%DIFDELCMD < \nameref{S7_Fig}%%%
+\DIFdelend ) at the population scale (see section~\ref{subsec:s-polymorphism-method} in Materials \& Methods\DIFaddbegin \DIFadd{, Fig~A-C in~}\nameref{S3_File}\DIFaddend ).
+These approaches offer a unique opportunity to contrast selection coefficients estimated at the phylogenetic scale ($\Sphy$) and at the population scale ($\Spop$) in different dataset (\DIFdelbegin %DIFDELCMD < \nameref{S8_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Fig~D in~}\nameref{S3_File}\DIFaddend ).
 
 Across our selection classes ($\SphyDel$, $\SphyNeu$ and $\SphyBen$), one can ultimately estimate the proportion of correct and incorrect predictions, leading to an estimation of \textit{precision} and \textit{recall} (Fig~\ref{fig:method}F-G and section~\ref{subsec:precisison_recall} in Materials \& Methods).
 Across 28 populations of different mammal species, mutations predicted to be deleterious at the phylogenetic scale ($\SphyDel$) were indeed purged at the population scale, with a \textit{precision} in the range of 90--97\% (Table~\ref{table:proba} and Fig~\ref{fig:homo-afr-results}D for humans).
@@ -500,8 +604,12 @@ $\Ne$ is the estimated effective population size for each population.
 Mutations predicted as $\SphyNeu$ were effectively composed of a mix of neutral and selected mutations with varying \textit{precision} (36--63\%) and \textit{recall} (32--45\%) across the different populations (Table~\ref{table:proba}, Fig~\ref{fig:homo-afr-results}D for humans).
 The variable proportions between populations can be explained by the effective number of individuals in the population ($\Ne$), a major driver of selection efficacy.
 Moreover, estimates of mutation rate per generation ($u$), from Bergeron \textit{et al.}~\cite{bergeron_evolution_2023} and Orlando \textit{et al.}~\cite{orlando_recalibrating_2013}, and Watterson’s $\theta$ obtained from the synonymous SFS as in Achaz~\cite{achaz_frequency_2009}, allow us to obtain $\Ne$ through $\Ne=\theta/4 u)$.
-Using correlation analyses that accounted for phylogenetic relationship (see section~\ref{subsec:correlation-diversity} in Materials \& Methods, Fig~E in~\nameref{S3_File}), we found that higher $\Ne$ was associated with a smaller proportion of nearly-neutral mutations ($r^2=0.31$, $p=0.001$, Fig~\ref{fig:diversity}A).
-This result follows the prediction of the nearly-neutral theory and suggests that in populations with higher diversity (e.g.,~\textit{Bos} or \textit{Ovis}), discrimination between beneficial and deleterious mutations is more likely to occur (Fig~F-H in~\nameref{S3_File}).
+Using correlation analyses that accounted for phylogenetic relationship (see section~\ref{subsec:correlation-diversity} in Materials \& Methods, \DIFdelbegin \DIFdel{~}%DIFDELCMD < \nameref{S9_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Fig~E in~}\nameref{S3_File}\DIFaddend ), we found that higher $\Ne$ was associated with a smaller proportion of nearly-neutral mutations ($r^2=0.31$, $p=0.001$, Fig~\ref{fig:diversity}A).
+This result follows the prediction of the nearly-neutral theory and suggests that in populations with higher diversity (e.g.,~\textit{Bos} or \textit{Ovis}), discrimination between beneficial and deleterious mutations is more likely to occur (\DIFdelbegin %DIFDELCMD < \nameref{S10_Fig}%%%
+\DIFdel{,~}%DIFDELCMD < \nameref{S11_Fig}%%%
+\DIFdel{,~}%DIFDELCMD < \nameref{S12_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Fig~F-H in~}\nameref{S3_File}\DIFaddend ).
 Conversely, many more mutations are effectively neutral in populations with lower diversity (e.g.,~\textit{Homo}).
 
 \begin{figure}[!ht]
@@ -521,32 +629,50 @@ Correlations account for phylogenetic relationship and non-independence of sampl
 
 Finally, mutations predicted to be $\SphyBen$ were indeed beneficial for individuals bearing them, with a \textit{precision} (Fig~\ref{fig:method}F) in the range of 19--87\% (Table~\ref{table:proba} and Fig~\ref{fig:homo-afr-results}D for humans).
 This result confirms that selection toward amino acids restoring existing functions is ongoing in these populations.
-Importantly, the \textit{recall} value in this case, computed as $\proba [ \SphyBen \given \SpopBen]$, is the probability for a beneficial mutation at the population scale to be a non-adaptive, i.e., going toward a fitter amino acid given a stable fitness landscape (Fig~\ref{fig:method}G, Table~A in~\nameref{S4_File}).
+Importantly, the \textit{recall} value in this case, computed as $\proba [ \SphyBen \given \SpopBen]$, is the probability for a beneficial mutation at the population scale to be a non-adaptive, i.e., going toward a fitter amino acid given a stable fitness landscape (Fig~\ref{fig:method}G, \DIFdelbegin \DIFdel{~}%DIFDELCMD < \nameref{S7_Table}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Table~A in~}\nameref{S4_File}\DIFaddend ).
 In other words, the \textit{recall} value quantifies the number of beneficial mutations restoring damaged genomes instead of creating adaptive innovations.
 Across the 28 populations, this proportion is in the range of 11--82\% (Table~\ref{table:proba}), with a mean of 30\%.
 Accounting for phylogenetic relationships, we found no correlation between the proportion of beneficial non-adaptive mutations and estimates of $\Ne$ based on genetic diversity ($r^2=0.00$, $p=0.772$, Fig~\ref{fig:diversity}B).
 
 We additionally performed controls and simulations to ensure our results were robust.
-First, we controlled that these estimations were not affected by SNP mispolarization (Fig~A-B in~\nameref{S4_File}).
-Second, we performed simulations at the population-genetic level and confirmed that our method was able to recover the proportion of beneficial mutations that are non-adaptive in synthetic polymorphism datasets (Fig~C in~\nameref{S4_File}).
-Third, we ran our analysis filtering out CpG mutations and obtained values of $\proba [ \SphyBen \given \SpopBen]$ in the range of 5--27\%, with a mean of 14\% (Table~B-C in~\nameref{S4_File}, Fig~D in~\nameref{S4_File}), providing more conservative estimates.
+First, we controlled that these estimations were not affected by SNP mispolarization (\DIFdelbegin %DIFDELCMD < \nameref{S13_Fig}%%%
+\DIFdel{,~}%DIFDELCMD < \nameref{S14_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Fig~A-B in~}\nameref{S4_File}\DIFaddend ).
+Second, we performed simulations at the population-genetic level and confirmed that our method was able to recover the proportion of beneficial mutations that are non-adaptive in synthetic polymorphism datasets (\DIFdelbegin %DIFDELCMD < \nameref{S15_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Fig~C in~}\nameref{S4_File}\DIFaddend ).
+Third, we ran our analysis filtering out CpG mutations and obtained values of $\proba [ \SphyBen \given \SpopBen]$ in the range of 5--27\%, with a mean of 14\% (\DIFdelbegin %DIFDELCMD < \nameref{S8_Table}%%%
+\DIFdel{, }%DIFDELCMD < \nameref{S9_Table}%%%
+\DIFdel{, }%DIFDELCMD < \nameref{S16_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Table~B-C in~}\nameref{S4_File}\DIFadd{, Fig~D in~}\nameref{S4_File}\DIFaddend ), providing more conservative estimates.
 Finally, because the phylogenetic mutation-selection codon model should fit better for genes with uniformly conserved functions, we filtered out genes under pervasive adaptation~\cite{latrille_genes_2023} as a control.
-In this subset of the exome, containing genes with a more stable fitness landscape, we found an increase in the proportion of beneficial mutations that are non-adaptive (Wilcoxon signed-rank, $s=80$, $p=0.002$, Table~D in~\nameref{S4_File}), consistent with our expectation that beneficial mutations occur more frequently in genes under changing fitness landscapes.
+In this subset of the exome, containing genes with a more stable fitness landscape, we found an increase in the proportion of beneficial mutations that are non-adaptive (Wilcoxon signed-rank, $s=80$, $p=0.002$, \DIFdelbegin \DIFdel{~}%DIFDELCMD < \nameref{S10_Table}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Table~D in~}\nameref{S4_File}\DIFaddend ), consistent with our expectation that beneficial mutations occur more frequently in genes under changing fitness landscapes.
 
 \subsection*{Selection in the terminal lineage and in populations}
 
 As an alternative to relying solely on currently segregating mutations to quantify selection, one can leverage both polymorphism within a population and substitutions in the terminal lineage to estimate the distribution of fitness effects (DFE).
-Hence, we estimated \textit{precision} and \textit{recall} as done previously, but now including the number of substitutions per site as input for the DFE estimators (see~\ref{subsec:s-polymorphism-method} in Materials \& Methods and Fig~E in~\nameref{S4_File}).
-When including substitutions in the terminal lineage, estimates of $\proba [ \SphyBen \given \SpopBen]$ are in the 10--78\% range with a mean of 36\%, and 19 out of 28 estimates fall between 15\% and 45\% (Table~E-F in~\nameref{S4_File}).
+Hence, we estimated \textit{precision} and \textit{recall} as done previously, but now including the number of substitutions per site as input for the DFE estimators (see~\ref{subsec:s-polymorphism-method} in Materials \& Methods and \DIFdelbegin \DIFdel{~}%DIFDELCMD < \nameref{S17_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Fig~E in~}\nameref{S4_File}\DIFaddend ).
+When including substitutions in the terminal lineage, estimates of $\proba [ \SphyBen \given \SpopBen]$ are in the 10--78\% range with a mean of 36\%, and 19 out of 28 estimates fall between 15\% and 45\% (\DIFdelbegin %DIFDELCMD < \nameref{S11_Table}%%%
+\DIFdel{, }%DIFDELCMD < \nameref{S12_Table}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Table~E-F in~}\nameref{S4_File}\DIFaddend ).
 
-Additionally, we controlled that these estimations were not affected by SNP mispolarization (Fig~F in~\nameref{S4_File}).
-We also filtered out genes under pervasive adaptation, and again found an increase in $\proba [ \SphyBen \given \SpopBen]$, consistent with our expectation (Wilcoxon signed-rank, $s=120$, $p=0.027$, Table~G in~\nameref{S4_File}).
+Additionally, we controlled that these estimations were not affected by SNP mispolarization (\DIFdelbegin %DIFDELCMD < \nameref{S18_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Fig~F in~}\nameref{S4_File}\DIFaddend ).
+We also filtered out genes under pervasive adaptation, and again found an increase in $\proba [ \SphyBen \given \SpopBen]$, consistent with our expectation (Wilcoxon signed-rank, $s=120$, $p=0.027$, \DIFdelbegin \DIFdel{~}%DIFDELCMD < \nameref{S13_Table}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Table~G in~}\nameref{S4_File}\DIFaddend ).
 We assessed the impact of fitting the same functional form of DFE to the three different categories of changes $\SphyDel$, $\SphyNeu$ and $\SphyBen$.
 To this aim we computed the total amount of current selection by fitting either a single DFE on the whole dataset or by summing the other three independent DFEs.
-These disjoint estimates are well correlated, with a goodness of fit $r^2={0.95, 0.89, 0.82}$ for respectively $\proba [\SpopDel]$ (Fig~G in~\nameref{S4_File}), $\proba [\SpopNeu]$(Fig~H in~\nameref{S4_File}) and $\proba [\SpopBen]$ (Fig~I in~\nameref{S4_File}).
+These disjoint estimates are well correlated, with a goodness of fit $r^2={0.95, 0.89, 0.82}$ for respectively $\proba [\SpopDel]$ (\DIFdelbegin %DIFDELCMD < \nameref{S19_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Fig~G in~}\nameref{S4_File}\DIFaddend ), $\proba [\SpopNeu]$(\DIFdelbegin %DIFDELCMD < \nameref{S20_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Fig~H in~}\nameref{S4_File}\DIFaddend ) and $\proba [\SpopBen]$ (\DIFdelbegin %DIFDELCMD < \nameref{S21_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Fig~I in~}\nameref{S4_File}\DIFaddend ).
 Finally, we evaluated the effect of fitting a parametric functional form for the DFE.
 As implemented in Tataru \textit{et al.}~\cite{tataru_inference_2017}, the DFE is a mixture between a reflected gamma distribution and an exponential distribution (eq.~\ref{eq:parametric-dfe}, section~\ref{subsec:precisison_recall} in Materials \& Methods).
-Instead of using such a continuous DFE, we also tested our prediction with a non-parametric functional form for the DFE, obtaining estimates of $\proba [ \SphyBen \given \SpopBen]$ in the 8--94\% range, with a mean of 43\% (Table~H-I in~\nameref{S4_File}).
+Instead of using such a continuous DFE, we also tested our prediction with a non-parametric functional form for the DFE, obtaining estimates of $\proba [ \SphyBen \given \SpopBen]$ in the 8--94\% range, with a mean of 43\% (\DIFdelbegin %DIFDELCMD < \nameref{S14_Table}%%%
+\DIFdel{, }%DIFDELCMD < \nameref{S15_Table}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Table~H-I in~}\nameref{S4_File}\DIFaddend ).
 
 \section*{Discussion}
 \subsection*{Beneficial mutations are not necessarily adaptive}
@@ -557,7 +683,7 @@ At the phylogenetic scale, codon diversity at each site of a protein-coding DNA 
 These amino-acid fitness landscapes allow us to predict any mutation’s selection coefficient ($\Sphy$) along a protein-coding sequence.
 We have compared these selective effects to observations at the population level, and by doing so, we have confirmed that mutations predicted to be deleterious ($\SphyDel \coloneqq \Sphy < -1$) are generally purified away in extant populations.
 Our results concur with previous studies showing that SIFT scores~\cite{ng_sift_2003, vaser_sift_2016}, based on amino acid alignments across species, also inform on the deleterious fitness effects exerted at the population scale~\cite{chen_hunting_2021}.
-However, contrary to SIFT scores, our mutation-selection model is parameterized by a fitness function such that changes are directly interpretable as fitness effects (see also section~1 in~\nameref{S3_File}).
+However, contrary to SIFT scores, our mutation-selection model is parameterized by a fitness function such that changes are directly interpretable as fitness effects (see also section\DIFdelbegin \DIFdel{S5}\DIFdelend \DIFaddbegin \DIFadd{~1 in~}\nameref{S3_File}\DIFaddend ).
 In this regard, an interesting prediction of our model is that some deleterious mutations reach fixation due to genetic drift, while beneficial non-adaptive mutations restore states of higher fitness.
 We have tested this hypothesis and have found that a substantial part of these predicted non-adaptive mutations ($\SphyBen \coloneqq \Sphy > 1 $) are indeed beneficial in extant populations.
 We estimate that between 11 and 82\% of all beneficial mutations in mammalian populations are not adaptive.
@@ -583,11 +709,15 @@ In summary, under a changing fitness landscapes~\cite{mustonen_molecular_2008}, 
 
 \subsection*{Convergent adaptation}
 
-If there are several substitutions toward the same amino acid along the mammalian tree (section~1.1 in~\nameref{S2_File}), our mutation-selection model cannot formally distinguish between a scenario where mammals have fixed deleterious mutations that are reverted in several lineages, from more complex scenarios involving convergent adaptation across mammals.
+If there are several substitutions toward the same amino acid along the mammalian tree (\DIFdelbegin %DIFDELCMD < \nameref{S3_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{section~1.1 in~}\nameref{S2_File}\DIFaddend ), our mutation-selection model cannot formally distinguish between a scenario where mammals have fixed deleterious mutations that are reverted in several lineages, from more complex scenarios involving convergent adaptation across mammals.
 In a first scenario, repeated changes of fitness landscapes in the same direction could occur along several lineages, leading to repeated substitutions in multiple lineages (parallel or convergent adaptation).
 In a second scenario, an environmental change that occurred near the root of placental mammals ($\sim$100 Mys ago), to which extant populations are currently responding independently through weakly adaptive mutations, could also lead to repeated substitutions toward the same amino acids.
-Importantly, we would usually expect adaptive convergent mutations to be linked to particular converging phenotypes across mammals, and hence, they should not massively affect the whole genome as we find (Fig~C and Table~D in~\nameref{S2_File}).
-Moreover, after filtering out genes usually associated to recurrent adaptation (e.g. immune genes), we recover an even higher proportion of beneficial non-adaptive mutations (Table~D in~\nameref{S4_File}).
+Importantly, we would usually expect adaptive convergent mutations to be linked to particular converging phenotypes across mammals, and hence, they should not massively affect the whole genome as we find (\DIFdelbegin %DIFDELCMD < \nameref{S4_Table}%%%
+\DIFdel{,~}%DIFDELCMD < \nameref{S4_Fig}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Fig~C and Table~D in~}\nameref{S2_File}\DIFaddend ).
+Moreover, after filtering out genes usually associated to recurrent adaptation (e.g. immune genes), we recover an even higher proportion of beneficial non-adaptive mutations (\DIFdelbegin %DIFDELCMD < \nameref{S8_Table}%%%
+\DIFdelend \DIFaddbegin \DIFadd{Table~D in~}\nameref{S4_File}\DIFaddend ).
 For these reasons, we argue that the signal of predictable positive selection we recover in extant population is indeed mainly driven by non-adaptive evolution.
 
 \subsection*{The influence of effective population size}
@@ -677,11 +807,11 @@ The rate of substitution from codon $a$ to $b$ at a site $i$ is thus:
 q_{a \mapsto b}^{(i)} & = 0 \text{ if codons $a$ and $b$ are more than one mutation away,} \\
 q_{a \mapsto b}^{(i)} & = \mu_{a \mapsto b} \text{ if codons $a$ and $b$ are synonymous, and}\\
 q_{a \mapsto b}^{(i)} & = \mu_{a \mapsto b} \dfrac{F_b^{(i)} - F_a^{(i)}}{1 - \e^{F_a^{(i)} - F_b^{(i)}}} \text{ if codons $a$ and $b$ are non-synonymous}.
-\end{dcases}\label{eq:subs}
-\end{equation}
+\end{dcases}\DIFaddbegin \label{eq:subs}
+\DIFaddend \end{equation}
 
 Fitting the mutation-selection model on a multi-species sequence alignment leads to an estimation of the gene-wide $4 \times 4$ nucleotide mutation rate matrix ($\bm{\mu}$) as well as the $20$ amino-acid fitness landscape ($\bm{F^{(i)}}$) at each site $i$.
-The priors and full configuration of the model are given in~\nameref{S1_File} (section~1).
+The priors and full configuration of the model are given in\DIFdelbegin \DIFdel{section S1}\DIFdelend \DIFaddbegin \DIFadd{~}\nameref{S1_File} \DIFadd{(section~1)}\DIFaddend .
 From a technical perspective, the Bayesian estimation is a two-step procedure~\cite{rodrigue_bayesian_2008}.
 The first step is a data augmentation of the alignment, consisting in sampling a detailed substitution history along the phylogenetic tree for each site, given the current value of the model parameters.
 In the second step, the parameters of the model can then be directly updated by a Gibbs sampling procedure, conditional on the current substitution history.
@@ -732,8 +862,8 @@ From the reconstructed ancestral exome, all possible mutations were computed, we
 Finally, the mutational opportunities for synonymous mutations were computed as the total number of sites across the exome ($L_{\text{tot}}$) weighted by the proportion of synonymous mutations among all possible mutations as:
 
 \begin{equation}
-L_{\text{syn}} = L_{\text{tot}} \frac{\mu_{\text{syn}}}{\mu_{\text{tot}}}.\label{eq:syn-opp}
-\end{equation}
+L_{\text{syn}} = L_{\text{tot}} \frac{\mu_{\text{syn}}}{\mu_{\text{tot}}}.\DIFaddbegin \label{eq:syn-opp}
+\DIFaddend \end{equation}
 
 Similarly, for non-synonymous mutations, the total mutation rate for each class of selection $\Sphyclass \in \{\SphyDel, \SphyNeu, \SphyBen \}$, called $\mu\left( \Sphyclass \right)$, was estimated as the sum across all non-synonymous mutations if their selection coefficient at the phylogenetic scale is in the class $\Sphy \in \Sphyclass$.
 Accordingly, the mutational opportunities ($L \left( \Sphyclass \right)$) for each class of selection coefficient ($\Sphyclass$) was finally computed as the total number of sites across the exome ($L_{\text{tot}}$) weighted by the ratio of the aggregated mutations rates falling in the class $\mu\left( \Sphyclass \right)$:
@@ -849,31 +979,352 @@ Estimates for $u$ were averaged per species across the pedigree-based estimation
 For \textit{Ovis} we used the estimated $u$ of \textit{Capra}.
 For \textit{Equus}, we used $u$ as estimated in Orlando \textit{et al.}~\cite{orlando_recalibrating_2013} ($u=7.24\times10^{-9}$).
 Because a correlation must account for phylogenetic relationship and non-independence of samples, we fitted a Phylogenetic Generalized Linear Model in \textit{R} with the method \texttt{pgls} with default settings from the package \texttt{caper}~\cite{orme_caper_2013}.
-The mammalian dated tree was obtained from TimeTree~\cite{kumar_timetree_2017} and pruned to include only the species analysed in this study, with multi-furcation of the different populations from each species placed at the same divergence time as the species (section~2.1 in~\nameref{S3_File}).
+The mammalian dated tree was obtained from TimeTree~\cite{kumar_timetree_2017} and pruned to include only the species analysed in this study, with multi-furcation of the different populations from each species placed at the same divergence time as the species (section\DIFdelbegin \DIFdel{S4.1}\DIFdelend \DIFaddbegin \DIFadd{~2.1 in~}\nameref{S3_File}\DIFaddend ).
 
-\section*{Acknowledgements}
+\DIFdelbegin \section*{\DIFdel{Data availability}}
+%DIFAUXCMD
+\DIFdel{The data underlying this article are available at }%DIFDELCMD < \url{https://doi.org/10.5281/zenodo.7878953}%%%
+\DIFdel{.
+Snakemake pipeline, analysis scripts and documentation are available at }\href{https://github.com/ThibaultLatrille/SelCoeff}{\DIFdel{github.com/ThibaultLatrille/SelCoeff}}%DIFAUXCMD
+\DIFdel{.
+}%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\DIFdelend \section*{Acknowledgements}
 \label{sec:acknowledgment}
 We gratefully acknowledge the help of Mélodie Bastian, Nicolas Lartillot, Carina Farah Mugal, Laurent Duret, Alexandre Reymond, Daniele Silvestro and Nicolas Gambardella for their advice and reviews concerning this manuscript.
 This work was performed using the computing facilities of the CC LBBE/PRABI\@.
 This study makes use of data generated by the NextGen Consortium.
 
-\section*{Supporting information}
+\DIFdelbegin \section*{\DIFdel{Funding}}
+%DIFAUXCMD
+\DIFdel{This work was funded by Faculté de Biologie et de Médecine, Université de Lausanne (https://www.unil.ch; to TL, DAH and NS) and Agence Nationale de la Recherche (https://anr.fr/; grant ANR-19-CE12-0019 / HotRec to JJ). The funders did not play any role in the study design, data collection and analysis, decision to publish, or preparation of the manuscript.
+}%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\section*{\DIFdel{Competing interests}}
+%DIFAUXCMD
+\DIFdel{The authors have declared that no competing interests exist.
+}%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\section*{\DIFdel{Author information}}
+%DIFAUXCMD
+\DIFdel{Original idea: T.L.\ and J.J.;
+Model conception: T.L., J.J.\ and N.S.;
+Code: T.L.;
+Data analyses: T.L.\ and J.J.;
+Interpretation: T.L., J.J., D.A.H.\ and N.S.;
+First draft: T.L.\ and J.J.;
+Editing and revisions: T.L., J.J., D.A.H.\ and N.S.
+Project management and funding: N.S}%DIFDELCMD < \@%%%
+\DIFdel{.
+}%DIFDELCMD < 
+
+%DIFDELCMD < \newpage
+%DIFDELCMD < %%%
+\DIFdelend \section*{Supporting information}
 
 \paragraph*{S1 File.}
 \label{S1_File}
-{\bf Supplementary appendix on the parameterization of Mutation-selection codon models.} Contains 5 pages of supplementary information including 1 figure (Fig A).
+{\bf Supplementary appendix \DIFaddbegin \DIFadd{on the parameterization of Mutation-selection codon models}\DIFaddend .} Contains \DIFdelbegin \DIFdel{43 }\DIFdelend \DIFaddbegin \DIFadd{5 }\DIFaddend pages of supplementary information \DIFdelbegin \DIFdel{: model parameterization, supplementary figures (S1 Fig to S21 Fig)and supplementary tables (S1 Table to S15 Table)}\DIFdelend \DIFaddbegin \DIFadd{including 1 figure (Fig A)}\DIFaddend .
 
-\paragraph*{S2 File.}
-\label{S2_File}
-{\bf Supplementary appendix on the caracterization of non-adaptive beneficial mutations.} Contains 12 pages of supplementary information including 3 figures (Fig A to C) and 6 tables (Table A to F).
+\DIFdelbegin \subsection*{\DIFdel{List of Figures}}
+%DIFAUXCMD
+\DIFdelend \paragraph*{\DIFdelbegin \DIFdel{S1 Fig}\DIFdelend \DIFaddbegin \DIFadd{S2 File}\DIFaddend .}
+\DIFdelbegin %DIFDELCMD < \label{S1_Fig}
+%DIFDELCMD < %%%
+\DIFdelend \DIFaddbegin \label{S2_File}
+\DIFaddend {\bf \DIFdelbegin \DIFdel{Bayesian hierarchical model.}%DIFDELCMD < }
+%DIFDELCMD < 
 
-\paragraph*{S3 File.}
-\label{S3_File}
-{\bf Supplementary appendix on the contrast of selection at the phylogenetic and population-genetic scales.} Contains 7 pages of supplementary information including 8 figures (Fig A to H).
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S2 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S2_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Examples of $\bm{\SphyBen}$ mutation sites in }\textit{\DIFdel{Chlorocebus sabaeus}} %DIFAUXCMD
+\DIFdel{(reversions).}%DIFDELCMD < }
+%DIFDELCMD < 
 
-\paragraph*{S4 File.}
-\label{S4_File}
-{\bf Supplementary appendix on controls for estimating the proportion of beneficial mutations that are not adaptive.} Contains 21 pages of supplementary information including 9 figures (Fig A to I) and 9 tables (Table A to I).
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S3 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S3_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Examples of $\bm{\SphyBen}$ mutation sites in }\textit{\DIFdel{Chlorocebus sabaeus}}%DIFAUXCMD
+\DIFdel{.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S4 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S4_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Enrichment in $\bm{\SphyBen}$ SNPs across all gene ontology terms.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S5 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S5_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Estimation of selection at the population scale for $\bm{\SphyDel}$ mutations.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S6 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S6_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Estimation of selection at the population scale for $\bm{\SphyNeu}$ }\DIFdelend \DIFaddbegin \DIFadd{Supplementary appendix on the caracterization of non-adaptive beneficial }\DIFaddend mutations.} \DIFaddbegin \DIFadd{Contains 12 pages of supplementary information including 3 figures (Fig A to C) and 6 tables (Table A to F).
+}\DIFaddend 
+
+\DIFdelbegin \paragraph*{\DIFdel{S7 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S7_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Estimation of selection at the population scale for $\bm{\SphyBen}$ mutations.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S8 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S8_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Distribution of scaled selection coefficients ($\bm{\Sphy}$) .}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S9 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S9_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Tree used for PGLM (Phylogenetic Generalized Linear Model).
+}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\DIFdelend \paragraph*{\DIFdelbegin \DIFdel{S10 Fig}\DIFdelend \DIFaddbegin \DIFadd{S3 File}\DIFaddend .}
+\DIFdelbegin %DIFDELCMD < \label{S10_Fig}
+%DIFDELCMD < %%%
+\DIFdelend \DIFaddbegin \label{S3_File}
+\DIFaddend {\bf \DIFdelbegin \DIFdel{Relationship between the proportion of deleterious mutations ($\bm{\SpopDel}$) and effective population size.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S11 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S11_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Relationship between the proportion of deleterious mutations ($\bm{\SpopNeu}$) and effective population size}\DIFdelend \DIFaddbegin \DIFadd{Supplementary appendix on the contrast of selection at the phylogenetic and population-genetic scales}\DIFaddend .} \DIFaddbegin \DIFadd{Contains 7 pages of supplementary information including 8 figures (Fig A to H).
+}\DIFaddend 
+
+\DIFdelbegin \paragraph*{\DIFdel{S12 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S12_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Relationship between the proportion of deleterious mutations ($\bm{\SpopBen}$)and effective population size.
+}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\DIFdelend \paragraph*{\DIFdelbegin \DIFdel{S13 Fig}\DIFdelend \DIFaddbegin \DIFadd{S4 File}\DIFaddend .}
+\DIFdelbegin %DIFDELCMD < \label{S13_Fig}
+%DIFDELCMD < %%%
+\DIFdelend \DIFaddbegin \label{S4_File}
+\DIFaddend {\bf \DIFdelbegin \DIFdel{$\bm{\proba[\SphyBen\given \SpopBen ]}$ as a function of distance to the sister species.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S14 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S14_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Ratio of $\bm{\proba[\Sphy]}$ over $\bm{\proba[-\Sphy]}$ for polymorphisms of the African population of }\textit{\DIFdel{Homo sapiens}}%DIFAUXCMD
+\DIFdelend \DIFaddbegin \DIFadd{Supplementary appendix on controls for estimating the proportion of beneficial mutations that are not adaptive}\DIFaddend .} \DIFdelbegin %DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S15 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S15_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Proportion of non-adaptive mutations among beneficial ones ($\bm{\proba{[}\SphyBen\given \SpopBen {]}}$) estimated on synthetic site-frequency spectra.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S16 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S16_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Site-frequency spectrum when masking CpG transitions.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S17 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S17_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Including substitutions in the terminal lineage to estimate $\bm{\Spop}$.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S18 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S18_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{$\bm{\proba[\SphyBen\given \SpopBen ]}$ when including divergence to estimate $\bm{\Spop}$, as a function of distance to the sister species.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S19 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S19_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{$\bm{\proba [ \SpopDel ]}$ when fitting a single or three DFEs.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S20 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S20_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{$\bm{\proba [ \SpopNeu ]}$ when fitting a single or three DFEs.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S21 Fig.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S21_Fig}
+%DIFDELCMD < {\bf %%%
+\DIFdel{$\bm{\proba [ \SpopBen ]}$ when fitting a single or three DFEs.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < \newpage
+%DIFDELCMD < %%%
+\subsection*{\DIFdel{List of Tables}}
+%DIFAUXCMD
+\paragraph*{\DIFdel{S1 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S1_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Probability of mutations and substitutions to be $\bm{\SphyDel}$, $\bm{\SphyNeu}$ or $\bm{\SphyBen}$.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S2 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S2_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{$\bm{\dnds}$ for $\bm{\SphyDel}$, $\bm{\SphyNeu}$ or $\bm{\SphyBen}$.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S3 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S3_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{$\bm{\dnds}$ over-estimation due to non-adaptive beneficial mutations.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S4 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S4_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Gene ontology enrichment in $\bm{\SphyBen}$ SNPs.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S5 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S5_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Terms associated with deleterious mutations $\bm{\SphyDel}$.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S6 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S6_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Terms associated with non-adaptive beneficial mutations $\bm{\SphyBen}$.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S7 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S7_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Probability for beneficial mutations to be non-adaptive ($\bm{\proba[\SphyBen\given \SpopBen ]}$).}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S8 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S8_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{$\bm{\proba[\SphyBen\given \SpopBen ]}$ when masking CpG transitions.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S9 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S9_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Precision and recall when masking CpG transitions.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S10 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S10_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{$\bm{\proba[\SphyBen\given \SpopBen ]}$ excluding or not genes under adaptation.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S11 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S11_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{$\bm{\proba[\SphyBen\given \SpopBen ]}$ when including divergence to estimate $\bm{\Spop}$.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S12 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S12_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Precision and recall when including divergence to estimate $\bm{\Spop}$.
+}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S13 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S13_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{$\bm{\proba[\SphyBen\given \SpopBen ]}$ excluding or not genes under adaptation, when including divergence to estimate $\bm{\Spop}$.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S14 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S14_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{$\bm{\proba[\SphyBen\given \SpopBen ]}$ when using a discrete DFE to estimate $\bm{\Spop}$.}%DIFDELCMD < }
+%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\paragraph*{\DIFdel{S15 Table.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{S15_Table}
+%DIFDELCMD < {\bf %%%
+\DIFdel{Precision and recall when using a discrete DFE to estimate $\bm{\Spop}$.}%DIFDELCMD < }
+%DIFDELCMD < %%%
+\DIFdelend \DIFaddbegin \DIFadd{Contains 21 pages of supplementary information including 9 figures (Fig A to I) and 9 tables (Table A to I).
+}\DIFaddend 
 
 % Either type in your references using
 % \begin{thebibliography}{}
