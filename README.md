@@ -1,6 +1,7 @@
 **Mammalian protein-coding genes exhibit widespread beneficial mutations that are not adaptive**\
 Thibault Latrille, Julien Joseph, Diego Hartasánchez, Nicolas Salamin\
-_bioRxiv_, [doi.org/10.1101/2023.05.03.538864](https://doi.org/10.1101/2023.05.03.538864)
+_PLoS Genetics_, 2024,\
+[doi.org/10.1371/journal.pgen.1011536](https://doi.org/10.1371/journal.pgen.1011536)
 
 **Compiled binaries and instructions for BayesCode are available at [github.com/ThibaultLatrille/bayescode](https://github.com/ThibaultLatrille/bayescode)**
 
